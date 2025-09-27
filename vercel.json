@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm --prefix Neon-v2.4.0/ui run build",
+  "installCommand": "npm ci",
+  "framework": "nextjs",
+  "outputDirectory": "Neon-v2.4.0/ui/.next"
+}
+
