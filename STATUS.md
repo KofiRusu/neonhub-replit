@@ -80,7 +80,17 @@
 - ✅ Implementation roadmap created (3 sprints, 4-6 weeks)
 - 📄 See `UI_AUDIT.md` for full report
 
+## v2.5.0 Release (September 2025) ✅ (COMPLETED)
+- ✅ Trends Dashboard implemented (predictive analytics)
+- ✅ Complete v0.dev integration workflow
+- ✅ Clean workspace (325M, no node_modules)
+- ✅ Version tracking (CHANGELOG, VERSION, README)
+- ✅ 64% UI coverage (12/20 routes complete)
+- 📁 New directory: `Neon-v2.5.0/`
+- 🎯 Ready for Sprint 1: Billing + Team
+
 ## Deploy Readiness
-- Frontend: Vercel (root = Neon-v2.4.0/ui)
+- Frontend: Vercel (root = Neon-v2.5.0/ui) 🆕
 - Backend: Railway/Render (needs DATABASE_URL, OPENAI_API_KEY)
 - Database: Managed PostgreSQL (Supabase/Neon/Railway)
+- Version: v2.5.0 (September 2025)
