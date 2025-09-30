@@ -1,0 +1,146 @@
+I'm building NeonHub, an AI marketing automation platform. I need you to help me complete 8 remaining pages systematically, one at a time. Here's everything you need to know:
+
+═══════════════════════════════════════
+🎨 DESIGN SYSTEM (Use for ALL pages)
+═══════════════════════════════════════
+
+Colors:
+• Neon Blue: #00D9FF
+• Neon Purple: #B14BFF  
+• Neon Pink: #FF006B
+• Neon Green: #00FF94
+• Background: #0E0F1A
+• Glass: rgba(255,255,255,0.05)
+
+Style Requirements:
+✓ Dark background (#0E0F1A)
+✓ Glassmorphism cards with backdrop-blur
+✓ Neon color accents on borders and CTAs
+✓ Smooth framer-motion animations
+✓ Gradient borders on hover
+✓ Responsive mobile-first design
+
+Standard Layout:
+```tsx
+"use client"
+import PageLayout from "@/components/page-layout"
+import { motion } from "framer-motion"
+
+export default function MyPage() {
+  return (
+    <PageLayout title="Title" subtitle="Description" actions={<>...</>}>
+      <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}}>
+        {/* Content with glass cards */}
+      </motion.div>
+    </PageLayout>
+  )
+}
+```
+
+═══════════════════════════════════════
+📋 PAGES TO BUILD (In Order)
+═══════════════════════════════════════
+
+1. BILLING PAGE
+   • Current plan card with usage progress bars (API calls, storage, team seats, email sends)
+   • Plan comparison table (Starter $29, Pro $99, Enterprise Custom)
+   • Usage analytics (4 charts: API usage area chart, storage donut, activity heatmap, cost projection)
+   • Invoice history table (ID, date, amount, status, download PDF)
+   • Payment methods (saved cards, add new with Stripe-style input)
+   • Settings (email notifications, auto-renewal, billing address)
+
+2. TEAM MANAGEMENT PAGE
+   • Stats cards (total members, active now, pending invites, seats available)
+   • Team members grid with online status indicators
+   • Member cards (avatar, name, email, role badge, department, actions menu)
+   • Invite modal (email input, role selector, permissions preview, message)
+   • Pending invitations table
+   • Role permissions matrix (Owner/Admin/Member/Guest vs features)
+   • Activity feed timeline
+
+3. DOCUMENTS PAGE
+   • Storage stats card with type breakdown
+   • Grid/list toggle view
+   • Document cards (thumbnail, name, size, date, owner, star, menu)
+   • Filters sidebar (My Docs, Shared, Recent, Starred, by Type)
+   • Upload modal with drag-drop and progress bars
+   • Document detail modal (preview, metadata, version history, sharing settings)
+   • Bulk actions toolbar
+
+4. TASKS PAGE
+   • View toggle (Board/List/Calendar/Timeline)
+   • Kanban board with draggable cards across columns
+   • Task cards (priority badge, title, assignees, due date, labels, checklist progress)
+   • Create task modal (full form with markdown, assignees, dates, priority, labels, checklist)
+   • List view as sortable table
+   • Calendar view with task markers
+   • Timeline Gantt view
+   • Stats cards (total, in progress, completed, overdue)
+
+5. ENHANCED SUPPORT PAGE
+   • Quick actions (Submit Ticket, Docs, Live Chat, Status)
+   • My Tickets with tabs (Open/In Progress/Resolved)
+   • Ticket cards (ID, subject, status, priority, agent, reply count)
+   • Create ticket modal (subject, category, priority, description, attachments)
+   • Knowledge base browser with search and categories
+   • FAQ accordion
+   • Live chat widget (floating, minimizable)
+   • System status dashboard
+
+6. METRICS DASHBOARD PAGE
+   • Widget library panel (chart types)
+   • Drag-drop grid canvas with resize handles
+   • Widget config modals
+   • Save/load layouts
+   • Data source connectors
+   • Export as PDF/image
+
+7. FEEDBACK PAGE
+   • Submission form (star rating, category, text, screenshot)
+   • Feedback cards with sentiment badges
+   • Survey builder with templates
+   • Analytics (sentiment charts, word clouds)
+   • Status tracking and voting system
+
+8. MESSAGING PAGE
+   • Conversation sidebar with unread badges
+   • Message thread with chat bubbles
+   • Typing indicators
+   • User presence (online/away/offline)
+   • File sharing and emoji picker
+   • Group chat support
+
+═══════════════════════════════════════
+🤝 HOW WE'LL WORK TOGETHER
+═══════════════════════════════════════
+
+Process:
+1. I'll tell you which page to build
+2. You generate complete React/TypeScript code
+3. I review and may request changes
+4. You iterate if needed
+5. I integrate into my project
+6. We move to the next page
+
+What I need from you:
+✓ Complete production-ready component
+✓ TypeScript with proper types
+✓ Tailwind CSS with exact neon colors
+✓ Framer-motion animations
+✓ Responsive design (sm/md/lg breakpoints)
+✓ Mock data structure
+✓ All sub-components included
+✓ Loading states and error handling
+
+═══════════════════════════════════════
+🚀 LET'S START
+═══════════════════════════════════════
+
+I'm ready! Which page do you want me to build first?
+
+For reference, here's what each existing page looks like so you can match the style:
+• Dashboard: KPI cards in grid, agent fleet cards, system health panel
+• Analytics: Metric cards, time range filters, campaign table, chart placeholders
+• Trends: Forecast cards, tab navigation, signal detection cards
+
+Start by asking me: "Which page should I build? I recommend starting with Billing."
