@@ -394,3 +394,153 @@ NEXT_PUBLIC_STRIPE_LIVE=false
 - [ ] Verify "Sandbox" badge shows on /billing
 - [ ] Verify preview URL shows on /team invite
 - [ ] App remains functional
+
+---
+
+## 🚀 Production Deployment (neonhubecosystem.com)
+
+**Date:** October 3, 2025  
+**Status:** Documentation Complete - Ready for Manual Deployment  
+
+### Deployment Checklist
+
+**Pre-Deployment:**
+- [ ] All code merged to main branch
+- [ ] Builds passing (frontend + backend)
+- [ ] Secrets generated (openssl rand -base64 32)
+- [ ] Database provisioned (Vercel Postgres/Supabase)
+- [ ] Vercel account configured
+- [ ] Backend hosting chosen (Railway/Render recommended)
+
+**Backend Deployment (api.neonhubecosystem.com):**
+- [ ] Deploy to Railway/Render/Fly.io
+- [ ] Set all environment variables (see docs/PRODUCTION_ENV_GUIDE.md)
+- [ ] Run database migrations: `npx prisma migrate deploy`
+- [ ] Verify health: `curl https://api.neonhubecosystem.com/health`
+- [ ] Configure custom domain: api.neonhubecosystem.com
+- [ ] SSL certificate provisioned
+
+**Frontend Deployment (neonhubecosystem.com):**
+- [ ] Import project to Vercel from GitHub
+- [ ] Set root directory: Neon-v2.4.0/ui
+- [ ] Add all environment variables
+- [ ] Deploy and verify build succeeds
+- [ ] Add custom domain: neonhubecosystem.com
+- [ ] SSL certificate provisioned
+
+**DNS Configuration:**
+- [ ] Add A record: @ → Vercel IP (76.76.21.21)
+- [ ] Add CNAME: www → cname.vercel-dns.com
+- [ ] Add CNAME: api → [backend-provider-url]
+- [ ] Verify DNS propagation (dig commands)
+- [ ] HTTPS working on both domains
+
+**Stripe Configuration (Optional):**
+- [ ] Add Stripe test/live keys to backend
+- [ ] Create price IDs in Stripe dashboard
+- [ ] Configure webhook: https://api.neonhubecosystem.com/billing/webhook
+- [ ] Add webhook secret to backend env
+- [ ] Test checkout flow
+
+**Email Configuration (Optional):**
+- [ ] Add RESEND_API_KEY to backend
+- [ ] Configure sender domain in Resend
+- [ ] Test invitation flow
+- [ ] Verify emails delivered
+
+**Production Verification:**
+- [ ] Homepage loads: https://neonhubecosystem.com
+- [ ] API health: https://api.neonhubecosystem.com/health
+- [ ] All 20 routes accessible
+- [ ] WebSocket connects
+- [ ] Real-time updates work
+- [ ] Database queries succeed
+- [ ] No console errors
+- [ ] Lighthouse score > 90
+
+**Post-Deployment:**
+- [ ] Run production smoke tests
+- [ ] Monitor error logs (Sentry)
+- [ ] Check analytics (Vercel)
+- [ ] Verify billing works (Stripe)
+- [ ] Test team invites (email)
+- [ ] Document any issues
+- [ ] Update team
+
+### Deployment Resources
+
+**Guides:**
+- Complete guide: `docs/PRODUCTION_DEPLOYMENT.md`
+- Environment vars: `docs/PRODUCTION_ENV_GUIDE.md`
+- Quick start: `docs/QUICKSTART.md`
+- General deployment: `docs/DEPLOYMENT.md`
+
+**Commands:**
+```bash
+# Generate secrets
+openssl rand -base64 32
+
+# Test API locally with prod-like config
+DATABASE_URL="prod-url" npm run dev
+
+# Deploy via Vercel CLI
+cd Neon-v2.4.0/ui
+vercel --prod
+
+# Run smoke tests
+./scripts/qa-smoke-test.sh
+```
+
+### Rollback Plan
+
+**If deployment fails:**
+
+1. **Vercel UI:**
+   - Deployments → Find last working → Promote to Production
+   - Instant rollback (10 seconds)
+
+2. **Backend:**
+   - Railway/Render: Redeploy previous version
+   - Or: `git revert HEAD && git push`
+
+3. **Database:**
+   - Restore from backup if migrations failed
+   - Or: `npx prisma migrate resolve --rolled-back`
+
+4. **DNS:**
+   - No rollback needed (points to services)
+   - Services handle versioning
+
+**Rollback Time:** < 5 minutes for UI, < 2 minutes for API
+
+### Success Indicators
+
+✅ Both domains respond with 200 OK  
+✅ SSL certificates valid (check in browser)  
+✅ All pages load without errors  
+✅ Database queries working  
+✅ WebSocket connections stable  
+✅ Real-time features functioning  
+✅ Stripe showing correct mode (Live/Sandbox)  
+✅ Email invites working (or preview mode)  
+✅ No critical errors in Sentry  
+✅ Performance metrics acceptable
+
+### Known Limitations
+
+**Sandbox Mode (If Keys Not Added):**
+- Billing shows "Sandbox • Test Mode" badge
+- No actual Stripe charges
+- Team invites show preview URL instead of sending email
+- App fully functional for demo/testing
+
+**Database Integration:**
+- Team members using mock data (until User model added)
+- Stripe customer IDs not persisted (until User model updated)
+- Invite tokens in-memory (until database model added)
+
+**Future Enhancements:**
+- Add User/Team database models
+- Persist Stripe subscriptions
+- Add usage-based billing
+- Implement metered API billing
