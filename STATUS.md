@@ -613,9 +613,26 @@ curl http://localhost:3001/health
 
 ### Next Steps
 
-1. Follow `docs/PRODUCTION_DEPLOYMENT.md`
-2. Deploy to neonhubecosystem.com
-3. Verify with smoke tests
-4. Monitor for 24 hours
+1. Run preflight: `./scripts/preflight.sh`
+2. Follow Deploy Escort: `docs/DEPLOY_ESCORT.md` ⭐
+3. Or detailed guide: `docs/PRODUCTION_DEPLOYMENT.md`
+4. Verify with smoke tests
+5. Monitor for 24 hours
+
+### Deploy Escort (Quick Checklist)
+
+**Before deploying:**
+```bash
+./scripts/preflight.sh
+# Must show: ✅ All builds green
+```
+
+**Deploy in order:**
+1. Backend (Railway) → docs/DEPLOY_ESCORT.md Step 2
+2. Frontend (Vercel) → docs/DEPLOY_ESCORT.md Step 3
+3. DNS configuration → docs/DEPLOY_ESCORT.md Step 4
+4. Verify production → docs/DEPLOY_ESCORT.md Step 6
+
+**Estimated time:** 30-45 minutes
 
 **All work complete - ready for production deployment!** 🚀
