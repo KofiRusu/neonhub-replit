@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml)
 
+> **NOTE:** Update the CI badge URL above to use your actual GitHub org/repo name (replace `YOUR_ORG`).
+
 **Multi-Version Repository**
 
 ---
