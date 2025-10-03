@@ -14,6 +14,7 @@ import { authRouter } from "./routes/auth.js";
 import { jobsRouter } from "./routes/jobs.js";
 import { teamRouter } from "./routes/team.js";
 import { billingRouter } from "./routes/billing.js";
+import { stripeWebhookRouter } from "./routes/stripe-webhook.js";
 import { AppError } from "./lib/errors.js";
 
 // Load environment
@@ -56,6 +57,9 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+
+// Stripe webhook MUST be registered before express.json() to preserve raw body
+app.use(stripeWebhookRouter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

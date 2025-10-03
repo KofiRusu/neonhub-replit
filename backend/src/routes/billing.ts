@@ -1,7 +1,26 @@
 import { Router } from "express";
+import { z } from "zod";
 import { ok, fail } from "../lib/http";
+import { ValidationError } from "../lib/errors";
+import {
+  isStripeLive,
+  listInvoices,
+  createCheckoutSession,
+  createPortalSession,
+} from "../services/billing/stripe.js";
 
 export const billingRouter = Router();
+
+// Validation schemas
+const CheckoutSchema = z.object({
+  priceId: z.string().min(1, "Price ID is required"),
+  successUrl: z.string().url("Invalid success URL"),
+  cancelUrl: z.string().url("Invalid cancel URL"),
+});
+
+const PortalSchema = z.object({
+  returnUrl: z.string().url("Invalid return URL"),
+});
 
 // Mock billing data (until Stripe integration)
 const mockPlan = {
@@ -69,10 +88,22 @@ const mockInvoices = [
 // GET /billing/plan
 billingRouter.get("/billing/plan", async (req, res) => {
   try {
-    // TODO: Integrate with Stripe to get real subscription data
-    // const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    // Return plan with live flag
+    const plan = {
+      ...mockPlan,
+      live: isStripeLive(),
+    };
     
-    return res.json(ok(mockPlan));
+    // TODO: If Stripe configured, fetch real subscription
+    // const customerId = req.user?.stripeCustomerId;
+    // if (customerId && isStripeLive()) {
+    //   const subscription = await getSubscription(customerId);
+    //   if (subscription) {
+    //     plan = transformSubscriptionToPlan(subscription);
+    //   }
+    // }
+    
+    return res.json(ok(plan));
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return res.status(500).json(fail(message).body);
@@ -98,11 +129,97 @@ billingRouter.get("/billing/usage", async (req, res) => {
 // GET /billing/invoices
 billingRouter.get("/billing/invoices", async (req, res) => {
   try {
-    // TODO: Integrate with Stripe to get real invoices
-    // const invoices = await stripe.invoices.list({ customer: customerId });
+    // If Stripe configured, fetch real invoices
+    if (isStripeLive()) {
+      // TODO: Get customer ID from authenticated user
+      // const customerId = req.user?.stripeCustomerId;
+      // if (customerId) {
+      //   const stripeInvoices = await listInvoices(customerId);
+      //   const invoices = stripeInvoices.map(inv => ({
+      //     id: inv.id,
+      //     date: new Date(inv.created * 1000).toISOString().split('T')[0],
+      //     amount: inv.amount_paid / 100,
+      //     status: inv.status,
+      //     pdfUrl: inv.invoice_pdf || '#',
+      //   }));
+      //   return res.json(ok(invoices));
+      // }
+    }
     
     return res.json(ok(mockInvoices));
   } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+// POST /billing/checkout - Create Stripe checkout session
+billingRouter.post("/billing/checkout", async (req, res) => {
+  try {
+    if (!isStripeLive()) {
+      throw new ValidationError("Stripe not configured - billing is in sandbox mode");
+    }
+
+    const result = CheckoutSchema.safeParse(req.body);
+    if (!result.success) {
+      throw new ValidationError(result.error.errors[0].message);
+    }
+
+    const { priceId, successUrl, cancelUrl } = result.data;
+
+    // TODO: Get userId and email from authenticated user
+    const userId = "demo-user"; // req.user?.id
+    const userEmail = "demo@example.com"; // req.user?.email
+
+    const session = await createCheckoutSession({
+      priceId,
+      successUrl,
+      cancelUrl,
+      userId,
+      userEmail,
+    });
+
+    return res.json(ok({ url: session.url }));
+  } catch (e: unknown) {
+    if (e instanceof ValidationError) {
+      return res.status(400).json(fail(e.message).body);
+    }
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+// POST /billing/portal - Create billing portal session
+billingRouter.post("/billing/portal", async (req, res) => {
+  try {
+    if (!isStripeLive()) {
+      throw new ValidationError("Stripe not configured - billing is in sandbox mode");
+    }
+
+    const result = PortalSchema.safeParse(req.body);
+    if (!result.success) {
+      throw new ValidationError(result.error.errors[0].message);
+    }
+
+    const { returnUrl } = result.data;
+
+    // TODO: Get customer ID from authenticated user
+    const customerId = "cus_demo"; // req.user?.stripeCustomerId
+
+    if (!customerId) {
+      throw new ValidationError("No Stripe customer found for this user");
+    }
+
+    const session = await createPortalSession({
+      customerId,
+      returnUrl,
+    });
+
+    return res.json(ok({ url: session.url }));
+  } catch (e: unknown) {
+    if (e instanceof ValidationError) {
+      return res.status(400).json(fail(e.message).body);
+    }
     const message = e instanceof Error ? e.message : "Server error";
     return res.status(500).json(fail(message).body);
   }
