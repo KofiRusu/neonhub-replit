@@ -302,3 +302,95 @@ cd Neon-v2.5.0
 **Last QA Run:** Pending  
 **Production Deploy:** Pending Approval  
 **Next Review:** After QA execution
+
+---
+
+## 🔌 Live Service Wiring (Sprint 3 - Completed)
+
+**Date:** October 3, 2025  
+**Status:** Stripe & Email Integration Complete  
+
+### Stripe Billing (Live/Test Mode)
+
+**Setup Steps:**
+1. Get Stripe keys from https://dashboard.stripe.com/apikeys
+2. Add to backend/.env:
+   ```
+   STRIPE_SECRET_KEY=sk_test_... (or sk_live_...)
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   STRIPE_PRICE_ID_STARTER=price_...
+   STRIPE_PRICE_ID_PRO=price_...
+   STRIPE_PRICE_ID_ENTERPRISE=price_...
+   ```
+3. Add to UI/.env.local:
+   ```
+   NEXT_PUBLIC_STRIPE_LIVE=true
+   ```
+4. Configure webhook in Stripe: `https://your-api.com/billing/webhook`
+
+**Features:**
+- ✅ Live plan fetching (with sandbox fallback)
+- ✅ Real invoice history
+- ✅ Checkout session creation
+- ✅ Billing portal redirect
+- ✅ Webhook handling (subscription events, payments)
+- ✅ Dynamic badge (Live vs Sandbox)
+
+### Team Email Invitations (Resend)
+
+**Setup Steps:**
+1. Get API key from https://resend.com
+2. Add to backend/.env:
+   ```
+   RESEND_API_KEY=re_...
+   APP_BASE_URL=https://your-app.com
+   INVITE_REDIRECT_URL=https://your-app.com/auth/signin
+   ```
+3. Configure sender domain in Resend
+
+**Features:**
+- ✅ Email sending via Resend
+- ✅ Beautiful HTML email template
+- ✅ Unique token generation (UUID)
+- ✅ Token validation & expiry (7 days)
+- ✅ Accept flow (/team/accept?token=xxx)
+- ✅ Preview URL in mock mode
+- ✅ Graceful fallback when email not configured
+
+### Rollback Instructions
+
+**If issues arise:**
+```bash
+# Revert to previous stable state
+git revert HEAD~3..HEAD
+
+# Or disable live features via env:
+NEXT_PUBLIC_STRIPE_LIVE=false
+# Remove RESEND_API_KEY
+
+# App will fallback to sandbox/mock mode automatically
+```
+
+### Testing Checklist
+
+**Stripe (Test Mode):**
+- [ ] Set test keys in .env
+- [ ] Click "Upgrade" on /billing
+- [ ] Complete checkout with test card: 4242 4242 4242 4242
+- [ ] Verify redirect back to app
+- [ ] Click "Manage Billing" - portal opens
+- [ ] Check webhooks received in Stripe dashboard
+
+**Email Invites:**
+- [ ] Set RESEND_API_KEY in .env
+- [ ] Invite yourself on /team
+- [ ] Check email inbox
+- [ ] Click accept link in email
+- [ ] Verify redirect to signin
+- [ ] Check invitation marked as used
+
+**Mock Mode (No Keys):**
+- [ ] Remove Stripe/Resend keys
+- [ ] Verify "Sandbox" badge shows on /billing
+- [ ] Verify preview URL shows on /team invite
+- [ ] App remains functional
