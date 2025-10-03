@@ -98,10 +98,12 @@ const webhookLimiter = rateLimit({
 
 app.use(generalLimiter);
 
-// Stripe webhook MUST be registered before express.json() to preserve raw body
+// ⚠️  CRITICAL: Stripe webhook MUST be registered before express.json()
+// Raw body is required for signature verification
 app.use("/billing/webhook", webhookLimiter);
 app.use(stripeWebhookRouter);
 
+// JSON parsing (after webhook to preserve raw body)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
