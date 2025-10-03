@@ -1,5 +1,7 @@
 # NeonHub - AI-Powered Marketing Automation Platform
 
+[![CI](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml)
+
 **Multi-Version Repository**
 
 ---
@@ -68,6 +70,87 @@ cd backend
 npm install
 npm run dev
 ```
+
+---
+
+## 🚢 How to Deploy
+
+### Pre-Deployment Checks
+
+Run the preflight script to validate your local build:
+
+```bash
+./scripts/preflight.sh
+```
+
+This script will:
+- Build the backend (TypeScript compilation)
+- Build the UI (Next.js production build)
+- Run Prisma validation
+- Check for TypeScript errors
+
+### Vercel Deployment (UI)
+
+The `vercel.json` at the repository root is configured to deploy **Neon-v2.5.0/ui**.
+
+**Vercel Project Settings:**
+- **Framework Preset:** Next.js
+- **Node Version:** 20.x
+- **Install Command:** `pnpm i --frozen-lockfile`
+- **Build Command:** `pnpm build`
+- **Root Directory:** `Neon-v2.5.0/ui`
+
+**Required Environment Variables:**
+- `NEXT_PUBLIC_API_URL` - Backend API URL (e.g., `https://api.neonhubecosystem.com`)
+- `NEXTAUTH_URL` - Frontend URL (e.g., `https://neonhubecosystem.com`)
+- `NEXTAUTH_SECRET` - NextAuth secret key (generate with `openssl rand -base64 32`)
+- `SENTRY_DSN` - (Optional) Sentry error tracking
+
+See: [Production Environment Guide](./docs/PRODUCTION_ENV_GUIDE.md)
+
+### Backend Deployment
+
+**Docker Deployment:**
+```bash
+# Build and push container
+docker build -t neonhub-backend:latest ./backend
+docker push your-registry.com/neonhub-backend:latest
+
+# Deploy with your orchestrator (K8s, Docker Swarm, etc.)
+```
+
+**Database Migrations:**
+```bash
+# After deploying backend, run migrations
+pnpm -C backend prisma migrate deploy
+```
+
+**Required Environment Variables:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `CORS_ORIGIN` - Allowed origins (e.g., `https://neonhubecosystem.com`)
+- `OPENAI_API_KEY` - OpenAI API key for content generation
+- `JWT_SECRET` - JWT signing secret
+
+See: [Backend Environment Template](./backend/ENV_TEMPLATE.md)
+
+### Post-Deployment Verification
+
+**API Health Check:**
+```bash
+API_URL=https://api.neonhubecosystem.com ./scripts/smoke-api.sh
+```
+
+**Manual Verification:**
+- UI loads: `/dashboard`, `/analytics`, `/trends`
+- API `/health` endpoint returns 200
+- Metrics summary is non-empty
+- Team invite flow works
+
+### Additional Resources
+
+- [Deploy Escort Guide](./docs/DEPLOY_ESCORT.md) - Step-by-step deployment walkthrough
+- [Production Environment Guide](./docs/PRODUCTION_ENV_GUIDE.md) - Environment variable reference
+- [Release Notes v1.0.0](./release/RELEASE_NOTES_v1.0.0.md) - Latest release information
 
 ---
 
