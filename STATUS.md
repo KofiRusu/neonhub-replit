@@ -94,3 +94,12 @@
 - Backend: Railway/Render (needs DATABASE_URL, OPENAI_API_KEY)
 - Database: Managed PostgreSQL (Supabase/Neon/Railway)
 - Version: v2.5.0 (September 2025)
+
+## Cleanup History
+
+- **2025-10-03**: Repository cleanup completed
+  - Removed ~671MB of build artifacts
+  - Organized 17 documentation files into /docs
+  - Created root README.md for monorepo navigation
+  - Verified builds: UI ✅, Backend ✅
+  - Branch: chore/cleanup-20251003
