@@ -77,6 +77,8 @@ npm run dev
 
 ## 🚢 How to Deploy
 
+> **NOTE:** Update the CI badge org/repo after first push, and follow [docs/POST_MERGE_DEPLOY.md](./docs/POST_MERGE_DEPLOY.md) for complete production go-live steps.
+
 ### Pre-Deployment Checks
 
 Run the preflight script to validate your local build:
