@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm --prefix Neon-v2.4.0/ui run build",
-  "installCommand": "npm ci",
   "framework": "nextjs",
-  "outputDirectory": "Neon-v2.4.0/ui/.next"
+  "installCommand": "pnpm i --frozen-lockfile",
+  "buildCommand": "pnpm -C Neon-v2.5.0/ui build",
+  "outputDirectory": "Neon-v2.5.0/ui/.next"
 }
 
