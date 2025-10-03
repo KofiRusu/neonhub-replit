@@ -36,19 +36,42 @@ app.use(helmet({
   contentSecurityPolicy: env.NODE_ENV === "production" ? undefined : false,
 }));
 
-// CORS with allowlist
-const corsOrigins = process.env.CORS_ORIGIN?.split(",") || [
+// CORS with allowlist (production-ready)
+const corsOrigins = process.env.CORS_ORIGIN?.split(",").map(o => o.trim()) || [
   env.NEXTAUTH_URL || "http://127.0.0.1:3000",
   "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://neonhubecosystem.com",
+  "https://*.vercel.app", // Note: Wildcard may need expansion in production
 ];
 
 app.use(cors({
-  origin: corsOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin matches allowed list or wildcard patterns
+    const allowed = corsOrigins.some(allowedOrigin => {
+      if (allowedOrigin === origin) return true;
+      if (allowedOrigin.includes("*")) {
+        const pattern = allowedOrigin.replace("*", ".*");
+        return new RegExp(`^${pattern}$`).test(origin);
+      }
+      return false;
+    });
+
+    if (allowed) {
+      callback(null, true);
+    } else {
+      logger.warn({ origin }, "CORS blocked origin");
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
 
-// Rate limiting
-const limiter = rateLimit({
+// Rate limiting (general)
+const generalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "60000"),
   max: parseInt(process.env.RATE_LIMIT_MAX || "120"),
   message: { error: "Too many requests, please try again later" },
@@ -56,9 +79,27 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use(limiter);
+// Stricter rate limiting for billing/team
+const strictLimiter = rateLimit({
+  windowMs: 60000, // 1 minute
+  max: 30,
+  message: { error: "Too many requests to sensitive endpoints, please slow down" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Very strict for webhooks
+const webhookLimiter = rateLimit({
+  windowMs: 60000,
+  max: 100, // Allow more for legitimate webhook traffic
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(generalLimiter);
 
 // Stripe webhook MUST be registered before express.json() to preserve raw body
+app.use("/billing/webhook", webhookLimiter);
 app.use(stripeWebhookRouter);
 
 app.use(express.json());
@@ -76,6 +117,10 @@ app.use(contentRouter);
 app.use(metricsRouter);
 app.use(authRouter);
 app.use(jobsRouter);
+
+// Sensitive routes with stricter rate limiting
+app.use("/team", strictLimiter);
+app.use("/billing", strictLimiter);
 app.use(teamRouter);
 app.use(billingRouter);
 
