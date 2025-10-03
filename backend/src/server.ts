@@ -12,6 +12,8 @@ import { contentRouter } from "./routes/content.js";
 import { metricsRouter } from "./routes/metrics.js";
 import { authRouter } from "./routes/auth.js";
 import { jobsRouter } from "./routes/jobs.js";
+import { teamRouter } from "./routes/team.js";
+import { billingRouter } from "./routes/billing.js";
 import { AppError } from "./lib/errors.js";
 
 // Load environment
@@ -70,6 +72,8 @@ app.use(contentRouter);
 app.use(metricsRouter);
 app.use(authRouter);
 app.use(jobsRouter);
+app.use(teamRouter);
+app.use(billingRouter);
 
 // 404 handler
 app.use((_req, res) => {
