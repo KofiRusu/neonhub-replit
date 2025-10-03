@@ -14,7 +14,7 @@ let stripe: Stripe | null = null;
 
 if (isStripeConfigured) {
   stripe = new Stripe(stripeKey!, {
-    apiVersion: "2024-11-20.acacia",
+    apiVersion: "2025-09-30.clover",
     typescript: true,
   });
   logger.info("Stripe initialized in test mode");
