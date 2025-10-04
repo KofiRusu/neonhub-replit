@@ -25,5 +25,5 @@ jobs:
         with: { node-version: 20, cache: 'pnpm' }
       - run: corepack enable
       - run: corepack prepare pnpm@latest --activate
-      - run: pnpm -C Neon-v2.5.0/ui i --frozen-lockfile || pnpm -C Neon-v2.4.0/ui i --frozen-lockfile
-      - run: pnpm -C Neon-v2.5.0/ui build || pnpm -C Neon-v2.4.0/ui build
+      - run: pnpm -C Neon-v2.5.0/ui i --frozen-lockfile
+      - run: pnpm -C Neon-v2.5.0/ui build
