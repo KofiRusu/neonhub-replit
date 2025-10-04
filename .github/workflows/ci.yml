@@ -12,8 +12,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
       - run: pnpm -C backend install --frozen-lockfile
       - run: pnpm -C backend build
       - run: pnpm -C backend test || true
@@ -23,7 +26,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
       - run: pnpm -C Neon-v2.5.0/ui install --frozen-lockfile
       - run: pnpm -C Neon-v2.5.0/ui build
