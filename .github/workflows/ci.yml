@@ -11,10 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'pnpm' }
-      - run: corepack enable
-      - run: corepack prepare pnpm@latest --activate
-      - run: pnpm -C backend i --frozen-lockfile
+        with: { node-version: 20 }
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - run: pnpm -C backend install --frozen-lockfile
       - run: pnpm -C backend build
       - run: pnpm -C backend test || true
   ui:
@@ -22,8 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'pnpm' }
-      - run: corepack enable
-      - run: corepack prepare pnpm@latest --activate
-      - run: pnpm -C Neon-v2.5.0/ui i --frozen-lockfile
+        with: { node-version: 20 }
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - run: pnpm -C Neon-v2.5.0/ui install --frozen-lockfile
       - run: pnpm -C Neon-v2.5.0/ui build
