@@ -4,7 +4,11 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import Providers from "@/providers/Providers"
+import Providers from "../providers/Providers"
+
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
 
 const inter = Inter({ subsets: ["latin"] })
 
