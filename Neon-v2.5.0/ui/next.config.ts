@@ -94,20 +94,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: ['localhost:3000', '*.vercel.app'],
     },
-    // Skip prerender errors in client components
-    missingSuspenseWithCSRBailout: false,
-  },
-  
-  // Disable static optimization for dynamic pages
-  // This app is a dashboard with client-side data fetching
-  staticPageGenerationTimeout: 120,
-  
-  // Skip failing prerender to allow build to complete
-  // This is a dashboard with runtime data - prerendering will fail
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000', '*.vercel.app'],
-    },
   },
 };
 
