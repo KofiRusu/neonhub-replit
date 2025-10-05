@@ -28,4 +28,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'Neon-v2.5.0/ui/package-lock.json'
       - run: npm ci --prefix Neon-v2.5.0/ui
-      - run: npm run build --prefix Neon-v2.5.0/ui
+      - name: Build UI
+        run: npm run build --prefix Neon-v2.5.0/ui
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/neonhub"
