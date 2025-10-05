@@ -4,7 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { api } from "@/lib/api-client"
+import Providers from "@/providers/Providers"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 }
 
-function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
@@ -70,13 +70,13 @@ function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )
 }
-
-export default api.withTRPC(RootLayout)
