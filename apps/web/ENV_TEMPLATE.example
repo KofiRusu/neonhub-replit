@@ -1,0 +1,19 @@
+# Web App Environment Variables
+# Copy to .env.local
+
+# API
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# Auth
+NEXTAUTH_SECRET=replace_me_with_random_32_char_string
+NEXTAUTH_URL=http://localhost:3000
+
+# Site
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Stripe (Public Key)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+
+# Prisma (for client generation)
+DATABASE_URL=postgresql://user:pass@localhost:5432/neonhub?schema=public
+

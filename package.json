@@ -1,27 +1,37 @@
 {
   "name": "neonhub",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "private": true,
-  "description": "NeonHub - AI-Powered Marketing Automation Platform",
+  "description": "NeonHub v3.0 - AI-Powered Marketing Automation Platform",
   "workspaces": [
-    "backend",
-    "Neon-v2.5.0/backend"
+    "apps/api",
+    "apps/web"
   ],
   "scripts": {
+    "postinstall": "npm run prisma:generate",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/api",
+    "build": "npm run prisma:generate && npm run build --workspaces --if-present",
+    "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\"",
+    "start": "concurrently \"npm run start --workspace=apps/api\" \"npm run start --workspace=apps/web\"",
     "verify": "npm run lint && npm run typecheck && npm run test",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
+    "test:autonomous": "node scripts/autonomous-testing-agent.js",
+    "validate:api": "node scripts/api-contract-validator.js",
+    "fine-tune": "node scripts/fine-tuning-master.js",
+    "quality:check": "npm run lint && npm run typecheck && npm run test:autonomous",
     "format": "npm run format --workspaces --if-present",
-    "format:check": "npm run format:check --workspaces --if-present",
+    "format:check": "npm run format --workspaces --if-present",
     "prepare": "husky"
   },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
+  "packageManager": "npm@10.8.2",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "husky": "^9.0.11",
     "prettier": "^3.3.3"
   }

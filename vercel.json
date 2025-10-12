@@ -1,7 +1,21 @@
 {
+  "version": 2,
+  "buildCommand": "cd apps/web && npm run build",
+  "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "installCommand": "pnpm i --frozen-lockfile",
-  "buildCommand": "pnpm -C Neon-v2.5.0/ui build",
-  "outputDirectory": "Neon-v2.5.0/ui/.next"
+  "installCommand": "npm install && npm run prisma:generate",
+  "devCommand": "cd apps/web && npm run dev",
+  "regions": ["iad1"],
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url",
+    "NEXT_PUBLIC_API_URL": "@next-public-api-url",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "@stripe-publishable-key"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "@database-url"
+    }
+  }
 }
-
