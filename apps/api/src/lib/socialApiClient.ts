@@ -27,7 +27,7 @@ export class SocialApiClient {
   /**
    * Fetch trending topics from Twitter
    */
-  async fetchTwitterTrends(location: string = 'worldwide'): Promise<TrendData[]> {
+  async fetchTwitterTrends(_location: string = 'worldwide'): Promise<TrendData[]> {
     // In development, return mock data if no API key
     if (!this.twitterBearerToken || process.env.NODE_ENV === 'development') {
       return this.getMockTwitterData();

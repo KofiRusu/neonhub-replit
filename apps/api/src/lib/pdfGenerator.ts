@@ -4,7 +4,6 @@
  */
 
 import PDFDocument from 'pdfkit';
-import { Readable } from 'stream';
 
 export interface ProposalData {
   clientName: string;

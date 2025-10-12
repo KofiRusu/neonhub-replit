@@ -67,17 +67,17 @@ model VerificationToken {
 }
 
 model ContentDraft {
-  id        String   @id @default(cuid())
-  title     String
-  topic     String
-  body      String   @db.Text
-  tone      String   @default("professional")
-  audience  String?
-  status    String   @default("draft") // draft, generated, published
+  id          String   @id @default(cuid())
+  title       String
+  topic       String
+  body        String   @db.Text
+  tone        String   @default("professional")
+  audience    String?
+  status      String   @default("draft") // draft, generated, published
   createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([createdById])
   @@index([status])
@@ -86,17 +86,17 @@ model ContentDraft {
 }
 
 model AgentJob {
-  id        String   @id @default(cuid())
-  agent     String   // content, seo, email, social, support, trend
-  input     Json
-  output    Json?
-  status    String   @default("queued") // queued, running, success, error
-  error     String?  @db.Text
-  metrics   Json?    // { duration: number, tokens: number, etc }
+  id          String   @id @default(cuid())
+  agent       String // content, seo, email, social, support, trend
+  input       Json
+  output      Json?
+  status      String   @default("queued") // queued, running, success, error
+  error       String?  @db.Text
+  metrics     Json? // { duration: number, tokens: number, etc }
   createdById String?
-  createdBy   User?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([agent])
   @@index([status])
@@ -106,8 +106,8 @@ model AgentJob {
 
 model MetricEvent {
   id        String   @id @default(cuid())
-  type      String   // page_view, click, conversion, agent_run, etc
-  meta      Json     // flexible metadata
+  type      String // page_view, click, conversion, agent_run, etc
+  meta      Json // flexible metadata
   createdAt DateTime @default(now())
 
   @@index([type])

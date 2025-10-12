@@ -74,7 +74,7 @@ export class LeadScraper {
       // Generic selectors - adapt for specific directories
       const companyElements = document.querySelectorAll('.company, .listing, [data-company]');
       
-      companyElements.forEach((element) => {
+      companyElements.forEach((element: Element) => {
         const nameEl = element.querySelector('h2, h3, .company-name, [data-name]');
         const websiteEl = element.querySelector('a[href*="http"], .website');
         const industryEl = element.querySelector('.industry, .category, [data-industry]');

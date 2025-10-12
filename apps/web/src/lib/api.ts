@@ -31,6 +31,6 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
   if (contentType.includes("application/json")) {
     return (await res.json()) as T;
   }
-  // @ts-expect-error caller is responsible for correct T if not JSON
+  // Caller is responsible for correct T if not JSON
   return (await res.text()) as T;
 }

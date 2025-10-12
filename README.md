@@ -1,264 +1,411 @@
-# NeonHub - AI-Powered Marketing Automation Platform
+# NeonHub v3.0 - AI-Powered Marketing Automation Platform
 
-[![CI](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_ORG/neonhub/actions/workflows/ci.yml)
+[![CI](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml/badge.svg)](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml)
 
-> **NOTE:** Update the CI badge URL above to use your actual GitHub org/repo name (replace `YOUR_ORG`).
-
-**Multi-Version Repository**
+**NeonHub** is an AI-powered marketing automation platform built with Next.js 15, Express, Prisma, and OpenAI. This is a monorepo containing both the API backend and web frontend.
 
 ---
 
-## 📁 Repository Structure
+## 📁 Project Structure
 
-This repository contains multiple versions and components of the NeonHub platform:
-
-### 🚀 Production Versions
-
-- **`/Neon-v2.5.0/`** - Latest stable version (v2.5.0) 
-  - Full-stack application with enhanced UI/UX
-  - Vercel deployment ready
-  - Complete documentation
-  - [Read more →](./Neon-v2.5.0/README.md)
-
-- **`/Neon-v2.4.0/`** - Previous stable version (v2.4.0)
-  - Production frontend
-  - Proven stability
-  
-- **`/backend/`** - Shared backend API
-  - Node.js + Express + TypeScript
-  - Prisma ORM + PostgreSQL
-  - AI-powered content generation
-
-### 📂 Legacy/Archive
-
-- **`/Neon0.2/`** - Early version (v0.2)
-- **`/AutoOpt/`** - Auto-optimization tools
-- **`/frontend/`** - Standalone frontend (deprecated)
-- **`/_archive/`** - Archived build artifacts and old files
-
-### 🛠️ Infrastructure
-
-- **`/.github/`** - CI/CD workflows (GitHub Actions)
-- **`/scripts/`** - Automation and deployment scripts
-- **`/docs/`** - Comprehensive documentation
-- **`docker-compose.yml`** - Full-stack Docker orchestration
-- **`vercel.json`** - Vercel deployment configuration
+```
+NeonHub/
+├── apps/
+│   ├── api/              # Backend API (Express + Prisma)
+│   └── web/              # Frontend Web App (Next.js 15)
+├── docs/                 # Documentation
+├── scripts/              # Build and deployment scripts
+├── _archive/             # Legacy versions (v2.4.0, v2.5.0)
+└── package.json          # Workspace root
+```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Local Development)
 
-### Option 1: Latest Version (v2.5.0)
+### Prerequisites
+
+- **Node.js** 20.x or higher
+- **PostgreSQL** 14+ running locally
+- **npm** 10+
+
+### 1. Install Dependencies
 
 ```bash
-cd Neon-v2.5.0
-./scripts/setup.sh
+npm install --ignore-scripts
 ```
 
-See detailed guide: [Neon-v2.5.0/QUICKSTART.md](./Neon-v2.5.0/QUICKSTART.md)
+### 2. Set Up Environment Variables
 
-### Option 2: Docker (Full Stack)
+Create `.env` files from templates:
 
 ```bash
-docker-compose up -d
+# Root (optional - for shared config)
+cp ENV_TEMPLATE.example .env
+
+# API
+cp apps/api/ENV_TEMPLATE.example apps/api/.env
+
+# Web
+cp apps/web/ENV_TEMPLATE.example apps/web/.env.local
 ```
 
-Access at: http://localhost:3000
+**Required Environment Variables:**
 
-### Option 3: Backend Only
+#### API (`apps/api/.env`)
+```env
+DATABASE_URL=postgresql://youruser@localhost:5432/neonhub?schema=public
+PORT=3001
+NODE_ENV=development
+OPENAI_API_KEY=sk-proj-your-key-here
+STRIPE_SECRET_KEY=sk_test_your-key-here
+STRIPE_WEBHOOK_SECRET=whsec_your-secret-here
+RESEND_API_KEY=re_your-key-here
+CORS_ORIGINS=http://localhost:3000
+```
+
+#### Web (`apps/web/.env.local`)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXTAUTH_SECRET=your-random-32-char-secret
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your-key-here
+DATABASE_URL=postgresql://youruser@localhost:5432/neonhub?schema=public
+GITHUB_ID=your_github_oauth_client_id
+GITHUB_SECRET=your_github_oauth_client_secret
+```
+
+> **Tip:** Generate NEXTAUTH_SECRET with: `openssl rand -base64 32`
+
+### 3. Initialize Database
 
 ```bash
-cd backend
-npm install
+# Create the database (PostgreSQL must be running)
+createdb neonhub
+
+# Run migrations
+cd apps/api
+npx prisma migrate dev --name initial
+
+# Seed with demo data
+npm run seed
+```
+
+### 4. Start Development Servers
+
+**Terminal 1 - API:**
+```bash
+cd apps/api
 npm run dev
 ```
 
----
-
-## 🚢 How to Deploy
-
-> **NOTE:** Update the CI badge org/repo after first push, and follow [docs/POST_MERGE_DEPLOY.md](./docs/POST_MERGE_DEPLOY.md) for complete production go-live steps.
-
-### Pre-Deployment Checks
-
-Run the preflight script to validate your local build:
-
+**Terminal 2 - Web:**
 ```bash
-./scripts/preflight.sh
+cd apps/web
+npm run dev
 ```
 
-This script will:
-- Build the backend (TypeScript compilation)
-- Build the UI (Next.js production build)
-- Run Prisma validation
-- Check for TypeScript errors
+**Access the app:**
+- Web UI: http://localhost:3000
+- API: http://localhost:3001
+- API Health: http://localhost:3001/health
 
-### Vercel Deployment (UI)
+### 5. Verify Setup
 
-The `vercel.json` at the repository root is configured to deploy **Neon-v2.5.0/ui**.
-
-**Vercel Project Settings:**
-- **Framework Preset:** Next.js
-- **Node Version:** 20.x
-- **Install Command:** `pnpm i --frozen-lockfile`
-- **Build Command:** `pnpm build`
-- **Root Directory:** `Neon-v2.5.0/ui`
-
-**Required Environment Variables:**
-- `NEXT_PUBLIC_API_URL` - Backend API URL (e.g., `https://api.neonhubecosystem.com`)
-- `NEXTAUTH_URL` - Frontend URL (e.g., `https://neonhubecosystem.com`)
-- `NEXTAUTH_SECRET` - NextAuth secret key (generate with `openssl rand -base64 32`)
-- `SENTRY_DSN` - (Optional) Sentry error tracking
-
-See: [Production Environment Guide](./docs/PRODUCTION_ENV_GUIDE.md)
-
-### Backend Deployment
-
-**Docker Deployment:**
 ```bash
-# Build and push container
-docker build -t neonhub-backend:latest ./backend
-docker push your-registry.com/neonhub-backend:latest
+# Check API health
+curl http://localhost:3001/health
 
-# Deploy with your orchestrator (K8s, Docker Swarm, etc.)
+# Should return:
+# {"status":"ok","db":true,"ws":true,"version":"1.0.0"}
 ```
-
-**Database Migrations:**
-```bash
-# After deploying backend, run migrations
-pnpm -C backend prisma migrate deploy
-```
-
-**Required Environment Variables:**
-- `DATABASE_URL` - PostgreSQL connection string
-- `CORS_ORIGIN` - Allowed origins (e.g., `https://neonhubecosystem.com`)
-- `OPENAI_API_KEY` - OpenAI API key for content generation
-- `JWT_SECRET` - JWT signing secret
-
-See: [Backend Environment Template](./backend/ENV_TEMPLATE.md)
-
-### Post-Deployment Verification
-
-**API Health Check:**
-```bash
-API_URL=https://api.neonhubecosystem.com ./scripts/smoke-api.sh
-```
-
-**Manual Verification:**
-- UI loads: `/dashboard`, `/analytics`, `/trends`
-- API `/health` endpoint returns 200
-- Metrics summary is non-empty
-- Team invite flow works
-
-### Additional Resources
-
-- [Deploy Escort Guide](./docs/DEPLOY_ESCORT.md) - Step-by-step deployment walkthrough
-- [Production Environment Guide](./docs/PRODUCTION_ENV_GUIDE.md) - Environment variable reference
-- [Release Notes v1.0.0](./release/RELEASE_NOTES_v1.0.0.md) - Latest release information
 
 ---
 
-## 📚 Documentation
+## 🧪 Development Commands
 
-### Getting Started
-- [Quick Start Guide](./docs/QUICKSTART.md)
-- [Setup Instructions](./docs/SETUP.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
+### Root (Workspace)
+```bash
+npm run build          # Build all apps
+npm run dev            # Start all apps in dev mode
+npm run lint           # Lint all apps
+npm run typecheck      # Type-check all apps
+npm run verify         # Run all quality checks
+```
 
-### Development
-- [v0.dev Integration](./docs/V0_WORKFLOW_GUIDE.md)
-- [Contributing Guidelines](./Neon-v2.5.0/CONTRIBUTING.md)
-- [Security Policy](./Neon-v2.5.0/SECURITY.md)
+### API (`apps/api/`)
+```bash
+npm run dev            # Start dev server (port 3001)
+npm run build          # Build for production
+npm run start          # Start production server
+npm run lint           # Run ESLint
+npm run typecheck      # Run TypeScript checks
+npm run test           # Run Jest tests
+npm run seed           # Seed database with demo data
 
-### Project Status
-- [Current Status](./STATUS.md)
-- [Implementation Progress](./docs/IMPLEMENTATION_PROGRESS.md)
-- [UI Audit](./docs/UI_AUDIT.md)
-- [Release Notes](./docs/RELEASE_v2.5.0.md)
+# Prisma commands
+npx prisma studio              # Open Prisma Studio GUI
+npx prisma migrate dev         # Create & apply migration
+npx prisma migrate deploy      # Apply migrations (production)
+npx prisma generate            # Generate Prisma Client
+```
+
+### Web (`apps/web/`)
+```bash
+npm run dev            # Start dev server (port 3000)
+npm run build          # Build for production
+npm run start          # Start production server
+npm run lint           # Run Next.js linter
+npm run typecheck      # Run TypeScript checks
+```
 
 ---
 
-## 🎯 Current Focus: Neon v2.5.0
+## 🤖 AI Agents
 
-The **Neon-v2.5.0** directory contains the latest production-ready version with:
+NeonHub includes 5 powerful AI agents for marketing automation:
 
-✅ 12/20 routes complete (60% UI coverage)  
-✅ Vercel deployment configuration  
-✅ Docker containerization  
-✅ GitHub Actions CI/CD  
-✅ Comprehensive documentation  
-✅ v0.dev integration guide
+1. **AdAgent** - Campaign creation & optimization
+2. **InsightAgent** - Data analysis & predictions  
+3. **DesignAgent** - AI-powered design generation
+4. **TrendAgent** - Social media trend monitoring
+5. **OutreachAgent** - B2B lead generation & outreach
 
-**Next Steps:** Complete remaining 8 routes using v0.dev → [Guide](./docs/V0_WORKFLOW_GUIDE.md)
+**📖 See [README_AGENTS.md](./README_AGENTS.md) for complete agent documentation, API endpoints, and usage examples.**
 
 ---
 
 ## 🏗️ Architecture
 
-```
-NeonHub/
-├── Neon-v2.5.0/          # ⭐ Latest version
-│   ├── ui/               # Next.js 15 frontend
-│   ├── backend/          # Node.js API
-│   └── [docs, config]
-│
-├── backend/              # Shared backend (can be used independently)
-│   ├── src/             # TypeScript source
-│   ├── prisma/          # Database schema
-│   └── package.json
-│
-├── docs/                 # Central documentation
-├── scripts/              # Automation scripts
-├── .github/              # CI/CD workflows
-└── docker-compose.yml    # Full-stack orchestration
-```
+### Backend (API)
 
----
+- **Framework:** Express.js
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **AI:** OpenAI GPT-4 + DALL-E for content & design generation
+- **Real-time:** Socket.io for live updates
+- **Email:** Resend API
+- **Payments:** Stripe
+- **Web Scraping:** Puppeteer for lead generation
+- **PDF Generation:** PDFKit for proposals
+- **Social APIs:** Twitter & Reddit for trend monitoring
+- **Monitoring:** Sentry (optional)
 
-## 🛠️ Tech Stack
+**Key Features:**
+- RESTful API with Express
+- Type-safe database queries with Prisma
+- 5 AI Agents (Ad, Insight, Design, Trend, Outreach)
+- WebSocket support for real-time updates
+- Rate limiting and CORS protection
+- Health checks and monitoring
 
-### Frontend
+### Frontend (Web)
+
 - **Framework:** Next.js 15 (App Router)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS + Glassmorphism
-- **UI Library:** shadcn/ui
-- **State:** React Query + Zustand
-- **Auth:** NextAuth.js
+- **Styling:** Tailwind CSS
+- **UI Components:** shadcn/ui + Radix UI
+- **Auth:** NextAuth.js with GitHub OAuth
+- **State:** React Query (@tanstack/react-query)
+- **Real-time:** Socket.io client
+- **Theme:** Dark mode with next-themes
 
-### Backend
-- **Runtime:** Node.js 20+
-- **Framework:** Express
-- **Language:** TypeScript
-- **Database:** PostgreSQL (Prisma ORM)
-- **AI:** OpenAI GPT-4
-- **Real-time:** Socket.io
-
-### Infrastructure
-- **Deployment:** Vercel (frontend) + Docker
-- **CI/CD:** GitHub Actions
-- **Monitoring:** Sentry (ready)
-- **Analytics:** Vercel Analytics (ready)
+**Key Pages:**
+- `/dashboard` - Main dashboard with metrics
+- `/agents` - AI agent management
+- `/content` - Content generation and management
+- `/campaigns` - Campaign tracking
+- `/analytics` - Advanced analytics
+- `/trends` - Social media trends
+- `/billing` - Stripe integration
+- `/team` - Team member management
+- `/brand-voice` - Brand voice configuration
 
 ---
 
-## 📊 Project Status
+## 🚢 Production Deployment
 
-**Version:** 2.5.0  
-**Status:** Production Ready  
-**UI Coverage:** 60% (12/20 routes)  
-**Deployment:** Vercel + Docker Ready  
-**Documentation:** ✅ Complete
+### Option 1: Vercel (Web) + Railway/Render (API)
 
-See [STATUS.md](./STATUS.md) for detailed status.
+#### Deploy Web to Vercel
+
+1. **Connect GitHub repo** to Vercel
+2. **Project Settings:**
+   - Framework: Next.js
+   - Root Directory: `apps/web`
+   - Build Command: `npm run build`
+   - Install Command: `npm install`
+   - Node Version: 20.x
+
+3. **Environment Variables** (on Vercel dashboard):
+   ```
+   NEXT_PUBLIC_API_URL=https://your-api-domain.com
+   NEXTAUTH_SECRET=<generated-secret>
+   NEXTAUTH_URL=https://your-domain.vercel.app
+   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+   DATABASE_URL=<your-production-postgres-url>
+   GITHUB_ID=<github-oauth-client-id>
+   GITHUB_SECRET=<github-oauth-client-secret>
+   ```
+
+4. **Deploy**: Vercel will auto-deploy on push to main
+
+#### Deploy API to Railway/Render
+
+1. **Create new service** linked to GitHub
+2. **Configure Build:**
+   - Root Directory: `apps/api`
+   - Build Command: `npm install && npm run build && npx prisma migrate deploy`
+   - Start Command: `npm run start`
+   - Port: 3001
+
+3. **Environment Variables:**
+   ```
+   DATABASE_URL=<managed-postgres-url>
+   PORT=3001
+   NODE_ENV=production
+   OPENAI_API_KEY=sk-...
+   STRIPE_SECRET_KEY=sk_live_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   RESEND_API_KEY=re_...
+   CORS_ORIGINS=https://your-domain.vercel.app
+   SENTRY_DSN=https://... (optional)
+   ```
+
+4. **Post-deployment:**
+   ```bash
+   # SSH into your service and run
+   npx prisma migrate deploy
+   npm run seed  # Optional: add demo data
+   ```
+
+### Option 2: Docker Compose
+
+```bash
+# Build and start all services
+docker-compose up -d
+
+# Run migrations
+docker-compose exec api npx prisma migrate deploy
+
+# View logs
+docker-compose logs -f
+```
+
+---
+
+## 🔐 Security
+
+- **Authentication:** NextAuth.js with GitHub OAuth
+- **Authorization:** Session-based with database
+- **API Security:** Rate limiting, CORS, Helmet middleware
+- **Environment:** All secrets in environment variables
+- **Database:** Parameterized queries via Prisma
+
+---
+
+## 📊 Database Schema
+
+The database uses Prisma ORM. Key models:
+
+- **User** - User accounts and authentication
+- **Account** - OAuth provider accounts
+- **Session** - NextAuth sessions
+- **ContentDraft** - AI-generated content
+- **AgentJob** - AI agent execution logs
+- **MetricEvent** - Analytics and metrics
+
+**View schema:** `apps/api/prisma/schema.prisma`
+
+---
+
+## 🧪 Testing
+
+### API Tests
+```bash
+cd apps/api
+npm run test         # Run all tests
+npm run test:watch   # Watch mode
+```
+
+### E2E Testing (Optional)
+```bash
+# Install Playwright
+cd apps/web
+npm install --save-dev @playwright/test
+
+# Run E2E tests
+npx playwright test
+```
+
+---
+
+## 📚 Documentation
+
+- [Setup Guide](./docs/SETUP.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [API Documentation](./apps/api/docs/)
+- [Environment Variables](./docs/PRODUCTION_ENV_GUIDE.md)
+- [Contributing](./CONTRIBUTING.md)
+
+---
+
+## 🐛 Troubleshooting
+
+### Database Connection Errors
+
+```bash
+# Check PostgreSQL is running
+brew services list | grep postgresql
+
+# Create database if missing
+createdb neonhub
+
+# Update DATABASE_URL in .env files
+```
+
+### Port Already in Use
+
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+
+# Kill process on port 3001
+lsof -ti:3001 | xargs kill -9
+```
+
+### Prisma Client Out of Sync
+
+```bash
+cd apps/api
+npx prisma generate
+cd ../web
+npx prisma generate
+```
+
+### Build Errors
+
+```bash
+# Clean install
+rm -rf node_modules package-lock.json apps/*/node_modules
+npm install --ignore-scripts
+
+# Generate Prisma clients
+cd apps/api && npx prisma generate
+cd ../web && npx prisma generate
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see:
-- [Contributing Guide](./Neon-v2.5.0/CONTRIBUTING.md)
-- [Development Setup](./docs/SETUP.md)
-- [Code of Conduct](./Neon-v2.5.0/CONTRIBUTING.md#code-of-conduct)
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
 ---
 
@@ -268,14 +415,12 @@ Private - NeonHub Technologies
 
 ---
 
-## 🔗 Quick Links
+## 🔗 Links
 
-- **Latest Version:** [Neon-v2.5.0/README.md](./Neon-v2.5.0/README.md)
-- **API Documentation:** [backend/README.md](./backend/README.md)
-- **Deployment Guide:** [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
-- **Status Dashboard:** [STATUS.md](./STATUS.md)
+- **Repository:** https://github.com/KofiRusu/Neonhub-v3.0
+- **Issues:** https://github.com/KofiRusu/Neonhub-v3.0/issues
+- **Documentation:** [./docs](./docs)
 
 ---
 
-**Built with ❤️ using AI-powered development tools**
-
+**Built with ❤️ using Next.js, Express, Prisma, and OpenAI**

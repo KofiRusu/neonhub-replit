@@ -4,7 +4,9 @@
 
 import { OpenAI } from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+});
 
 export interface DesignAsset {
   id: string;
@@ -88,7 +90,7 @@ Format as JSON.`;
         size,
       });
 
-      return response.data[0]?.url || null;
+      return response.data?.[0]?.url || null;
     } catch (error) {
       console.error('Image generation error:', error);
       return null;

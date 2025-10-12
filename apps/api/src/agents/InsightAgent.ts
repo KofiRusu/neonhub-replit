@@ -4,7 +4,9 @@
 
 import { OpenAI } from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+});
 
 export interface DataInsight {
   type: 'trend' | 'anomaly' | 'prediction' | 'recommendation';
@@ -90,7 +92,7 @@ Format as JSON array: [{ "title": "...", "description": "...", "actions": ["..."
         actionable: true,
         suggestedActions: insight.actions || [],
       }));
-    } catch (error) {
+    } catch {
       return [];
     }
   }
