@@ -114,7 +114,7 @@ teamRouter.post("/team/invite", async (req, res) => {
       throw new ValidationError(result.error.errors[0].message);
     }
 
-    const { email, role, message: customMessage } = result.data;
+    const { email, role } = result.data;
 
     // Generate unique token
     const token = uuidv4();

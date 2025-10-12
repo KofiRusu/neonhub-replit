@@ -90,7 +90,7 @@ export default function BrandVoiceCopilot({ onIntent, sources }: BrandVoiceCopil
           { title: "Brand Guidelines v2.1", url: "/docs/brand-guidelines", updatedAt: "2024-01-15" },
           { title: "Tone & Voice Playbook", url: "/docs/tone-voice", updatedAt: "2024-01-10" },
         ],
-        predictedIntent,
+        predictedIntent: predictedIntent ?? undefined,
         reasoning:
           "I analyzed your request against brand guidelines and recent campaign performance data to provide this recommendation.",
       }

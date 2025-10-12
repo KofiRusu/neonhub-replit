@@ -30,7 +30,7 @@ export async function searchKnowledge(q = "", filters?: { type?: string; agent?:
   }));
   if (filters?.type) items = items.filter((i) => i.type === filters.type);
   items.sort((a, b) => b.score - a.score);
-  return items.map(({ score, ...rest }) => rest);
+  return items.map(({ score: _score, ...rest }) => rest);
 }
 
 

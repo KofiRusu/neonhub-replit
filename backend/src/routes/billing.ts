@@ -4,7 +4,6 @@ import { ok, fail } from "../lib/http";
 import { ValidationError } from "../lib/errors";
 import {
   isStripeLive,
-  listInvoices,
   createCheckoutSession,
   createPortalSession,
 } from "../services/billing/stripe.js";

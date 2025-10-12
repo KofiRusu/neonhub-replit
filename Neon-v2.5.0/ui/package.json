@@ -1,5 +1,5 @@
 {
-  "name": "neonhub-ui",
+  "name": "@neonhub/ui-v2.5",
   "version": "2.5.0",
   "private": true,
   "engines": {
@@ -8,12 +8,16 @@
   },
   "packageManager": "npm@10.8.2",
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "prisma:generate": "prisma generate",
-    "build": "npm run prisma:generate && next build",
     "dev": "next dev -H 127.0.0.1 -p 3000",
+    "build": "npm run prisma:generate && next build",
+    "start": "next start -H 127.0.0.1 -p 3000",
+    "test": "echo \"No tests configured\"",
     "lint": "next lint",
-    "start": "next start -H 127.0.0.1 -p 3000"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",

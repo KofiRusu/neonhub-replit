@@ -1,0 +1,28 @@
+{
+  "name": "neonhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NeonHub - AI-Powered Marketing Automation Platform",
+  "workspaces": [
+    "backend",
+    "Neon-v2.5.0/backend"
+  ],
+  "scripts": {
+    "verify": "npm run lint && npm run typecheck && npm run test",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present",
+    "format:check": "npm run format:check --workspaces --if-present",
+    "prepare": "husky"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "prettier": "^3.3.3"
+  }
+}

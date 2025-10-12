@@ -216,7 +216,7 @@ export default function AgentActionPicker({ predictedIntent, onConfirm, onCancel
               {field.type === "text" && (
                 <Input
                   id={field.name}
-                  placeholder={field.placeholder}
+                  placeholder={"placeholder" in field ? field.placeholder : ""}
                   value={formData[field.name] || ""}
                   onChange={(e) => updateFormData(field.name, e.target.value)}
                   className="bg-[#2A2B35]/50 border-white/10 text-white placeholder-gray-400"
@@ -226,7 +226,7 @@ export default function AgentActionPicker({ predictedIntent, onConfirm, onCancel
               {field.type === "textarea" && (
                 <Textarea
                   id={field.name}
-                  placeholder={field.placeholder}
+                  placeholder={"placeholder" in field ? field.placeholder : ""}
                   value={formData[field.name] || ""}
                   onChange={(e) => updateFormData(field.name, e.target.value)}
                   className="bg-[#2A2B35]/50 border-white/10 text-white placeholder-gray-400 min-h-[80px]"
@@ -234,7 +234,7 @@ export default function AgentActionPicker({ predictedIntent, onConfirm, onCancel
               )}
 
               {field.type === "select" && field.options && (
-                <Select value={formData[field.name] || ""} onValueChange={(value) => updateFormData(field.name, value)}>
+                <Select value={formData[field.name] || ""} onValueChange={(value: string) => updateFormData(field.name, value)}>
                   <SelectTrigger className="bg-[#2A2B35]/50 border-white/10 text-white">
                     <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
                   </SelectTrigger>

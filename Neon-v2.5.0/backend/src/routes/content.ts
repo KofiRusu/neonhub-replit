@@ -4,7 +4,6 @@ import { GenerateContentRequestSchema } from "../types/index.js";
 import { ValidationError } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
 import { contentAgent } from "../agents/content/ContentAgent.js";
-import { agentJobManager } from "../agents/base/AgentJobManager.js";
 
 export const contentRouter = Router();
 

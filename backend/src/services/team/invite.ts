@@ -35,11 +35,10 @@ export async function sendInviteEmail(params: InviteEmailParams): Promise<{
   messageId?: string;
   previewUrl?: string;
 }> {
-  const { to, token, role, fromName = "NeonHub Team", redirectUrl } = params;
+  const { to, token, role, fromName = "NeonHub Team" } = params;
 
   const baseUrl = process.env.APP_BASE_URL || "http://127.0.0.1:3000";
   const acceptUrl = `${baseUrl}/team/accept?token=${token}`;
-  const finalRedirect = redirectUrl || `${baseUrl}/auth/signin`;
 
   // If Resend configured, send real email
   if (resend && isEmailConfigured) {

@@ -135,14 +135,14 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
     });
 
     // Filter jobs with metrics and calculate average
-    const jobsWithDuration = recentJobs.filter(job => {
+    const jobsWithDuration = recentJobs.filter((job: { metrics: any }) => {
       const metrics = job.metrics as any;
       return metrics && typeof metrics.duration === "number";
     });
 
     let avgJobLatencyMs = 0;
     if (jobsWithDuration.length > 0) {
-      const totalLatency = jobsWithDuration.reduce((sum, job) => {
+      const totalLatency = jobsWithDuration.reduce((sum: number, job: { metrics: any }) => {
         const metrics = job.metrics as any;
         return sum + (metrics?.duration || 0);
       }, 0);
@@ -159,7 +159,7 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
     });
 
     // Extract specific event types
-    const eventCounts = events.reduce((acc, e) => {
+    const eventCounts = events.reduce((acc: Record<string, number>, e: { type: string; _count: { id: number } }) => {
       acc[e.type] = e._count.id;
       return acc;
     }, {} as Record<string, number>);
@@ -184,7 +184,7 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
           conversions: eventCounts.conversion || 0,
           pageViews: eventCounts.page_view || 0,
         },
-        eventsByType: events.map(e => ({
+        eventsByType: events.map((e: { type: string; _count: { id: number } }) => ({
           type: e.type,
           count: e._count.id,
         })),
