@@ -14,9 +14,13 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SOURCE_PAT: ${{ secrets.SOURCE_PAT }}
       NODE_OPTIONS: "--max-old-space-size=4096"
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +35,14 @@ jobs:
       - name: Install deps
         run: |
           corepack enable || true
-          if [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; else npm ci; fi
+          npm ci
+
+      - name: Ensure labels exist
+        run: |
+          gh label create auto-sync -c "#0366d6" -d "Automated sync PRs" 2>&1 || true
+          gh label create risk:low -c "#2cbe4e" -d "Low risk changes" 2>&1 || true
+          gh label create risk:medium -c "#fbca04" -d "Medium risk changes" 2>&1 || true
+          gh label create risk:high -c "#d93f0b" -d "High risk changes" 2>&1 || true
 
       - name: Run Auto Sync
         run: |

@@ -4,6 +4,7 @@ import { sh, checkoutNewBranch, commitAll, createPr, autoMergePr } from "./utils
 import { isPathAllowed } from "./filters";
 import { scoreRisk } from "./risk";
 import { runSmoke } from "./smoke";
+import { fetchRemoteWithRetry, assertSourcePAT, buildRemoteUrl, isLikelyPrivateRepo } from "./enhancements";
 
 type Cfg = typeof import("./config.json");
 const cfg: Cfg = JSON.parse(fs.readFileSync(path.resolve(__dirname, "config.json"), "utf8"));
@@ -33,13 +34,37 @@ async function main() {
   sh(`git checkout ${base}`);
   sh(`git pull --ff-only`);
 
+  // Check SOURCE_PAT configuration
+  const patCheck = assertSourcePAT();
+  if (!patCheck.configured) {
+    console.warn(`[auto-sync] ${patCheck.message}`);
+  }
+
   for (const repo of cfg.sourceRepos) {
     const safeRepoId = repo.replace(/[\/.]/g, "_");
     const integBranch = `${cfg.integrationBranchPrefix}/${repo.replace(/[\/.]/g, "-")}`;
 
-    // add & fetch remote
-    sh(`git remote add src_${safeRepoId} https://github.com/${repo}.git || true`);
-    sh(`git fetch src_${safeRepoId} --tags --prune`);
+    // Build authenticated remote URL
+    const sourceToken = process.env.SOURCE_PAT || "";
+    const remoteName = `src_${safeRepoId}`;
+    const remoteUrl = buildRemoteUrl(repo, sourceToken);
+
+    // Warn about likely private repos without PAT
+    if (isLikelyPrivateRepo(repo) && !sourceToken) {
+      console.error(`[auto-sync] WARNING: ${repo} appears to be private but SOURCE_PAT not set`);
+    }
+
+    // Remove and re-add remote (handles URL changes)
+    sh(`git remote remove ${remoteName} 2>/dev/null || true`);
+    sh(`git remote add ${remoteName} ${remoteUrl} || true`);
+    
+    // Fetch with retry logic
+    try {
+      fetchRemoteWithRetry(remoteName, 3);
+    } catch (error) {
+      console.error(`[auto-sync] Failed to fetch ${repo}, skipping`);
+      continue;
+    }
 
     const newest = sh(`git ls-remote src_${safeRepoId} HEAD`).split("\t")[0] || "";
     const last = state[repo] || "";
