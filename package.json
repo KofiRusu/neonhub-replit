@@ -13,9 +13,12 @@
     "build": "npm run prisma:generate && npm run build --workspaces --if-present",
     "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\"",
     "start": "concurrently \"npm run start --workspace=apps/api\" \"npm run start --workspace=apps/web\"",
+    "start:api": "npm run start --workspace=apps/api",
+    "start:web": "npm run start --workspace=apps/web",
     "verify": "npm run lint && npm run typecheck && npm run test",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "type-check": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:autonomous": "node scripts/autonomous-testing-agent.js",
     "validate:api": "node scripts/api-contract-validator.js",
@@ -33,6 +36,7 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "husky": "^9.0.11",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.0"
   }
 }

@@ -1,0 +1,16 @@
+{
+  "sourceRepos": [
+    "KofiRusu/Neon-v2.4.0",
+    "KofiRusu/Neon-v2.3.3",
+    "KofiRusu/Neon-v3.0"
+  ],
+  "targetDefaultBranch": "main",
+  "integrationBranchPrefix": "integration/auto-sync",
+  "stateFile": ".neon/auto-sync-state.json",
+  "allowConventionalTypes": ["feat", "fix", "perf", "refactor"],
+  "disallowCommitTypes": ["chore", "revert", "style", "docs", "test", "build", "ci"],
+  "maxCommitsPerRun": 40,
+  "autoMergeLowRisk": true,
+  "requireCiGreenForMerge": true
+}
+

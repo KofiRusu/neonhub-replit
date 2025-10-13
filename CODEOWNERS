@@ -1,0 +1,5 @@
+# NeonHub Code Owners
+# Auto-sync pipeline
+.github/workflows/auto-sync-from-siblings.yml @KofiRusu
+scripts/auto-sync/** @KofiRusu
+

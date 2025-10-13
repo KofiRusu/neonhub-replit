@@ -1,0 +1,40 @@
+name: Auto Sync from Sibling Repos
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+  push:
+    paths: [ "scripts/auto-sync/**", ".github/workflows/auto-sync-from-siblings.yml" ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: ${{ hashFiles('pnpm-lock.yaml') && 'pnpm' || 'npm' }}
+
+      - name: Install deps
+        run: |
+          corepack enable || true
+          if [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; else npm ci; fi
+
+      - name: Run Auto Sync
+        run: |
+          chmod +x scripts/auto-sync/run-ci.sh
+          ./scripts/auto-sync/run-ci.sh
+

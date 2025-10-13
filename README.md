@@ -399,6 +399,38 @@ cd ../web && npx prisma generate
 
 ---
 
+## 🔄 Auto Sync Pipeline
+
+This repository auto-ingests improvements from sibling `Neon-v*` repos with strict safety guards:
+
+### Features
+- **Conventional Commits Only**: `feat`, `fix`, `perf`, `refactor`
+- **Path Filters**: No `.env`, `secrets/`, or production infrastructure files
+- **CI Checks**: Type-check, lint, build, tests all required
+- **Prisma Safety**: Validates schema changes and guards against destructive migrations
+- **Runtime Smoke Tests**: API `/health` and Web homepage must respond
+- **Risk Scoring**: Low-risk changes auto-merge; medium/high risk require manual review
+
+### Configuration
+- **Config**: `scripts/auto-sync/config.json`
+- **State**: `.neon/auto-sync-state.json` (auto-generated)
+- **Workflow**: `.github/workflows/auto-sync-from-siblings.yml`
+
+### Source Repositories
+- `KofiRusu/Neon-v2.4.0`
+- `KofiRusu/Neon-v2.3.3`
+- `KofiRusu/Neon-v3.0`
+
+### Manual Trigger
+```bash
+# Via GitHub Actions UI
+Actions → Auto Sync from Sibling Repos → Run workflow
+```
+
+The pipeline runs automatically every hour and creates PRs with detailed diagnostics for review.
+
+---
+
 ## 🤝 Contributing
 
 1. Fork the repository
