@@ -417,9 +417,9 @@ This repository auto-ingests improvements from sibling `Neon-v*` repos with stri
 - **Workflow**: `.github/workflows/auto-sync-from-siblings.yml`
 
 ### Source Repositories
-- `KofiRusu/Neon-v2.4.0`
-- `KofiRusu/Neon-v2.3.3`
-- `KofiRusu/Neon-v3.0`
+- `KofiRusu/neon-v2.4.0`
+- `KofiRusu/Neon-v2.5.0`
+- `KofiRusu/NeonHub-v3.0`
 
 ### Manual Trigger
 ```bash
