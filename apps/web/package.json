@@ -7,6 +7,9 @@
     "npm": ">=10.0.0"
   },
   "packageManager": "npm@10.8.2",
+  "prisma": {
+    "schema": "../../apps/api/prisma/schema.prisma"
+  },
   "scripts": {
     "dev": "next dev -H 127.0.0.1 -p 3000",
     "build": "npm run prisma:generate && next build",
@@ -54,6 +57,7 @@
     "@sentry/nextjs": "^10.17.0",
     "@tanstack/react-query": "^5.90.2",
     "autoprefixer": "^10.4.20",
+    "bullmq": "^5.61.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
