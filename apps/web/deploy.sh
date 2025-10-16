@@ -1,5 +1,5 @@
 #!/bin/bash
-# Web App Deployment Script
+# Web App Deployment Script for Vercel
 
 set -e
 
@@ -7,15 +7,17 @@ echo "🚀 Starting Web deployment..."
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install --workspace=apps/web
+npm ci
 
-# Generate Prisma client
+# Generate Prisma client  
 echo "🔧 Generating Prisma client..."
-npm run prisma:generate --workspace=apps/web
+npx prisma generate
 
 # Build application
 echo "🏗️  Building application..."
-npm run build --workspace=apps/web
+npm run build
 
-echo "✅ Web deployment complete!"
+echo "✅ Web build complete!"
+echo "ℹ️  Deploy to Vercel using: vercel --prod"
+echo "ℹ️  Or use GitHub integration for automatic deployments"
 

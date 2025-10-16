@@ -1,5 +1,5 @@
 #!/bin/bash
-# API Deployment Script
+# API Deployment Script for Railway/Render
 
 set -e
 
@@ -7,23 +7,18 @@ echo "🚀 Starting API deployment..."
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install --workspace=apps/api
+npm ci
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
-npm run prisma:generate --workspace=apps/api
-
-# Run database migrations
-echo "📊 Running database migrations..."
-npm run prisma:migrate:deploy --workspace=apps/api
+npx prisma generate
 
 # Build application
 echo "🏗️  Building application..."
-npm run build --workspace=apps/api
+npm run build
 
-# Run health check
-echo "🏥 Running health check..."
-curl -f http://localhost:3001/health || echo "Health check will run after deployment"
+echo "✅ API build complete!"
+echo "ℹ️  Migrations will run automatically on container start via: npx prisma migrate deploy"
 
-echo "✅ API deployment complete!"
+# Note: Health check and migrations happen at runtime in production
 

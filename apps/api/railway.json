@@ -1,0 +1,26 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "npm ci && npx prisma generate && npm run build",
+    "startCommand": "npx prisma migrate deploy && npm run start"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "sleepApplication": false,
+    "restartPolicyType": "always",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 30
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      }
+    }
+  }
+}
+
+
+

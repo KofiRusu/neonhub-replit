@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+// Import env validation - will validate on startup
+import "./src/config/env";
 
 const nextConfig: NextConfig = {
   // Build settings for Vercel
@@ -30,19 +32,16 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // API rewrites for development
+  // API rewrites for same-origin requests (better for previews)
   async rewrites() {
-    const isDev = process.env.NODE_ENV !== "production";
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001";
     
-    return isDev
-      ? [
-          {
-            source: "/api/backend/:path*",
-            destination: `${apiUrl}/:path*`,
-          },
-        ]
-      : [];
+    return [
+      {
+        source: "/api/backend/:path*",
+        destination: `${apiUrl}/:path*`,
+      },
+    ];
   },
   
   // Headers for security

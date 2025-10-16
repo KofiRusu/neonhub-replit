@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
-import { loadEnv, getEnv } from "./config/env.js";
+import { env } from "./config/env.js";
 import { logger } from "./lib/logger.js";
 import { initWebSocket } from "./ws/index.js";
 import { initSentry, Sentry } from "./obs/sentry.js";
@@ -14,9 +14,7 @@ import { authRouter } from "./routes/auth.js";
 import { jobsRouter } from "./routes/jobs.js";
 import { AppError } from "./lib/errors.js";
 
-// Load environment
-loadEnv();
-const env = getEnv();
+// Environment is validated on import
 
 // Initialize Sentry (no-op if DSN not configured)
 initSentry();
