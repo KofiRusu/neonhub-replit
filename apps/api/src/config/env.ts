@@ -53,5 +53,8 @@ export function validateEnv(): Env {
 // Singleton instance
 export const env = validateEnv();
 
+// Legacy export for compatibility
+export const getEnv = () => env;
+
 // Getter function for compatibility
 export const getEnv = () => env;

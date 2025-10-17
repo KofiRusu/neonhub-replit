@@ -1,6 +1,13 @@
 import { EventEmitter } from 'events';
-import { logger } from '../../apps/api/src/lib/logger';
 import { AgentMessage, AgentContext, AgentEvent } from './types';
+
+// Simple logger implementation
+const logger = {
+  info: (message: string, meta?: any) => console.log(`[AIB INFO] ${message}`, meta || ''),
+  debug: (message: string, meta?: any) => console.debug(`[AIB DEBUG] ${message}`, meta || ''),
+  error: (message: string, meta?: any) => console.error(`[AIB ERROR] ${message}`, meta || ''),
+  warn: (message: string, meta?: any) => console.warn(`[AIB WARN] ${message}`, meta || '')
+};
 
 export class AgentIntelligenceBus extends EventEmitter {
   private agents: Map<string, AgentContext> = new Map();
