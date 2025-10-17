@@ -1,0 +1,51 @@
+Category,Metric,v3.0.0,v3.1.0,v3.2.0,v3.1_to_v3.2_Change,v3.0_to_v3.2_Change
+Traffic Volume,Total Page Views,109375.0,109375.0,109375.0,+0.0%,+0.0%
+Traffic Volume,Unique Visitors,40500.0,40500.0,40500.0,+0.0%,+0.0%
+Traffic Volume,Daily Average Page Views,4167,4167,4167,+0.0%,+0.0%
+Traffic Volume,Peak Daily Page Views,5200,5200,5200,+0.0%,+0.0%
+Traffic Volume,Bounce Rate,0.0,0.0,0.0,+0.0%,+0.0%
+Traffic Volume,Session Duration Avg Seconds,180,180,180,+0.0%,+0.0%
+Latency,Api Response Time Avg Ms,651.0,651.0,651.0,+0.0%,+0.0%
+Latency,Api Response Time P95 Ms,918.4,918.4,918.4,+0.0%,+0.0%
+Latency,Page Load Time Avg Ms,1942.5,1942.5,1942.5,+0.0%,+0.0%
+Latency,Page Load Time P95 Ms,2400,2400,2400,+0.0%,+0.0%
+Latency,Job Processing Latency Avg Ms,4680.0,4680.0,4680.0,+0.0%,+0.0%
+Latency,Job Processing Latency P95 Ms,7200,7200,7200,+0.0%,+0.0%
+Error Rates,Api Error Rate,0.0,0.0,0.0,+0.0%,+0.0%
+Error Rates,Job Failure Rate,0.0,0.0,0.0,+0.0%,+0.0%
+Error Rates,Total Errors,1875,1875,1875,+0.0%,+0.0%
+Error Rates,Critical Errors,125,125,125,+0.0%,+0.0%
+Conversion Metrics,Total Conversions,2250,2250,2250,+0.0%,+0.0%
+Conversion Metrics,Conversion Rate,0.0,0.0,0.0,+0.0%,+0.0%
+Conversion Metrics,Click Through Rate,0.0,0.0,0.0,+0.0%,+0.0%
+Conversion Metrics,Open Rate,0.72,0.72,0.72,+0.0%,+0.0%
+Infrastructure Metrics,Uptime Percentage,99.0,99.0,99.0,+0.0%,+0.0%
+Infrastructure Metrics,Cpu Utilization Avg,0.9,0.9,0.9,+0.0%,+0.0%
+Infrastructure Metrics,Memory Utilization Avg,0.85,0.85,0.85,+0.0%,+0.0%
+Infrastructure Metrics,Database Connection Pool Utilization,0.58,0.58,0.58,+0.0%,+0.0%
+Infrastructure Metrics,Cdn Hit Rate,0.89,0.89,0.89,+0.0%,+0.0%
+
+ML Benchmarks,,,,,
+Predictive_Models - Traffic_Prediction,Accuracy,,,0.87,,
+Predictive_Models - Traffic_Prediction,Precision,,,0.84,,
+Predictive_Models - Traffic_Prediction,Recall,,,0.89,,
+Predictive_Models - Traffic_Prediction,F1 Score,,,0.86,,
+Predictive_Models - Traffic_Prediction,Training Time Seconds,,,45.2,,
+Predictive_Models - Traffic_Prediction,Inference Time Ms,,,12.3,,
+Predictive_Models - Latency_Prediction,Accuracy,,,0.91,,
+Predictive_Models - Latency_Prediction,Precision,,,0.88,,
+Predictive_Models - Latency_Prediction,Recall,,,0.93,,
+Predictive_Models - Latency_Prediction,F1 Score,,,0.9,,
+Predictive_Models - Latency_Prediction,Training Time Seconds,,,38.7,,
+Predictive_Models - Latency_Prediction,Inference Time Ms,,,8.9,,
+Predictive_Models - Error_Rate_Prediction,Accuracy,,,0.94,,
+Predictive_Models - Error_Rate_Prediction,Precision,,,0.96,,
+Predictive_Models - Error_Rate_Prediction,Recall,,,0.92,,
+Predictive_Models - Error_Rate_Prediction,F1 Score,,,0.94,,
+Predictive_Models - Error_Rate_Prediction,Training Time Seconds,,,52.1,,
+Predictive_Models - Error_Rate_Prediction,Inference Time Ms,,,15.6,,
+Reinforcement_Learning - Adaptive_Agent,Episodes Trained,,,10000,,
+Reinforcement_Learning - Adaptive_Agent,Average Reward,,,0.78,,
+Reinforcement_Learning - Adaptive_Agent,Convergence Episodes,,,2500,,
+Reinforcement_Learning - Adaptive_Agent,Final Policy Quality,,,0.89,,
+Reinforcement_Learning - Adaptive_Agent,Decision Accuracy,,,0.85,,

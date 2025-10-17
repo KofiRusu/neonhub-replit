@@ -1,0 +1,44 @@
+{
+  "name": "@neonhub/qa-sentinel",
+  "version": "5.1.0",
+  "description": "Autonomous QA & Regression Sentinel for NeonHub v5.1 - Self-maintaining QA ecosystem",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "qa",
+    "testing",
+    "automation",
+    "regression",
+    "ml",
+    "ai",
+    "neonhub"
+  ],
+  "author": "NeonHub Team",
+  "license": "MIT",
+  "dependencies": {
+    "@neonhub/aib": "workspace:*",
+    "@neonhub/self-healing": "workspace:*",
+    "@neonhub/predictive-engine": "workspace:*",
+    "@neonhub/cognitive-infra": "workspace:*",
+    "tensorFlow.js": "^4.15.0",
+    "ml-regression": "^6.0.1",
+    "stats-lite": "^2.2.0",
+    "lodash": "^4.17.21",
+    "rxjs": "^7.8.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/lodash": "^4.14.202",
+    "typescript": "^5.3.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.8",
+    "eslint": "^8.55.0"
+  }
+}

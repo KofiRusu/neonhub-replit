@@ -1,0 +1,118 @@
+name: Weekly Repository Validation
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  validate-repo:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint code
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Type check
+        run: npm run typecheck
+        continue-on-error: true
+      
+      - name: Run tests
+        run: npm run test:ci
+      
+      - name: Build applications
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.com
+          NEXT_PUBLIC_API_URL: https://api.example.com
+          NEXTAUTH_URL: https://example.com
+          NEXTAUTH_SECRET: validation-secret-key-for-builds
+          NODE_ENV: production
+      
+      - name: Validate Docker Compose
+        run: docker-compose config > /dev/null
+      
+      - name: Validate Documentation Links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/workflows/mlc_config.json'
+        continue-on-error: true
+      
+      - name: Check Preservation Integrity
+        run: |
+          if [ -f preservation/v3.0/manifest.json ]; then
+            echo "✅ Preservation snapshot exists"
+            FILE_COUNT=$(jq '.files | length' preservation/v3.0/manifest.json)
+            echo "📦 Preserved files: $FILE_COUNT"
+          else
+            echo "⚠️  Preservation snapshot not found"
+            exit 1
+          fi
+      
+      - name: Verify Roadmap Documentation
+        run: |
+          if [ -d roadmap ] && [ -f roadmap/ROADMAP_v3.1-v7.1.md ]; then
+            echo "✅ Roadmap documentation exists"
+          else
+            echo "⚠️  Roadmap documentation missing"
+            exit 1
+          fi
+      
+      - name: Create Validation Report
+        if: always()
+        run: |
+          mkdir -p reports/validation
+          cat > reports/validation/weekly-validation-$(date +%Y-%m-%d).md << EOF
+          # Weekly Repository Validation Report
+          
+          **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Branch**: ${{ github.ref_name }}
+          **Commit**: ${{ github.sha }}
+          
+          ## Validation Results
+          
+          - Lint: ${{ steps.lint.outcome || 'SKIPPED' }}
+          - Type Check: ${{ steps.typecheck.outcome || 'SKIPPED' }}
+          - Tests: ${{ steps.tests.outcome || 'SKIPPED' }}
+          - Build: ${{ steps.build.outcome || 'SKIPPED' }}
+          - Docker: ${{ steps.docker.outcome || 'SKIPPED' }}
+          - Documentation: ${{ steps.docs.outcome || 'SKIPPED' }}
+          - Preservation: ${{ steps.preservation.outcome || 'SKIPPED' }}
+          - Roadmap: ${{ steps.roadmap.outcome || 'SKIPPED' }}
+          
+          ## Summary
+          
+          Repository health: ${{ job.status }}
+          EOF
+      
+      - name: Create Issue on Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '⚠️ Weekly Validation Failed';
+            const body = `Repository validation failed on ${new Date().toISOString()}\n\nPlease check the [workflow run](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) for details.`;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['automated', 'validation-failure']
+            });

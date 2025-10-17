@@ -1,0 +1,43 @@
+{
+  "name": "@neonhub/ai-governance",
+  "version": "4.0.0",
+  "description": "AI Governance Module for NeonHub v4.0 - Rule-based policy engine with ethical and legal compliance frameworks for AI operations",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "ai-governance",
+    "policy-engine",
+    "ethical-framework",
+    "legal-compliance",
+    "audit-trails",
+    "compliance-monitoring",
+    "neonhub"
+  ],
+  "dependencies": {
+    "@neonhub/compliance-consent": "^4.0.0",
+    "@neonhub/federation": "^4.0.0",
+    "crypto": "^1.0.1",
+    "uuid": "^9.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "@types/uuid": "^9.0.7",
+    "@types/jsonwebtoken": "^9.0.4",
+    "@types/winston": "^2.4.4",
+    "typescript": "^5.2.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.5",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

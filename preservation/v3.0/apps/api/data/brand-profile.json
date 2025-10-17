@@ -1,0 +1,21 @@
+{
+  "name": "NeonHub",
+  "mission": "Unify AI agents to accelerate marketing outcomes with consistent, on-brand execution.",
+  "tone": ["confident", "helpful", "practical", "innovative"],
+  "pillars": ["Consistency", "Performance", "Clarity", "Speed"],
+  "dos": ["Use clear, direct language", "Show value first", "Cite sources when summarizing"],
+  "donts": ["Overpromise", "Use slang that reduces professionalism", "Hand-wave metrics"],
+  "examplePhrases": [
+    "Here’s the shortest path to impact.",
+    "Stay consistent; win weekly.",
+    "On-brand, on-time, every time."
+  ],
+  "personas": [
+    { "name": "Marketing Lead", "description": "Owns outcomes, needs clarity + speed." },
+    { "name": "Content Manager", "description": "Drafts and schedules multi-channel content." }
+  ],
+  "valueProps": ["Faster production", "Consistent voice", "Data-backed insights"]
+}
+
+
+

@@ -1,0 +1,41 @@
+{
+  "name": "@neonhub/compliance-consent",
+  "version": "4.0.0",
+  "description": "Compliance & Consent Layer for NeonHub v4.0 - Regulatory compliance and data governance",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "compliance",
+    "consent",
+    "gdpr",
+    "ccpa",
+    "hipaa",
+    "data-governance",
+    "privacy",
+    "neonhub"
+  ],
+  "dependencies": {
+    "@neonhub/federation": "^4.0.0",
+    "crypto": "^1.0.1",
+    "uuid": "^9.0.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "@types/uuid": "^9.0.7",
+    "@types/jsonwebtoken": "^9.0.4",
+    "typescript": "^5.2.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.5",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

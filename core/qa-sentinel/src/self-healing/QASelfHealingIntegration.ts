@@ -1,0 +1,314 @@
+import { EventEmitter } from 'events';
+import { SelfHealingManager, RepairAction } from '../../../self-healing';
+import { Anomaly } from '../types';
+import * as winston from 'winston';
+
+export interface SelfHealingTrigger {
+  id: string;
+  anomaly: Anomaly;
+  action: RepairAction;
+  triggeredAt: Date;
+  status: 'pending' | 'executing' | 'completed' | 'failed';
+  result?: any;
+}
+
+export class QASelfHealingIntegration extends EventEmitter {
+  private selfHealingManager: SelfHealingManager;
+  private activeTriggers: Map<string, SelfHealingTrigger> = new Map();
+  private logger: winston.Logger;
+
+  constructor(selfHealingManager: SelfHealingManager) {
+    super();
+    this.selfHealingManager = selfHealingManager;
+
+    this.logger = winston.createLogger({
+      level: 'info',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+      ),
+      defaultMeta: { service: 'qa-self-healing-integration' },
+      transports: [
+        new winston.transports.File({ filename: 'logs/qa-self-healing.log' }),
+        new winston.transports.Console({
+          format: winston.format.simple()
+        })
+      ]
+    });
+
+    this.setupEventHandlers();
+  }
+
+  private setupEventHandlers(): void {
+    // Listen to self-healing manager events
+    this.selfHealingManager.on('repair:completed', this.handleRepairCompleted.bind(this));
+    this.selfHealingManager.on('repair:failed', this.handleRepairFailed.bind(this));
+  }
+
+  async triggerSelfHealing(anomaly: Anomaly): Promise<SelfHealingTrigger> {
+    this.logger.info('Triggering self-healing for anomaly', { anomalyId: anomaly.id, type: anomaly.type });
+
+    // Determine appropriate repair action based on anomaly
+    const repairAction = this.determineRepairAction(anomaly);
+
+    const trigger: SelfHealingTrigger = {
+      id: `qa-trigger-${Date.now()}-${Math.random()}`,
+      anomaly,
+      action: repairAction,
+      triggeredAt: new Date(),
+      status: 'pending'
+    };
+
+    this.activeTriggers.set(trigger.id, trigger);
+
+    try {
+      // Execute the repair action
+      trigger.status = 'executing';
+
+      // Note: In a real implementation, we would call the appropriate method
+      // from SelfHealingManager. For now, we'll simulate the execution.
+      await this.simulateRepairExecution(repairAction);
+
+      trigger.status = 'completed';
+      trigger.result = { success: true, message: 'Repair completed successfully' };
+
+      this.logger.info('Self-healing completed successfully', { triggerId: trigger.id });
+
+    } catch (error) {
+      trigger.status = 'failed';
+      trigger.result = { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+
+      this.logger.error('Self-healing failed', { triggerId: trigger.id, error });
+    }
+
+    this.emit('self-healing:completed', trigger);
+    return trigger;
+  }
+
+  private determineRepairAction(anomaly: Anomaly): RepairAction {
+    let actionType: 'restart' | 'scale' | 'rollback' | 'patch' | 'reconfigure' = 'restart';
+    let component = 'unknown';
+    let priority: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+
+    // Determine component from anomaly metric
+    if (anomaly.metric.includes('api') || anomaly.metric.includes('response_time')) {
+      component = 'api';
+    } else if (anomaly.metric.includes('database') || anomaly.metric.includes('db')) {
+      component = 'database';
+    } else if (anomaly.metric.includes('agent')) {
+      component = 'agents';
+    } else if (anomaly.metric.includes('cpu') || anomaly.metric.includes('memory')) {
+      component = 'infrastructure';
+    }
+
+    // Determine action type and priority based on anomaly type and severity
+    switch (anomaly.type) {
+      case 'performance':
+        if (anomaly.severity === 'critical') {
+          actionType = 'restart';
+          priority = 'critical';
+        } else if (anomaly.severity === 'high') {
+          actionType = 'scale';
+          priority = 'high';
+        } else {
+          actionType = 'reconfigure';
+          priority = 'medium';
+        }
+        break;
+
+      case 'error':
+        if (anomaly.severity === 'critical') {
+          actionType = 'rollback';
+          priority = 'critical';
+        } else {
+          actionType = 'restart';
+          priority = 'high';
+        }
+        break;
+
+      case 'resource':
+        if (anomaly.severity === 'critical') {
+          actionType = 'scale';
+          priority = 'critical';
+        } else {
+          actionType = 'reconfigure';
+          priority = 'medium';
+        }
+        break;
+
+      case 'behavior':
+        actionType = 'patch';
+        priority = 'low';
+        break;
+    }
+
+    return {
+      id: `repair-${Date.now()}`,
+      component,
+      action: actionType,
+      priority,
+      estimatedDuration: this.getEstimatedDuration(actionType, priority),
+      success: false,
+      timestamp: new Date()
+    };
+  }
+
+  private getEstimatedDuration(actionType: string, priority: string): number {
+    const baseDurations = {
+      restart: 30000,    // 30 seconds
+      scale: 120000,     // 2 minutes
+      rollback: 300000,  // 5 minutes
+      patch: 60000,      // 1 minute
+      reconfigure: 45000 // 45 seconds
+    };
+
+    const baseDuration = baseDurations[actionType as keyof typeof baseDurations] || 30000;
+
+    // Adjust duration based on priority
+    const priorityMultiplier = {
+      low: 0.8,
+      medium: 1.0,
+      high: 1.2,
+      critical: 1.5
+    };
+
+    return baseDuration * (priorityMultiplier[priority as keyof typeof priorityMultiplier] || 1.0);
+  }
+
+  private async simulateRepairExecution(action: RepairAction): Promise<void> {
+    // Simulate repair execution time
+    await new Promise(resolve => setTimeout(resolve, action.estimatedDuration));
+
+    // Simulate success/failure (90% success rate)
+    if (Math.random() > 0.1) {
+      action.success = true;
+    } else {
+      throw new Error(`Simulated repair failure for ${action.component}`);
+    }
+  }
+
+  private handleRepairCompleted(event: any): void {
+    this.logger.info('Repair completed event received', { event });
+
+    // Find related QA trigger
+    const relatedTrigger = Array.from(this.activeTriggers.values())
+      .find(trigger => trigger.action.id === event.repairId);
+
+    if (relatedTrigger) {
+      relatedTrigger.status = 'completed';
+      relatedTrigger.result = event.result;
+      this.emit('qa-repair:completed', relatedTrigger);
+    }
+  }
+
+  private handleRepairFailed(event: any): void {
+    this.logger.error('Repair failed event received', { event });
+
+    // Find related QA trigger
+    const relatedTrigger = Array.from(this.activeTriggers.values())
+      .find(trigger => trigger.action.id === event.repairId);
+
+    if (relatedTrigger) {
+      relatedTrigger.status = 'failed';
+      relatedTrigger.result = { error: event.error };
+      this.emit('qa-repair:failed', relatedTrigger);
+    }
+  }
+
+  async getSystemHealth(): Promise<'healthy' | 'degraded' | 'critical'> {
+    return this.selfHealingManager.getSystemHealth();
+  }
+
+  getActiveTriggers(): SelfHealingTrigger[] {
+    return Array.from(this.activeTriggers.values());
+  }
+
+  getTriggerHistory(hours: number = 24): SelfHealingTrigger[] {
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    return Array.from(this.activeTriggers.values())
+      .filter(trigger => trigger.triggeredAt >= cutoff);
+  }
+
+  async forceRepair(component: string, actionType: 'restart' | 'scale' | 'rollback' | 'patch' | 'reconfigure'): Promise<SelfHealingTrigger> {
+    this.logger.info('Forcing repair action', { component, actionType });
+
+    const mockAnomaly: Anomaly = {
+      id: `forced-${Date.now()}`,
+      type: 'behavior',
+      severity: 'medium',
+      metric: `${component}_forced`,
+      expectedValue: 0,
+      actualValue: 1,
+      deviation: 1,
+      confidence: 1.0,
+      timestamp: new Date()
+    };
+
+    const repairAction: RepairAction = {
+      id: `forced-repair-${Date.now()}`,
+      component,
+      action: actionType,
+      priority: 'high',
+      estimatedDuration: this.getEstimatedDuration(actionType, 'high'),
+      success: false,
+      timestamp: new Date()
+    };
+
+    const trigger: SelfHealingTrigger = {
+      id: `forced-trigger-${Date.now()}`,
+      anomaly: mockAnomaly,
+      action: repairAction,
+      triggeredAt: new Date(),
+      status: 'pending'
+    };
+
+    this.activeTriggers.set(trigger.id, trigger);
+
+    try {
+      trigger.status = 'executing';
+      await this.simulateRepairExecution(repairAction);
+      trigger.status = 'completed';
+      trigger.result = { success: true, message: 'Forced repair completed' };
+    } catch (error) {
+      trigger.status = 'failed';
+      trigger.result = { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+
+    this.emit('self-healing:completed', trigger);
+    return trigger;
+  }
+
+  getRepairSuccessRate(hours: number = 24): number {
+    const recentTriggers = this.getTriggerHistory(hours);
+    const completedTriggers = recentTriggers.filter(t => t.status === 'completed');
+
+    return recentTriggers.length > 0 ? completedTriggers.length / recentTriggers.length : 0;
+  }
+
+  getAnomalyResponseTime(): number {
+    const completedTriggers = Array.from(this.activeTriggers.values())
+      .filter(t => t.status === 'completed');
+
+    if (completedTriggers.length === 0) return 0;
+
+    const totalResponseTime = completedTriggers.reduce((sum, trigger) => {
+      return sum + (trigger.result?.duration || 0);
+    }, 0);
+
+    return totalResponseTime / completedTriggers.length;
+  }
+
+  clearOldTriggers(hours: number = 24): void {
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    for (const [id, trigger] of this.activeTriggers) {
+      if (trigger.triggeredAt < cutoff) {
+        this.activeTriggers.delete(id);
+      }
+    }
+
+    this.logger.info('Cleared old triggers', { cutoff: cutoff.toISOString() });
+  }
+}

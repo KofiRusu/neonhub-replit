@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: neonhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: neonhub
+      POSTGRES_PASSWORD: neonhub
+      POSTGRES_DB: neonhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neonhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neonhub-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://neonhub:neonhub@postgres:5432/neonhub
+      PORT: 3001
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ui:
+    build:
+      context: ./Neon-v2.4.0/ui
+      dockerfile: Dockerfile
+    container_name: neonhub-ui
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001
+      NEXTAUTH_URL: http://127.0.0.1:3000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:

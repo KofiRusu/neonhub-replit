@@ -1,0 +1,43 @@
+{
+  "name": "@neonhub/data-trust",
+  "version": "4.0.0",
+  "description": "Data Trust Module for NeonHub v4.0 - Blockchain-based data provenance and integrity verification system",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "data-trust",
+    "blockchain",
+    "merkle-tree",
+    "provenance",
+    "integrity-verification",
+    "cryptographic-proofs",
+    "audit-trails",
+    "neonhub"
+  ],
+  "dependencies": {
+    "@neonhub/federation": "^4.0.0",
+    "crypto": "^1.0.1",
+    "ethers": "^6.8.0",
+    "web3": "^4.2.2",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "@types/node": "^20.8.7"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.7",
+    "@types/winston": "^2.4.4",
+    "typescript": "^5.2.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.5",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

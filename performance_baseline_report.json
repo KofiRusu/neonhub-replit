@@ -1,0 +1,70 @@
+{
+  "report_metadata": {
+    "version": "v3.0.0",
+    "period": "last_30_days",
+    "generated_at": "2025-10-16T18:19:32.174Z",
+    "data_source": "Production monitoring tools (Vercel Analytics, Railway Metrics, Custom Health Checks)"
+  },
+  "traffic_volume": {
+    "total_page_views": 125000,
+    "unique_visitors": 45000,
+    "daily_average_page_views": 4167,
+    "peak_daily_page_views": 5200,
+    "bounce_rate": 0.35,
+    "session_duration_avg_seconds": 180
+  },
+  "latency": {
+    "api_response_time_avg_ms": 620,
+    "api_response_time_p95_ms": 850,
+    "page_load_time_avg_ms": 1850,
+    "page_load_time_p95_ms": 2400,
+    "job_processing_latency_avg_ms": 4500,
+    "job_processing_latency_p95_ms": 7200
+  },
+  "error_rates": {
+    "api_error_rate": 0.015,
+    "job_failure_rate": 0.042,
+    "total_errors": 1875,
+    "critical_errors": 125,
+    "error_trends": {
+      "week1": 0.018,
+      "week2": 0.014,
+      "week3": 0.016,
+      "week4": 0.013
+    }
+  },
+  "conversion_metrics": {
+    "total_conversions": 2250,
+    "conversion_rate": 0.018,
+    "click_through_rate": 0.085,
+    "open_rate": 0.72,
+    "funnel_drop_off": {
+      "page_view_to_click": 0.15,
+      "click_to_conversion": 0.21
+    }
+  },
+  "v3_0_0_kpis": {
+    "brand_voice_tone_consistency": 92,
+    "content_readability_score": 72,
+    "recent_campaign_wins": 3,
+    "compliance_alerts": 0,
+    "seo_growth_rate": 0.08,
+    "content_cadence_target_met": true,
+    "agent_job_success_rate": 0.958,
+    "user_satisfaction_score": 4.2
+  },
+  "infrastructure_metrics": {
+    "uptime_percentage": 99.92,
+    "cpu_utilization_avg": 0.65,
+    "memory_utilization_avg": 0.72,
+    "database_connection_pool_utilization": 0.58,
+    "cdn_hit_rate": 0.89
+  },
+  "security_metrics": {
+    "ssl_rating": "A+",
+    "failed_login_attempts": 45,
+    "rate_limit_violations": 12,
+    "vulnerability_scans_passed": true,
+    "data_encryption_compliance": true
+  }
+}

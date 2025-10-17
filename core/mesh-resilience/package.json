@@ -1,0 +1,43 @@
+{
+  "name": "@neonhub/mesh-resilience",
+  "version": "7.0.0",
+  "description": "Multi-layer resilience architecture with CRDTs, Byzantine fault tolerance, and self-reconstruction",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "resilience",
+    "crdt",
+    "byzantine-fault-tolerance",
+    "distributed-systems",
+    "offline-first",
+    "eventual-consistency",
+    "mesh-networking"
+  ],
+  "author": "NeonHub Team",
+  "license": "MIT",
+  "dependencies": {
+    "automerge": "^2.1.10",
+    "yjs": "^13.6.10",
+    "winston": "^3.11.0",
+    "eventemitter3": "^5.0.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "ts-jest": "^29.1.1",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0"
+  }
+}

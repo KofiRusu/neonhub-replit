@@ -1,0 +1,45 @@
+Category,Metric,Value,Unit,Period
+Traffic Volume,Total Page Views,125000,count,last_30_days
+Traffic Volume,Unique Visitors,45000,count,last_30_days
+Traffic Volume,Daily Average Page Views,4167,count,last_30_days
+Traffic Volume,Peak Daily Page Views,5200,count,last_30_days
+Traffic Volume,Bounce Rate,0.35,percentage,last_30_days
+Traffic Volume,Session Duration Avg,180,seconds,last_30_days
+Latency,API Response Time Avg,620,milliseconds,last_30_days
+Latency,API Response Time P95,850,milliseconds,last_30_days
+Latency,Page Load Time Avg,1850,milliseconds,last_30_days
+Latency,Page Load Time P95,2400,milliseconds,last_30_days
+Latency,Job Processing Latency Avg,4500,milliseconds,last_30_days
+Latency,Job Processing Latency P95,7200,milliseconds,last_30_days
+Error Rates,API Error Rate,0.015,percentage,last_30_days
+Error Rates,Job Failure Rate,0.042,percentage,last_30_days
+Error Rates,Total Errors,1875,count,last_30_days
+Error Rates,Critical Errors,125,count,last_30_days
+Error Rates,Week 1 Error Rate,0.018,percentage,last_30_days
+Error Rates,Week 2 Error Rate,0.014,percentage,last_30_days
+Error Rates,Week 3 Error Rate,0.016,percentage,last_30_days
+Error Rates,Week 4 Error Rate,0.013,percentage,last_30_days
+Conversion Metrics,Total Conversions,2250,count,last_30_days
+Conversion Metrics,Conversion Rate,0.018,percentage,last_30_days
+Conversion Metrics,Click Through Rate,0.085,percentage,last_30_days
+Conversion Metrics,Open Rate,0.72,percentage,last_30_days
+Conversion Metrics,Funnel Drop-off Page View to Click,0.15,percentage,last_30_days
+Conversion Metrics,Funnel Drop-off Click to Conversion,0.21,percentage,last_30_days
+v3.0.0 KPIs,Brand Voice Tone Consistency,92,percentage,last_30_days
+v3.0.0 KPIs,Content Readability Score,72,score,last_30_days
+v3.0.0 KPIs,Recent Campaign Wins,3,count,last_30_days
+v3.0.0 KPIs,Compliance Alerts,0,count,last_30_days
+v3.0.0 KPIs,SEO Growth Rate,0.08,percentage,last_30_days
+v3.0.0 KPIs,Content Cadence Target Met,true,boolean,last_30_days
+v3.0.0 KPIs,Agent Job Success Rate,0.958,percentage,last_30_days
+v3.0.0 KPIs,User Satisfaction Score,4.2,score,last_30_days
+Infrastructure Metrics,Uptime Percentage,99.92,percentage,last_30_days
+Infrastructure Metrics,CPU Utilization Avg,0.65,percentage,last_30_days
+Infrastructure Metrics,Memory Utilization Avg,0.72,percentage,last_30_days
+Infrastructure Metrics,Database Connection Pool Utilization,0.58,percentage,last_30_days
+Infrastructure Metrics,CDN Hit Rate,0.89,percentage,last_30_days
+Security Metrics,SSL Rating,A+,grade,last_30_days
+Security Metrics,Failed Login Attempts,45,count,last_30_days
+Security Metrics,Rate Limit Violations,12,count,last_30_days
+Security Metrics,Vulnerability Scans Passed,true,boolean,last_30_days
+Security Metrics,Data Encryption Compliance,true,boolean,last_30_days

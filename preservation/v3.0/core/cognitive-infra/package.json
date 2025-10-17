@@ -1,0 +1,39 @@
+{
+  "name": "@neonhub/cognitive-infra",
+  "version": "5.0.0",
+  "description": "Cognitive Infrastructure with Neural Feedback Loops and Topology Adaptation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@neonhub/aib": "^4.0.0",
+    "@neonhub/federation": "^4.0.0",
+    "@neonhub/meta-orchestrator": "^3.3.0",
+    "@neonhub/self-healing": "^3.3.0",
+    "tensorflow": "^4.0.0",
+    "brain.js": "^2.0.0",
+    "rxjs": "^7.8.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/lodash": "^4.14.191",
+    "typescript": "^4.9.0",
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0"
+  },
+  "keywords": [
+    "neural-networks",
+    "cognitive-infrastructure",
+    "adaptive-systems",
+    "machine-learning",
+    "federated-ai"
+  ],
+  "author": "NeonHub Team",
+  "license": "MIT"
+}

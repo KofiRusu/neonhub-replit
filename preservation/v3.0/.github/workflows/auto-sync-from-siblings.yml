@@ -1,0 +1,51 @@
+name: Auto Sync from Sibling Repos
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+  push:
+    paths: [ "scripts/auto-sync/**", ".github/workflows/auto-sync-from-siblings.yml" ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SOURCE_PAT: ${{ secrets.SOURCE_PAT }}
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: ${{ hashFiles('pnpm-lock.yaml') && 'pnpm' || 'npm' }}
+
+      - name: Install deps
+        run: |
+          corepack enable || true
+          npm ci
+
+      - name: Ensure labels exist
+        run: |
+          gh label create auto-sync -c "#0366d6" -d "Automated sync PRs" 2>&1 || true
+          gh label create risk:low -c "#2cbe4e" -d "Low risk changes" 2>&1 || true
+          gh label create risk:medium -c "#fbca04" -d "Medium risk changes" 2>&1 || true
+          gh label create risk:high -c "#d93f0b" -d "High risk changes" 2>&1 || true
+
+      - name: Run Auto Sync
+        run: |
+          chmod +x scripts/auto-sync/run-ci.sh
+          ./scripts/auto-sync/run-ci.sh
+
