@@ -27,18 +27,18 @@ interface BrandVoiceCopilotProps {
   sources?: Array<{ title: string; url: string; updatedAt: string }>
 }
 
-export default function BrandVoiceCopilot({ onIntent, sources }: BrandVoiceCopilotProps) {
+export default function BrandVoiceCopilot({ onIntent: _onIntent, sources }: BrandVoiceCopilotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       type: "assistant",
       content:
-        "Hi! I'm your Brand Voice Copilot. I can help you generate content, analyze campaigns, run SEO audits, and coordinate across all your marketing agents. Try typing `/` to see available commands or just ask me anything!",
+        "Hi! I&apos;m your Brand Voice Copilot. I can help you generate content, analyze campaigns, run SEO audits, and coordinate across all your marketing agents. Try typing `/` to see available commands or just ask me anything!",
       timestamp: new Date(),
     },
   ])
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [_isLoading, setIsLoading] = useState(false)
   const [showActionPicker, setShowActionPicker] = useState(false)
   const [predictedIntent, setPredictedIntent] = useState<string | null>(null)
   const [expandedReasoning, setExpandedReasoning] = useState<string | null>(null)
@@ -84,7 +84,7 @@ export default function BrandVoiceCopilot({ onIntent, sources }: BrandVoiceCopil
         type: "assistant",
         content: predictedIntent
           ? `I can help you with that! I've detected you want to run a ${predictedIntent} action. Would you like me to proceed?`
-          : `I understand you're asking about "${input}". Based on your brand voice guidelines, here's what I recommend...`,
+          : `I understand you&apos;re asking about "${input}". Based on your brand voice guidelines, here's what I recommend...`,
         timestamp: new Date(),
         sources: sources || [
           { title: "Brand Guidelines v2.1", url: "/docs/brand-guidelines", updatedAt: "2024-01-15" },

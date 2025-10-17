@@ -23,7 +23,7 @@ interface AgentRunnerProps {
   isRunning?: boolean
 }
 
-export default function AgentRunner({ agentId, agentName, schema, onRun, isRunning = false }: AgentRunnerProps) {
+export default function AgentRunner({ agentId: _agentId, agentName, schema, onRun, isRunning = false }: AgentRunnerProps) {
   const [params, setParams] = useState<Record<string, any>>({})
   const [showAdvanced, setShowAdvanced] = useState(false)
 

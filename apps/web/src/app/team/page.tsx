@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import PageLayout from "@/components/page-layout"
-import { Skeleton } from "@/src/components/ui/skeleton"
+// import { Skeleton } from "@/src/components/ui/skeleton" // Unused
 import { useTeamMembers, useInvitations, useInviteMember, useRemoveMember, useCancelInvitation } from "@/src/hooks/useTeam"
 import type { InviteMemberInput } from "@/src/lib/adapters/team"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -104,7 +104,7 @@ export default function TeamPage() {
     }
   }
 
-  const isLoading = membersLoading || invitationsLoading
+  const _isLoading = membersLoading || invitationsLoading
 
   const getRoleColor = (role: string) => {
     switch (role) {

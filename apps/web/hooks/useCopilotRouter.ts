@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 
 interface Intent {
   command: string
@@ -21,8 +21,8 @@ interface ActionResult {
 export function useCopilotRouter() {
   const [isExecuting, setIsExecuting] = useState(false)
 
-  // Define available intents and their handlers
-  const intents: Intent[] = [
+  // Define available intents and their handlers - memoized to prevent recreation
+  const intents: Intent[] = useMemo(() => [
     {
       command: "generate-post",
       description: "Generate social media post with brand compliance",
@@ -156,7 +156,7 @@ export function useCopilotRouter() {
         }
       },
     },
-  ]
+  ], [])
 
   const executeIntent = useCallback(async (command: string, payload: any): Promise<ActionResult> => {
     setIsExecuting(true)
@@ -182,7 +182,7 @@ export function useCopilotRouter() {
     } finally {
       setIsExecuting(false)
     }
-  }, [])
+  }, [intents])
 
   const getAvailableIntents = useCallback(() => {
     return intents.map((intent) => ({
@@ -191,11 +191,11 @@ export function useCopilotRouter() {
       category: intent.category,
       status: intent.status,
     }))
-  }, [])
+  }, [intents])
 
   const getIntentByCommand = useCallback((command: string) => {
     return intents.find((i) => i.command === command)
-  }, [])
+  }, [intents])
 
   return {
     executeIntent,

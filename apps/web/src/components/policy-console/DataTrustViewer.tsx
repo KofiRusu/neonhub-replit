@@ -43,7 +43,7 @@ export function DataTrustViewer({ dataId = 'sample-data-001' }: DataTrustViewerP
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Provenance Chain for {dataId}</h3>
         <div className="space-y-4">
-          {provenance.map((event, idx) => (
+          {provenance.map((event, _idx) => (
             <div key={event.eventId} className="flex items-start border-l-4 border-blue-500 pl-4 py-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">

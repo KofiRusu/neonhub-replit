@@ -156,7 +156,7 @@ export default function BrandMemoryPanel({ brandProfile = mockBrandProfile, canE
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Brand Memory</h2>
-            <p className="text-sm text-gray-400">Your brand's core identity and voice guidelines</p>
+            <p className="text-sm text-gray-400">Your brand&apos;s core identity and voice guidelines</p>
           </div>
         </div>
 
@@ -314,7 +314,7 @@ export default function BrandMemoryPanel({ brandProfile = mockBrandProfile, canE
 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-semibold text-[#00FF88] mb-2">Do's</h4>
+                    <h4 className="text-sm font-semibold text-[#00FF88] mb-2">Do&apos;s</h4>
                     <ul className="space-y-1">
                       {brandProfile.voice.doList.map((item, index) => (
                         <li key={index} className="text-sm text-gray-300 flex items-start">
@@ -326,7 +326,7 @@ export default function BrandMemoryPanel({ brandProfile = mockBrandProfile, canE
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-[#FF006B] mb-2">Don'ts</h4>
+                    <h4 className="text-sm font-semibold text-[#FF006B] mb-2">Don&apos;ts</h4>
                     <ul className="space-y-1">
                       {brandProfile.voice.dontList.map((item, index) => (
                         <li key={index} className="text-sm text-gray-300 flex items-start">

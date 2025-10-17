@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { fetchAPI, formatPercent, getSeverityColor } from './utils';
+import { fetchAPI } from './utils';
 import type { EthicalAssessment } from './types';
 
 export interface EthicalMonitorProps {

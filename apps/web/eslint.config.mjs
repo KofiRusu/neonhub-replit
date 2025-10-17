@@ -20,6 +20,31 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    rules: {
+      // Warnings (should fix but not blocking)
+      "@typescript-eslint/no-explicit-any": "warn", // Warning budget allows this
+      "@next/next/no-img-element": "warn", // Allow <img> with warning
+      
+      // Errors (must fix)
+      "@typescript-eslint/no-unused-vars": ["error", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_"
+      }],
+      "react/no-unescaped-entities": "error",
+      "react-hooks/exhaustive-deps": "error",
+      
+      // Disable overly strict rules
+      "@typescript-eslint/no-require-imports": "off", // Some legacy code needs this
+    },
+  },
+  {
+    files: ["**/__tests__/**/*", "**/*.test.*", "**/*.spec.*"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // Allow any in tests
+    },
+  },
 ];
 
 export default eslintConfig;

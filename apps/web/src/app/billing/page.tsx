@@ -80,8 +80,8 @@ export default function BillingPage() {
   // Fetch real data
   const { data: currentPlan, isLoading: planLoading } = useBillingPlan()
   const { data: usageData, isLoading: usageLoading } = useUsage()
-  const { data: invoices = [], isLoading: invoicesLoading } = useInvoices()
-  const isSandbox = useIsSandboxMode()
+  const { data: invoices = [], isLoading: _invoicesLoading } = useInvoices()
+  const _isSandbox = useIsSandboxMode()
   const isStripeLive = useIsStripeLive()
 
   // Stripe mutations
@@ -490,7 +490,7 @@ export default function BillingPage() {
                       Usage Alert
                     </h3>
                     <p className="text-sm text-gray-400">
-                      You're using 43% of your API quota. At current rate, you'll exceed your limit on Jan 22.
+                      You&apos;re using 43% of your API quota. At current rate, you&apos;ll exceed your limit on Jan 22.
                     </p>
                   </div>
                   <Button variant="outline" className="bg-transparent border-[#FF006B]/30 hover:bg-[#FF006B]/10">

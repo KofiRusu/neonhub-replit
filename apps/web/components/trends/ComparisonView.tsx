@@ -8,7 +8,7 @@ interface ComparisonViewProps {
   timeRange: string
 }
 
-export function ComparisonView({ timeRange }: ComparisonViewProps) {
+export function ComparisonView({ timeRange: _timeRange }: ComparisonViewProps) {
   const comparisons = [
     {
       category: "Content Performance",

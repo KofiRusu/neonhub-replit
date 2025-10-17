@@ -1106,7 +1106,7 @@ function AutomationCard({ automation, onEdit, onToggle, onAnalyze }: AutomationC
           <span className="text-xs text-gray-400">{automation.steps.length} steps</span>
         </div>
         <div className="space-y-2">
-          {automation.steps.slice(0, 3).map((step, index) => (
+          {automation.steps.slice(0, 3).map((step, _index) => (
             <div key={step.id} className="flex items-center justify-between text-xs">
               <span className="text-gray-300">{step.name}</span>
               <div className="flex items-center space-x-2">

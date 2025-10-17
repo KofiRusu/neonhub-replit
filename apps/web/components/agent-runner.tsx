@@ -11,7 +11,7 @@ interface AgentSchema {
   type: string
   required: boolean
   description: string
-  default?: any
+  default?: string | number | boolean
   options?: string[]
 }
 
@@ -19,12 +19,12 @@ interface AgentRunnerProps {
   agentId: string
   agentName: string
   schema: AgentSchema[]
-  onRun: (params: Record<string, any>) => void
+  onRun: (params: Record<string, string | number | boolean>) => void
   isRunning?: boolean
 }
 
-export default function AgentRunner({ agentId, agentName, schema, onRun, isRunning = false }: AgentRunnerProps) {
-  const [params, setParams] = useState<Record<string, any>>({})
+export default function AgentRunner({ agentId: _agentId, agentName, schema, onRun, isRunning = false }: AgentRunnerProps) {
+  const [params, setParams] = useState<Record<string, string | number | boolean>>({})
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,7 +32,7 @@ export default function AgentRunner({ agentId, agentName, schema, onRun, isRunni
     onRun(params)
   }
 
-  const updateParam = (name: string, value: any) => {
+  const updateParam = (name: string, value: string | number | boolean) => {
     setParams((prev) => ({ ...prev, [name]: value }))
   }
 

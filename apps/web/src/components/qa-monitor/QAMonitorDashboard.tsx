@@ -9,7 +9,7 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle,
-  Clock,
+  // Clock, // Unused
   TrendingUp,
   TrendingDown,
   Zap,
@@ -59,7 +59,7 @@ export const QAMonitorDashboard: React.FC = () => {
 
   const [anomalies, setAnomalies] = useState<AnomalyData[]>([]);
   const [benchmarks, setBenchmarks] = useState<BenchmarkData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {

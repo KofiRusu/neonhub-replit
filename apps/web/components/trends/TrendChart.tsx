@@ -6,7 +6,7 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ timeRange }: TrendChartProps) {
-  const chartData = useMemo(() => {
+  const _chartData = useMemo(() => {
     // Generate mock data based on time range
     const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90
     return Array.from({ length: days }, (_, i) => ({

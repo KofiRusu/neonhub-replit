@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_BASE, http } from "@/src/lib/api";
+import { API_BASE } from "@/src/lib/api";
 import { r, type RouteKey } from "@/src/lib/route-map";
 
 type Probe = { k: RouteKey; method: "GET" | "POST" };

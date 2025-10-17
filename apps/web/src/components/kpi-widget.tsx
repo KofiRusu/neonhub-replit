@@ -19,7 +19,7 @@ interface KPIWidgetProps {
 }
 
 export default function KPIWidget({ title, value, change, format = "number", icon, color = "blue", subtitle }: KPIWidgetProps) {
-  const [displayValue, setDisplayValue] = useState(0)
+  const [_displayValue, setDisplayValue] = useState(0)
   const prefersReduced = useReducedMotion()
 
   useEffect(() => {

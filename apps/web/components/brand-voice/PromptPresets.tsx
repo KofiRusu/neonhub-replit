@@ -153,7 +153,7 @@ const difficultyColors = {
 export default function PromptPresets() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [selectedPreset, setSelectedPreset] = useState<PromptPreset | null>(null)
+  const [_selectedPreset, _setSelectedPreset] = useState<PromptPreset | null>(null)
   const [customPrompt, setCustomPrompt] = useState("")
 
   const filteredPresets = presets.filter((preset) => {

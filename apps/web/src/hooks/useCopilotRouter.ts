@@ -7,7 +7,7 @@ import { r } from "@/src/lib/route-map";
 
 // No tRPC client present in this UI package. Keep optional to avoid build-time resolution.
 // If a tRPC client is added later, wire it here.
-const api: unknown = undefined;
+const _api: unknown = undefined;
 
 type AnyPayload = Record<string, unknown>;
 
@@ -23,7 +23,7 @@ function notImplemented(intent: Intent): NotImplementedError {
 export function useCopilotRouter() {
   const mapIntentToCall = useCallback(
     async (intent: Intent, payload: AnyPayload): Promise<ActionResult> => {
-      const startedAt = performance.now();
+      const _startedAt = performance.now();
       try {
         // Map intents to REST endpoints; if an endpoint 404s, surface NotImplemented
         switch (intent) {
@@ -85,6 +85,7 @@ export function useCopilotRouter() {
         void endedAt; // reserved for optional telemetry/logging by caller
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- No external dependencies, all logic is self-contained
     []
   );
 

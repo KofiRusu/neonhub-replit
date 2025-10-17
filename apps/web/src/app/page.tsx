@@ -20,14 +20,14 @@ interface AgentCardProps {
   tasks: number
 }
 
-interface ActivityItem {
+interface _ActivityItem {
   id: string
   message: string
   time: string
   type: "success" | "info" | "warning"
 }
 
-const MetricCard = ({ title, value, change, icon, theme }: MetricCardProps) => {
+const _MetricCard = ({ title, value, change, icon, theme }: MetricCardProps) => {
   const themeClasses = {
     blue: "border-blue-500/30 hover:border-blue-500/50",
     purple: "border-purple-500/30 hover:border-purple-500/50",
@@ -56,7 +56,7 @@ const MetricCard = ({ title, value, change, icon, theme }: MetricCardProps) => {
   )
 }
 
-const AgentCard = ({ name, status, performance, icon, tasks }: AgentCardProps) => {
+const _AgentCard = ({ name, status, performance, icon, tasks }: AgentCardProps) => {
   return (
     <div className="card-glow animate-fade-in-up">
       <div className="flex items-center justify-between mb-3">

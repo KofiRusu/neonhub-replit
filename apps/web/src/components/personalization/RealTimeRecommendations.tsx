@@ -45,6 +45,7 @@ export function RealTimeRecommendations({
     // Set up real-time updates every 30 seconds
     const interval = setInterval(fetchRecommendations, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchRecommendations is stable and defined in same scope
   }, [userId, context]);
 
   const fetchRecommendations = async () => {
@@ -143,7 +144,7 @@ export function RealTimeRecommendations({
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-blue-600" />
               <p className="text-blue-800">
-                No real-time recommendations available. We'll analyze your data and provide insights soon.
+                No real-time recommendations available. We&apos;ll analyze your data and provide insights soon.
               </p>
             </div>
           </div>

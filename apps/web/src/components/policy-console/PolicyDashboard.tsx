@@ -248,7 +248,7 @@ interface StatusCardProps {
   total: number;
 }
 
-function StatusCard({ title, status, healthy, total }: StatusCardProps) {
+function StatusCard({ title, status: _status, healthy, total }: StatusCardProps) {
   const healthStatus = getHealthStatus(healthy, total);
   
   return (

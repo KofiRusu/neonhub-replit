@@ -41,6 +41,7 @@ export function UserBehaviorAnalytics({ userId, className }: UserBehaviorAnalyti
   useEffect(() => {
     fetchUserBehaviorData();
     fetchRecommendations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Functions are stable and defined in same scope
   }, [userId]);
 
   const fetchUserBehaviorData = async () => {

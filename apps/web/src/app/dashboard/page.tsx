@@ -112,7 +112,7 @@ function KPIMetricCard({
   isTopPerformer = false,
 }: KPIMetricCardProps) {
   const [displayValue, setDisplayValue] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const [_isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => {

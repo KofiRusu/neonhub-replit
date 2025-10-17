@@ -16,7 +16,7 @@ interface ForecastWidgetProps {
 
 export function ForecastWidget({
   title,
-  metric,
+  metric: _metric,
   currentValue,
   predictedValue,
   confidence,

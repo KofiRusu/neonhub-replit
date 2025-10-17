@@ -270,7 +270,7 @@ export default function SocialMediaPage() {
                 <CardContent>
                   <div className="space-y-3">
                     <p className="text-sm text-gray-300">
-                      "Just launched our new AI-powered analytics dashboard! 🚀 #AI #Analytics"
+                      &quot;Just launched our new AI-powered analytics dashboard! 🚀 #AI #Analytics&quot;
                     </p>
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1">

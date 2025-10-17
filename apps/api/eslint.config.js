@@ -15,9 +15,25 @@ export default [
       "@typescript-eslint": tsPlugin,
     },
     rules: {
+      // Errors (must fix)
+      "@typescript-eslint/no-unused-vars": ["error", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_"
+      }],
+      // "@typescript-eslint/no-floating-promises": "error", // Disabled - requires type information
+      "no-console": ["warn", { allow: ["warn", "error", "info", "debug"] }],
+      
+      // Warnings (should fix but not blocking)
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@typescript-eslint/explicit-module-boundary-types": "off", // Too noisy for now
+      "@typescript-eslint/no-inferrable-types": "warn",
+    },
+  },
+  {
+    files: ["**/__tests__/**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off", // Allow any in tests
     },
   },
 ];
