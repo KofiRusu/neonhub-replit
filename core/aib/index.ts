@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { logger } from '../../backend/src/lib/logger';
+import { logger } from '../../apps/api/src/lib/logger';
 import { AgentMessage, AgentContext, AgentEvent } from './types';
 
 export class AgentIntelligenceBus extends EventEmitter {

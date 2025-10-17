@@ -14,9 +14,8 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../core/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

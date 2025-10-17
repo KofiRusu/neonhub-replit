@@ -1,4 +1,4 @@
-import { logger } from '../../backend/src/lib/logger';
+import { logger } from '../../apps/api/src/lib/logger';
 import { AgentIntelligenceBus, AgentMessage } from '../aib';
 
 export interface SafetyFilter {

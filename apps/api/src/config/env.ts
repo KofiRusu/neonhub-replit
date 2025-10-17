@@ -20,6 +20,7 @@ const envSchema = z.object({
   // External APIs
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
   OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+  OPENAI_MODEL: z.string().default('gpt-4'),
   
   // Environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -51,3 +52,6 @@ export function validateEnv(): Env {
 
 // Singleton instance
 export const env = validateEnv();
+
+// Getter function for compatibility
+export const getEnv = () => env;
