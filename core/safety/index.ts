@@ -183,7 +183,7 @@ export class SafetyManager {
           break;
         }
       } catch (error) {
-        logger.error(`Safety filter ${filter.id} failed`, { error });
+        logger.error({ filterId: filter.id, error }, `Safety filter ${filter.id} failed`);
         allResults.push({
           passed: false,
           score: 0,
@@ -339,18 +339,18 @@ export class SafetyManager {
   }
 
   private async handleSafetyViolation(message: AgentMessage, result: SafetyResult): Promise<void> {
-    logger.warn('Safety violation detected', {
+    logger.warn({
       messageId: message.id,
       violations: result.violations,
       score: result.score
-    });
+    }, 'Safety violation detected');
 
     // Determine appropriate fallback action
     const fallbackAction = this.determineFallbackAction(result);
 
     switch (fallbackAction) {
       case 'block':
-        logger.info('Message blocked due to safety violation', { messageId: message.id });
+        logger.info({ messageId: message.id }, 'Message blocked due to safety violation');
         break;
       case 'sanitize':
         await this.sanitizeAndForward(message, result);
@@ -387,7 +387,7 @@ export class SafetyManager {
     };
 
     await this.aib.broadcastMessage(sanitizedMessage);
-    logger.info('Message sanitized and forwarded', { messageId: message.id });
+    logger.info({ messageId: message.id }, 'Message sanitized and forwarded');
   }
 
   private sanitizeContent(payload: any, recommendations: string[]): any {
@@ -419,7 +419,7 @@ export class SafetyManager {
     };
 
     await this.aib.broadcastMessage(escalationMessage);
-    logger.warn('Safety violation escalated', { messageId: message.id });
+    logger.warn({ messageId: message.id }, 'Safety violation escalated');
   }
 
   addCustomFilter(filter: SafetyFilter): void {

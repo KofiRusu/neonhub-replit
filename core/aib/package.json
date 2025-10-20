@@ -1,0 +1,7 @@
+{
+  "name": "@neonhub/aib",
+  "version": "4.0.0",
+  "description": "AI Brain module",
+  "main": "index.ts",
+  "types": "index.ts"
+}

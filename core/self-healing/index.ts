@@ -134,7 +134,7 @@ export class SelfHealingManager {
           await this.attemptAutoRepair(component, result);
         }
       } catch (error) {
-        logger.error(`Health check failed for ${component}`, { error });
+        logger.error({ component, error }, `Health check failed for ${component}`);
       }
     }
 
@@ -261,9 +261,9 @@ export class SelfHealingManager {
     try {
       await this.executeRepairAction(repairAction);
       repairAction.success = true;
-      logger.info(`Auto-repair successful for ${component}`, { repairId: repairAction.id });
+      logger.info({ component, repairId: repairAction.id }, `Auto-repair successful for ${component}`);
     } catch (error) {
-      logger.error(`Auto-repair failed for ${component}`, { error, repairId: repairAction.id });
+      logger.error({ component, error, repairId: repairAction.id }, `Auto-repair failed for ${component}`);
     }
 
     this.repairHistory.push(repairAction);
@@ -300,21 +300,21 @@ export class SelfHealingManager {
   }
 
   private handleAgentError(event: any) {
-    logger.warn('Agent error detected, initiating repair', { agentId: event.agentId, error: event.error });
+    logger.warn({ agentId: event.agentId, error: event.error }, 'Agent error detected, initiating repair');
     // Trigger immediate repair for agent errors
   }
 
   private handleHealthCheck(event: any) {
-    logger.debug('Health check event received', { component: event.component, status: event.status });
+    logger.debug({ component: event.component, status: event.status }, 'Health check event received');
   }
 
   private handleTenantHealthCheck(event: any) {
-    logger.debug('Tenant health check event received', { tenantId: event.tenantId, component: event.component, status: event.status });
+    logger.debug({ tenantId: event.tenantId, component: event.component, status: event.status }, 'Tenant health check event received');
     // Handle tenant-specific health checks
   }
 
   private handleTenantResourceUsage(event: any) {
-    logger.debug('Tenant resource usage event received', { tenantId: event.tenantId, usage: event.usage });
+    logger.debug({ tenantId: event.tenantId, usage: event.usage }, 'Tenant resource usage event received');
     // Update tenant resource usage tracking
     this.tenantResourceUsage.set(event.tenantId, {
       tenantId: event.tenantId,
@@ -336,7 +336,7 @@ export class SelfHealingManager {
           await this.attemptTenantAutoRepair(tenantId, result);
         }
       } catch (error) {
-        logger.error(`Tenant health check failed for ${tenantId}`, { error });
+        logger.error({ tenantId, error }, `Tenant health check failed for ${tenantId}`);
       }
     }
   }
@@ -401,7 +401,7 @@ export class SelfHealingManager {
     const repairPolicy = policies.find(p => p.type === 'repair' && p.enabled);
 
     if (!repairPolicy) {
-      logger.warn(`No repair policy found for tenant ${tenantId}`);
+      logger.warn({ tenantId }, `No repair policy found for tenant ${tenantId}`);
       return;
     }
 
@@ -419,9 +419,9 @@ export class SelfHealingManager {
     try {
       await this.executeTenantRepairAction(repairAction);
       repairAction.success = true;
-      logger.info(`Tenant auto-repair successful for ${tenantId}`, { repairId: repairAction.id });
+      logger.info({ tenantId, repairId: repairAction.id }, `Tenant auto-repair successful for ${tenantId}`);
     } catch (error) {
-      logger.error(`Tenant auto-repair failed for ${tenantId}`, { error, repairId: repairAction.id });
+      logger.error({ tenantId, error, repairId: repairAction.id }, `Tenant auto-repair failed for ${tenantId}`);
     }
 
     this.repairHistory.push(repairAction);
@@ -472,7 +472,7 @@ export class SelfHealingManager {
     this.tenantConfigs.set(config.id, config);
     this.tenantIsolationContexts.set(config.id, this.createTenantIsolationContext(config));
     this.tenantPolicies.set(config.id, config.policies);
-    logger.info(`Tenant registered: ${config.id}`);
+    logger.info({ tenantId: config.id }, `Tenant registered: ${config.id}`);
   }
 
   unregisterTenant(tenantId: string): void {
@@ -481,7 +481,7 @@ export class SelfHealingManager {
     this.tenantResourceUsage.delete(tenantId);
     this.tenantCommunicationChannels.delete(tenantId);
     this.tenantPolicies.delete(tenantId);
-    logger.info(`Tenant unregistered: ${tenantId}`);
+    logger.info({ tenantId }, `Tenant unregistered: ${tenantId}`);
   }
 
   private createTenantIsolationContext(config: TenantConfig): TenantIsolationContext {
@@ -516,12 +516,12 @@ export class SelfHealingManager {
       throw new Error(`Tenant ${tenantId} not found`);
     }
 
-    logger.info(`Migrating tenant ${tenantId} to cluster ${targetCluster}`);
+    logger.info({ tenantId, targetCluster }, `Migrating tenant ${tenantId} to cluster ${targetCluster}`);
 
     // Use federation manager to coordinate cross-cluster migration
     // Note: FederationManager.migrateTenant method would need to be implemented
     // For now, simulate the migration coordination
-    logger.info(`Coordinating tenant migration with federation manager for ${tenantId} to ${targetCluster}`);
+    logger.info({ tenantId, targetCluster }, `Coordinating tenant migration with federation manager for ${tenantId} to ${targetCluster}`);
 
     // Update tenant config with new cluster
     config.federationEnabled = true;
@@ -529,7 +529,7 @@ export class SelfHealingManager {
   }
 
   async failoverTenant(tenantId: string, targetCluster: string): Promise<void> {
-    logger.warn(`Initiating tenant failover for ${tenantId} to ${targetCluster}`);
+    logger.warn({ tenantId, targetCluster }, `Initiating tenant failover for ${tenantId} to ${targetCluster}`);
 
     // Similar to migration but for emergency scenarios
     await this.migrateTenant(tenantId, targetCluster);
@@ -544,7 +544,7 @@ export class SelfHealingManager {
   }
 
   private async executeTenantPolicy(tenantId: string, policy: TenantPolicy): Promise<void> {
-    logger.info(`Executing tenant policy ${policy.name} for ${tenantId}`);
+    logger.info({ tenantId, policyName: policy.name }, `Executing tenant policy ${policy.name} for ${tenantId}`);
 
     // Simulate policy execution
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -573,7 +573,7 @@ export class SelfHealingManager {
       authenticated: true
     });
 
-    logger.info(`Secure tenant channel created: ${channelId}`);
+    logger.info({ channelId, tenantId, peerTenantId }, `Secure tenant channel created: ${channelId}`);
   }
 
   getTenantDiagnostics(): MultiTenantDiagnosticResult[] {
@@ -594,6 +594,6 @@ export class SelfHealingManager {
 
     config.resourceQuotas = { ...config.resourceQuotas, ...quotas };
     this.tenantConfigs.set(tenantId, config);
-    logger.info(`Updated resource quotas for tenant ${tenantId}`);
+    logger.info({ tenantId, quotas }, `Updated resource quotas for tenant ${tenantId}`);
   }
 }

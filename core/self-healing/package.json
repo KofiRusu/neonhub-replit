@@ -1,0 +1,7 @@
+{
+  "name": "@neonhub/self-healing",
+  "version": "3.3.0",
+  "description": "Self-Healing module",
+  "main": "index.ts",
+  "types": "index.ts"
+}

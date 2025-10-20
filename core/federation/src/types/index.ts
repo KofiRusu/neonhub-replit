@@ -228,12 +228,6 @@ export interface AggregationConfig {
   timeoutMs: number;
 }
 
-export enum AggregationAlgorithm {
-  FED_AVG = 'fed_avg',
-  FED_PROX = 'fed_prox',
-  SECURE_AGGREGATION = 'secure_aggregation'
-}
-
 export enum IntelligenceAggregationAlgorithm {
   FED_AVG = 'fed_avg',
   FED_PROX = 'fed_prox',
@@ -242,6 +236,8 @@ export enum IntelligenceAggregationAlgorithm {
   STACKED_GENERALIZATION = 'stacked_generalization',
   META_LEARNING_AGGREGATION = 'meta_learning_aggregation'
 }
+
+export type AggregationAlgorithm = IntelligenceAggregationAlgorithm;
 
 export interface PoisoningDetectionResult {
   nodeId: string;
@@ -369,14 +365,6 @@ export interface IntelligenceAggregationRequest {
   timeoutMs: number;
 }
 
-export enum AggregationAlgorithm {
-  FED_AVG = 'fed_avg',
-  FED_PROX = 'fed_prox',
-  SECURE_AGGREGATION = 'secure_aggregation',
-  ENSEMBLE_AVERAGE = 'ensemble_average',
-  STACKED_GENERALIZATION = 'stacked_generalization',
-  META_LEARNING_AGGREGATION = 'meta_learning_aggregation'
-}
 
 export interface ModelVersion {
   modelId: string;

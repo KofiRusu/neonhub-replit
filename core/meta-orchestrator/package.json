@@ -1,0 +1,7 @@
+{
+  "name": "@neonhub/meta-orchestrator",
+  "version": "3.3.0",
+  "description": "Meta Orchestrator module",
+  "main": "index.ts",
+  "types": "index.ts"
+}

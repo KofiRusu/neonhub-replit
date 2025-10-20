@@ -9,7 +9,8 @@ import {
   Logger,
   ConsoleLogger,
   GlobalOrchestratorError,
-  GlobalOrchestratorErrorCode
+  GlobalOrchestratorErrorCode,
+  GlobalCapability
 } from '../types';
 import { NodeDiscoveryService } from '../services/NodeDiscoveryService';
 import { HealthMonitoringService } from '../services/HealthMonitoringService';
@@ -204,6 +205,7 @@ export class GlobalOrchestratorManager extends EventEmitter {
     const failoverStats = this.failoverService.getFailoverStats();
 
     return {
+      orchestratorId: this.config.orchestratorId,
       messagesSent: 0, // Would be tracked
       messagesReceived: 0, // Would be tracked
       bytesSent: 0, // Would be tracked
@@ -289,7 +291,7 @@ export class GlobalOrchestratorManager extends EventEmitter {
       federations: Array.from(federations.entries()).map(([federationId, nodes]) => ({
         federationId,
         nodes,
-        leaderNodeId: nodes.find(n => n.capabilities.includes('federation_coordination'))?.nodeId,
+        leaderNodeId: nodes.find(n => n.capabilities.includes(GlobalCapability.FEDERATION_COORDINATION))?.nodeId,
         lastSync: Date.now(),
         capabilities: nodes.flatMap(n => n.capabilities),
         status: 'active' as any // Would be determined by federation state

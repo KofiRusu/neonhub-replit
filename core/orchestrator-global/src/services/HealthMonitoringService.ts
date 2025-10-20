@@ -216,6 +216,12 @@ export class HealthMonitoringService extends EventEmitter {
     };
   }
 
+  updateNodeHealth(nodeId: string, isHealthy: boolean): void {
+    const status = isHealthy ? HealthStatus.HEALTHY : HealthStatus.UNHEALTHY;
+    this.nodeHealthStatus.set(nodeId, status);
+    this.logger.debug(`Updated health status for node ${nodeId}: ${status}`);
+  }
+
   calculateAverageLoad(nodeIds?: string[]): LoadMetrics | null {
     let nodesToCheck = nodeIds;
     if (!nodesToCheck) {

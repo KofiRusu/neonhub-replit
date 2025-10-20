@@ -1,8 +1,42 @@
 # NeonHub v3.0 - AI-Powered Marketing Automation Platform
 
 [![CI](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml/badge.svg)](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml)
+[![Production Status](https://img.shields.io/badge/production-v3.0-green)](https://neonhubecosystem.com)
+[![Test Coverage](https://img.shields.io/badge/tests-32%2F32%20passing-success)](./apps/api/src/__tests__)
 
 **NeonHub** is an AI-powered marketing automation platform built with Next.js 15, Express, Prisma, and OpenAI. This is a monorepo containing both the API backend and web frontend.
+
+## 🌐 Production Deployment (v3.0 Hybrid)
+
+**Status:** ✅ Production Ready | **Test Coverage:** 32/32 passing
+
+### Production URLs
+- **Web Application:** https://neonhubecosystem.com
+- **API Endpoint:** https://api.neonhubecosystem.com
+- **API Health:** https://api.neonhubecosystem.com/api/health
+- **Status Page:** https://status.neonhubecosystem.com
+- **Documentation:** https://docs.neonhubecosystem.com
+
+### Deployment Architecture
+- **Web Frontend:** Vercel (Next.js 15)
+- **API Backend:** Railway (Node.js/Express)
+- **Database:** Neon PostgreSQL
+- **CDN:** Vercel Edge Network
+- **Monitoring:** UptimeRobot + Railway Metrics
+
+### Deployment Documentation
+- **📘 [Hybrid Deployment Guide](./docs/HYBRID_DEPLOYMENT_v3.0.md)** - Complete production deployment steps
+- **📋 [Release Notes v3.0](./release/RELEASE_NOTES_v3.0_HYBRID.md)** - Features and changes
+- **🔧 [API Environment Checklist](./release/env-checklist-api.md)** - API configuration
+- **🌐 [Web Environment Checklist](./release/env-checklist-web.md)** - Web configuration
+- **🧪 [Smoke Test Script](./scripts/smoke-test-production.sh)** - Post-deployment validation
+
+### Quick Deploy
+```bash
+# Run automated deployment preparation
+chmod +x release/v3.0-hybrid-deployment.sh
+./release/v3.0-hybrid-deployment.sh
+```
 
 ---
 
@@ -226,63 +260,36 @@ NeonHub includes 5 powerful AI agents for marketing automation:
 
 ## 🚢 Production Deployment
 
-### Option 1: Vercel (Web) + Railway/Render (API)
+**Current Version:** v3.0 (Hybrid Strategy)
 
-#### Deploy Web to Vercel
+For complete production deployment instructions, see:
 
-1. **Connect GitHub repo** to Vercel
-2. **Project Settings:**
-   - Framework: Next.js
-   - Root Directory: `apps/web`
-   - Build Command: `npm run build`
-   - Install Command: `npm install`
-   - Node Version: 20.x
+### 📘 Primary Documentation
+- **[Hybrid Deployment Guide](./docs/HYBRID_DEPLOYMENT_v3.0.md)** - Complete 10-phase deployment protocol
+- **[Release Notes v3.0](./release/RELEASE_NOTES_v3.0_HYBRID.md)** - Features, limitations, and upgrade path
 
-3. **Environment Variables** (on Vercel dashboard):
-   ```
-   NEXT_PUBLIC_API_URL=https://your-api-domain.com
-   NEXTAUTH_SECRET=<generated-secret>
-   NEXTAUTH_URL=https://your-domain.vercel.app
-   NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
-   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
-   DATABASE_URL=<your-production-postgres-url>
-   GITHUB_ID=<github-oauth-client-id>
-   GITHUB_SECRET=<github-oauth-client-secret>
-   ```
+### 🔧 Configuration Templates
+- **[Railway Config](./release/railway-config.json)** - API backend configuration
+- **[Vercel Config](./release/vercel-config.json)** - Web frontend configuration
+- **[API Environment Checklist](./release/env-checklist-api.md)** - Required environment variables
+- **[Web Environment Checklist](./release/env-checklist-web.md)** - Required environment variables
+- **[Monitoring Setup](./release/monitoring-config.yml)** - UptimeRobot/Pingdom templates
 
-4. **Deploy**: Vercel will auto-deploy on push to main
+### 🧪 Testing & Validation
+```bash
+# Run smoke tests after deployment
+chmod +x scripts/smoke-test-production.sh
+./scripts/smoke-test-production.sh https://api.your-domain.com https://your-domain.com
+```
 
-#### Deploy API to Railway/Render
+### 🚀 Quick Deploy (Automated)
+```bash
+# Execute automated deployment preparation
+chmod +x release/v3.0-hybrid-deployment.sh
+./release/v3.0-hybrid-deployment.sh
+```
 
-1. **Create new service** linked to GitHub
-2. **Configure Build:**
-   - Root Directory: `apps/api`
-   - Build Command: `npm install && npm run build && npx prisma migrate deploy`
-   - Start Command: `npm run start`
-   - Port: 3001
-
-3. **Environment Variables:**
-   ```
-   DATABASE_URL=<managed-postgres-url>
-   PORT=3001
-   NODE_ENV=production
-   OPENAI_API_KEY=sk-...
-   STRIPE_SECRET_KEY=sk_live_...
-   STRIPE_WEBHOOK_SECRET=whsec_...
-   RESEND_API_KEY=re_...
-   CORS_ORIGINS=https://your-domain.vercel.app
-   SENTRY_DSN=https://... (optional)
-   ```
-
-4. **Post-deployment:**
-   ```bash
-   # SSH into your service and run
-   npx prisma migrate deploy
-   npm run seed  # Optional: add demo data
-   ```
-
-### Option 2: Docker Compose
-
+### Alternative: Docker Compose (Local/Self-Hosted)
 ```bash
 # Build and start all services
 docker-compose up -d
@@ -344,11 +351,21 @@ npx playwright test
 
 ## 📚 Documentation
 
-- [Setup Guide](./docs/SETUP.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [API Documentation](./apps/api/docs/)
-- [Environment Variables](./docs/PRODUCTION_ENV_GUIDE.md)
-- [Contributing](./CONTRIBUTING.md)
+### Production Documentation (v3.0)
+- **[Hybrid Deployment Guide](./docs/HYBRID_DEPLOYMENT_v3.0.md)** - Production deployment protocol
+- **[Release Notes v3.0](./release/RELEASE_NOTES_v3.0_HYBRID.md)** - Features and changes
+- **[Environment Checklists](./release/)** - API and Web configuration
+
+### Development Documentation
+- **[Setup Guide](./docs/SETUP.md)** - Local development setup
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - General deployment info
+- **[API Documentation](./apps/api/docs/)** - API endpoints reference
+- **[Environment Variables](./docs/PRODUCTION_ENV_GUIDE.md)** - Configuration guide
+- **[Agent Guide](./README_AGENTS.md)** - AI agent documentation
+
+### Additional Resources
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Security Checklist](./docs/SECURITY_CHECKLIST.md)** - Security best practices
 
 ---
 
@@ -449,9 +466,17 @@ Private - NeonHub Technologies
 
 ## 🔗 Links
 
+### Production
+- **Web Application:** https://neonhubecosystem.com
+- **API Endpoint:** https://api.neonhubecosystem.com
+- **Status Page:** https://status.neonhubecosystem.com
+- **Documentation:** https://docs.neonhubecosystem.com
+
+### Development
 - **Repository:** https://github.com/KofiRusu/Neonhub-v3.0
 - **Issues:** https://github.com/KofiRusu/Neonhub-v3.0/issues
-- **Documentation:** [./docs](./docs)
+- **Project Docs:** [./docs](./docs)
+- **Deployment Docs:** [./release](./release)
 
 ---
 

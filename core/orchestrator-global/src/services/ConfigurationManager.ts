@@ -5,7 +5,9 @@ import {
   GlobalOrchestratorConfig,
   GlobalOrchestratorError,
   GlobalOrchestratorErrorCode,
-  Logger
+  Logger,
+  RoutingAlgorithm,
+  LoadBalancingStrategy
 } from '../types';
 
 export class ConfigurationManager extends EventEmitter {
@@ -41,8 +43,8 @@ export class ConfigurationManager extends EventEmitter {
         metricsCollectionInterval: 30000 // 30 seconds
       },
       routing: {
-        algorithm: 'adaptive',
-        loadBalancingStrategy: 'weighted',
+        algorithm: RoutingAlgorithm.ADAPTIVE,
+        loadBalancingStrategy: LoadBalancingStrategy.WEIGHTED,
         geoRoutingEnabled: true,
         latencyThreshold: 100, // ms
         capacityThreshold: 80, // percent
@@ -60,6 +62,7 @@ export class ConfigurationManager extends EventEmitter {
       },
       failover: {
         enabled: true,
+        backupNodes: [],
         failoverTimeout: 30000, // 30 seconds
         autoRecovery: true,
         dataReplication: true
@@ -262,12 +265,12 @@ export class ConfigurationManager extends EventEmitter {
   async setConfigValue(path: string, value: any): Promise<void> {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
-    const target = keys.reduce((current, key) => {
+    const target = keys.reduce((current: any, key) => {
       if (!current[key] || typeof current[key] !== 'object') {
         current[key] = {};
       }
       return current[key];
-    }, this.config);
+    }, this.config as any);
 
     target[lastKey] = value;
     await this.saveConfiguration();

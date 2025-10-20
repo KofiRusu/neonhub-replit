@@ -117,10 +117,11 @@ export class HealthChecker extends EventEmitter {
       }
     } catch (error) {
       const responseTime = Date.now() - startTime;
+      const message = error instanceof Error ? error.message : 'Unknown error';
       status.responseTime = responseTime;
       status.lastCheck = Date.now();
-      status.error = error.message;
-      this.handleUnhealthyNode(nodeId, status, error.message);
+      status.error = message;
+      this.handleUnhealthyNode(nodeId, status, message);
     }
   }
 
@@ -129,7 +130,8 @@ export class HealthChecker extends EventEmitter {
       const result = await grpcClient.healthCheck();
       return { healthy: result.healthy };
     } catch (error) {
-      throw new FederationError(FederationErrorCode.HEALTH_CHECK_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new FederationError(FederationErrorCode.HEALTH_CHECK_FAILED, message);
     }
   }
 

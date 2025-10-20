@@ -50,13 +50,14 @@ export class NodeDiscoveryService extends EventEmitter {
       // Perform initial discovery
       await this.performDiscovery();
     } catch (error) {
-      this.logger.error('Failed to start node discovery service', error);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Failed to start node discovery service', error as Error);
       throw new GlobalOrchestratorError(
         GlobalOrchestratorErrorCode.DISCOVERY_FAILED,
         'Failed to start discovery service',
         undefined,
         undefined,
-        { originalError: error.message }
+        { originalError: message }
       );
     }
   }
@@ -81,7 +82,7 @@ export class NodeDiscoveryService extends EventEmitter {
       this.isRunning = false;
       this.logger.info('Node discovery service stopped successfully');
     } catch (error) {
-      this.logger.error('Error stopping node discovery service', error);
+      this.logger.error('Error stopping node discovery service', error as Error);
     }
   }
 
@@ -109,7 +110,8 @@ export class NodeDiscoveryService extends EventEmitter {
 
       this.logger.info(`Discovery completed, found ${nodes.length} nodes`);
     } catch (error) {
-      this.logger.warn('Discovery request failed', { error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.warn('Discovery request failed', { error: message });
     }
   }
 
@@ -130,7 +132,7 @@ export class NodeDiscoveryService extends EventEmitter {
         this.logger.info(`Discovered new node: ${nodeInfo.nodeId} in federation ${nodeInfo.federationId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to register node ${nodeInfo.nodeId}`, error);
+      this.logger.error(`Failed to register node ${nodeInfo.nodeId}`, error as Error);
     }
   }
 
@@ -151,7 +153,8 @@ export class NodeDiscoveryService extends EventEmitter {
         // Send heartbeat to node
         await this.sendHeartbeatToNode(node);
       } catch (error) {
-        this.logger.warn(`Failed to send heartbeat to node ${nodeId}`, { error: error.message });
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        this.logger.warn(`Failed to send heartbeat to node ${nodeId}`, { error: message });
       }
     }
   }
@@ -171,7 +174,8 @@ export class NodeDiscoveryService extends EventEmitter {
       node.lastHealthCheck = Date.now();
       this.logger.debug(`Heartbeat sent to node ${node.nodeId}`);
     } catch (error) {
-      this.logger.debug(`Heartbeat failed for node ${node.nodeId}`, { error: error.message });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.debug(`Heartbeat failed for node ${node.nodeId}`, { error: message });
       throw error;
     }
   }

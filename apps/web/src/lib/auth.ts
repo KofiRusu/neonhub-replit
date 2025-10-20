@@ -15,6 +15,19 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "database",
+    maxAge: 12 * 60 * 60, // 12 hours
+    updateAge: 60 * 60,   // 1 hour (sliding window)
+  },
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+      },
+    },
   },
   callbacks: {
     session: async ({ session, user }) => {
@@ -25,6 +38,12 @@ export const authOptions: AuthOptions = {
           id: user.id,
         },
       };
+    },
+    async redirect({ url, baseUrl }) {
+      // Validate redirect URLs - prevent open redirects
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

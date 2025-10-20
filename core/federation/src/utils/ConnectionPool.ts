@@ -121,8 +121,9 @@ export class ConnectionPool extends EventEmitter {
 
       return connection;
     } catch (error) {
-      this.logger.error(`Failed to create connection for node ${nodeId}`, error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to create connection for node ${nodeId}`, error as Error);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 

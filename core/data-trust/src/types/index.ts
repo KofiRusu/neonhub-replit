@@ -1,5 +1,3 @@
-import { ethers } from 'ethers';
-
 export type HashAlgorithm = 'sha256' | 'sha3-256' | 'sha3-512' | 'blake2b-256' | 'blake2b-512';
 
 export type BlockchainNetwork =
@@ -47,7 +45,7 @@ export interface BlockchainConfig {
   contractAddress?: string;
   privateKey?: string;
   gasLimit?: number;
-  gasPrice?: ethers.BigNumber;
+  gasPrice?: bigint;
 }
 
 export interface BlockchainTransaction {
@@ -57,9 +55,9 @@ export interface BlockchainTransaction {
   timestamp: Date;
   from: string;
   to: string;
-  value: ethers.BigNumber;
-  gasUsed: ethers.BigNumber;
-  gasPrice: ethers.BigNumber;
+  value: bigint;
+  gasUsed: bigint;
+  gasPrice: bigint;
   status: boolean;
   data?: string;
 }

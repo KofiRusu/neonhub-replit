@@ -15,6 +15,17 @@ export function initWebSocket(httpServer: HTTPServer): SocketIOServer {
   io.on("connection", (socket) => {
     logger.info({ socketId: socket.id }, "Client connected");
 
+    // Subscribe to campaign updates
+    socket.on("subscribe:campaign", (campaignId: string) => {
+      socket.join(`campaign:${campaignId}`);
+      logger.debug({ socketId: socket.id, campaignId }, "Subscribed to campaign");
+    });
+
+    socket.on("unsubscribe:campaign", (campaignId: string) => {
+      socket.leave(`campaign:${campaignId}`);
+      logger.debug({ socketId: socket.id, campaignId }, "Unsubscribed from campaign");
+    });
+
     socket.on("disconnect", () => {
       logger.info({ socketId: socket.id }, "Client disconnected");
     });
@@ -37,5 +48,15 @@ export function broadcast(event: string, data: any): void {
     logger.debug({ event, data }, "Broadcast event");
   } catch (error) {
     logger.error({ error, event }, "Failed to broadcast event");
+  }
+}
+
+export function broadcastToCampaign(campaignId: string, event: string, data: any): void {
+  try {
+    const socket = getIO();
+    socket.to(`campaign:${campaignId}`).emit(event, data);
+    logger.debug({ campaignId, event, data }, "Broadcast to campaign");
+  } catch (error) {
+    logger.error({ error, campaignId, event }, "Failed to broadcast to campaign");
   }
 }

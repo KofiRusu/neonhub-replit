@@ -218,6 +218,7 @@ export enum FailoverType {
 }
 
 export interface GlobalMetrics extends FederationMetrics {
+  orchestratorId: string;
   totalFederations: number;
   activeNodes: number;
   routingDecisions: number;
@@ -234,6 +235,32 @@ export interface Logger {
   warn(message: string, meta?: any): void;
   error(message: string, error?: Error, meta?: any): void;
   debug(message: string, meta?: any): void;
+}
+
+export class ConsoleLogger implements Logger {
+  private prefix: string;
+
+  constructor(prefix: string = '[GlobalOrchestrator]') {
+    this.prefix = prefix;
+  }
+
+  info(message: string, meta?: any): void {
+    console.log(`${this.prefix} ${new Date().toISOString()} INFO: ${message}`, meta || '');
+  }
+
+  warn(message: string, meta?: any): void {
+    console.warn(`${this.prefix} ${new Date().toISOString()} WARN: ${message}`, meta || '');
+  }
+
+  error(message: string, error?: Error, meta?: any): void {
+    console.error(`${this.prefix} ${new Date().toISOString()} ERROR: ${message}`, error?.stack || error || '', meta || '');
+  }
+
+  debug(message: string, meta?: any): void {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`${this.prefix} ${new Date().toISOString()} DEBUG: ${message}`, meta || '');
+    }
+  }
 }
 
 export class GlobalOrchestratorError extends Error {

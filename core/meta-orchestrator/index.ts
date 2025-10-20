@@ -99,7 +99,7 @@ export class MetaOrchestrator {
       await this.resolveConflicts();
       await this.optimizeResourceAllocation();
     } catch (error) {
-      logger.error('Orchestration decision making failed', { error });
+      logger.error({ error }, 'Orchestration decision making failed');
     }
   }
 
@@ -163,9 +163,9 @@ export class MetaOrchestrator {
 
     try {
       await this.aib.sendMessage(agentId, message);
-      logger.debug(`Resource reallocation notified to ${agentId}`, { newAllocation });
+      logger.debug({ agentId, newAllocation }, `Resource reallocation notified to ${agentId}`);
     } catch (error) {
-      logger.error(`Failed to notify agent ${agentId} of reallocation`, { error });
+      logger.error({ agentId, error }, `Failed to notify agent ${agentId} of reallocation`);
     }
   }
 
@@ -182,7 +182,7 @@ export class MetaOrchestrator {
     };
 
     this.agentPriorities.set(agentId, priority);
-    logger.info(`Agent priority initialized`, { agentId, priority: priority.priority });
+    logger.info({ agentId, priority: priority.priority }, `Agent priority initialized`);
   }
 
   private async handleTaskRequest(event: any) {
@@ -211,7 +211,7 @@ export class MetaOrchestrator {
         });
         decision.success = true;
       } catch (error) {
-        logger.error(`Task assignment failed`, { taskId: task.id, agentId: bestAgent, error });
+        logger.error({ taskId: task.id, agentId: bestAgent, error }, `Task assignment failed`);
       }
 
       this.decisionHistory.push(decision);
@@ -219,7 +219,7 @@ export class MetaOrchestrator {
   }
 
   private handleConflict(event: any) {
-    logger.warn('Agent conflict detected', { conflict: event.conflict });
+    logger.warn({ conflict: event.conflict }, 'Agent conflict detected');
     // Implement conflict resolution logic
   }
 

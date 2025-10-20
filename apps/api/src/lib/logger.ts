@@ -3,7 +3,44 @@ import { getEnv } from "../config/env.js";
 
 const env = getEnv();
 
-export const logger = pino({
+/**
+ * Sanitize sensitive data from logs
+ * Redacts tokens, passwords, secrets, and masks long alphanumeric strings
+ */
+function sanitize(data: any): any {
+  if (!data) return data;
+  
+  if (typeof data === 'string') {
+    // Mask potential tokens (long alphanumeric strings)
+    if (data.length > 20 && /^[A-Za-z0-9_-]+$/.test(data)) {
+      return `${data.substring(0, 4)}...${data.substring(data.length - 4)}`;
+    }
+    return data;
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(sanitize);
+  }
+  
+  if (typeof data === 'object') {
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      // Never log these fields
+      const sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'accessToken',
+                            'refreshToken', 'authorization', 'cookie', 'sessionToken'];
+      if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
+        sanitized[key] = '[REDACTED]';
+      } else {
+        sanitized[key] = sanitize(value);
+      }
+    }
+    return sanitized;
+  }
+  
+  return data;
+}
+
+const baseLogger = pino({
   level: env.NODE_ENV === "production" ? "info" : "debug",
   transport:
     env.NODE_ENV !== "production"
@@ -17,3 +54,37 @@ export const logger = pino({
         }
       : undefined,
 });
+
+/**
+ * Wrapped logger that automatically sanitizes sensitive data
+ */
+export const logger = {
+  info: (obj: any, msg?: string) => {
+    if (typeof obj === 'string') {
+      baseLogger.info(obj);
+    } else {
+      baseLogger.info(sanitize(obj), msg);
+    }
+  },
+  error: (obj: any, msg?: string) => {
+    if (typeof obj === 'string') {
+      baseLogger.error(obj);
+    } else {
+      baseLogger.error(sanitize(obj), msg);
+    }
+  },
+  warn: (obj: any, msg?: string) => {
+    if (typeof obj === 'string') {
+      baseLogger.warn(obj);
+    } else {
+      baseLogger.warn(sanitize(obj), msg);
+    }
+  },
+  debug: (obj: any, msg?: string) => {
+    if (typeof obj === 'string') {
+      baseLogger.debug(obj);
+    } else {
+      baseLogger.debug(sanitize(obj), msg);
+    }
+  },
+};

@@ -9,7 +9,7 @@ import {
 } from '../types/index.js';
 
 export class BlockchainConnector implements BlockchainConnectorInterface {
-  private provider: ethers.providers.JsonRpcProvider | null = null;
+  private provider: ethers.JsonRpcProvider | null = null;
   private web3: Web3 | null = null;
   private signer: ethers.Wallet | null = null;
   private config: BlockchainConfig;
@@ -25,10 +25,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   async connect(): Promise<void> {
     try {
       // Initialize ethers provider
-      this.provider = new ethers.providers.JsonRpcProvider(this.config.rpcUrl, {
-        chainId: this.config.chainId,
-        name: this.config.network
-      });
+      this.provider = new ethers.JsonRpcProvider(this.config.rpcUrl, this.config.chainId);
 
       // Initialize Web3 instance
       this.web3 = new Web3(this.config.rpcUrl);
@@ -94,12 +91,15 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
       const tx = await this.signer.sendTransaction({
         to: contractAddress,
         data,
-        gasLimit: this.config.gasLimit || gasEstimate.mul(120).div(100), // 20% buffer
+        gasLimit: this.config.gasLimit || (gasEstimate * 120n / 100n), // 20% buffer
         gasPrice: this.config.gasPrice
       });
 
       // Wait for confirmation
       const receipt = await tx.wait();
+      if (!receipt) {
+        throw new BlockchainError('Transaction receipt is null');
+      }
 
       return this.formatTransaction(receipt);
     } catch (error) {
@@ -176,7 +176,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
       const blockNumber = await this.provider!.getBlockNumber();
 
       return {
-        chainId: network.chainId,
+        chainId: Number(network.chainId),
         blockNumber
       };
     } catch (error) {
@@ -235,7 +235,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   private encodeStoreHashData(hash: string, metadata?: Record<string, any>): string {
     // This is a simplified implementation
     // In a real implementation, you'd use a proper contract ABI
-    const data = ethers.utils.defaultAbiCoder.encode(
+    const data = ethers.AbiCoder.defaultAbiCoder().encode(
       ['bytes32', 'string'],
       [hash, metadata ? JSON.stringify(metadata) : '']
     );
@@ -254,7 +254,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
     try {
       // Remove function signature and decode
       const encodedData = '0x' + data.slice(10);
-      const decoded = ethers.utils.defaultAbiCoder.decode(['bytes32', 'string'], encodedData);
+      const decoded = ethers.AbiCoder.defaultAbiCoder().decode(['bytes32', 'string'], encodedData);
       return decoded[0];
     } catch (error) {
       return '';
@@ -264,17 +264,17 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   /**
    * Format transaction from receipt
    */
-  private formatTransaction(receipt: ethers.providers.TransactionReceipt): BlockchainTransaction {
+  private formatTransaction(receipt: ethers.TransactionReceipt): BlockchainTransaction {
     return {
-      hash: receipt.transactionHash,
+      hash: receipt.hash,
       blockNumber: receipt.blockNumber,
       blockHash: receipt.blockHash,
       timestamp: new Date(), // Would need to get from block
       from: receipt.from,
       to: receipt.to || '',
-      value: ethers.BigNumber.from(0), // Would need to get from transaction
+      value: 0n, // Would need to get from transaction
       gasUsed: receipt.gasUsed,
-      gasPrice: ethers.BigNumber.from(0), // Would need to get from transaction
+      gasPrice: 0n, // Would need to get from transaction
       status: receipt.status === 1,
       data: '' // Would need to get from transaction
     };
@@ -284,8 +284,8 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
    * Format transaction from receipt and transaction
    */
   private formatTransactionFromReceipt(
-    tx: ethers.providers.TransactionResponse,
-    receipt: ethers.providers.TransactionReceipt
+    tx: ethers.TransactionResponse,
+    receipt: ethers.TransactionReceipt
   ): BlockchainTransaction {
     return {
       hash: tx.hash,
@@ -305,13 +305,14 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   /**
    * Get current gas price
    */
-  async getGasPrice(): Promise<ethers.BigNumber> {
+  async getGasPrice(): Promise<bigint> {
     if (!this.connected) {
       throw new BlockchainError('Not connected to blockchain');
     }
 
     try {
-      return await this.provider!.getGasPrice();
+      const feeData = await this.provider!.getFeeData();
+      return feeData.gasPrice || 0n;
     } catch (error) {
       throw new BlockchainError(
         'Failed to get gas price',
@@ -326,8 +327,8 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   async estimateGas(tx: {
     to: string;
     data?: string;
-    value?: ethers.BigNumber;
-  }): Promise<ethers.BigNumber> {
+    value?: bigint;
+  }): Promise<bigint> {
     if (!this.connected) {
       throw new BlockchainError('Not connected to blockchain');
     }

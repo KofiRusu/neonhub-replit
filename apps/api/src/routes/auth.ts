@@ -1,54 +1,14 @@
-import { Router } from "express";
-import { prisma } from "../db/prisma.js";
+import { Router } from 'express';
+import { requireAuth, type AuthRequest } from '../middleware/auth.js';
+import { prisma } from '../db/prisma.js';
 
-export const authRouter = Router();
+const router = Router();
 
-// Simple session check endpoint
-// In Phase 1D, this will integrate with NextAuth
-authRouter.get("/auth/session", async (req, res) => {
-  // TODO: Integrate with NextAuth session validation
-  // For now, return a mock session
-  
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader) {
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized",
-    });
-  }
-
-  // Mock session for development
-  const demoUser = await prisma.user.findUnique({
-    where: { email: "demo@neonhub.ai" },
-  });
-
-  if (!demoUser) {
-    return res.status(404).json({
-      success: false,
-      error: "User not found",
-    });
-  }
-
-  res.json({
-    success: true,
-    data: {
-      user: {
-        id: demoUser.id,
-        email: demoUser.email,
-        name: demoUser.name,
-        image: demoUser.image,
-      },
-    },
-  });
-});
-
-// User profile endpoint
-authRouter.get("/auth/me", async (req, res, next) => {
+// Get current user (protected)
+router.get('/auth/me', requireAuth, async (req: AuthRequest, res) => {
   try {
-    // TODO: Get user ID from session
-    const demoUser = await prisma.user.findUnique({
-      where: { email: "demo@neonhub.ai" },
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
       select: {
         id: true,
         email: true,
@@ -57,19 +17,31 @@ authRouter.get("/auth/me", async (req, res, next) => {
         createdAt: true,
       },
     });
-
-    if (!demoUser) {
-      return res.status(404).json({
-        success: false,
-        error: "User not found",
-      });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-
-    res.json({
-      success: true,
-      data: demoUser,
-    });
+    
+    res.json({ user });
   } catch (error) {
-    next(error);
+    console.error('Get user error:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
+
+// Logout (clear session)
+router.post('/auth/logout', requireAuth, async (req: AuthRequest, res) => {
+  try {
+    // Delete all sessions for user
+    await prisma.session.deleteMany({
+      where: { userId: req.user!.id },
+    });
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
+  }
+});
+
+export const authRouter = router;

@@ -149,8 +149,9 @@ export class FederationManager extends EventEmitter {
       this.logger.info('Federation manager started successfully');
       this.emit('started');
     } catch (error) {
-      this.logger.error('Failed to start federation manager', error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Failed to start federation manager', error as Error);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 
@@ -235,8 +236,9 @@ export class FederationManager extends EventEmitter {
       this.logger.info(`Connected to node ${nodeInfo.nodeId}`);
       this.emit('nodeConnected', nodeInfo);
     } catch (error) {
-      this.logger.error(`Failed to connect to node ${nodeInfo.nodeId}`, error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to connect to node ${nodeInfo.nodeId}`, error as Error);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 
@@ -270,9 +272,9 @@ export class FederationManager extends EventEmitter {
       this.updateMetrics(message);
 
       // Determine target node
-      let targetNodeId = message.targetNodeId;
+      let targetNodeId: string | undefined = message.targetNodeId;
       if (!targetNodeId) {
-        targetNodeId = this.loadBalancer.selectNode();
+        targetNodeId = this.loadBalancer.selectNode() || undefined;
         if (!targetNodeId) {
           throw new FederationError(FederationErrorCode.NODE_UNAVAILABLE, 'No available nodes');
         }

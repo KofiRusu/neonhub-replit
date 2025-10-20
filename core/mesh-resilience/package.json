@@ -23,7 +23,7 @@
   "author": "NeonHub Team",
   "license": "MIT",
   "dependencies": {
-    "automerge": "^2.1.10",
+    "@automerge/automerge": "^2.2.8",
     "yjs": "^13.6.10",
     "winston": "^3.11.0",
     "eventemitter3": "^5.0.1",

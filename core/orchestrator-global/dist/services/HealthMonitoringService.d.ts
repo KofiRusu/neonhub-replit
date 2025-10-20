@@ -21,6 +21,7 @@ export declare class HealthMonitoringService extends EventEmitter {
     getHealthyNodes(): string[];
     getUnhealthyNodes(): string[];
     getHealthSummary(): any;
+    updateNodeHealth(nodeId: string, isHealthy: boolean): void;
     calculateAverageLoad(nodeIds?: string[]): LoadMetrics | null;
 }
 //# sourceMappingURL=HealthMonitoringService.d.ts.map

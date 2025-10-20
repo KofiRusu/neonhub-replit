@@ -56,11 +56,17 @@ export async function evaluateAction(action: {
 }> {
   try {
     const manager = await getGovernanceManager();
-    const evaluation = await manager.policyEnforcer.evaluateAction(action);
+    const subject = {
+      type: 'REQUEST' as any,
+      id: `request-${Date.now()}`,
+      attributes: { action: action.action, ...action.context }
+    };
+    
+    const evaluation = await manager.policyEnforcer.enforce(subject, action.action, action.context);
     
     return {
       allowed: evaluation.allowed,
-      violations: evaluation.violations || [],
+      violations: evaluation.reason ? [evaluation.reason] : [],
       recommendations: evaluation.recommendations || []
     };
   } catch (error) {
@@ -81,7 +87,23 @@ export async function addPolicy(policy: {
 }): Promise<void> {
   try {
     const manager = await getGovernanceManager();
-    await manager.policyEngine.addPolicy(policy);
+    const fullPolicy = {
+      ...policy,
+      version: '1.0.0',
+      jurisdiction: ['GLOBAL'],
+      category: 'COMPLIANCE' as any,
+      metadata: {
+        author: 'system',
+        tags: [],
+        complianceFrameworks: [],
+        riskLevel: 'MEDIUM' as any,
+        reviewCycle: 30
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: policy.enabled ? 'ACTIVE' as any : 'DRAFT' as any
+    };
+    await manager.policyEngine.loadPolicy(fullPolicy);
     logger.info({ policyId: policy.id }, 'Policy added successfully');
   } catch (error) {
     logger.error({ error, policy }, 'Failed to add policy');
@@ -95,7 +117,7 @@ export async function addPolicy(policy: {
 export async function getPolicies(): Promise<any[]> {
   try {
     const manager = await getGovernanceManager();
-    return await manager.policyEngine.getAllPolicies();
+    return manager.policyEngine.getPolicies();
   } catch (error) {
     logger.error({ error }, 'Failed to get policies');
     throw new Error('Failed to retrieve policies');
@@ -116,12 +138,22 @@ export async function assessEthics(assessment: {
 }> {
   try {
     const manager = await getGovernanceManager();
-    const result = await manager.ethicalFramework.assessScenario(assessment);
+    const subject = {
+      type: 'SYSTEM' as any,
+      id: `assessment-${Date.now()}`,
+      attributes: {
+        scenario: assessment.scenario,
+        stakeholders: assessment.stakeholders,
+        potentialImpacts: assessment.potentialImpacts
+      }
+    };
+    
+    const result = await manager.ethicalFramework.assessEthicalImpact(subject);
     
     return {
       score: result.score,
-      concerns: result.concerns || [],
-      recommendations: result.recommendations || []
+      concerns: result.concerns.map(c => c.description),
+      recommendations: result.recommendations
     };
   } catch (error) {
     logger.error({ error, assessment }, 'Failed to assess ethics');
@@ -158,7 +190,7 @@ export async function getAuditLogs(filter?: {
 }): Promise<any[]> {
   try {
     const manager = await getGovernanceManager();
-    return await manager.auditLogger.getLogs(filter);
+    return await manager.auditLogger.getRecentLogs(100);
   } catch (error) {
     logger.error({ error, filter }, 'Failed to get audit logs');
     throw new Error('Failed to retrieve audit logs');

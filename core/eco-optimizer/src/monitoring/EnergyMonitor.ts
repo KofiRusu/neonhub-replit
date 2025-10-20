@@ -1,5 +1,5 @@
 import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch';
-import { MonitorClient, MetricsQueryClient } from '@azure/monitor-query';
+import { MetricsQueryClient } from '@azure/monitor-query';
 import { MetricServiceClient } from '@google-cloud/monitoring';
 import {
   CloudProvider,

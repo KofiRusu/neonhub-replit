@@ -66,8 +66,8 @@ class ConfigurationManager extends events_1.EventEmitter {
                 metricsCollectionInterval: 30000 // 30 seconds
             },
             routing: {
-                algorithm: 'adaptive',
-                loadBalancingStrategy: 'weighted',
+                algorithm: types_1.RoutingAlgorithm.ADAPTIVE,
+                loadBalancingStrategy: types_1.LoadBalancingStrategy.WEIGHTED,
                 geoRoutingEnabled: true,
                 latencyThreshold: 100, // ms
                 capacityThreshold: 80, // percent
@@ -85,6 +85,7 @@ class ConfigurationManager extends events_1.EventEmitter {
             },
             failover: {
                 enabled: true,
+                backupNodes: [],
                 failoverTimeout: 30000, // 30 seconds
                 autoRecovery: true,
                 dataReplication: true

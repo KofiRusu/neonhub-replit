@@ -51,8 +51,9 @@ export class GRPCClient extends EventEmitter {
 
       this.logger.info(`gRPC client connected to ${this.config.host}:${this.config.port}`);
     } catch (error) {
-      this.logger.error('Failed to connect gRPC client', error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Failed to connect gRPC client', error as Error);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 

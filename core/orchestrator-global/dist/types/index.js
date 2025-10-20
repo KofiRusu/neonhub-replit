@@ -1,7 +1,7 @@
 "use strict";
 // Import types from federation module (will be available at runtime)
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FailoverStrategy = exports.FederationStatus = exports.QualityOfService = exports.GlobalOrchestratorErrorCode = exports.GlobalOrchestratorError = exports.FailoverType = exports.ScalingAction = exports.HealthStatus = exports.GlobalCapability = exports.LoadBalancingStrategy = exports.RoutingAlgorithm = void 0;
+exports.FailoverStrategy = exports.FederationStatus = exports.QualityOfService = exports.GlobalOrchestratorErrorCode = exports.GlobalOrchestratorError = exports.ConsoleLogger = exports.FailoverType = exports.ScalingAction = exports.HealthStatus = exports.GlobalCapability = exports.LoadBalancingStrategy = exports.RoutingAlgorithm = void 0;
 var RoutingAlgorithm;
 (function (RoutingAlgorithm) {
     RoutingAlgorithm["ROUND_ROBIN"] = "round_robin";
@@ -47,6 +47,26 @@ var FailoverType;
     FailoverType["MANUAL"] = "manual";
     FailoverType["RECOVERY"] = "recovery";
 })(FailoverType || (exports.FailoverType = FailoverType = {}));
+class ConsoleLogger {
+    constructor(prefix = '[GlobalOrchestrator]') {
+        this.prefix = prefix;
+    }
+    info(message, meta) {
+        console.log(`${this.prefix} ${new Date().toISOString()} INFO: ${message}`, meta || '');
+    }
+    warn(message, meta) {
+        console.warn(`${this.prefix} ${new Date().toISOString()} WARN: ${message}`, meta || '');
+    }
+    error(message, error, meta) {
+        console.error(`${this.prefix} ${new Date().toISOString()} ERROR: ${message}`, error?.stack || error || '', meta || '');
+    }
+    debug(message, meta) {
+        if (process.env.NODE_ENV === 'development') {
+            console.debug(`${this.prefix} ${new Date().toISOString()} DEBUG: ${message}`, meta || '');
+        }
+    }
+}
+exports.ConsoleLogger = ConsoleLogger;
 class GlobalOrchestratorError extends Error {
     constructor(code, message, nodeId, federationId, details) {
         super(message);

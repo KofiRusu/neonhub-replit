@@ -121,7 +121,7 @@ export class AuditLogger extends EventEmitter {
       subject,
       result,
       policyId,
-      details
+      details: details || {}
     });
   }
 
@@ -339,6 +339,13 @@ export class AuditLogger extends EventEmitter {
    */
   getAuditEntriesCount(): number {
     return this.auditEntries.length;
+  }
+
+  /**
+   * Get recent audit logs
+   */
+  getRecentLogs(limit: number = 100): AuditEntry[] {
+    return this.queryAuditEntries({ limit });
   }
 
   /**

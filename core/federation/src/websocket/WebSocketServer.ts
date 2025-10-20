@@ -11,6 +11,7 @@ import {
   FederationError,
   FederationErrorCode,
   NodeInfo,
+  NodeStatus,
   MessagePriority
 } from '../types';
 import { Logger } from '../utils/Logger';
@@ -40,7 +41,7 @@ export class WebSocketServer extends EventEmitter {
 
       // Configure TLS if enabled
       if (this.config.tls?.enabled) {
-        serverOptions.server = this.createTLSServer();
+        serverOptions.server = this.createTLSServer() as any;
       }
 
       this.wss = new WebSocket.Server(serverOptions);
@@ -57,7 +58,7 @@ export class WebSocketServer extends EventEmitter {
       this.logger.info(`WebSocket server started on ${this.config.host}:${this.config.port}`);
     } catch (error) {
       this.logger.error('Failed to start WebSocket server', error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
@@ -95,7 +96,7 @@ export class WebSocketServer extends EventEmitter {
         address: request.socket.remoteAddress!,
         port: request.socket.remotePort!,
         capabilities: [],
-        status: 'online',
+        status: NodeStatus.ONLINE,
         lastSeen: Date.now(),
       };
       this.nodeRegistry.set(nodeId, nodeInfo);
@@ -185,7 +186,7 @@ export class WebSocketServer extends EventEmitter {
     this.connections.delete(nodeId);
     const nodeInfo = this.nodeRegistry.get(nodeId);
     if (nodeInfo) {
-      nodeInfo.status = 'offline';
+      nodeInfo.status = NodeStatus.OFFLINE;
       this.emit('nodeDisconnected', nodeInfo);
     }
     this.logger.info(`Node ${nodeId} disconnected`);
@@ -229,7 +230,7 @@ export class WebSocketServer extends EventEmitter {
   }
 
   getConnectedNodes(): NodeInfo[] {
-    return Array.from(this.nodeRegistry.values()).filter(node => node.status === 'online');
+    return Array.from(this.nodeRegistry.values()).filter(node => node.status === NodeStatus.ONLINE);
   }
 
   async stop(): Promise<void> {

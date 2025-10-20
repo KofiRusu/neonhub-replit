@@ -50,8 +50,9 @@ export class GRPCServer extends EventEmitter {
         }
       );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('Failed to start gRPC server', error);
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 
@@ -88,9 +89,9 @@ export class GRPCServer extends EventEmitter {
     if (this.config.tls?.enabled) {
       const cert = fs.readFileSync(this.config.tls.certPath!);
       const key = fs.readFileSync(this.config.tls.keyPath!);
-      const ca = this.config.tls.caPath ? fs.readFileSync(this.config.tls.caPath) : undefined;
+      const ca = this.config.tls.caPath ? fs.readFileSync(this.config.tls.caPath) : null;
 
-      return grpc.ServerCredentials.createSsl(ca, [{ cert, key }], true);
+      return grpc.ServerCredentials.createSsl(ca, [{ private_key: key, cert_chain: cert }], true);
     }
 
     return grpc.ServerCredentials.createInsecure();
@@ -174,8 +175,9 @@ message StreamRequest {
 
       callback(null, { success: true });
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error('Error handling send message', error);
-      callback({ code: grpc.status.INTERNAL, message: error.message });
+      callback({ code: grpc.status.INTERNAL, message });
     }
   }
 

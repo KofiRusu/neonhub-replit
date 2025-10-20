@@ -5,7 +5,7 @@
  */
 
 import { EventEmitter } from 'eventemitter3';
-import * as Automerge from 'automerge';
+import * as Automerge from '@automerge/automerge';
 import { v4 as uuidv4 } from 'uuid';
 import { CRDTState, MeshNode } from '../types';
 
@@ -26,7 +26,7 @@ export class CRDTManager extends EventEmitter {
   /**
    * Initialize a new CRDT document
    */
-  public createDocument<T>(docId: string, initialData: T): void {
+  public createDocument<T extends Record<string, unknown>>(docId: string, initialData: T): void {
     const doc = Automerge.from(initialData);
     this.documents.set(docId, doc);
     this.vectorClocks.set(docId, new Map([[this.nodeId, 1]]));
@@ -146,9 +146,9 @@ export class CRDTManager extends EventEmitter {
     if (!doc || doc.type !== 'G-Counter') return 0;
 
     return Object.values(doc.counters).reduce(
-      (sum: number, val: any) => sum + val,
+      (sum: number, val: any) => sum + (typeof val === 'number' ? val : 0),
       0
-    );
+    ) as number;
   }
 
   /**

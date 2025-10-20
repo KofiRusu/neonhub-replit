@@ -1,59 +1,75 @@
-# Week 1 Baseline Validation Report
+# Week 1 Baseline Validation Report (NeonHub Focus)
 
 Generated: 2025-10-20
 
-## Active Repositories
-- **NeonHub** (`/Users/kofirusu/Desktop/NeonHub`) – populated monorepo with extensive pending changes.
-- **Neon-v2.4.0** (`/Users/kofirusu/Desktop/Dev Work/Neon-v2.4.0`) – contains only `ui/.env.local`; application sources absent.
-- **OFAuto** (`/Users/kofirusu/Desktop/OFAuto`) – repository directory exists but is empty.
-- **PersRM** – not found; closest match is `PersLM` (`/Users/kofirusu/Desktop/PersLM`) with application scaffold but no `.env` files.
-- **neonui2.3** – repository not present under the Desktop workspace.
+## Repositories Detected
+- **NeonHub** (`/Users/kofirusu/Desktop/NeonHub`, version `3.0.0`) – Monorepo with API (`apps/api`), Web (`apps/web`), and `core/*` packages. Large backlog of tracked/untracked changes predates this baseline.
+- **Neon-v2.4.0** (`/Users/kofirusu/Desktop/Dev Work/Neon-v2.4.0`) – Directory contains only `ui/.env.local`; `package.json` and application sources are missing so dependency tasks cannot run.
+- **Neon-v2.3.3** (`/Users/kofirusu/Desktop/Desktop - MacBook Air (2)/NeonDev/Neon-v2.3.3`) – Legacy Next.js codebase present; pnpm installable but depends on Postgres env vars.
+- **neonui2.3** – Not found anywhere under the reachable Desktop workspace; anti-mock validation for this repo blocked.
 
-## Environment Summary
-- Node.js: `v20.17.0`
-- npm: `10.8.3`
-- pnpm: not available; `corepack enable pnpm` fails with `EACCES` and the workspace is locked to npm via `packageManager`.
-- Conda: `conda 24.9.2`
-- Python (base env): `Python 3.12.4`
-- Docker Engine: `Docker version 28.1.1, build 4eba377`
-- Docker Compose: `v2.35.1-desktop.1`
-- Required environment keys:
-  - `NeonHub/.env` and `apps/web/.env` include OpenAI, Stripe, Postgres (`DATABASE_URL`), and other integrations, but no Vercel-specific keys were detected.
-  - `apps/api/.env` covers OpenAI, Stripe, Postgres; Vercel variables are absent.
-  - External repos (`OFAuto`, `PersLM`, `Neon-v2.4.0/ui`) lack required environment templates.
+## Tooling & Environment
+- Node.js `v20.17.0`
+- npm `10.8.3`
+- pnpm `9.12.1` (via `corepack pnpm`; every command warns that `pnpm-workspace.yaml` is missing because the repo is configured for npm)
+- Conda `24.9.2`
+- Python `3.12.4`
+- Docker Engine `28.1.1`, Docker Compose `v2.36.0-desktop.1`
+- Required env keys (no values exposed):
+  - `NeonHub/.env`, `apps/web/.env`, and `apps/api/.env` include `DATABASE_URL`, `STRIPE_*`, and `OPENAI_API_KEY`.
+  - `Neon-v2.4.0/ui/.env.local` only exposes `NEXT_PUBLIC_API_URL` (missing DB/Stripe/OpenAI keys).
+  - `Neon-v2.3.3/.env.local` includes the full Postgres/Stripe/OpenAI/Vercel set.
 
-## Dependency & Workspace Notes
-- `npm install` (root) completed successfully and triggered Prisma generate; lockfile unchanged.
-- 17 vulnerabilities reported (`npm audit`); no fixes applied.
-- Workspace structure matches `package.json` workspaces (`apps/*`, `core/*`, `modules/*`), but many packages emit build/lint errors.
-- No pnpm workspace file present; converting to pnpm would require new tooling setup.
+## Dependencies & Database Actions
+- `corepack pnpm install` (NeonHub) – ✅ Completed with Prisma postinstall; repeated warnings about missing workspace manifest.
+- `corepack pnpm install` (Neon-v2.4.0) – ❌ Fails: `No package.json found`.
+- `corepack pnpm install` (Neon-v2.3.3) – ✅ Succeeds but Corepack injected a `packageManager` field referencing `pnpm@9.12.1`; new `pnpm-lock.yaml` generated.
+- `corepack pnpm prisma:generate` (NeonHub) – ✅ Prisma Client generated.
+- `corepack pnpm exec prisma migrate deploy --schema apps/api/prisma/schema.prisma` (NeonHub) – ✅ No pending migrations.
+- `corepack pnpm exec prisma migrate deploy --schema prisma/schema.prisma` (Neon-v2.3.3) – ❌ Fails: `DATABASE_URL` env var not set (incidentally confirms schema validation requires live Postgres). No migrations applied.
+- Seed scripts not executed because local Postgres service is offline and Docker stack cannot start.
 
-## Build, Lint, Test & Runtime Results
-| Command | Scope | Result | Key Findings |
-| --- | --- | --- | --- |
-| `npm install` | root | ✅ | Completed with Prisma client generation; 17 unresolved vulnerabilities remain. |
-| `npm run prisma:generate` | root → `apps/api` | ✅ | Prisma client generated successfully. |
-| `npm run build` | all workspaces | ❌ | <ul><li>`apps/api`: missing module `modules/predictive-engine/src/core/PredictiveEngine`, `CognitiveInfrastructure.analyze` typing gap.</li><li>`apps/web`: Next.js build failed; path aliases `@/src/hooks/useCopilotRouter` and `@/hooks/use-toast` unresolved.</li><li>`core/qa-sentinel`: numerous TS issues (`@tensorflow/tfjs-node` missing, `stats-lite` types missing, rootDir/include misconfigurations, missing `SelfHealingManager.on`).</li><li>`core/cooperative-intelligence`: TS18003 (no inputs matched `src/**/*`).</li></ul> |
-| `npm run lint` | all workspaces | ❌ | <ul><li>`apps/api/src/config/env.d.ts`: unused `envSchema` export error.</li><li>Multiple packages (`core/federation`, `core/qa-sentinel`, `core/orchestrator-global`, `core/mesh-resilience`, `modules/predictive-engine`) lack ESLint config (ESLint lookup failure).</li><li>Numerous `no-explicit-any` warnings remain across API routes/services.</li></ul> |
-| `npm run test` | all workspaces | ❌ | <ul><li>`apps/api`: suites pass but emit live OpenAI 401 errors (tests hit real API using redacted key).</li><li>`core/orchestrator-global`: Jest fails on `ExecutionEnvironment.ts` due to unsupported optional chaining syntax in current transform pipeline.</li><li>`core/qa-sentinel`, `modules/predictive-engine`: Jest exits with code 1 because no tests are found (`passWithNoTests` not enabled).</li></ul> |
-| `docker-compose up -d` | root services | ❌ | Fails immediately: Docker daemon not running (`Cannot connect to the Docker daemon at unix:///Users/kofirusu/.docker/run/docker.sock`). |
+## Build, Lint, Test Results (pnpm)
+| Command | Result | Highlights |
+| --- | --- | --- |
+| `pnpm lint --fix` | ❌ | `apps/api/src/config/env.d.ts` unrecoverable `no-unused-vars`; numerous `no-explicit-any` warnings; multiple packages (`core/federation`, `core/qa-sentinel`, `core/orchestrator-global`, `core/mesh-resilience`, `modules/predictive-engine`) lack ESLint configs so lint exits with configuration errors. |
+| `pnpm build` | ❌ | `apps/api` compile stops at `core/qa-sentinel` imports (`PredictiveEngine` path, missing `CognitiveInfrastructure.analyze`, `@tensorflow/tfjs-node`, `stats-lite` types); `apps/web` Next.js build fails due to unresolved aliases (`@/src/hooks/useCopilotRouter`, `@/hooks/use-toast`); multiple `core/*` packages (e.g., cooperative-intelligence) report TS18003 (no inputs). |
+| `pnpm test` | ❌ | API Jest suites pass but hit live OpenAI and log 401s; `core/orchestrator-global` Jest fails (Babel transform error); `core/qa-sentinel` and `modules/predictive-engine` exit with code 1 because no tests found; pnpm surfaces the same warnings about missing workspace manifest. |
 
-## Fixes Performed
-- No code fixes applied during this sweep; all issues remain outstanding.
+## Docker Stack
+- `docker-compose up -d` (NeonHub root) – ❌ `Cannot connect to the Docker daemon at unix:///Users/kofirusu/.docker/run/docker.sock`; Docker Desktop must be started before retrying.
+
+## Anti-Mock Sweep
+- `neonui2.3` repository unavailable → validation skipped (blocking issue).
+- `apps/web` (NeonHub) still leverages runtime mocks, e.g.:
+  - `apps/web/src/lib/adapters/billing.ts`, `team.ts` fallback to `mockPlan`, `mockUsage`, `mockMembers`, etc.
+  - Feature pages (`apps/web/src/app/{dashboard,campaigns,email,agents,content}/page.tsx`) render directly from `mock*` collections instead of tRPC calls.
+  - `fixture` terminology remains in adapters, indicating fallback data paths.
+- Requirement to ensure dashboards hit live tRPC endpoints is unmet.
+
+## Docker/Service Health Checks
+- API health route and UI root could not be tested because docker-compose never launched.
+
+## Artifacts & Changes Created
+- `pnpm-lock.yaml` (root) generated by Corepack; not staged.
+- No code fixes applied; baseline deliberately left unchanged aside from this report.
 
 ## Outstanding Blockers
-1. Missing or outdated inter-package imports (e.g., predictive engine types) break API build.
-2. UI path alias configuration is inconsistent, causing Next.js module resolution failures.
-3. QA Sentinel package lacks required dependencies/config (`@tensorflow/tfjs-node`, `stats-lite` typings, tsconfig include adjustments).
-4. Several packages do not provide ESLint configuration, causing lint command failures.
-5. Test suites require adjustments (`global.fetch` polyfill, passWithNoTests) and stable service mocks to avoid live API hits.
-6. Docker Desktop must be running locally before container orchestration can be validated.
-7. External repositories (`neonui2.3`, `PersRM`) missing or incomplete, preventing cross-project validation.
+1. Missing repositories (`neonui2.3`) and incomplete `Neon-v2.4.0` source tree prevent full-stack validation.
+2. Workspace lacks `pnpm-workspace.yaml`; pnpm treats the setup as npm-first, which triggers warnings and leaves scripts relying on npm internals (`npm run ...`) rather than pure pnpm equivalents.
+3. Inter-package imports (e.g., `core/qa-sentinel` -> raw sources in `modules/predictive-engine`) break TypeScript compilation.
+4. Next.js app relies on mock data instead of live tRPC/Prisma responses; violates anti-mock directive.
+5. Multiple packages miss ESLint configuration or type dependencies, causing lint/build failures.
+6. Jest environment still depends on live OpenAI keys and unsupported syntax transforms.
+7. Docker Desktop is stopped, so the required Postgres/Redis/API/UI stack cannot be validated.
+8. Prisma migrations for Neon-v2.3.3 cannot run without providing `DATABASE_URL`.
 
-## Suggested Next Steps
-1. Restore or re-clone missing repositories (`neonui2.3`, full `Neon-v2.4.0`, populated `OFAuto`, correct `PersRM`).
-2. Standardize tooling (`pnpm` vs `npm`) and add required workspace configs (`pnpm-workspace.yaml` or enforce npm scripts consistently).
-3. Resolve TypeScript path and dependency gaps noted above, then rerun build/lint.
-4. Add ESLint configs to affected packages or exclude them from the global lint command until configured.
-5. Harden tests against live API calls (mocks or env gating) and adjust Jest configs for packages with no test files.
-6. Launch Docker Desktop and rerun `docker-compose up -d` to validate service readiness once builds succeed.
+## Recommendations
+1. Restore or reclone `neonui2.3` and the missing files inside `Neon-v2.4.0` to bring frontend/backend repos back online.
+2. Add a `pnpm-workspace.yaml` (or migrate scripts fully to pnpm) so workspace commands no longer proxy through npm.
+3. Refactor cross-package dependencies so each package builds against published artefacts instead of deep source imports; add missing type declarations (`@tensorflow/tfjs-node`, `stats-lite`, etc.).
+4. Replace runtime mock datasets in `apps/web` with tRPC-backed data loaders before rerunning anti-mock checks.
+5. Introduce ESLint configs for standalone packages or adjust lint command to skip packages until configured.
+6. Stub or mock external APIs during tests to avoid live OpenAI calls and fix Babel/Jest configuration for `core/orchestrator-global`.
+7. Start Docker Desktop and re-run `docker-compose up -d`, followed by API/UI health probes once the build/test blockers above are resolved.
+8. Provide local Postgres credentials (or start containers) before retrying `prisma migrate deploy` / `seed` steps in all repos.

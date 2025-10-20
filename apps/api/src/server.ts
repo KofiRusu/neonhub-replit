@@ -1,22 +1,29 @@
 import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import { env } from "./config/env.js";
 import { logger } from "./lib/logger.js";
 import { initWebSocket } from "./ws/index.js";
 import { initSentry, Sentry } from "./obs/sentry.js";
+import { requireAuth } from "./middleware/auth.js";
+import { securityHeaders } from "./middleware/securityHeaders.js";
+import { strictCORS } from "./middleware/cors.js";
+import { rateLimit, authRateLimit } from "./middleware/rateLimit.js";
+import { auditMiddleware } from "./middleware/auditLog.js";
 import { healthRouter } from "./routes/health.js";
 import { contentRouter } from "./routes/content.js";
 import { metricsRouter } from "./routes/metrics.js";
 import { authRouter } from "./routes/auth.js";
 import { jobsRouter } from "./routes/jobs.js";
+import { campaignRouter } from "./routes/campaign.js";
+import credentialsRouter from "./routes/credentials.js";
+import settingsRouter from "./routes/settings.js";
 import predictiveRouter from "./routes/predictive.js";
 import governanceRouter from "./routes/governance.js";
 import dataTrustRouter from "./routes/data-trust.js";
 import ecoMetricsRouter from "./routes/eco-metrics.js";
 import orchestrationRouter from "./routes/orchestration.js";
+import { stripeWebhookRouter } from "./routes/stripe-webhook.js";
+import billingRouter from "./routes/billing.js";
 import { AppError } from "./lib/errors.js";
 
 // Environment is validated on import
@@ -31,35 +38,19 @@ const httpServer = createServer(app);
 // Initialize WebSocket
 initWebSocket(httpServer);
 
-// Middleware
-app.use(helmet({
-  contentSecurityPolicy: env.NODE_ENV === "production" ? undefined : false,
-}));
+// Security Middleware Stack (Week 3)
+// 1. Body parsing with size limits (1MB)
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// CORS with allowlist
-const corsOrigins = process.env.CORS_ORIGIN?.split(",") || [
-  env.NEXTAUTH_URL || "http://127.0.0.1:3000",
-  "http://localhost:3000",
-];
+// 2. Security headers (global)
+app.use(securityHeaders);
 
-app.use(cors({
-  origin: corsOrigins,
-  credentials: true,
-}));
+// 3. Strict CORS
+app.use(strictCORS);
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "60000"),
-  max: parseInt(process.env.RATE_LIMIT_MAX || "120"),
-  message: { error: "Too many requests, please try again later" },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(limiter);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// 4. Rate limiting (global, with feature flag support)
+app.use(rateLimit);
 
 // Request logging
 app.use((req, _res, next) => {
@@ -67,17 +58,24 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Routes
+// Public routes (no auth required)
 app.use(healthRouter);
-app.use(contentRouter);
-app.use(metricsRouter);
-app.use(authRouter);
-app.use(jobsRouter);
-app.use('/api/predictive', predictiveRouter);
-app.use('/api/governance', governanceRouter);
-app.use('/api/data-trust', dataTrustRouter);
-app.use('/api/eco-metrics', ecoMetricsRouter);
-app.use('/api/orchestration', orchestrationRouter);
+app.use(authRateLimit, authRouter); // Stricter rate limit on auth endpoints
+app.use(stripeWebhookRouter); // Webhook must use raw body
+
+// Protected routes (auth required + audit logging)
+app.use(requireAuth, contentRouter);
+app.use(requireAuth, metricsRouter);
+app.use(requireAuth, jobsRouter);
+app.use('/api/campaigns', requireAuth, auditMiddleware('campaign'), campaignRouter);
+app.use('/api/credentials', requireAuth, auditMiddleware('credential'), credentialsRouter);
+app.use('/api/settings', requireAuth, auditMiddleware('settings'), settingsRouter);
+app.use('/api/predictive', requireAuth, predictiveRouter);
+app.use('/api/governance', requireAuth, auditMiddleware('governance'), governanceRouter);
+app.use('/api/data-trust', requireAuth, dataTrustRouter);
+app.use('/api/eco-metrics', requireAuth, ecoMetricsRouter);
+app.use('/api/orchestration', requireAuth, orchestrationRouter);
+app.use('/api', requireAuth, billingRouter); // Billing routes with auth
 
 // 404 handler
 app.use((_req, res) => {

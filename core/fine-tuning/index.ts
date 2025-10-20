@@ -107,7 +107,7 @@ export class IncrementalFineTuner {
     }
 
     try {
-      logger.info('Starting fine-tuning cycle', { bufferSize: this.telemetryBuffer.length });
+      logger.info({ bufferSize: this.telemetryBuffer.length }, 'Starting fine-tuning cycle');
 
       // Prepare training data
       const trainingData = this.prepareTrainingData();
@@ -123,7 +123,7 @@ export class IncrementalFineTuner {
 
       logger.info('Fine-tuning cycle completed');
     } catch (error) {
-      logger.error('Fine-tuning cycle failed', { error });
+      logger.error({ error }, 'Fine-tuning cycle failed');
     }
   }
 
@@ -229,11 +229,11 @@ export class IncrementalFineTuner {
       },
       sender: 'fine-tuning-service',
       timestamp: new Date(),
-      priority: 'medium'
+      priority: 'medium' as const
     };
 
     await this.aib.broadcastMessage(message);
-    logger.debug(`Fine-tuning recommendations sent to ${agentId}`);
+    logger.debug({ agentId }, `Fine-tuning recommendations sent to ${agentId}`);
   }
 
   private async updateAgentConfigurations(): Promise<void> {

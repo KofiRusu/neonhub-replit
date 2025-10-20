@@ -24,8 +24,8 @@
   "author": "NeonHub Team",
   "license": "MIT",
   "dependencies": {
-    "@neonhub/ai-governance": "workspace:*",
-    "@neonhub/data-trust": "workspace:*",
+    "@neonhub/ai-governance": "*",
+    "@neonhub/data-trust": "*",
     "zod": "^3.22.4",
     "yaml": "^2.3.4"
   },

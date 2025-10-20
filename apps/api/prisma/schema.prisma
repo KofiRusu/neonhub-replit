@@ -23,6 +23,12 @@ model User {
   sessions      Session[]
   contentDrafts ContentDraft[]
   agentJobs     AgentJob[]
+  campaigns     Campaign[]
+  credentials   Credential[]
+  settings      UserSettings?
+  subscription  Subscription?
+  auditLogs     AuditLog[]
+  stripeCustomerId String?  @unique
 
   @@map("users")
 }
@@ -113,4 +119,261 @@ model MetricEvent {
   @@index([type])
   @@index([createdAt])
   @@map("metric_events")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  type        String   // 'email', 'social', 'multi-channel'
+  status      String   // 'draft', 'scheduled', 'active', 'paused', 'completed'
+  
+  config      Json     // Campaign-specific configuration
+  schedule    Json?    // Scheduling configuration
+  budget      Json?    // { total: 1000, spent: 250, currency: 'usd', alerts: [50, 75, 90] }
+  
+  emailSequences  EmailSequence[]
+  socialPosts     SocialPost[]
+  abTests         ABTest[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, status])
+  @@map("campaigns")
+}
+
+model EmailSequence {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  subject     String
+  body        String   @db.Text
+  variant     String?  // For A/B testing
+  
+  scheduledFor DateTime?
+  sentAt      DateTime?
+  
+  metrics     Json?    // opens, clicks, conversions
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([campaignId, scheduledFor])
+  @@map("email_sequences")
+}
+
+model SocialPost {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  platform    String   // 'twitter', 'linkedin', 'facebook', 'instagram'
+  content     String   @db.Text
+  mediaUrls   Json?
+  variant     String?  // For A/B testing
+  
+  scheduledFor DateTime?
+  publishedAt DateTime?
+  externalId  String?  // Platform post ID
+  
+  metrics     Json?    // likes, shares, comments, impressions
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([campaignId, platform, scheduledFor])
+  @@map("social_posts")
+}
+
+model ABTest {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  name        String
+  variants    Json     // Variant configurations
+  winner      String?  // Winning variant ID
+  
+  metrics     Json     // Performance metrics per variant
+  
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([campaignId])
+  @@map("ab_tests")
+}
+
+
+model Credential {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  provider    String   // 'twitter', 'linkedin', 'facebook', 'sendgrid', 'stripe', etc.
+  accountId   String?  // External account ID
+  
+  // Encrypted fields - NEVER store plaintext
+  accessToken      String?  @db.Text
+  refreshToken     String?  @db.Text
+  accessSecret     String?  @db.Text // For OAuth 1.0a (Twitter)
+  
+  scope       String?  // OAuth scopes granted
+  tokenType   String?  // 'Bearer', 'OAuth', etc.
+  
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // For tracking token usage
+  lastUsedAt  DateTime?
+  status      String   @default("active") // 'active', 'expired', 'revoked'
+  
+  @@unique([userId, provider, accountId])
+  @@index([userId, provider])
+  @@map("credentials")
+}
+
+model UserSettings {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Brand & Voice
+  brandVoice  Json?    // Brand personality, tone, style
+  
+  // Notifications
+  emailNotifications     Boolean @default(true)
+  pushNotifications      Boolean @default(false)
+  notificationFrequency  String  @default("realtime") // 'realtime', 'daily', 'weekly'
+  
+  // Regional
+  timezone    String   @default("UTC")
+  locale      String   @default("en-US")
+  dateFormat  String   @default("MM/DD/YYYY")
+  
+  // Privacy
+  dataRetention    Int     @default(90) // days
+  allowAnalytics   Boolean @default(true)
+  allowPersonalization Boolean @default(true)
+  
+  // API & Integration
+  apiRateLimit     Int     @default(1000) // requests per hour
+  webhookUrl       String?
+  webhookSecret    String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("user_settings")
+}
+
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  stripeCustomerId       String   @unique
+  stripeSubscriptionId   String   @unique
+  stripePriceId          String
+  stripeProductId        String
+  
+  plan              String   // 'free', 'pro', 'enterprise'
+  status            String   // 'active', 'canceled', 'past_due', 'trialing'
+  
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean  @default(false)
+  canceledAt            DateTime?
+  
+  // Usage tracking
+  campaignsUsed    Int      @default(0)
+  emailsSent       Int      @default(0)
+  socialPosts      Int      @default(0)
+  agentCalls       Int      @default(0)
+  
+  // Limits based on plan
+  campaignLimit    Int      @default(5)   // Free: 5, Pro: 50, Enterprise: unlimited
+  emailLimit       Int      @default(1000) // Free: 1K, Pro: 50K, Enterprise: unlimited
+  socialLimit      Int      @default(100)  // Free: 100, Pro: 5K, Enterprise: unlimited
+  agentCallLimit   Int      @default(100)  // Free: 100, Pro: 5K, Enterprise: unlimited
+  
+  trialEndsAt      DateTime?
+  metadata         Json?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  invoices         Invoice[]
+  usageRecords     UsageRecord[]
+  
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id                    String   @id @default(cuid())
+  subscriptionId        String
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  stripeInvoiceId       String   @unique
+  stripePaymentIntentId String?
+  
+  amountDue        Int      // in cents
+  amountPaid       Int      @default(0)
+  currency         String   @default("usd")
+  
+  status           String   // 'draft', 'open', 'paid', 'void', 'uncollectible'
+  
+  invoicePdf       String?
+  hostedInvoiceUrl String?
+  
+  dueDate          DateTime?
+  paidAt           DateTime?
+  
+  metadata         Json?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([subscriptionId, status])
+  @@map("invoices")
+}
+
+model UsageRecord {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  resourceType   String   // 'campaign', 'email', 'social_post', 'agent_call'
+  resourceId     String?  // ID of campaign, email, etc.
+  
+  quantity       Int      @default(1)
+  cost           Int?     // in cents, if applicable
+  
+  timestamp      DateTime @default(now())
+  
+  metadata       Json?
+  
+  @@index([subscriptionId, resourceType, timestamp])
+  @@map("usage_records")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  ip        String?
+  action    String   // 'create_campaign', 'delete_credential', 'update_settings', etc.
+  resource  String?  // Resource ID or type
+  metadata  Json?    // Additional context
+  
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([action])
+  @@map("audit_logs")
 }

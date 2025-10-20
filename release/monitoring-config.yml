@@ -1,0 +1,302 @@
+# NeonHub v3.0 Monitoring Configuration
+# Template for UptimeRobot, Pingdom, or similar monitoring services
+
+version: "1.0"
+service: "NeonHub v3.0 Production"
+updated: "2025-10-18"
+
+# API Monitoring
+api_monitors:
+  - name: "API Health Check"
+    type: "http"
+    url: "https://api.your-domain.com/api/health"
+    interval: 300  # 5 minutes
+    timeout: 10
+    method: "GET"
+    expected_status: 200
+    alert_contacts:
+      - email: "devops@your-domain.com"
+      - slack: "#production-alerts"
+    
+  - name: "API Auth Providers"
+    type: "http"
+    url: "https://api.your-domain.com/api/auth/providers"
+    interval: 600  # 10 minutes
+    timeout: 10
+    method: "GET"
+    expected_status: 200
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+  - name: "API Response Time"
+    type: "http"
+    url: "https://api.your-domain.com/api/health"
+    interval: 300
+    timeout: 10
+    method: "GET"
+    response_time_threshold: 2000  # 2 seconds
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+# Web Monitoring
+web_monitors:
+  - name: "Web Homepage"
+    type: "http"
+    url: "https://your-domain.com"
+    interval: 300  # 5 minutes
+    timeout: 10
+    method: "GET"
+    expected_status: 200
+    alert_contacts:
+      - email: "devops@your-domain.com"
+      - slack: "#production-alerts"
+    
+  - name: "Web Response Time"
+    type: "http"
+    url: "https://your-domain.com"
+    interval: 300
+    timeout: 10
+    method: "GET"
+    response_time_threshold: 3000  # 3 seconds
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+# SSL Certificate Monitoring
+ssl_monitors:
+  - name: "API SSL Certificate"
+    type: "ssl"
+    url: "https://api.your-domain.com"
+    interval: 86400  # 24 hours
+    expiry_threshold: 14  # Alert 14 days before expiry
+    alert_contacts:
+      - email: "devops@your-domain.com"
+  
+  - name: "Web SSL Certificate"
+    type: "ssl"
+    url: "https://your-domain.com"
+    interval: 86400  # 24 hours
+    expiry_threshold: 14
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+# Database Monitoring (if publicly accessible)
+database_monitors:
+  - name: "Database Connection"
+    type: "port"
+    host: "your-db-host.neon.tech"
+    port: 5432
+    interval: 600  # 10 minutes
+    timeout: 10
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+# Keyword Monitoring
+keyword_monitors:
+  - name: "API Error Page Check"
+    type: "keyword"
+    url: "https://api.your-domain.com/api/health"
+    interval: 300
+    keyword: '"status"'
+    keyword_type: "exists"
+    alert_contacts:
+      - email: "devops@your-domain.com"
+  
+  - name: "API Error Detection"
+    type: "keyword"
+    url: "https://api.your-domain.com/api/health"
+    interval: 300
+    keyword: "error"
+    keyword_type: "not-exists"
+    alert_contacts:
+      - email: "devops@your-domain.com"
+
+# Alert Settings
+alert_settings:
+  escalation_policy:
+    - level: 1
+      delay: 0  # Immediate
+      contacts:
+        - email: "devops@your-domain.com"
+    
+    - level: 2
+      delay: 15  # After 15 minutes
+      contacts:
+        - email: "engineering-lead@your-domain.com"
+        - sms: "+1234567890"
+    
+    - level: 3
+      delay: 60  # After 1 hour
+      contacts:
+        - email: "cto@your-domain.com"
+        - phone: "+1234567890"
+  
+  notification_channels:
+    email:
+      - address: "devops@your-domain.com"
+        name: "DevOps Team"
+      - address: "engineering-lead@your-domain.com"
+        name: "Engineering Lead"
+    
+    slack:
+      - webhook: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+        channel: "#production-alerts"
+        name: "Production Alerts"
+    
+    pagerduty:
+      - integration_key: "YOUR_PAGERDUTY_KEY"
+        name: "On-Call Engineer"
+
+# Maintenance Windows
+maintenance_windows:
+  - name: "Weekly Maintenance"
+    type: "recurring"
+    day: "Sunday"
+    start_time: "02:00"
+    duration: 120  # 2 hours
+    timezone: "UTC"
+    
+  - name: "Database Backup Window"
+    type: "recurring"
+    day: "Daily"
+    start_time: "01:00"
+    duration: 30
+    timezone: "UTC"
+
+# Reporting
+reports:
+  - name: "Weekly Uptime Report"
+    type: "uptime"
+    frequency: "weekly"
+    day: "Monday"
+    time: "09:00"
+    timezone: "UTC"
+    recipients:
+      - email: "engineering@your-domain.com"
+  
+  - name: "Monthly Performance Report"
+    type: "performance"
+    frequency: "monthly"
+    day_of_month: 1
+    time: "09:00"
+    timezone: "UTC"
+    recipients:
+      - email: "management@your-domain.com"
+
+# Platform-Specific Configurations
+
+# UptimeRobot Configuration
+uptimerobot:
+  api_key: "YOUR_UPTIMEROBOT_API_KEY"
+  alert_contacts:
+    - id: "123456"
+      type: "email"
+      value: "devops@your-domain.com"
+  monitors:
+    - friendly_name: "NeonHub API Health"
+      url: "https://api.your-domain.com/api/health"
+      type: 1  # HTTP(s)
+      interval: 300
+      timeout: 10
+      alert_contacts: "123456"
+    
+    - friendly_name: "NeonHub Web"
+      url: "https://your-domain.com"
+      type: 1
+      interval: 300
+      timeout: 10
+      alert_contacts: "123456"
+
+# Pingdom Configuration
+pingdom:
+  api_key: "YOUR_PINGDOM_API_KEY"
+  account_email: "your-email@your-domain.com"
+  checks:
+    - name: "NeonHub API"
+      host: "api.your-domain.com"
+      type: "http"
+      url: "/api/health"
+      encryption: true
+      port: 443
+      resolution: 5
+      sendnotificationwhendown: 2
+      notifyagainevery: 5
+      notifywhenbackup: true
+      
+    - name: "NeonHub Web"
+      host: "your-domain.com"
+      type: "http"
+      url: "/"
+      encryption: true
+      port: 443
+      resolution: 5
+      sendnotificationwhendown: 2
+      notifyagainevery: 5
+      notifywhenbackup: true
+
+# Custom Health Checks
+custom_health_checks:
+  - name: "Database Health"
+    script: |
+      #!/bin/bash
+      psql $DATABASE_URL -c "SELECT 1" > /dev/null 2>&1
+      echo $?
+    interval: 300
+    expected_exit_code: 0
+  
+  - name: "API Latency Check"
+    script: |
+      #!/bin/bash
+      time=$(curl -s -o /dev/null -w "%{time_total}" https://api.your-domain.com/api/health)
+      if (( $(echo "$time > 2.0" | bc -l) )); then
+        exit 1
+      fi
+      exit 0
+    interval: 300
+    expected_exit_code: 0
+
+# Metrics to Track
+metrics:
+  api:
+    - request_rate
+    - error_rate
+    - response_time_p50
+    - response_time_p95
+    - response_time_p99
+    - uptime_percentage
+  
+  web:
+    - page_load_time
+    - first_contentful_paint
+    - time_to_interactive
+    - cumulative_layout_shift
+    - uptime_percentage
+  
+  database:
+    - connection_count
+    - query_duration_avg
+    - query_duration_p95
+    - connection_pool_usage
+
+# SLA Targets
+sla_targets:
+  uptime: 99.9  # 99.9% uptime
+  api_response_time_p95: 2000  # 2 seconds
+  web_response_time_p95: 3000  # 3 seconds
+  error_rate: 0.01  # 1% error rate
+
+# Notes
+notes: |
+  This configuration template should be adapted to your specific monitoring service.
+  
+  Common monitoring services:
+  - UptimeRobot: https://uptimerobot.com
+  - Pingdom: https://pingdom.com
+  - StatusCake: https://statuscake.com
+  - Datadog: https://datadoghq.com
+  - New Relic: https://newrelic.com
+  
+  Update placeholders:
+  - Replace 'your-domain.com' with actual domain
+  - Add actual API keys and webhooks
+  - Configure alert contact emails
+  - Adjust intervals based on your SLA requirements

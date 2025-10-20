@@ -111,7 +111,8 @@ export class WebSocketClient extends EventEmitter {
       });
     } catch (error) {
       this.isConnecting = false;
-      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
     }
   }
 

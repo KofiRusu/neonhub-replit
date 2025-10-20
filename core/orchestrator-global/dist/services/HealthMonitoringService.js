@@ -204,6 +204,11 @@ class HealthMonitoringService extends events_1.EventEmitter {
             lastUpdated: Date.now()
         };
     }
+    updateNodeHealth(nodeId, isHealthy) {
+        const status = isHealthy ? types_1.HealthStatus.HEALTHY : types_1.HealthStatus.UNHEALTHY;
+        this.nodeHealthStatus.set(nodeId, status);
+        this.logger.debug(`Updated health status for node ${nodeId}: ${status}`);
+    }
     calculateAverageLoad(nodeIds) {
         let nodesToCheck = nodeIds;
         if (!nodesToCheck) {

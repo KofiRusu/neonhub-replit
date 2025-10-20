@@ -72,8 +72,9 @@ class NodeDiscoveryService extends events_1.EventEmitter {
             await this.performDiscovery();
         }
         catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error('Failed to start node discovery service', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.DISCOVERY_FAILED, 'Failed to start discovery service', undefined, undefined, { originalError: error.message });
+            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.DISCOVERY_FAILED, 'Failed to start discovery service', undefined, undefined, { originalError: message });
         }
     }
     async stop() {
@@ -116,7 +117,8 @@ class NodeDiscoveryService extends events_1.EventEmitter {
             this.logger.info(`Discovery completed, found ${nodes.length} nodes`);
         }
         catch (error) {
-            this.logger.warn('Discovery request failed', { error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.warn('Discovery request failed', { error: message });
         }
     }
     async registerNode(nodeInfo) {
@@ -156,7 +158,8 @@ class NodeDiscoveryService extends events_1.EventEmitter {
                 await this.sendHeartbeatToNode(node);
             }
             catch (error) {
-                this.logger.warn(`Failed to send heartbeat to node ${nodeId}`, { error: error.message });
+                const message = error instanceof Error ? error.message : 'Unknown error';
+                this.logger.warn(`Failed to send heartbeat to node ${nodeId}`, { error: message });
             }
         }
     }
@@ -174,7 +177,8 @@ class NodeDiscoveryService extends events_1.EventEmitter {
             this.logger.debug(`Heartbeat sent to node ${node.nodeId}`);
         }
         catch (error) {
-            this.logger.debug(`Heartbeat failed for node ${node.nodeId}`, { error: error.message });
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.debug(`Heartbeat failed for node ${node.nodeId}`, { error: message });
             throw error;
         }
     }
