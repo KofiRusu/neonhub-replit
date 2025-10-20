@@ -9,6 +9,11 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     name?: string | null;
+    stripeCustomerId?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    image?: string | null;
+    emailVerified: Date | null;
   };
 }
 
@@ -33,7 +38,20 @@ export async function requireAuth(
       // For now, implement basic session lookup
       const session = await prisma.session.findFirst({
         where: { sessionToken: token },
-        include: { user: true },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+              emailVerified: true,
+              createdAt: true,
+              updatedAt: true,
+              stripeCustomerId: true,
+            },
+          },
+        },
       });
       
       if (!session || session.expires < new Date()) {
@@ -44,6 +62,11 @@ export async function requireAuth(
         id: session.user.id,
         email: session.user.email!,
         name: session.user.name,
+        stripeCustomerId: session.user.stripeCustomerId,
+        createdAt: session.user.createdAt,
+        updatedAt: session.user.updatedAt,
+        image: session.user.image,
+        emailVerified: session.user.emailVerified,
       };
     }
     
@@ -51,7 +74,20 @@ export async function requireAuth(
     else if (sessionCookie) {
       const session = await prisma.session.findUnique({
         where: { sessionToken: sessionCookie },
-        include: { user: true },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+              emailVerified: true,
+              createdAt: true,
+              updatedAt: true,
+              stripeCustomerId: true,
+            },
+          },
+        },
       });
       
       if (!session || session.expires < new Date()) {
@@ -62,6 +98,11 @@ export async function requireAuth(
         id: session.user.id,
         email: session.user.email!,
         name: session.user.name,
+        stripeCustomerId: session.user.stripeCustomerId,
+        createdAt: session.user.createdAt,
+        updatedAt: session.user.updatedAt,
+        image: session.user.image,
+        emailVerified: session.user.emailVerified,
       };
     }
     

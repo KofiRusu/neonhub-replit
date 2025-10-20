@@ -1,0 +1,90 @@
+# npm audit report
+
+form-data  <2.5.4
+Severity: critical
+form-data uses unsafe random function in form-data for choosing boundary - https://github.com/advisories/GHSA-fjxv-7rqg-78g4
+fix available via `npm audit fix --force`
+Will install kubernetes-client@0.0.1, which is a breaking change
+node_modules/request/node_modules/form-data
+  request  *
+  Depends on vulnerable versions of form-data
+  Depends on vulnerable versions of tough-cookie
+  node_modules/request
+    @kubernetes/client-node  <=1.0.0-rc7
+    Depends on vulnerable versions of jsonpath-plus
+    Depends on vulnerable versions of request
+    node_modules/@kubernetes/client-node
+    node_modules/kubernetes-client/node_modules/@kubernetes/client-node
+      @neonhub/predictive-engine  
+      Depends on vulnerable versions of @kubernetes/client-node
+      Depends on vulnerable versions of kubernetes-client
+      apps/api/node_modules/@neonhub/predictive-engine
+      modules/predictive-engine
+      node_modules/@neonhub/predictive-engine
+      kubernetes-client  >=1.0.0
+      Depends on vulnerable versions of @kubernetes/client-node
+      Depends on vulnerable versions of openid-client
+      Depends on vulnerable versions of request
+      Depends on vulnerable versions of swagger-fluent
+      node_modules/kubernetes-client
+    swagger-fluent  *
+    Depends on vulnerable versions of request
+    node_modules/swagger-fluent
+
+got  <11.8.5
+Severity: moderate
+Got allows a redirect to a UNIX socket - https://github.com/advisories/GHSA-pfrx-2q88-qq97
+fix available via `npm audit fix --force`
+Will install kubernetes-client@0.0.1, which is a breaking change
+node_modules/got
+  openid-client  <=3.15.10
+  Depends on vulnerable versions of got
+  Depends on vulnerable versions of jose
+  node_modules/kubernetes-client/node_modules/openid-client
+
+jose  <2.0.7
+Severity: moderate
+jose vulnerable to resource exhaustion via specifically crafted JWE with compressed plaintext - https://github.com/advisories/GHSA-hhhv-q57g-882q
+fix available via `npm audit fix --force`
+Will install kubernetes-client@0.0.1, which is a breaking change
+node_modules/kubernetes-client/node_modules/jose
+
+jsonpath-plus  <=10.2.0
+Severity: critical
+JSONPath Plus Remote Code Execution (RCE) Vulnerability - https://github.com/advisories/GHSA-pppg-cpfq-h7wr
+JSONPath Plus allows Remote Code Execution - https://github.com/advisories/GHSA-hw8r-x6gr-5gjp
+fix available via `npm audit fix --force`
+Will install kubernetes-client@0.0.1, which is a breaking change
+node_modules/jsonpath-plus
+node_modules/kubernetes-client/node_modules/jsonpath-plus
+
+protobufjs  7.0.0 - 7.2.4
+Severity: critical
+protobufjs Prototype Pollution vulnerability - https://github.com/advisories/GHSA-h755-8qp9-cq85
+fix available via `npm audit fix`
+node_modules/@google-cloud/monitoring/node_modules/protobufjs
+  google-gax  2.2.1-pre - 2.2.1-pre.2 || 2.28.2-alpha.1 - 2.28.4-alpha.1 || 3.1.4 - 4.0.3
+  Depends on vulnerable versions of protobufjs
+  node_modules/@google-cloud/monitoring/node_modules/google-gax
+    @google-cloud/monitoring  3.0.2 - 3.0.5
+    Depends on vulnerable versions of google-gax
+    node_modules/@google-cloud/monitoring
+
+
+tough-cookie  <4.1.3
+Severity: moderate
+tough-cookie Prototype Pollution vulnerability - https://github.com/advisories/GHSA-72xf-g2v4-qvf3
+fix available via `npm audit fix --force`
+Will install kubernetes-client@0.0.1, which is a breaking change
+node_modules/tough-cookie
+
+14 vulnerabilities (5 moderate, 9 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.

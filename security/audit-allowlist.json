@@ -1,0 +1,15 @@
+{
+    "allowlist": [
+        "kubernetes-client@9",
+        "kubernetes-client/*",
+        "@kubernetes/client-node@<=0.18.1",
+        "form-data@<2.5.4",
+        "request@*",
+        "got@<11.8.5",
+        "jose@<2.0.7",
+        "jsonpath-plus@<=10.2.0",
+        "tough-cookie@<4.1.3",
+        "swagger-fluent@*",
+        "openid-client@<=3.15.10"
+    ]
+}
