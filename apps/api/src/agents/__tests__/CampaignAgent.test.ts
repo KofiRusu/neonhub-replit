@@ -22,7 +22,7 @@ describe('CampaignAgent', () => {
         targetAudience: 'all_users',
       };
       
-      const isValid = validConfig.name && validConfig.type;
+      const isValid = Boolean(validConfig.name && validConfig.type);
       expect(isValid).toBe(true);
     });
   });

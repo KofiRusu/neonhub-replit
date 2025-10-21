@@ -1,22 +1,22 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 
-// Mock dependencies
+// Mock dependencies with proper typing
 const mockOpenAI = {
   chat: {
     completions: {
-      create: jest.fn(),
+      create: jest.fn() as jest.MockedFunction<any>,
     },
   },
 };
 
 const mockPrisma = {
   emailSequence: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    update: jest.fn(),
+    create: jest.fn() as jest.MockedFunction<any>,
+    findMany: jest.fn() as jest.MockedFunction<any>,
+    update: jest.fn() as jest.MockedFunction<any>,
   },
   campaign: {
-    findUnique: jest.fn(),
+    findUnique: jest.fn() as jest.MockedFunction<any>,
   },
 };
 
@@ -115,7 +115,7 @@ describe('EmailAgent', () => {
         updatedAt: new Date(),
       });
 
-      const result = await mockPrisma.emailSequence.create({
+      const result: any = await mockPrisma.emailSequence.create({
         data: sequenceData,
       });
 
@@ -128,7 +128,7 @@ describe('EmailAgent', () => {
     });
 
     it('should validate required fields', async () => {
-      const invalidData = {
+      const invalidData: any = {
         campaignId: 'test-campaign-id',
         // Missing required fields
       };
@@ -152,7 +152,7 @@ describe('EmailAgent', () => {
         .mockResolvedValueOnce({ id: '1', ...emails[0] })
         .mockResolvedValueOnce({ id: '2', ...emails[1] });
 
-      const results = await Promise.all(
+      const results: any[] = await Promise.all(
         emails.map(email => mockPrisma.emailSequence.create({ data: email }))
       );
 
@@ -193,7 +193,7 @@ describe('EmailAgent', () => {
 
       const personalized = template.replace(
         '{{firstName}}',
-        userData.firstName || '[Name]'
+        (userData as any).firstName || '[Name]'
       );
 
       expect(personalized).toBe('Hello [Name]!');

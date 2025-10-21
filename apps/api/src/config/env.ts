@@ -44,14 +44,49 @@ export function validateEnv(): Env {
     if (error instanceof z.ZodError) {
       const missingVars = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('\n');
       console.error('❌ Environment validation failed:\n' + missingVars);
-      process.exit(1);
+
+      const nodeEnv = process.env.NODE_ENV ?? 'development';
+      if (nodeEnv === 'production') {
+        process.exit(1);
+      }
+
+      throw new Error(`Environment validation failed:\n${missingVars}`);
     }
     throw error;
   }
 }
 
-// Singleton instance
-export const env = validateEnv();
+// Singleton instance - skip strict validation in test mode
+let _env: Env | null = null;
+
+export const env = (() => {
+  if (_env) return _env;
+  
+  // In test mode, provide relaxed defaults
+  if (process.env.NODE_ENV === 'test') {
+    _env = {
+      DATABASE_URL: process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test',
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test-secret-min-32-chars-long-12345',
+      NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+      CORS_ORIGINS: ['http://localhost:3000'],
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_fake',
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test_fake',
+      RESEND_API_KEY: process.env.RESEND_API_KEY || 'test_fake',
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+      OPENAI_MODEL: 'gpt-4',
+      NODE_ENV: 'test' as const,
+      PORT: 3001,
+      SENTRY_DSN: undefined,
+      TWILIO_ACCOUNT_SID: undefined,
+      TWILIO_AUTH_TOKEN: undefined,
+      TWILIO_PHONE_NUMBER: undefined,
+    };
+    return _env;
+  }
+  
+  _env = validateEnv();
+  return _env;
+})();
 
 // Getter function for compatibility
 export const getEnv = () => env;

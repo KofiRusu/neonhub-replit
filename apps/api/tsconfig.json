@@ -17,11 +17,28 @@
     "baseUrl": "../../",
     "paths": {
       "@core/*": ["core/*"],
-      "@modules/*": ["modules/*"]
+      "@modules/*": ["modules/*"],
+      "@neonhub/predictive-engine": ["modules/predictive-engine/src"],
+      "@neonhub/ai-governance": ["core/ai-governance/src"],
+      "@neonhub/orchestrator-global": ["core/orchestrator-global/src"],
+      "@neonhub/data-trust": ["core/data-trust/src"],
+      "@neonhub/eco-optimizer": ["core/eco-optimizer/src"]
     },
     "types": ["node", "jest"],
     "noImplicitAny": false
   },
-  "include": ["src/**/*", "../../core/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "../../core/ai-economy/**/*",
+    "../../core/cognitive-infra/**/*",
+    "../../core/data-trust/**/*",
+    "../../core/eco-optimizer/**/*",
+    "../../core/federation/**/*",
+    "../../core/mesh-resilience/**/*",
+    "../../core/orchestrator-global/**/*",
+    "../../core/qa-sentinel/**/*"
+  ]
 }

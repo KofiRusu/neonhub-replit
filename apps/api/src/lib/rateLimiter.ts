@@ -10,12 +10,24 @@ let _client: ReturnType<typeof createClient> | null = null;
 /**
  * Get or create Redis client for rate limiting
  */
+let hasLoggedFallback = false;
+
 async function getClient() {
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+
+  if (nodeEnv !== 'production') {
+    if (!hasLoggedFallback) {
+      logger.info(`Rate limiter using in-memory store (env: ${nodeEnv})`);
+      hasLoggedFallback = true;
+    }
+    return null;
+  }
+
   if (!_client) {
     const url = process.env.RATE_LIMIT_REDIS_URL;
     if (!url) {
-      logger.warn('RATE_LIMIT_REDIS_URL not set, using in-memory limiter');
-      return null;
+      logger.error('RATE_LIMIT_REDIS_URL must be configured in production');
+      process.exit(1);
     }
     _client = createClient({ url });
     _client.on('error', (e) => logger.error('Redis error', e));
