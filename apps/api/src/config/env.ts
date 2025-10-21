@@ -37,6 +37,8 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+let hasWarnedNonProd = false;
+
 export function validateEnv(): Env {
   try {
     return envSchema.parse(process.env);
@@ -45,9 +47,19 @@ export function validateEnv(): Env {
       const missingVars = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('\n');
       console.error('❌ Environment validation failed:\n' + missingVars);
 
-      const nodeEnv = process.env.NODE_ENV ?? 'development';
-      if (nodeEnv === 'production') {
-        process.exit(1);
+      const nodeEnv = (process.env.NODE_ENV ?? 'development').toLowerCase();
+      const isJestRuntime =
+        Boolean(process.env.JEST_WORKER_ID) ||
+        process.argv.some((arg) => arg.includes('jest'));
+
+      if (nodeEnv !== 'production' || isJestRuntime) {
+        if (!hasWarnedNonProd) {
+          console.warn(
+            '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+          );
+          hasWarnedNonProd = true;
+        }
+        return buildFallbackEnv(nodeEnv === 'test' || isJestRuntime ? 'test' : 'development');
       }
 
       throw new Error(`Environment validation failed:\n${missingVars}`);
@@ -59,32 +71,90 @@ export function validateEnv(): Env {
 // Singleton instance - skip strict validation in test mode
 let _env: Env | null = null;
 
+function parseOrigins(raw?: string | string[]): string[] {
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+  if (!raw) {
+    return ['http://localhost:3000'];
+  }
+  return raw
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function buildFallbackEnv(target: 'test' | 'development'): Env {
+  const defaults = {
+    DATABASE_URL:
+      process.env.DATABASE_URL ||
+      (target === 'test'
+        ? 'postgresql://test:test@localhost:5432/test'
+        : 'postgresql://localhost:5432/neonhub'),
+    NEXTAUTH_SECRET:
+      process.env.NEXTAUTH_SECRET ||
+      (target === 'test'
+        ? 'test-secret-min-32-chars-long-12345'
+        : 'dev-secret-min-32-chars-long-12345'),
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+    CORS_ORIGINS: parseOrigins(process.env.CORS_ORIGINS),
+    STRIPE_SECRET_KEY:
+      process.env.STRIPE_SECRET_KEY ||
+      (target === 'test' ? 'sk_test_fake' : 'sk_test_dev'),
+    STRIPE_WEBHOOK_SECRET:
+      process.env.STRIPE_WEBHOOK_SECRET ||
+      (target === 'test' ? 'whsec_test_fake' : 'whsec_dev_fake'),
+    RESEND_API_KEY: process.env.RESEND_API_KEY || 'test_fake',
+    OPENAI_API_KEY:
+      process.env.OPENAI_API_KEY ||
+      (target === 'test'
+        ? 'test-key-for-testing'
+        : 'test-key-for-development'),
+    OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4',
+    NODE_ENV: target as 'test' | 'development' | 'production',
+    PORT: Number(process.env.PORT ?? 3001),
+    SENTRY_DSN: process.env.SENTRY_DSN,
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+    TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
+  };
+
+  return defaults;
+}
+
 export const env = (() => {
   if (_env) return _env;
   
-  // In test mode, provide relaxed defaults
-  if (process.env.NODE_ENV === 'test') {
+  const nodeEnv = (process.env.NODE_ENV ?? 'development').toLowerCase();
+  const isJestRuntime =
+    Boolean(process.env.JEST_WORKER_ID) ||
+    process.argv.some((arg) => arg.includes('jest'));
+  const isTest = nodeEnv === 'test' || isJestRuntime;
+
+  if (nodeEnv === 'production' && !isJestRuntime) {
+    _env = validateEnv();
+    return _env;
+  }
+
+  const parsed = envSchema.safeParse(process.env);
+  if (parsed.success) {
     _env = {
-      DATABASE_URL: process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/test',
-      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'test-secret-min-32-chars-long-12345',
-      NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
-      CORS_ORIGINS: ['http://localhost:3000'],
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_fake',
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test_fake',
-      RESEND_API_KEY: process.env.RESEND_API_KEY || 'test_fake',
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'test-key-for-testing',
-      OPENAI_MODEL: 'gpt-4',
-      NODE_ENV: 'test' as const,
-      PORT: 3001,
-      SENTRY_DSN: undefined,
-      TWILIO_ACCOUNT_SID: undefined,
-      TWILIO_AUTH_TOKEN: undefined,
-      TWILIO_PHONE_NUMBER: undefined,
+      ...parsed.data,
+      NODE_ENV: isTest ? 'test' : (parsed.data.NODE_ENV ?? 'development'),
+      CORS_ORIGINS: parseOrigins(process.env.CORS_ORIGINS),
+      PORT: Number(process.env.PORT ?? parsed.data.PORT ?? 3001),
     };
     return _env;
   }
-  
-  _env = validateEnv();
+
+  if (!hasWarnedNonProd) {
+    console.warn(
+      '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+    );
+    hasWarnedNonProd = true;
+  }
+
+  _env = buildFallbackEnv(isTest ? 'test' : 'development');
   return _env;
 })();
 

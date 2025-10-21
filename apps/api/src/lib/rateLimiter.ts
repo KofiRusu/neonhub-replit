@@ -13,7 +13,7 @@ let _client: ReturnType<typeof createClient> | null = null;
 let hasLoggedFallback = false;
 
 async function getClient() {
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  const nodeEnv = (process.env.NODE_ENV ?? 'development').toLowerCase();
 
   if (nodeEnv !== 'production') {
     if (!hasLoggedFallback) {
@@ -26,12 +26,20 @@ async function getClient() {
   if (!_client) {
     const url = process.env.RATE_LIMIT_REDIS_URL;
     if (!url) {
-      logger.error('RATE_LIMIT_REDIS_URL must be configured in production');
-      process.exit(1);
+      const errMsg = 'RATE_LIMIT_REDIS_URL must be configured in production';
+      logger.error(errMsg);
+      throw new Error(errMsg);
     }
-    _client = createClient({ url });
-    _client.on('error', (e) => logger.error('Redis error', e));
-    await _client.connect();
+    
+    try {
+      _client = createClient({ url });
+      _client.on('error', (e) => logger.error('Redis error', e));
+      await _client.connect();
+    } catch (error) {
+      logger.error('Failed to connect to Redis:', error);
+      // In production, throw error; strict behavior preserved
+      throw new Error('Redis connection failed in production');
+    }
   }
   return _client;
 }
@@ -102,7 +110,20 @@ export async function rateLimitFor(ip?: string, userId?: string): Promise<LimitR
 }
 
 // In-memory fallback (simple, non-distributed)
-const inMemoryStore = new Map<string, { count: number; resetAt: number }>();
+type MemoryWindow = { count: number; resetAt: number };
+type RateLimiterGlobal = typeof globalThis & {
+  __neonhub_rateLimiterStore?: Map<string, MemoryWindow>;
+};
+
+const MEMORY_STORE_KEY = '__neonhub_rateLimiterStore' as const;
+const globalObject = globalThis as RateLimiterGlobal;
+
+const inMemoryStore: Map<string, MemoryWindow> =
+  globalObject[MEMORY_STORE_KEY] ?? new Map<string, MemoryWindow>();
+
+if (!globalObject[MEMORY_STORE_KEY]) {
+  globalObject[MEMORY_STORE_KEY] = inMemoryStore;
+}
 
 function inMemoryCheckLimit(key: string, limit: number): LimitResult {
   const now = Date.now();
@@ -123,4 +144,9 @@ function inMemoryCheckLimit(key: string, limit: number): LimitResult {
     remaining,
     resetMs: resetAt - now,
   };
+}
+
+export function resetInMemoryRateLimiter() {
+  inMemoryStore.clear();
+  hasLoggedFallback = false;
 }

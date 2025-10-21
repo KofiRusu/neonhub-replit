@@ -1,9 +1,8 @@
-import { checkLimit, rateLimitFor } from '../rateLimiter';
+import { checkLimit, rateLimitFor, resetInMemoryRateLimiter } from '../rateLimiter';
 
 describe('Rate Limiter', () => {
   beforeEach(() => {
-    // Clear in-memory store between tests
-    // Note: This uses the in-memory fallback since Redis won't be available in tests
+    resetInMemoryRateLimiter();
   });
 
   test('should allow requests under limit', async () => {
