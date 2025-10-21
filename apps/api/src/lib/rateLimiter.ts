@@ -45,7 +45,9 @@ export async function checkLimit(key: string, limit = maxPerIp): Promise<LimitRe
   const now = Date.now();
   const windowKey = `ratelimit:${key}:${Math.floor(now / windowMs)}`;
   
-  const count = await client.incr(windowKey);
+  const countResult = await client.incr(windowKey);
+  const count = typeof countResult === 'string' ? parseInt(countResult, 10) : countResult;
+  
   if (count === 1) {
     await client.pExpire(windowKey, windowMs);
   }

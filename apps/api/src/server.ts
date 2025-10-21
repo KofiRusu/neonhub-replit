@@ -8,6 +8,7 @@ import { requireAuth } from "./middleware/auth.js";
 import { securityHeaders } from "./middleware/securityHeaders.js";
 import { strictCORS } from "./middleware/cors.js";
 import { rateLimit, authRateLimit } from "./middleware/rateLimit.js";
+import { adminIPGuard } from "./middleware/adminGuard.js";
 import { auditMiddleware } from "./middleware/auditLog.js";
 import { healthRouter } from "./routes/health.js";
 import { contentRouter } from "./routes/content.js";
@@ -69,12 +70,12 @@ app.use(requireAuth, metricsRouter);
 app.use(requireAuth, jobsRouter);
 app.use('/api/campaigns', requireAuth, auditMiddleware('campaign'), campaignRouter);
 app.use('/api/credentials', requireAuth, auditMiddleware('credential'), credentialsRouter);
-app.use('/api/settings', requireAuth, auditMiddleware('settings'), settingsRouter);
+app.use('/api/settings', requireAuth, adminIPGuard, auditMiddleware('settings'), settingsRouter);
 app.use('/api/predictive', requireAuth, predictiveRouter);
-app.use('/api/governance', requireAuth, auditMiddleware('governance'), governanceRouter);
-app.use('/api/data-trust', requireAuth, dataTrustRouter);
-app.use('/api/eco-metrics', requireAuth, ecoMetricsRouter);
-app.use('/api/orchestration', requireAuth, orchestrationRouter);
+app.use('/api/governance', requireAuth, adminIPGuard, auditMiddleware('governance'), governanceRouter);
+app.use('/api/data-trust', requireAuth, adminIPGuard, auditMiddleware('data-trust'), dataTrustRouter);
+app.use('/api/eco-metrics', requireAuth, adminIPGuard, auditMiddleware('eco-metrics'), ecoMetricsRouter);
+app.use('/api/orchestration', requireAuth, adminIPGuard, auditMiddleware('orchestration'), orchestrationRouter);
 app.use('/api', requireAuth, billingRouter); // Billing routes with auth
 
 // 404 handler
