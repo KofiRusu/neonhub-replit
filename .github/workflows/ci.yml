@@ -14,7 +14,16 @@ jobs:
         node-version: [20]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Verify submodules
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --recursive
 
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -58,7 +67,11 @@ jobs:
     needs: test
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -84,7 +97,11 @@ jobs:
     if: github.event_name == 'pull_request'
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
