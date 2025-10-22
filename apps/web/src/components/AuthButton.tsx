@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { LogIn, LogOut, User } from "lucide-react";
 import { motion } from "framer-motion";
@@ -21,10 +22,12 @@ export default function AuthButton() {
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2 px-3 py-2 glass rounded-lg">
           {session.user.image ? (
-            <img
+            <Image
               src={session.user.image}
               alt={session.user.name || "User"}
-              className="w-6 h-6 rounded-full"
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
             <User className="w-4 h-4 text-white/60" />

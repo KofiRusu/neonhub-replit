@@ -78,7 +78,7 @@ export default function TrendsPage() {
   const isLoading = metricsLoading || signalsLoading
 
   return (
-    <PageLayout title="Trends & Predictions" description="AI-powered predictive analytics and emerging signals">
+    <PageLayout title="Trends & Predictions" subtitle="AI-powered predictive analytics and emerging signals">
       <div className="space-y-6">
         {/* Header Actions */}
         <div className="flex items-center justify-between">

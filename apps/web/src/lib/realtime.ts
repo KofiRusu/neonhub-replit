@@ -47,11 +47,11 @@ export function getSocket(): Socket | null {
 /**
  * Subscribe to an event
  */
-export function subscribe(event: string, callback: (...args: any[]) => void): () => void {
+export function subscribe<T = unknown>(event: string, callback: (payload: T) => void): () => void {
   const socket = getSocket();
   if (!socket) return () => {};
 
-  socket.on(event, callback);
+  socket.on(event, (payload: T) => callback(payload));
 
   // Return unsubscribe function
   return () => {
@@ -62,7 +62,7 @@ export function subscribe(event: string, callback: (...args: any[]) => void): ()
 /**
  * Emit an event
  */
-export function emit(event: string, data: any): void {
+export function emit<T>(event: string, data: T): void {
   const socket = getSocket();
   if (!socket) return;
 

@@ -13,7 +13,7 @@ export default function SupportPage() {
       <h1 className="text-2xl font-bold">Support</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map((c) => (
-          <NeonCard key={c.title} glow={c.glow as any} className="p-4">
+          <NeonCard key={c.title} glow={c.glow} className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-white/5">{c.icon}</div>
               <div>

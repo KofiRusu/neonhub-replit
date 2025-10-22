@@ -168,6 +168,44 @@ npm run typecheck      # Type-check all apps
 npm run verify         # Run all quality checks
 ```
 
+### 🤖 AI-Assisted Development with Cline
+
+NeonHub integrates **Cline**, an AI coding assistant CLI that enhances your development workflow:
+
+```bash
+# Interactive mode - chat with AI about any task
+npm run cline
+
+# Quick task execution
+npm run cline:task
+cline "Add error handling to the campaign API"
+
+# Common workflows
+npm run cline:fix      # Fix TypeScript and linting errors
+npm run cline:test     # Add missing tests
+npm run cline:docs     # Update documentation
+
+# Direct usage
+npx cline "Refactor the InsightAgent to use async/await"
+```
+
+**Cline Features:**
+- ✅ Context-aware code generation
+- ✅ Automatic error fixing
+- ✅ Test generation with high coverage
+- ✅ Documentation updates
+- ✅ Follows NeonHub's `.clinerules` guidelines
+
+**Project-Specific Rules:**
+Cline is configured via `.clinerules` to follow NeonHub standards:
+- No mock data, always use real APIs
+- Maintain TypeScript strict mode
+- Follow TailwindCSS + shadcn/ui patterns
+- Zero tolerance for lint/type errors
+- Preserve multi-repo integrity
+
+See [docs/CLINE_WORKFLOW.md](./docs/CLINE_WORKFLOW.md) for detailed usage examples.
+
 ### API (`apps/api/`)
 ```bash
 npm run dev            # Start dev server (port 3001)

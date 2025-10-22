@@ -1,7 +1,8 @@
 "use client"
 
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Mail,
   Users,
@@ -948,6 +949,14 @@ interface TemplateCardProps {
 }
 
 function TemplateCard({ template, onSelect, onPreview }: TemplateCardProps) {
+  const [thumbnailSrc, setThumbnailSrc] = useState(template.thumbnail ?? "/placeholder.svg")
+
+  useEffect(() => {
+    setThumbnailSrc(template.thumbnail ?? "/placeholder.svg")
+  }, [template.thumbnail])
+
+  const fallbackSrc = `/placeholder.svg?height=160&width=300&text=${encodeURIComponent(template.name)}`
+
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
@@ -955,13 +964,15 @@ function TemplateCard({ template, onSelect, onPreview }: TemplateCardProps) {
     >
       {/* Template Preview */}
       <div className="relative">
-        <img
-          src={template.thumbnail || "/placeholder.svg"}
+        <Image
+          src={thumbnailSrc}
           alt={template.name}
+          width={600}
+          height={160}
           className="w-full h-40 object-cover"
-          onError={(e) => {
-            e.currentTarget.src = "/placeholder.svg?height=160&width=300&text=" + encodeURIComponent(template.name)
-          }}
+          sizes="(max-width: 640px) 100vw, 600px"
+          onError={() => setThumbnailSrc(fallbackSrc)}
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         <div className="absolute top-2 right-2 flex items-center space-x-1">

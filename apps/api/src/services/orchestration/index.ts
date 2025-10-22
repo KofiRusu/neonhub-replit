@@ -5,27 +5,31 @@
 
 import { logger } from '../../lib/logger.js';
 
-export async function initializeOrchestrator(config?: any): Promise<any> {
+type GenericRecord = Record<string, unknown>;
+
+export async function initializeOrchestrator(_config?: unknown): Promise<{
+  status: string;
+}> {
   logger.info('Orchestrator initialization requested (stubbed)');
   return { status: 'stubbed' };
 }
 
-export async function getOrchestratorManager(): Promise<any> {
+export async function getOrchestratorManager(): Promise<GenericRecord> {
   return { status: 'stubbed' };
 }
 
-export async function registerNode(node: any): Promise<void> {
+export async function registerNode(node: GenericRecord): Promise<void> {
   logger.info({ node }, 'Node registration requested (stubbed)');
 }
 
-export async function discoverNodes(region?: string): Promise<any[]> {
+export async function discoverNodes(region?: string): Promise<GenericRecord[]> {
   logger.info({ region }, 'Node discovery requested (stubbed)');
   return [];
 }
 
-export async function routeRequest(request: any): Promise<{
-  targetNode: any;
-  route: any;
+export async function routeRequest(request: GenericRecord): Promise<{
+  targetNode: GenericRecord | null;
+  route: GenericRecord | null;
   latency: number;
 }> {
   logger.info({ request }, 'Request routing requested (stubbed)');
@@ -38,8 +42,8 @@ export async function routeRequest(request: any): Promise<{
 
 export async function getSystemHealth(): Promise<{
   overall: string;
-  nodes: any[];
-  metrics: any;
+  nodes: GenericRecord[];
+  metrics: GenericRecord;
 }> {
   return {
     overall: 'healthy',
@@ -48,7 +52,7 @@ export async function getSystemHealth(): Promise<{
   };
 }
 
-export async function evaluateScaling(metrics: any): Promise<{
+export async function evaluateScaling(metrics: GenericRecord): Promise<{
   action: 'scale-up' | 'scale-down' | 'maintain';
   currentReplicas: number;
   targetReplicas: number;
@@ -65,7 +69,7 @@ export async function evaluateScaling(metrics: any): Promise<{
 
 export async function executeFailover(nodeId: string): Promise<{
   success: boolean;
-  backupNode: any;
+  backupNode: GenericRecord | null;
   message: string;
 }> {
   logger.info({ nodeId }, 'Failover execution requested (stubbed)');
@@ -92,7 +96,7 @@ export async function getOrchestrationMetrics(): Promise<{
   };
 }
 
-export async function updateConfiguration(config: any): Promise<void> {
+export async function updateConfiguration(config: GenericRecord): Promise<void> {
   logger.info({ config }, 'Configuration update requested (stubbed)');
 }
 

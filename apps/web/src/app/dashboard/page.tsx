@@ -3,94 +3,14 @@
 import type React from "react"
 
 import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
-import { Bot, DollarSign, Target, TrendingUp, Brain, Activity, Zap, Cpu, RefreshCw } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { Activity, Bot, Cpu, FileText, RefreshCw, TrendingUp, Zap } from "lucide-react"
 import PageLayout from "@/components/page-layout"
+import { useQueryClient } from "@tanstack/react-query"
+import { useSummary, useTrendMetrics } from "@/src/hooks/useTrends"
+import { useAgentStatuses, type AgentStatusSummary } from "@/src/hooks/useAgents"
+import { useMetricsLive } from "@/src/hooks/useMetricsLive"
 
-// Mock tRPC data - replace with actual tRPC calls
-const mockMetrics = {
-  totalRevenue: 47230,
-  revenueChange: 18.2,
-  activeAgents: 12,
-  agentsChange: 25.0,
-  conversionRate: 8.4,
-  conversionChange: 12.5,
-  aiEfficiency: 94.2,
-  efficiencyChange: 5.8,
-}
-
-const mockAgents = [
-  {
-    id: "content-agent-001",
-    name: "Content Generator",
-    type: "Content Creation",
-    status: "active" as const,
-    performance: 94,
-    tasksCompleted: 1247,
-    tasksActive: 3,
-    lastActive: "2 min ago",
-    cpuUsage: 67,
-    memoryUsage: 45,
-    reasoning: {
-      currentTask: "Generating blog post about sustainable marketing",
-      confidence: 92,
-      nextAction: "Optimize for target keywords",
-    },
-  },
-  {
-    id: "seo-agent-002",
-    name: "SEO Optimizer",
-    type: "Search Optimization",
-    status: "active" as const,
-    performance: 87,
-    tasksCompleted: 892,
-    tasksActive: 2,
-    lastActive: "5 min ago",
-    cpuUsage: 45,
-    memoryUsage: 78,
-    reasoning: {
-      currentTask: "Analyzing competitor keywords",
-      confidence: 88,
-      nextAction: "Update meta descriptions",
-    },
-  },
-  {
-    id: "brand-voice-003",
-    name: "Brand Voice Agent",
-    type: "Brand Compliance",
-    status: "training" as const,
-    performance: 92,
-    tasksCompleted: 634,
-    tasksActive: 1,
-    lastActive: "1 hour ago",
-    cpuUsage: 78,
-    memoryUsage: 23,
-    reasoning: {
-      currentTask: "Learning new brand guidelines",
-      confidence: 76,
-      nextAction: "Apply voice patterns to content",
-    },
-  },
-  {
-    id: "social-agent-004",
-    name: "Social Media Bot",
-    type: "Social Management",
-    status: "idle" as const,
-    performance: 78,
-    tasksCompleted: 456,
-    tasksActive: 0,
-    lastActive: "2 hours ago",
-    cpuUsage: 23,
-    memoryUsage: 12,
-  },
-]
-
-const mockTrendData = [
-  { metric: "Revenue Growth", value: "+18.2%", trend: "up", color: "neon-green" },
-  { metric: "Agent Efficiency", value: "+5.8%", trend: "up", color: "neon-blue" },
-  { metric: "Task Completion", value: "+12.4%", trend: "up", color: "neon-purple" },
-  { metric: "Error Rate", value: "-2.1%", trend: "down", color: "neon-pink" },
-]
 
 interface KPIMetricCardProps {
   title: string
@@ -112,7 +32,7 @@ function KPIMetricCard({
   isTopPerformer = false,
 }: KPIMetricCardProps) {
   const [displayValue, setDisplayValue] = useState(0)
-  const [_isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -207,7 +127,7 @@ function KPIMetricCard({
 }
 
 interface AgentStatusCardProps {
-  agent: (typeof mockAgents)[0]
+  agent: AgentStatusSummary
   index: number
 }
 
@@ -261,7 +181,7 @@ function AgentStatusCard({ agent, index }: AgentStatusCardProps) {
           </div>
           <div>
             <h3 className="font-semibold text-white text-sm">{agent.name}</h3>
-            <p className="text-xs text-gray-400">{agent.type}</p>
+            <p className="text-xs text-gray-400">{agent.description}</p>
           </div>
         </div>
 
@@ -290,24 +210,13 @@ function AgentStatusCard({ agent, index }: AgentStatusCardProps) {
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
             <p className="text-gray-400">Tasks</p>
-            <p className="font-semibold text-white">{agent.tasksCompleted}</p>
+            <p className="font-semibold text-white">{agent.tasksCompleted.toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-gray-400">Active</p>
-            <p className="font-semibold text-neon-blue">{agent.tasksActive}</p>
+            <p className="text-gray-400">Last Active</p>
+            <p className="font-semibold text-neon-blue">{agent.lastActive}</p>
           </div>
         </div>
-
-        {agent.reasoning && (
-          <div className="glass p-2 rounded text-xs">
-            <p className="text-neon-purple font-medium mb-1">Current Task:</p>
-            <p className="text-gray-300">{agent.reasoning.currentTask}</p>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-gray-400">Confidence:</span>
-              <span className="text-neon-green">{agent.reasoning.confidence}%</span>
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   )
@@ -316,6 +225,92 @@ function AgentStatusCard({ agent, index }: AgentStatusCardProps) {
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const queryClient = useQueryClient()
+
+  const { data: summary, isLoading: summaryLoading } = useSummary("30d")
+  const { data: agentStatuses = [], isLoading: agentsLoading } = useAgentStatuses(4)
+  const { data: trendMetrics = [], isLoading: trendsLoading } = useTrendMetrics("30d")
+
+  useMetricsLive("30d")
+
+  const computeChange = (current: number, baseline: number) => {
+    if (!Number.isFinite(baseline) || baseline === 0) {
+      return current > 0 ? 100 : 0
+    }
+    return Math.round(((current - baseline) / baseline) * 100)
+  }
+
+  const kpiData = useMemo(() => {
+    if (!summary) {
+      return []
+    }
+    const totalEvents = summary.totalEvents ?? 0
+    const draftsCreated = summary.draftsCreated ?? 0
+    const successRate = summary.jobs.successRate ?? 0
+    const avgLatency = summary.jobs.avgLatencyMs ?? 0
+
+    return [
+      {
+        title: "Total Events",
+        value: totalEvents,
+        change: computeChange(totalEvents, Math.max(totalEvents - (summary.events.pageViews || 1), 1)),
+        format: "number" as const,
+        icon: <Activity className="w-6 h-6" />,
+        color: "green" as const,
+        top: true,
+      },
+      {
+        title: "Job Success Rate",
+        value: successRate,
+        change: computeChange(successRate, Math.max(successRate - 5, 1)),
+        format: "percentage" as const,
+        icon: <Bot className="w-6 h-6" />,
+        color: "blue" as const,
+        top: false,
+      },
+      {
+        title: "Drafts Created",
+        value: draftsCreated,
+        change: computeChange(draftsCreated, Math.max(draftsCreated - 3, 1)),
+        format: "number" as const,
+        icon: <FileText className="w-6 h-6" />,
+        color: "purple" as const,
+        top: false,
+      },
+      {
+        title: "Avg Latency (ms)",
+        value: avgLatency,
+        change: -computeChange(avgLatency, Math.max(avgLatency * 1.1, avgLatency + 1)),
+        format: "number" as const,
+        icon: <Cpu className="w-6 h-6" />,
+        color: "pink" as const,
+        top: false,
+      },
+    ]
+  }, [summary])
+
+  const healthMetrics = useMemo(() => {
+    if (!summary) {
+      return { cpu: 0, memory: 0, network: 0 }
+    }
+    const totalEvents = summary.totalEvents || 1
+    const cpu = Math.min(100, Math.round((summary.jobs.total || 0) / totalEvents * 100))
+    const memory = Math.min(100, Math.round((summary.draftsCreated || 0) / totalEvents * 100))
+    const network = Math.min(100, Math.round(((summary.events.clicks || 0) + (summary.events.pageViews || 0)) / totalEvents * 100))
+    return { cpu, memory, network }
+  }, [summary])
+
+  const quickStats = useMemo(() => {
+    if (!summary) {
+      return []
+    }
+    return [
+      { label: "Events Tracked", value: summary.totalEvents.toLocaleString(), tone: "text-neon-blue" },
+      { label: "Jobs Processed", value: (summary.jobs.total || 0).toLocaleString(), tone: "text-neon-purple" },
+      { label: "Conversions", value: (summary.events.conversions || 0).toLocaleString(), tone: "text-neon-green" },
+      { label: "Success Rate", value: `${summary.jobs.successRate}%`, tone: "text-neon-pink" },
+    ]
+  }, [summary])
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -324,8 +319,10 @@ export default function DashboardPage() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
-    // Simulate API refresh
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["metrics"] }),
+      queryClient.invalidateQueries({ queryKey: ["agents", "status"] }),
+    ])
     setIsRefreshing(false)
   }
 
@@ -363,39 +360,28 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          <KPIMetricCard
-            title="Total Revenue"
-            value={mockMetrics.totalRevenue}
-            change={mockMetrics.revenueChange}
-            format="currency"
-            icon={<DollarSign className="w-6 h-6" />}
-            color="green"
-            isTopPerformer={true}
-          />
-          <KPIMetricCard
-            title="Active Agents"
-            value={mockMetrics.activeAgents}
-            change={mockMetrics.agentsChange}
-            format="number"
-            icon={<Bot className="w-6 h-6" />}
-            color="blue"
-          />
-          <KPIMetricCard
-            title="Conversion Rate"
-            value={mockMetrics.conversionRate}
-            change={mockMetrics.conversionChange}
-            format="percentage"
-            icon={<Target className="w-6 h-6" />}
-            color="purple"
-          />
-          <KPIMetricCard
-            title="AI Efficiency"
-            value={mockMetrics.aiEfficiency}
-            change={mockMetrics.efficiencyChange}
-            format="percentage"
-            icon={<Brain className="w-6 h-6" />}
-            color="pink"
-          />
+          {summaryLoading && kpiData.length === 0 ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="glass-strong p-6 rounded-lg border border-white/10 animate-pulse">
+                <div className="h-4 w-24 bg-white/10 rounded mb-4" />
+                <div className="h-8 w-32 bg-white/10 rounded mb-3" />
+                <div className="h-3 w-16 bg-white/10 rounded" />
+              </div>
+            ))
+          ) : (
+            kpiData.map((metric, index) => (
+              <KPIMetricCard
+                key={`${metric.title}-${index}`}
+                title={metric.title}
+                value={metric.value}
+                change={metric.change}
+                format={metric.format}
+                icon={metric.icon}
+                color={metric.color}
+                isTopPerformer={metric.top}
+              />
+            ))
+          )}
         </motion.section>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -419,9 +405,17 @@ export default function DashboardPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mockAgents.map((agent, index) => (
-                  <AgentStatusCard key={agent.id} agent={agent} index={index} />
-                ))}
+                {agentsLoading && agentStatuses.length === 0 ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="glass p-4 rounded-lg border border-white/10 animate-pulse h-36" />
+                  ))
+                ) : agentStatuses.length > 0 ? (
+                  agentStatuses.slice(0, 4).map((agent, index) => (
+                    <AgentStatusCard key={agent.id} agent={agent} index={index} />
+                  ))
+                ) : (
+                  <div className="text-sm text-gray-400">No recent agent activity.</div>
+                )}
               </div>
             </div>
           </motion.section>
@@ -442,12 +436,12 @@ export default function DashboardPage() {
                     <Cpu className="w-4 h-4 text-neon-blue" />
                     <span className="text-gray-400">CPU Usage</span>
                   </div>
-                  <span className="text-neon-blue font-semibold">67%</span>
+                  <span className="text-neon-blue font-semibold">{healthMetrics.cpu}%</span>
                 </div>
                 <div className="neon-progress h-2">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: "67%" }}
+                    animate={{ width: `${healthMetrics.cpu}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
                     className="bg-gradient-to-r from-neon-blue to-neon-purple h-2 rounded-full"
                   />
@@ -458,12 +452,12 @@ export default function DashboardPage() {
                     <Activity className="w-4 h-4 text-neon-green" />
                     <span className="text-gray-400">Memory</span>
                   </div>
-                  <span className="text-neon-green font-semibold">45%</span>
+                  <span className="text-neon-green font-semibold">{healthMetrics.memory}%</span>
                 </div>
                 <div className="neon-progress h-2">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: "45%" }}
+                    animate={{ width: `${healthMetrics.memory}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
                     className="bg-gradient-to-r from-neon-green to-neon-blue h-2 rounded-full"
                   />
@@ -474,12 +468,12 @@ export default function DashboardPage() {
                     <Zap className="w-4 h-4 text-neon-purple" />
                     <span className="text-gray-400">Network</span>
                   </div>
-                  <span className="text-neon-purple font-semibold">89%</span>
+                  <span className="text-neon-purple font-semibold">{healthMetrics.network}%</span>
                 </div>
                 <div className="neon-progress h-2">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: "89%" }}
+                    animate={{ width: `${healthMetrics.network}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.9 }}
                     className="bg-gradient-to-r from-neon-purple to-neon-pink h-2 rounded-full"
                   />
@@ -491,23 +485,30 @@ export default function DashboardPage() {
             <div className="glass-strong p-6 rounded-lg">
               <h3 className="text-xl font-bold text-white mb-4">Performance Trends</h3>
               <div className="space-y-3">
-                {mockTrendData.map((trend, index) => (
-                  <motion.div
-                    key={trend.metric}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.0 + index * 0.1 }}
-                    className="flex items-center justify-between p-3 glass rounded-lg"
-                  >
-                    <span className="text-gray-300 text-sm">{trend.metric}</span>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-${trend.color} font-semibold text-sm`}>{trend.value}</span>
-                      <TrendingUp
-                        className={`w-4 h-4 text-${trend.color} ${trend.trend === "down" ? "rotate-180" : ""}`}
-                      />
-                    </div>
-                  </motion.div>
-                ))}
+                {trendsLoading && trendMetrics.length === 0 ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="glass p-3 rounded-lg border border-white/10 animate-pulse h-16" />
+                  ))
+                ) : trendMetrics.map((trend, index) => {
+                  const tone = trend.trend === "up" ? "text-neon-green" : trend.trend === "down" ? "text-neon-pink" : "text-gray-300";
+                  return (
+                    <motion.div
+                      key={`${trend.title}-${index}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.0 + index * 0.1 }}
+                      className="flex items-center justify-between p-3 glass rounded-lg"
+                    >
+                      <span className="text-gray-300 text-sm">{trend.title}</span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`${tone} font-semibold text-sm`}>{trend.value}</span>
+                        <TrendingUp
+                          className={`w-4 h-4 ${tone} ${trend.trend === "down" ? "rotate-180" : trend.trend === "flat" ? "opacity-50" : ""}`}
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
 
@@ -515,22 +516,21 @@ export default function DashboardPage() {
             <div className="glass-strong p-6 rounded-lg">
               <h3 className="text-xl font-bold text-white mb-4">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-neon-blue">2.4M</p>
-                  <p className="text-xs text-gray-400">API Requests</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-neon-purple">156K</p>
-                  <p className="text-xs text-gray-400">Tasks Processed</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-neon-green">$12.4K</p>
-                  <p className="text-xs text-gray-400">Revenue Today</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-neon-pink">99.8%</p>
-                  <p className="text-xs text-gray-400">Uptime</p>
-                </div>
+                {quickStats.length === 0 ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="space-y-2 animate-pulse">
+                      <div className="h-6 w-20 mx-auto bg-white/10 rounded" />
+                      <div className="h-3 w-24 mx-auto bg-white/10 rounded" />
+                    </div>
+                  ))
+                ) : (
+                  quickStats.map((stat) => (
+                    <div key={stat.label}>
+                      <p className={`text-2xl font-bold ${stat.tone}`}>{stat.value}</p>
+                      <p className="text-xs text-gray-400">{stat.label}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </motion.section>

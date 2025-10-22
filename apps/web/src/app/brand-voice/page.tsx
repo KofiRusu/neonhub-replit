@@ -12,13 +12,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Brain, Search, Plus, Download, Zap, FileText, Settings } from "lucide-react"
 
-const kpiData = [
-  { label: "Tone Consistency", value: "94%", trend: "up" as const },
-  { label: "Readability Score", value: "8.2", trend: "flat" as const },
-  { label: "Recent Wins", value: "12", trend: "up" as const },
-  { label: "Active Alerts", value: "2", trend: "down" as const },
-]
-
 export default function BrandVoicePage() {
   const [activeTab, setActiveTab] = useState("copilot")
   const [searchQuery, setSearchQuery] = useState("")
@@ -78,7 +71,7 @@ export default function BrandVoicePage() {
           </div>
 
           {/* Insights Strip */}
-          <InsightsStrip kpis={kpiData} />
+          <InsightsStrip />
         </div>
       </div>
 
@@ -131,7 +124,7 @@ export default function BrandVoicePage() {
             </TabsContent>
 
             <TabsContent value="knowledge" className="space-y-6">
-              <KnowledgeIndex query={searchQuery} />
+              <KnowledgeIndex query={searchQuery} onQueryChange={setSearchQuery} />
             </TabsContent>
 
             <TabsContent value="presets" className="space-y-6">

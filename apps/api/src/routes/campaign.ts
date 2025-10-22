@@ -5,6 +5,7 @@ import { emailAgent } from "../agents/EmailAgent.js";
 import { socialAgent, type SocialPlatform } from "../agents/SocialAgent.js";
 import { AppError } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
+import { getAuthenticatedUserId } from "../lib/requestUser.js";
 import {
   createCampaignSchema,
   updateCampaignSchema,
@@ -25,9 +26,9 @@ const router = Router();
 /**
  * POST /api/campaigns - Create a new campaign
  */
-router.post("/api/campaigns", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = createCampaignSchema.parse(req.body);
     
@@ -53,9 +54,9 @@ router.post("/api/campaigns", async (req, res, next) => {
 /**
  * GET /api/campaigns - List user campaigns
  */
-router.get("/api/campaigns", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const query = listCampaignsQuerySchema.parse(req.query);
     
@@ -82,14 +83,18 @@ router.get("/api/campaigns", async (req, res, next) => {
 /**
  * GET /api/campaigns/:id - Get campaign details
  */
-router.get("/api/campaigns/:id", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
+    const userId = getAuthenticatedUserId(req);
     
     const campaign = await campaignAgent.getCampaign(id);
     
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
+    }
+    if (campaign.userId !== userId) {
+      return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
     res.json({
@@ -104,10 +109,10 @@ router.get("/api/campaigns/:id", async (req, res, next) => {
 /**
  * PUT /api/campaigns/:id - Update campaign
  */
-router.put("/api/campaigns/:id", async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     updateCampaignSchema.parse(req.body);
     
@@ -137,10 +142,10 @@ router.put("/api/campaigns/:id", async (req, res, next) => {
 /**
  * DELETE /api/campaigns/:id - Delete campaign
  */
-router.delete("/api/campaigns/:id", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     // Check campaign exists and user owns it
     const campaign = await campaignAgent.getCampaign(id);
@@ -165,10 +170,10 @@ router.delete("/api/campaigns/:id", async (req, res, next) => {
 /**
  * POST /api/campaigns/:id/schedule - Schedule campaign
  */
-router.post("/api/campaigns/:id/schedule", async (req, res, next) => {
+router.post("/:id/schedule", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = scheduleCampaignSchema.parse(req.body);
     
@@ -215,10 +220,10 @@ router.post("/api/campaigns/:id/schedule", async (req, res, next) => {
 /**
  * POST /api/campaigns/:id/ab-test - Run A/B test
  */
-router.post("/api/campaigns/:id/ab-test", async (req, res, next) => {
+router.post("/:id/ab-test", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = runABTestSchema.parse(req.body);
     
@@ -248,10 +253,10 @@ router.post("/api/campaigns/:id/ab-test", async (req, res, next) => {
 /**
  * GET /api/campaigns/:id/analytics - Get campaign analytics
  */
-router.get("/api/campaigns/:id/analytics", async (req, res, next) => {
+router.get("/:id/analytics", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     getCampaignMetricsQuerySchema.parse(req.query);
     
@@ -281,10 +286,10 @@ router.get("/api/campaigns/:id/analytics", async (req, res, next) => {
 /**
  * POST /api/campaigns/:id/optimize - Optimize campaign
  */
-router.post("/api/campaigns/:id/optimize", async (req, res, next) => {
+router.post("/:id/optimize", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = optimizeCampaignSchema.parse(req.body);
     
@@ -318,10 +323,10 @@ router.post("/api/campaigns/:id/optimize", async (req, res, next) => {
 /**
  * POST /api/campaigns/:id/email/sequence - Generate email sequence
  */
-router.post("/api/campaigns/:id/email/sequence", async (req, res, next) => {
+router.post("/:id/email/sequence", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = generateEmailSequenceSchema.parse(req.body);
     
@@ -357,9 +362,9 @@ router.post("/api/campaigns/:id/email/sequence", async (req, res, next) => {
 /**
  * POST /api/campaigns/email/optimize-subject - Optimize email subject line
  */
-router.post("/api/campaigns/email/optimize-subject", async (req, res, next) => {
+router.post("/email/optimize-subject", async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = optimizeSubjectLineSchema.parse(req.body);
     
@@ -384,9 +389,9 @@ router.post("/api/campaigns/email/optimize-subject", async (req, res, next) => {
 /**
  * POST /api/campaigns/social/generate - Generate social post
  */
-router.post("/api/campaigns/social/generate", async (req, res, next) => {
+router.post("/social/generate", async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = generateSocialPostSchema.parse(req.body);
     
@@ -413,9 +418,9 @@ router.post("/api/campaigns/social/generate", async (req, res, next) => {
 /**
  * POST /api/campaigns/social/optimize - Optimize content for platform
  */
-router.post("/api/campaigns/social/optimize", async (req, res, next) => {
+router.post("/social/optimize", async (req, res, next) => {
   try {
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = optimizeForPlatformSchema.parse(req.body);
     
@@ -440,10 +445,10 @@ router.post("/api/campaigns/social/optimize", async (req, res, next) => {
 /**
  * POST /api/campaigns/:id/social/schedule - Schedule social post
  */
-router.post("/api/campaigns/:id/social/schedule", async (req, res, next) => {
+router.post("/:id/social/schedule", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const body = schedulePostSchema.parse(req.body);
     
@@ -480,10 +485,10 @@ router.post("/api/campaigns/:id/social/schedule", async (req, res, next) => {
 /**
  * PATCH /api/campaigns/:id/status - Update campaign status
  */
-router.patch("/api/campaigns/:id/status", async (req, res, next) => {
+router.patch("/:id/status", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.headers["x-user-id"] as string || "demo-user-id";
+    const userId = getAuthenticatedUserId(req);
     
     const { status } = req.body;
     

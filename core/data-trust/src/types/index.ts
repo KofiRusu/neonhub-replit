@@ -70,7 +70,7 @@ export interface ProvenanceEvent {
   timestamp: Date;
   previousHash?: string;
   currentHash: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   blockchainTx?: string;
 }
 
@@ -93,7 +93,7 @@ export interface DataProvenance {
   owner: string;
   lineage: ProvenanceEvent[];
   blockchainRecords: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface IntegrityCheck {
@@ -115,7 +115,7 @@ export interface AuditEvent {
   actor: string;
   action: string;
   resource: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
   sessionId?: string;
@@ -179,7 +179,7 @@ export interface BlockchainConnectorInterface {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   isConnected(): boolean;
-  storeHash(hash: string, metadata?: Record<string, any>): Promise<BlockchainTransaction>;
+  storeHash(hash: string, metadata?: Record<string, unknown>): Promise<BlockchainTransaction>;
   verifyHash(hash: string, txHash: string): Promise<boolean>;
   getTransaction(txHash: string): Promise<BlockchainTransaction>;
   getNetworkInfo(): Promise<{ chainId: number; blockNumber: number }>;
@@ -212,7 +212,7 @@ export class DataTrustError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'DataTrustError';
@@ -220,42 +220,42 @@ export class DataTrustError extends Error {
 }
 
 export class HashingError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'HASHING_ERROR', details);
     this.name = 'HashingError';
   }
 }
 
 export class MerkleTreeError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'MERKLE_TREE_ERROR', details);
     this.name = 'MerkleTreeError';
   }
 }
 
 export class BlockchainError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'BLOCKCHAIN_ERROR', details);
     this.name = 'BlockchainError';
   }
 }
 
 export class ProvenanceError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'PROVENANCE_ERROR', details);
     this.name = 'ProvenanceError';
   }
 }
 
 export class IntegrityError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'INTEGRITY_ERROR', details);
     this.name = 'IntegrityError';
   }
 }
 
 export class AuditError extends DataTrustError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'AUDIT_ERROR', details);
     this.name = 'AuditError';
   }

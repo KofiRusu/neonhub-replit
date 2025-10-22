@@ -32,6 +32,10 @@ export class ContentAgent {
   async generateDraft(input: GenerateDraftInput): Promise<GenerateDraftOutput> {
     const startTime = Date.now();
     
+    if (!input.createdById) {
+      throw new Error("Missing user context for content generation");
+    }
+    
     // Create job
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
@@ -68,7 +72,7 @@ export class ContentAgent {
           tone: input.tone,
           audience: input.audience,
           status: "generated",
-          createdById: input.createdById || "demo-user-id", // TODO: Get from auth
+          createdById: input.createdById,
         },
       });
 

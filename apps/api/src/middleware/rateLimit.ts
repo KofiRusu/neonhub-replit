@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { type AuthRequest } from './auth.js';
 import { rateLimitFor } from '../lib/rateLimiter.js';
 import { logger } from '../lib/logger.js';
+import { env } from '../config/env.js';
 
 /**
  * Global rate limit middleware
@@ -37,7 +38,11 @@ export async function rateLimit(req: AuthRequest, res: Response, next: NextFunct
     next();
   } catch (error) {
     logger.error({ error }, 'Rate limit check failed');
-    // Fail open - allow request
+    if (env.NODE_ENV === 'production') {
+      return res.status(503).json({
+        error: 'Rate limiting service unavailable',
+      });
+    }
     next();
   }
 }
@@ -67,6 +72,11 @@ export async function authRateLimit(req: AuthRequest, res: Response, next: NextF
     next();
   } catch (error) {
     logger.error({ error }, 'Auth rate limit failed');
+    if (env.NODE_ENV === 'production') {
+      return res.status(503).json({
+        error: 'Authentication temporarily unavailable',
+      });
+    }
     next();
   }
 }

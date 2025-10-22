@@ -125,7 +125,7 @@ export interface ProvenanceNode {
   label: string;
   type: 'data' | 'actor' | 'event';
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ProvenanceEdge {

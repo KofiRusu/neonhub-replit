@@ -1,38 +1,88 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
+import { env } from "../config/env.js";
 
-/**
- * Parse CORS origins from environment variable
- */
-const parseOrigins = (env: string | undefined): Set<string> => {
-  if (!env) return new Set();
-  return new Set(env.split(',').map(s => s.trim()).filter(Boolean));
+type OriginMatcher = (origin: string) => boolean;
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[-/\\^$+?.()|[\]{}]/g, "\\$&");
+
+const buildMatchers = (origins: string[]): OriginMatcher[] => {
+  if (!origins.length) {
+    return [];
+  }
+
+  return origins.map((origin) => {
+    const trimmed = origin.trim();
+
+    if (!trimmed) {
+      return () => false;
+    }
+
+    if (trimmed === "*" || trimmed.toLowerCase() === "all") {
+      return () => true;
+    }
+
+    if (trimmed.startsWith("regex:")) {
+      const pattern = trimmed.slice(6);
+      try {
+        const regex = new RegExp(pattern);
+        return (value: string) => regex.test(value);
+      } catch {
+        return (value: string) => value === trimmed;
+      }
+    }
+
+    if (trimmed.includes("*")) {
+      const regex = new RegExp(
+        `^${escapeRegExp(trimmed).replace(/\\\*/g, ".*")}$`
+      );
+      return (value: string) => regex.test(value);
+    }
+
+    return (value: string) => value === trimmed;
+  });
 };
 
-const allowed = parseOrigins(process.env.CORS_ORIGIN);
+const allowedOrigins = buildMatchers(env.CORS_ORIGINS);
 
-/**
- * Strict CORS middleware
- * Only allows requests from pre-configured origins
- */
+const isOriginAllowed = (origin?: string | null) => {
+  if (!origin) {
+    return false;
+  }
+
+  if (!allowedOrigins.length) {
+    return false;
+  }
+
+  return allowedOrigins.some((match) => match(origin));
+};
+
 export function strictCORS(req: Request, res: Response, next: NextFunction) {
-  const origin = req.headers.origin || '';
+  const origin = req.headers.origin;
+  const allowed = isOriginAllowed(origin);
 
-  if (allowed.has(origin)) {
-    res.setHeader('Vary', 'Origin');
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  if (allowed && origin) {
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
+    const requestHeaders =
+      (req.headers["access-control-request-headers"] as string | undefined) ??
+      "Content-Type, Authorization";
+
+    res.setHeader("Access-Control-Allow-Headers", requestHeaders);
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    );
   }
 
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+  if (req.method === "OPTIONS") {
+    return allowed ? res.status(204).end() : res.status(403).end();
   }
 
-  // Block unknown origins
-  if (origin && !allowed.has(origin)) {
-    return res.status(403).json({ error: 'CORS blocked' });
+  if (origin && !allowed) {
+    return res.status(403).json({ error: "CORS blocked" });
   }
 
   next();

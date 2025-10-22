@@ -4,12 +4,14 @@ import { ValidationError } from "../lib/errors.js";
 import { broadcast } from "../ws/index.js";
 import { logger } from "../lib/logger.js";
 import { MetricEventInputSchema, MetricsSummaryQuerySchema } from "./metrics.schemas.js";
+import { getAuthenticatedUserId } from "../lib/requestUser.js";
 
 export const metricsRouter = Router();
 
 // Track an event
 metricsRouter.post("/metrics/events", async (req, res, next) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     const result = MetricEventInputSchema.safeParse(req.body);
     
     if (!result.success) {
@@ -17,11 +19,14 @@ metricsRouter.post("/metrics/events", async (req, res, next) => {
     }
 
     const { type, meta } = result.data;
+    const metaPayload = (
+      meta && typeof meta === 'object' && !Array.isArray(meta)
+    ) ? { ...meta } : {};
 
     const event = await prisma.metricEvent.create({
       data: {
         type,
-        meta: meta || {},
+        meta: { ...metaPayload, userId },
       },
     });
 
@@ -32,6 +37,7 @@ metricsRouter.post("/metrics/events", async (req, res, next) => {
       id: event.id,
       type,
       timestamp: event.createdAt,
+      userId,
     });
 
     // Also broadcast delta for live updates
@@ -39,6 +45,7 @@ metricsRouter.post("/metrics/events", async (req, res, next) => {
       type,
       increment: 1,
       timestamp: new Date(),
+      userId,
     });
 
     res.json({
@@ -53,6 +60,7 @@ metricsRouter.post("/metrics/events", async (req, res, next) => {
 // Get event summary/analytics
 metricsRouter.get("/metrics/summary", async (req, res, next) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     // Validate query params
     const queryResult = MetricsSummaryQuerySchema.safeParse(req.query);
     if (!queryResult.success) {
@@ -68,14 +76,28 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
 
     logger.debug({ range, startDate }, "Fetching metrics summary");
 
+    const ownershipFilter = {
+      OR: [
+        { meta: { path: ["userId"], equals: userId } },
+        { meta: { path: ["tenantId"], equals: userId } },
+      ],
+    };
+
+    const eventWhere = {
+      AND: [{ createdAt: { gte: startDate } }, ownershipFilter],
+    };
+
+    const jobBaseWhere = {
+      createdById: userId,
+      createdAt: {
+        gte: startDate,
+      },
+    };
+
     // Get event counts by type
     const events = await prisma.metricEvent.groupBy({
       by: ["type"],
-      where: {
-        createdAt: {
-          gte: startDate,
-        },
-      },
+      where: eventWhere,
       _count: {
         id: true,
       },
@@ -83,47 +105,33 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
 
     // Get total events
     const totalEvents = await prisma.metricEvent.count({
-      where: {
-        createdAt: {
-          gte: startDate,
-        },
-      },
+      where: eventWhere,
     });
 
     // Get agent job stats
     const [successfulJobs, erroredJobs, totalJobs] = await Promise.all([
       prisma.agentJob.count({
         where: {
+          ...jobBaseWhere,
           status: "success",
-          createdAt: {
-            gte: startDate,
-          },
         },
       }),
       prisma.agentJob.count({
         where: {
+          ...jobBaseWhere,
           status: "error",
-          createdAt: {
-            gte: startDate,
-          },
         },
       }),
       prisma.agentJob.count({
-        where: {
-          createdAt: {
-            gte: startDate,
-          },
-        },
+        where: jobBaseWhere,
       }),
     ]);
 
     // Calculate average job latency from successful jobs with metrics
     const recentJobs = await prisma.agentJob.findMany({
       where: {
+        ...jobBaseWhere,
         status: "success",
-        createdAt: {
-          gte: startDate,
-        },
       },
       select: {
         metrics: true,
@@ -152,6 +160,7 @@ metricsRouter.get("/metrics/summary", async (req, res, next) => {
     // Get content drafts
     const draftsCreated = await prisma.contentDraft.count({
       where: {
+        createdById: userId,
         createdAt: {
           gte: startDate,
         },

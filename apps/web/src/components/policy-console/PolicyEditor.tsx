@@ -127,9 +127,12 @@ export function PolicyEditor({ policyId, onSave, onCancel }: PolicyEditorProps) 
                   <select
                     value={rule.action}
                     onChange={e => {
-                      const newRules = [...(policy.rules || [])];
-                      newRules[index] = { ...rule, action: e.target.value as any };
-                      setPolicy({ ...policy, rules: newRules });
+                      const value = e.target.value;
+                      if (value === 'allow' || value === 'deny' || value === 'review') {
+                        const newRules = [...(policy.rules || [])];
+                        newRules[index] = { ...rule, action: value };
+                        setPolicy({ ...policy, rules: newRules });
+                      }
                     }}
                     className="px-3 py-2 border rounded-lg"
                   >

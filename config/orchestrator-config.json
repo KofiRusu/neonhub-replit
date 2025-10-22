@@ -1,0 +1,52 @@
+{
+  "orchestratorId": "orchestrator-1761092040550",
+  "discovery": {
+    "enabled": true,
+    "discoveryInterval": 30000,
+    "heartbeatInterval": 10000,
+    "nodeTimeout": 60000,
+    "maxRetries": 3
+  },
+  "healthMonitoring": {
+    "enabled": true,
+    "checkInterval": 15000,
+    "timeout": 5000,
+    "unhealthyThreshold": 3,
+    "healthyThreshold": 2,
+    "metricsCollectionInterval": 30000
+  },
+  "routing": {
+    "algorithm": "adaptive",
+    "loadBalancingStrategy": "weighted",
+    "geoRoutingEnabled": true,
+    "latencyThreshold": 100,
+    "capacityThreshold": 80,
+    "adaptiveRouting": true
+  },
+  "scaling": {
+    "enabled": true,
+    "minNodes": 3,
+    "maxNodes": 50,
+    "scaleUpThreshold": 75,
+    "scaleDownThreshold": 25,
+    "cooldownPeriod": 300,
+    "predictiveScaling": false,
+    "metricsWindow": 300
+  },
+  "failover": {
+    "enabled": true,
+    "backupNodes": [],
+    "failoverTimeout": 30000,
+    "autoRecovery": true,
+    "dataReplication": true
+  },
+  "federation": {
+    "federationManagers": [],
+    "messageRoutingEnabled": true,
+    "crossFederationCommunication": true,
+    "sharedStateSync": true
+  },
+  "logger": {
+    "prefix": "[GlobalOrchestrator]"
+  }
+}

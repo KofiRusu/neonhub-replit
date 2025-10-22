@@ -12,7 +12,7 @@ export const stripeWebhookRouter = Router();
  * Requires raw body for signature verification
  */
 stripeWebhookRouter.post(
-  '/billing/webhook',
+  '/',
   bodyParser.raw({ type: 'application/json' }),
   async (req: Request, res: Response) => {
     const signature = req.headers['stripe-signature'];

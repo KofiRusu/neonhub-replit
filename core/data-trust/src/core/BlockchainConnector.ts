@@ -66,7 +66,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   /**
    * Store a hash on the blockchain
    */
-  async storeHash(hash: string, metadata?: Record<string, any>): Promise<BlockchainTransaction> {
+  async storeHash(hash: string, metadata?: Record<string, unknown>): Promise<BlockchainTransaction> {
     if (!this.connected || !this.signer) {
       throw new BlockchainError('Not connected to blockchain or no signer available');
     }
@@ -232,7 +232,7 @@ export class BlockchainConnector implements BlockchainConnectorInterface {
   /**
    * Encode data for storing hash on blockchain
    */
-  private encodeStoreHashData(hash: string, metadata?: Record<string, any>): string {
+  private encodeStoreHashData(hash: string, metadata?: Record<string, unknown>): string {
     // This is a simplified implementation
     // In a real implementation, you'd use a proper contract ABI
     const data = ethers.AbiCoder.defaultAbiCoder().encode(

@@ -159,25 +159,21 @@ export function PolicyDashboard({ refreshInterval = 30000 }: PolicyDashboardProp
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatusCard
           title="AI Governance"
-          status={status?.governance}
           healthy={Object.values(status?.governance || {}).filter(Boolean).length}
           total={Object.keys(status?.governance || {}).length}
         />
         <StatusCard
           title="Data Trust"
-          status={status?.dataTrust}
           healthy={Object.values(status?.dataTrust || {}).filter(Boolean).length}
           total={Object.keys(status?.dataTrust || {}).length}
         />
         <StatusCard
           title="Eco Optimizer"
-          status={status?.ecoOptimizer}
           healthy={Object.values(status?.ecoOptimizer || {}).filter(Boolean).length}
           total={Object.keys(status?.ecoOptimizer || {}).length}
         />
         <StatusCard
           title="Orchestration"
-          status={status?.orchestration}
           healthy={status?.orchestration.nodesActive || 0}
           total={stats?.orchestration.totalNodes || 0}
         />
@@ -243,12 +239,11 @@ export function PolicyDashboard({ refreshInterval = 30000 }: PolicyDashboardProp
 
 interface StatusCardProps {
   title: string;
-  status: any;
   healthy: number;
   total: number;
 }
 
-function StatusCard({ title, status: _status, healthy, total }: StatusCardProps) {
+function StatusCard({ title, healthy, total }: StatusCardProps) {
   const healthStatus = getHealthStatus(healthy, total);
   
   return (

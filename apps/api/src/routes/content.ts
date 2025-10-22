@@ -1,15 +1,17 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma.js";
 import { GenerateContentRequestSchema } from "../types/index.js";
-import { ValidationError } from "../lib/errors.js";
+import { AppError, ValidationError } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
 import { contentAgent } from "../agents/content/ContentAgent.js";
+import { getAuthenticatedUserId } from "../lib/requestUser.js";
 
 export const contentRouter = Router();
 
 // Generate content using ContentAgent
 contentRouter.post("/content/generate", async (req, res, next) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     const result = GenerateContentRequestSchema.safeParse(req.body);
     
     if (!result.success) {
@@ -24,7 +26,7 @@ contentRouter.post("/content/generate", async (req, res, next) => {
       tone: tone as any,
       audience,
       notes,
-      createdById: req.headers["x-user-id"] as string | undefined, // TODO: Get from NextAuth session
+      createdById: userId,
     });
 
     logger.info({ draftId: output.draftId, jobId: output.jobId, topic }, "Content generation initiated");
@@ -46,12 +48,16 @@ contentRouter.post("/content/generate", async (req, res, next) => {
 // Get all drafts (paginated)
 contentRouter.get("/content/drafts", async (req, res, next) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
     const [drafts, total] = await Promise.all([
       prisma.contentDraft.findMany({
+        where: {
+          createdById: userId,
+        },
         take: limit,
         skip,
         orderBy: { createdAt: "desc" },
@@ -66,7 +72,11 @@ contentRouter.get("/content/drafts", async (req, res, next) => {
           },
         },
       }),
-      prisma.contentDraft.count(),
+      prisma.contentDraft.count({
+        where: {
+          createdById: userId,
+        },
+      }),
     ]);
 
     res.json({
@@ -88,6 +98,7 @@ contentRouter.get("/content/drafts", async (req, res, next) => {
 contentRouter.get("/content/drafts/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
+    const userId = getAuthenticatedUserId(req);
 
     const draft = await prisma.contentDraft.findUnique({
       where: { id },
@@ -108,6 +119,9 @@ contentRouter.get("/content/drafts/:id", async (req, res, next) => {
         success: false,
         error: "Draft not found",
       });
+    }
+    if (draft.createdById !== userId) {
+      return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
     res.json({

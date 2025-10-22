@@ -11,7 +11,7 @@ interface LogEntry {
   message: string
   agentId?: string
   taskId?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 interface AgentLogProps {

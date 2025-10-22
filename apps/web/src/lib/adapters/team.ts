@@ -24,6 +24,7 @@ export interface PendingInvitation {
   invitedBy: string
   sentAt: string
   expiresAt: string
+  previewUrl?: string
 }
 
 export interface InviteMemberInput {

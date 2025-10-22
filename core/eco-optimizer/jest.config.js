@@ -17,7 +17,13 @@ module.exports = {
       statements: 80
     }
   },
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  }
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  },
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
+  },
+  extensionsToTreatAsEsm: ['.ts']
 };

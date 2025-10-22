@@ -60,7 +60,7 @@ describe('DataHasher', () => {
       const result = await hasher.hashMultiple(['item1', 'item2', 'item3']);
       expect(result).toBeDefined();
       expect(result.hash).toBeDefined();
-      expect(result.dataSize).toBe(17); // Combined length
+      expect(result.dataSize).toBe(15); // Combined length: 5+5+5
     });
   });
 

@@ -48,11 +48,12 @@ describe('ProvenanceTracker', () => {
 
   describe('getEventHistory', () => {
     it('should get event history', async () => {
+      const now = Date.now();
       await tracker.recordEvent({
         dataId: 'test-data-1',
         eventType: 'CREATED',
         actor: 'user@example.com',
-        timestamp: new Date(),
+        timestamp: new Date(now),
         currentHash: 'hash123',
         metadata: {}
       });
@@ -61,7 +62,7 @@ describe('ProvenanceTracker', () => {
         dataId: 'test-data-1',
         eventType: 'MODIFIED',
         actor: 'user@example.com',
-        timestamp: new Date(),
+        timestamp: new Date(now + 1000), // 1 second later
         previousHash: 'hash123',
         currentHash: 'hash456',
         metadata: {}

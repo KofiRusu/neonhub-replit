@@ -85,7 +85,6 @@ export function useCopilotRouter() {
         void endedAt; // reserved for optional telemetry/logging by caller
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- No external dependencies, all logic is self-contained
     []
   );
 

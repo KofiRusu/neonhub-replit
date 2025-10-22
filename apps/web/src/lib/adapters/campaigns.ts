@@ -67,8 +67,28 @@ export interface CampaignMetrics {
     id: string;
     name: string;
     winner?: string;
-    metrics: any;
+    metrics: Record<string, unknown>;
   }>;
+}
+
+export interface ScheduledEmail {
+  id: string;
+  day: number;
+  scheduledFor: string;
+}
+
+export interface ScheduledPost {
+  id: string;
+  platform: string;
+  scheduledFor: string;
+}
+
+export interface ScheduleCampaignResult {
+  jobId: string;
+  scheduled: {
+    emails: ScheduledEmail[];
+    posts: ScheduledPost[];
+  };
 }
 
 export async function getCampaigns(filters?: {
@@ -130,8 +150,8 @@ export async function scheduleCampaign(id: string, schedule: {
     content: string;
     scheduledFor: string;
   }>;
-}): Promise<{ success: boolean; data: any }> {
-  return http<{ success: boolean; data: any }>(`campaigns/${id}/schedule`, {
+}): Promise<{ success: boolean; data: ScheduleCampaignResult }> {
+  return http<{ success: boolean; data: ScheduleCampaignResult }>(`campaigns/${id}/schedule`, {
     method: 'POST',
     body: JSON.stringify(schedule),
   });

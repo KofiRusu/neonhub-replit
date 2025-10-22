@@ -9,10 +9,19 @@ import { r } from "@/src/lib/route-map";
 
 type Filters = { type?: string; agent?: string };
 
-export default function KnowledgeIndex() {
-  const [q, setQ] = useState("");
+interface KnowledgeIndexProps {
+  query?: string;
+  onQueryChange?: (value: string) => void;
+}
+
+export default function KnowledgeIndex({ query, onQueryChange }: KnowledgeIndexProps = {}) {
+  const [q, setQ] = useState(query ?? "");
   const [filters] = useState<Filters>({});
   const [items, setItems] = useState<KnowledgeItem[] | undefined>(undefined);
+
+  useEffect(() => {
+    setQ(query ?? "");
+  }, [query]);
 
   useEffect(() => {
     let mounted = true;
@@ -46,7 +55,15 @@ export default function KnowledgeIndex() {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 mb-4">
-          <Input placeholder="Search docs, briefs, references…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input
+            placeholder="Search docs, briefs, references…"
+            value={q}
+            onChange={(e) => {
+              const next = e.target.value;
+              setQ(next);
+              onQueryChange?.(next);
+            }}
+          />
         </div>
         {!hasData && (
           <div className="text-sm text-white/70">
@@ -74,5 +91,4 @@ export default function KnowledgeIndex() {
     </Card>
   );
 }
-
 

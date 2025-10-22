@@ -1,0 +1,195 @@
+# 🧠 Cline AI Assistant Rules for NeonHub
+# Project: NeonHub - AI-Powered Marketing Automation Platform
+# Version: v3.2.0
+# Purpose: Guide Cline's autonomous development behavior
+
+## 🎯 Project Context
+
+You are working on **NeonHub**, a production-grade AI-powered marketing automation platform. This is a TypeScript monorepo with:
+
+- **Frontend:** Next.js 15 + React + TailwindCSS + shadcn/ui
+- **Backend:** Express + Prisma + PostgreSQL + tRPC
+- **AI Stack:** OpenAI GPT-4, DALL-E, Claude 3.7
+- **Infrastructure:** Vercel (Web) + Railway (API) + Neon DB
+- **CI/CD:** GitHub Actions with strict quality gates
+
+## 📁 Workspace Structure
+
+```
+NeonHub/
+├── apps/
+│   ├── api/      # Backend API (Express + Prisma)
+│   └── web/      # Frontend (Next.js 15)
+├── core/         # Core AI modules (orchestrator, governance, etc.)
+├── modules/      # Predictive engine and other modules
+├── docs/         # Documentation
+└── scripts/      # Build and automation scripts
+```
+
+## ⚠️ Critical Rules (NEVER VIOLATE)
+
+1. **No Mock Data** - Always connect to real backend APIs and database
+2. **No Secret Modifications** - Never modify `.env`, `secrets/`, or key files
+3. **Zero Errors Policy** - Ensure 0 lint, TypeScript, and test errors before completion
+4. **Real APIs Only** - Always use existing backend routes and schemas
+5. **Complete Tasks** - Each task must be 100% complete before moving to next
+6. **Production Code** - Always generate fully working code, not pseudocode
+7. **Type Safety** - Maintain strict TypeScript compliance
+8. **Multi-repo Integrity** - Preserve consistency across all workspace packages
+
+## 🛠️ Development Standards
+
+### Code Quality
+- Follow TypeScript strict mode
+- Use ESLint and Prettier configurations
+- Write comprehensive tests (Jest for API, Playwright for E2E)
+- Maintain >= 95% test coverage
+- Document all new functions and complex logic
+
+### Styling & UI
+- Use TailwindCSS utility classes
+- Leverage shadcn/ui components
+- Follow existing design system patterns
+- Ensure responsive design (mobile-first)
+- Maintain dark mode compatibility
+
+### Backend Practices
+- Use Prisma for all database operations
+- Follow tRPC patterns for type-safe APIs
+- Implement proper error handling
+- Add rate limiting for public endpoints
+- Use middleware for authentication/authorization
+
+### Git & Commits
+- Use conventional commits format (feat, fix, chore, docs, etc.)
+- Write clear, professional commit messages
+- Make atomic commits (one logical change per commit)
+- Never commit sensitive data or credentials
+
+## 🚫 Files to Ignore
+
+**Never modify or read:**
+- `.env` files (all variants)
+- `secrets/` directory
+- `keys/` directory
+- `node_modules/`
+- `dist/` and build output directories
+- `.next/` cache
+- `*.log` files
+
+## 🎨 Brand Voice & Tone
+
+When generating content or documentation:
+- Tone: Professional, witty, confident
+- Style: Modern, clear, concise
+- Audience: Technical users and marketers
+- Avoid: Jargon overload, overly casual language
+
+## 🤖 AI Agents
+
+NeonHub includes 5 core AI agents:
+1. **AdAgent** - Campaign creation & optimization
+2. **InsightAgent** - Data analysis & predictions
+3. **DesignAgent** - AI-powered design generation
+4. **TrendAgent** - Social media trend monitoring
+5. **OutreachAgent** - B2B lead generation
+
+Always consider agent context when modifying agent-related code.
+
+## 📊 Testing Strategy
+
+- **Unit Tests:** All utility functions and business logic
+- **Integration Tests:** API endpoints and database operations
+- **E2E Tests:** Critical user flows
+- **CI/CD:** All tests must pass before merge
+
+## 🔐 Security Best Practices
+
+- Never expose API keys or secrets
+- Validate all user inputs
+- Use parameterized queries (Prisma handles this)
+- Implement proper CORS and rate limiting
+- Follow OWASP security guidelines
+
+## 📦 Dependency Management
+
+- Use npm workspaces for monorepo management
+- Keep dependencies up to date
+- Document any new package additions
+- Prefer established, well-maintained packages
+
+## 🚀 Deployment Awareness
+
+- **Web:** Deployed on Vercel (https://neonhubecosystem.com)
+- **API:** Deployed on Railway (https://api.neonhubecosystem.com)
+- **DB:** Neon PostgreSQL (serverless)
+- **Node Version:** >= 20.0.0
+
+## 📝 Documentation Requirements
+
+When adding features:
+1. Update relevant README files
+2. Add JSDoc comments for functions
+3. Update API documentation if endpoints change
+4. Create migration guides for breaking changes
+
+## ✅ Task Completion Checklist
+
+Before considering a task complete:
+- [ ] Code compiles without errors
+- [ ] All tests pass
+- [ ] No TypeScript errors
+- [ ] No ESLint warnings
+- [ ] Prettier formatting applied
+- [ ] Documentation updated
+- [ ] No security vulnerabilities introduced
+
+## 💡 Common Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Development
+npm run dev               # Start all apps
+npm run dev --workspace=apps/api  # API only
+npm run dev --workspace=apps/web  # Web only
+
+# Quality checks
+npm run lint              # Lint all workspaces
+npm run typecheck         # Type-check all workspaces
+npm run test              # Run all tests
+npm run verify            # Run all quality checks
+
+# Database
+npm run prisma:generate   # Generate Prisma client
+cd apps/api && npx prisma studio  # Open Prisma Studio
+cd apps/api && npx prisma migrate dev  # Create migration
+
+# Build
+npm run build             # Build all apps
+```
+
+## 🎯 Success Criteria
+
+A task is successfully complete when:
+1. All CI/CD checks pass
+2. Test coverage >= 95%
+3. Zero TypeScript errors
+4. Zero ESLint warnings
+5. Code reviewed and documented
+6. Deployment artifacts validated
+
+## 🤝 Communication Style
+
+When explaining or suggesting:
+- Be concise but thorough
+- Provide code examples
+- Explain the "why" behind decisions
+- Offer alternatives when appropriate
+- Use emojis sparingly for clarity
+
+---
+
+**Remember:** NeonHub is a production application serving real users. Quality, security, and reliability are paramount.
+

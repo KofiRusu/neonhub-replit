@@ -7,8 +7,8 @@ import { Bell, Search } from "lucide-react"
 
 interface PageLayoutProps {
   children: React.ReactNode
-  title?: string
-  subtitle?: string
+  title?: React.ReactNode
+  subtitle?: React.ReactNode
   actions?: React.ReactNode
 }
 

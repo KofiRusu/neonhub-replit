@@ -65,7 +65,7 @@ export interface ProvenanceEvent {
   action: string;
   timestamp: Date;
   hash: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ProvenanceChainVerification {
@@ -85,7 +85,7 @@ export interface AuditLogEntry {
   action: string;
   userId?: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DataTrustStatus {
@@ -219,7 +219,7 @@ export interface OrchestratorNode {
   region: string;
   endpoint: string;
   capabilities: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   status?: 'active' | 'inactive' | 'degraded';
 }
 
@@ -227,7 +227,7 @@ export interface RequestRouting {
   requestId: string;
   sourceRegion: string;
   priority: 'low' | 'medium' | 'high';
-  payload: any;
+  payload: unknown;
 }
 
 export interface RoutingResult {
@@ -307,7 +307,7 @@ export interface UnifiedGovernanceStatus {
 // API Response Types
 // ============================================================================
 
-export interface ApiSuccessResponse<T = any> {
+export interface ApiSuccessResponse<T = unknown> {
   success: true;
   data?: T;
   message?: string;
@@ -321,4 +321,4 @@ export interface ApiErrorResponse {
   code?: string;
 }
 
-export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
+export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;

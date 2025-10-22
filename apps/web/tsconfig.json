@@ -25,6 +25,9 @@
       "@/*": [
         "./src/*"
       ],
+      "@/src/*": [
+        "./src/*"
+      ],
       "@/components/*": [
         "./src/components/*"
       ],
@@ -47,6 +50,14 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "components/**/*",
+    "hooks/**/*",
+    "lib/**/*",
+    "analysis/**/*",
+    "tests/**/*",
+    "test-results/**/*",
+    "**/__tests__/**/*",
+    "playwright-report/**/*"
   ]
 }

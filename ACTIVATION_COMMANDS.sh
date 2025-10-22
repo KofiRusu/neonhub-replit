@@ -1,8 +1,39 @@
 #!/usr/bin/env bash
-# Auto-Sync Pipeline - Quick Activation Commands
+# NeonHub - Quick Activation Commands
 # Execute these steps in order after creating SOURCE_PAT
 
 set -euo pipefail
+
+echo "═══════════════════════════════════════════════════════════════"
+echo "   NEONHUB ACTIVATION COMMANDS"
+echo "═══════════════════════════════════════════════════════════════"
+echo ""
+
+echo "🐍 PYTHON ENVIRONMENTS"
+echo "═══════════════════════════════════════════════════════════════"
+echo ""
+echo "Setup Python environments (first time):"
+echo "  ./scripts/python/setup-all.sh"
+echo ""
+echo "Activate Python venv (production):"
+echo "  source .venv/activate-prod.sh"
+echo ""
+echo "Activate Python venv (test):"
+echo "  source .venv/activate-test.sh"
+echo ""
+echo "Activate conda (production):"
+echo "  conda activate neonhub-prod"
+echo ""
+echo "Activate conda (test):"
+echo "  conda activate neonhub-test"
+echo ""
+echo "Test Python environment:"
+echo "  ./scripts/python/test-python-env.sh venv prod"
+echo ""
+echo "Run Python benchmarks:"
+echo "  source .venv/activate-prod.sh && python scripts/benchmarking/generate-v32-report.py"
+echo ""
+echo ""
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "   AUTO-SYNC PIPELINE ACTIVATION"

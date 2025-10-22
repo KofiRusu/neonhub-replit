@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
@@ -9,8 +8,6 @@ import Providers from "../providers/Providers"
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
-
-const inter = Inter({ subsets: ["latin"] })
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://neonhubecosystem.com"
 
@@ -73,9 +70,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className="font-sans">
         <Providers>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <ThemeProvider defaultTheme="dark">
             {children}
             <Toaster />
           </ThemeProvider>

@@ -26,6 +26,7 @@ import orchestrationRouter from "./routes/orchestration.js";
 import { stripeWebhookRouter } from "./routes/stripe-webhook.js";
 import billingRouter from "./routes/billing.js";
 import { AppError } from "./lib/errors.js";
+import cookieParser from "cookie-parser";
 
 // Environment is validated on import
 
@@ -39,18 +40,24 @@ const httpServer = createServer(app);
 // Initialize WebSocket
 initWebSocket(httpServer);
 
-// Security Middleware Stack (Week 3)
-// 1. Body parsing with size limits (1MB)
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Stripe webhook must receive raw body before any JSON middleware
+app.use("/api/billing/webhook", stripeWebhookRouter);
 
-// 2. Security headers (global)
+// Security Middleware Stack (Week 3)
+// 1. Body parsing with size limits (1MB) for all non-webhook routes
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+// 2. Cookie parsing for session auth
+app.use(cookieParser(env.NEXTAUTH_SECRET));
+
+// 3. Security headers (global)
 app.use(securityHeaders);
 
-// 3. Strict CORS
+// 4. Strict CORS
 app.use(strictCORS);
 
-// 4. Rate limiting (global, with feature flag support)
+// 5. Rate limiting (global, with feature flag support)
 app.use(rateLimit);
 
 // Request logging
@@ -62,7 +69,6 @@ app.use((req, _res, next) => {
 // Public routes (no auth required)
 app.use(healthRouter);
 app.use(authRateLimit, authRouter); // Stricter rate limit on auth endpoints
-app.use(stripeWebhookRouter); // Webhook must use raw body
 
 // Protected routes (auth required + audit logging)
 app.use(requireAuth, contentRouter);

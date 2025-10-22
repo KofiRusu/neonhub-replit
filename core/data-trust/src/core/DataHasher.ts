@@ -102,8 +102,17 @@ export class DataHasher implements IDataHasher {
         dataItems.map(item => this.hash(item, algorithm))
       );
 
+      // Calculate total original data size
+      const totalDataSize = hashes.reduce((sum, h) => sum + h.dataSize, 0);
+
       const combinedData = hashes.map(h => h.hash).join('');
-      return this.hash(combinedData, algorithm);
+      const result = await this.hash(combinedData, algorithm);
+      
+      // Return with original data size, not hash size
+      return {
+        ...result,
+        dataSize: totalDataSize
+      };
     } catch (error) {
       throw new HashingError(
         `Failed to hash multiple data items`,

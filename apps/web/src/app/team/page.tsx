@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import PageLayout from "@/components/page-layout"
 // import { Skeleton } from "@/src/components/ui/skeleton" // Unused
@@ -71,12 +72,12 @@ export default function TeamPage() {
 
     try {
       const result = await inviteMutation.mutateAsync(input)
-      
-      // If email service not configured, show preview URL
-      if ((result as any).previewUrl) {
-        setLastInvitePreview((result as any).previewUrl)
+      if (result.previewUrl) {
+        setLastInvitePreview(result.previewUrl)
+      } else {
+        setLastInvitePreview(undefined)
       }
-      
+
       setInviteEmail("")
       setInviteMessage("")
       setIsInviteOpen(false)
@@ -326,10 +327,13 @@ export default function TeamPage() {
                     >
                       <div className="flex items-center gap-4">
                         <div className="relative">
-                          <img
+                          <Image
                             src={member.avatar || "/placeholder.svg"}
                             alt={member.name}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                            unoptimized
                           />
                           <div
                             className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#0E0F1A] ${getStatusColor(

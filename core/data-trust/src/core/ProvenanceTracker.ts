@@ -163,7 +163,12 @@ export class ProvenanceTracker implements ProvenanceTrackerInterface {
   /**
    * Record data validation event
    */
-  async recordValidation(dataId: string, actor: string, validationResult: boolean, details?: Record<string, any>): Promise<void> {
+  async recordValidation(
+    dataId: string,
+    actor: string,
+    validationResult: boolean,
+    details?: Record<string, unknown>
+  ): Promise<void> {
     try {
       const currentProvenance = this.provenanceStore.get(dataId);
       if (!currentProvenance) {
@@ -300,7 +305,7 @@ export class ProvenanceTracker implements ProvenanceTrackerInterface {
 
       // Update owner if this is a transfer event
       if (event.eventType === 'TRANSFERRED' && event.metadata.newOwner) {
-        provenance.owner = event.metadata.newOwner;
+        provenance.owner = String(event.metadata.newOwner);
       }
 
       // Update metadata

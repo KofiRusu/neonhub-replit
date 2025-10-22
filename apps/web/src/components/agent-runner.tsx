@@ -6,12 +6,16 @@ import { motion } from "framer-motion"
 import { useState } from "react"
 import { Play, Settings, Code, FileText, Zap } from "lucide-react"
 
+type AgentFieldType = "string" | "text" | "boolean" | "select"
+
+type AgentFieldValue = string | number | boolean
+
 interface AgentSchema {
   name: string
-  type: string
+  type: AgentFieldType
   required: boolean
   description: string
-  default?: any
+  default?: AgentFieldValue
   options?: string[]
 }
 
@@ -19,12 +23,12 @@ interface AgentRunnerProps {
   agentId: string
   agentName: string
   schema: AgentSchema[]
-  onRun: (params: Record<string, any>) => void
+  onRun: (params: Record<string, AgentFieldValue>) => void
   isRunning?: boolean
 }
 
 export default function AgentRunner({ agentId: _agentId, agentName, schema, onRun, isRunning = false }: AgentRunnerProps) {
-  const [params, setParams] = useState<Record<string, any>>({})
+  const [params, setParams] = useState<Record<string, AgentFieldValue>>({})
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,8 +36,18 @@ export default function AgentRunner({ agentId: _agentId, agentName, schema, onRu
     onRun(params)
   }
 
-  const updateParam = (name: string, value: any) => {
+  const updateParam = (name: string, value: AgentFieldValue) => {
     setParams((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const getStringValue = (field: AgentSchema): string => {
+    const value = params[field.name] ?? field.default ?? ""
+    return typeof value === "string" ? value : String(value)
+  }
+
+  const getBooleanValue = (field: AgentSchema): boolean => {
+    const value = params[field.name] ?? field.default ?? false
+    return Boolean(value)
   }
 
   return (
@@ -70,26 +84,26 @@ export default function AgentRunner({ agentId: _agentId, agentName, schema, onRu
             {field.type === "string" && !field.options && (
               <input
                 type="text"
-                value={params[field.name] || field.default || ""}
+                value={getStringValue(field)}
                 onChange={(e) => updateParam(field.name, e.target.value)}
                 className="w-full neon-glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none focus:ring-1 focus:ring-neon-blue/50"
-                placeholder={field.default || `Enter ${field.name}...`}
+                placeholder={(field.default && String(field.default)) || `Enter ${field.name}...`}
               />
             )}
 
             {field.type === "text" && (
               <textarea
-                value={params[field.name] || field.default || ""}
+                value={getStringValue(field)}
                 onChange={(e) => updateParam(field.name, e.target.value)}
                 rows={3}
                 className="w-full neon-glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none focus:ring-1 focus:ring-neon-blue/50 resize-none"
-                placeholder={field.default || `Enter ${field.name}...`}
+                placeholder={(field.default && String(field.default)) || `Enter ${field.name}...`}
               />
             )}
 
-            {field.options && (
+            {field.options && field.type !== "boolean" && (
               <select
-                value={params[field.name] || field.default || ""}
+                value={getStringValue(field)}
                 onChange={(e) => updateParam(field.name, e.target.value)}
                 className="w-full neon-glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none focus:ring-1 focus:ring-neon-blue/50"
               >
@@ -108,7 +122,7 @@ export default function AgentRunner({ agentId: _agentId, agentName, schema, onRu
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={params[field.name] || field.default || false}
+                  checked={getBooleanValue(field)}
                   onChange={(e) => updateParam(field.name, e.target.checked)}
                   className="sr-only peer"
                 />
@@ -134,7 +148,7 @@ export default function AgentRunner({ agentId: _agentId, agentName, schema, onRu
             <div className="space-y-2">
               <label className="block text-sm font-medium text-white">Memory Context</label>
               <textarea
-                value={params.memoryContext || ""}
+                value={typeof params.memoryContext === "string" ? params.memoryContext : ""}
                 onChange={(e) => updateParam("memoryContext", e.target.value)}
                 rows={2}
                 className="w-full neon-glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none focus:ring-1 focus:ring-neon-blue/50 resize-none"
@@ -145,7 +159,7 @@ export default function AgentRunner({ agentId: _agentId, agentName, schema, onRu
             <div className="space-y-2">
               <label className="block text-sm font-medium text-white">Reasoning Mode</label>
               <select
-                value={params.reasoningMode || "standard"}
+                value={typeof params.reasoningMode === "string" ? params.reasoningMode : "standard"}
                 onChange={(e) => updateParam("reasoningMode", e.target.value)}
                 className="w-full neon-glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none focus:ring-1 focus:ring-neon-blue/50"
               >

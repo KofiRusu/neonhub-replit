@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { ok, fail } from "../lib/http";
+import { getAuthenticatedUser } from "../lib/requestUser.js";
 import { ValidationError } from "../lib/errors";
 import {
   isStripeLive,
@@ -166,9 +167,13 @@ billingRouter.post("/billing/checkout", async (req, res) => {
 
     const { priceId, successUrl, cancelUrl } = result.data;
 
-    // TODO: Get userId and email from authenticated user
-    const userId = "demo-user"; // req.user?.id
-    const userEmail = "demo@example.com"; // req.user?.email
+    const user = getAuthenticatedUser(req);
+    const userId = user.id;
+    const userEmail = user.email;
+
+    if (!userEmail) {
+      throw new ValidationError("User email is required for checkout");
+    }
 
     const session = await createCheckoutSession({
       priceId,
@@ -202,15 +207,14 @@ billingRouter.post("/billing/portal", async (req, res) => {
 
     const { returnUrl } = result.data;
 
-    // TODO: Get customer ID from authenticated user
-    const customerId = "cus_demo"; // req.user?.stripeCustomerId
+    const { stripeCustomerId } = getAuthenticatedUser(req);
 
-    if (!customerId) {
+    if (!stripeCustomerId) {
       throw new ValidationError("No Stripe customer found for this user");
     }
 
     const session = await createPortalSession({
-      customerId,
+      customerId: stripeCustomerId,
       returnUrl,
     });
 

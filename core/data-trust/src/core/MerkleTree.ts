@@ -1,88 +1,113 @@
-import { createHash } from 'crypto';
-import { MerkleNode, MerkleProof, MerkleTreeConfig, MerkleTreeInterface, MerkleTreeError } from '../types/index.js';
+import crypto from 'crypto';
+import {
+  MerkleNode,
+  MerkleProof,
+  MerkleTreeConfig,
+  MerkleTreeInterface,
+  MerkleTreeError
+} from '../types/index.js';
+
+type RequiredMerkleConfig = Required<MerkleTreeConfig>;
+
+type InternalNode = {
+  hash: Buffer;
+  node: MerkleNode;
+};
+
+const DEFAULT_CONFIG: RequiredMerkleConfig = {
+  algorithm: 'sha256',
+  leafEncoding: 'utf8',
+  sortLeaves: false,
+  sortPairs: true
+};
 
 export class MerkleTree implements MerkleTreeInterface {
+  private readonly config: RequiredMerkleConfig;
   private leaves: string[] = [];
-  private tree: MerkleNode[] = [];
-  private config: MerkleTreeConfig;
+  private layers: Buffer[][] = [];
+  private rootNode: MerkleNode | null = null;
 
   constructor(config: MerkleTreeConfig = {}) {
-    this.config = {
-      algorithm: 'sha256',
-      leafEncoding: 'hex',
-      sortLeaves: false,
-      sortPairs: false,
-      ...config
-    };
+    this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
-  /**
-   * Build the Merkle tree from leaves
-   */
   async build(leaves: string[]): Promise<void> {
-    try {
-      this.leaves = this.config.sortLeaves ? [...leaves].sort() : [...leaves];
-      this.tree = [];
+    if (!Array.isArray(leaves) || leaves.length === 0) {
+      throw new MerkleTreeError('Cannot build tree with empty leaves');
+    }
 
-      if (this.leaves.length === 0) {
-        throw new MerkleTreeError('Cannot build tree with empty leaves');
+    const normalizedLeaves = this.config.sortLeaves ? [...leaves].sort() : [...leaves];
+    this.leaves = normalizedLeaves;
+    this.layers = [];
+
+    const leafNodes: InternalNode[] = normalizedLeaves.map(leaf => {
+      const hash = this.hashLeaf(leaf);
+      return {
+        hash,
+        node: {
+          hash: hash.toString('hex'),
+          data: leaf
+        }
+      };
+    });
+
+    this.layers.push(leafNodes.map(node => node.hash));
+    let currentLevel = leafNodes;
+
+    while (currentLevel.length > 1) {
+      const nextLevel: InternalNode[] = [];
+
+      for (let index = 0; index < currentLevel.length; index += 2) {
+        const left = currentLevel[index];
+        const right = currentLevel[index + 1] ?? left;
+
+        const [orderedLeft, orderedRight] = this.orderPair(left.hash, right.hash);
+        const parentHash = this.hashPair(orderedLeft, orderedRight);
+        const parentNode: InternalNode = {
+          hash: parentHash,
+          node: {
+            hash: parentHash.toString('hex'),
+            left: left.node,
+            right: right.node
+          }
+        };
+
+        nextLevel.push(parentNode);
       }
 
-      // Create leaf nodes
-      const leafNodes: MerkleNode[] = this.leaves.map(leaf => ({
-        hash: this.hashLeaf(leaf),
-        data: leaf
-      }));
+      this.layers.push(nextLevel.map(node => node.hash));
+      currentLevel = nextLevel;
+    }
 
-      this.tree.push(...leafNodes);
+    this.rootNode = currentLevel[0]?.node ?? null;
 
-      // Build tree upwards
-      let currentLevel = leafNodes;
-      while (currentLevel.length > 1) {
-        currentLevel = this.buildNextLevel(currentLevel);
-        this.tree.push(...currentLevel);
-      }
-    } catch (error) {
-      throw new MerkleTreeError(
-        'Failed to build Merkle tree',
-        { originalError: error, leafCount: leaves.length }
-      );
+    if (!this.rootNode) {
+      throw new MerkleTreeError('Failed to build Merkle tree');
     }
   }
 
-  /**
-   * Get the root hash of the tree
-   */
   getRoot(): string {
-    if (this.tree.length === 0) {
-      throw new MerkleTreeError('Tree not built yet');
-    }
-
-    const rootLevel = this.getLevel(this.getTreeHeight() - 1);
-    return rootLevel[0].hash;
+    this.ensureTreeBuilt();
+    return this.rootNode!.hash;
   }
 
-  /**
-   * Generate a proof for a specific leaf
-   */
   generateProof(leaf: string): MerkleProof {
+    this.ensureTreeBuilt();
+
     const leafIndex = this.leaves.indexOf(leaf);
     if (leafIndex === -1) {
       throw new MerkleTreeError(`Leaf not found in tree: ${leaf}`);
     }
 
     const proof: string[] = [];
-    let currentIndex = leafIndex;
+    let index = leafIndex;
 
-    for (let level = 0; level < this.getTreeHeight() - 1; level++) {
-      const levelNodes = this.getLevel(level);
-      const siblingIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
-
-      if (siblingIndex < levelNodes.length) {
-        proof.push(levelNodes[siblingIndex].hash);
-      }
-
-      currentIndex = Math.floor(currentIndex / 2);
+    for (let level = 0; level < this.layers.length - 1; level++) {
+      const layer = this.layers[level];
+      const siblingIndex = index % 2 === 0 ? index + 1 : index - 1;
+      const sibling = layer[siblingIndex] ?? layer[index];
+      proof.push(sibling.toString('hex'));
+      index = Math.floor(index / 2);
     }
 
     return {
@@ -93,172 +118,123 @@ export class MerkleTree implements MerkleTreeInterface {
     };
   }
 
-  /**
-   * Verify a proof against the tree
-   */
   verifyProof(leaf: string, proof: MerkleProof): boolean {
-    try {
-      let hash = this.hashLeaf(leaf);
-
-      for (const proofHash of proof.proof) {
-        // Determine order based on index parity
-        const isLeft = proof.index % 2 === 0;
-        hash = this.hashPair(isLeft ? hash : proofHash, isLeft ? proofHash : hash);
-        proof.index = Math.floor(proof.index / 2);
-      }
-
-      return hash === proof.root;
-    } catch (error) {
+    if (!proof || !Array.isArray(proof.proof)) {
       return false;
     }
+
+    let computed = this.hashLeaf(leaf);
+    let index = proof.index;
+
+    for (const siblingHex of proof.proof) {
+      const sibling = Buffer.from(siblingHex, 'hex');
+
+      if (this.config.sortPairs) {
+        const [left, right] = this.orderPair(computed, sibling);
+        computed = this.hashPair(left, right);
+      } else if (index % 2 === 0) {
+        computed = this.hashPair(computed, sibling);
+      } else {
+        computed = this.hashPair(sibling, computed);
+      }
+
+      index = Math.floor(index / 2);
+    }
+
+    return computed.toString('hex') === proof.root;
   }
 
-  /**
-   * Get all leaves
-   */
   getLeaves(): string[] {
     return [...this.leaves];
   }
 
-  /**
-   * Get the complete tree structure
-   */
   getTree(): MerkleNode {
-    if (this.tree.length === 0) {
-      throw new MerkleTreeError('Tree not built yet');
-    }
-
-    return this.reconstructTree();
+    this.ensureTreeBuilt();
+    return this.rootNode!;
   }
 
-  /**
-   * Get tree height
-   */
-  private getTreeHeight(): number {
-    return Math.ceil(Math.log2(this.leaves.length)) + 1;
-  }
-
-  /**
-   * Get nodes at a specific level
-   */
-  private getLevel(level: number): MerkleNode[] {
-    const startIndex = level === 0 ? 0 : Math.pow(2, level) - 1;
-    const endIndex = Math.pow(2, level + 1) - 1;
-    return this.tree.slice(startIndex, Math.min(endIndex, this.tree.length));
-  }
-
-  /**
-   * Hash a leaf node
-   */
-  private hashLeaf(leaf: string): string {
-    const data = this.config.leafEncoding === 'hex' ? leaf : Buffer.from(leaf, 'utf8').toString('hex');
-    return createHash(this.config.algorithm!).update(data).digest('hex');
-  }
-
-  /**
-   * Hash a pair of nodes
-   */
-  private hashPair(left: string, right: string): string {
-    const pair = this.config.sortPairs && left > right ? right + left : left + right;
-    return createHash(this.config.algorithm!).update(pair).digest('hex');
-  }
-
-  /**
-   * Build the next level of the tree
-   */
-  private buildNextLevel(currentLevel: MerkleNode[]): MerkleNode[] {
-    const nextLevel: MerkleNode[] = [];
-
-    for (let i = 0; i < currentLevel.length; i += 2) {
-      const left = currentLevel[i];
-      const right = i + 1 < currentLevel.length ? currentLevel[i + 1] : left;
-
-      const combinedHash = this.hashPair(left.hash, right.hash);
-      nextLevel.push({
-        hash: combinedHash,
-        left,
-        right
-      });
-    }
-
-    return nextLevel;
-  }
-
-  /**
-   * Reconstruct the tree structure from flat array
-   */
-  private reconstructTree(): MerkleNode {
-    if (this.tree.length === 0) return { hash: '' };
-
-    const height = this.getTreeHeight();
-    let levelStart = Math.pow(2, height - 2) - 1;
-
-    const buildNode = (index: number, level: number): MerkleNode => {
-      if (level === 0) {
-        return this.tree[index];
-      }
-
-      const leftIndex = (index - (Math.pow(2, level - 1) - 1)) * 2;
-      const rightIndex = leftIndex + 1;
-
-      const leftChild = buildNode(leftIndex, level - 1);
-      const rightChild = rightIndex < Math.pow(2, level - 1) ? buildNode(rightIndex, level - 1) : leftChild;
-
-      return {
-        hash: this.hashPair(leftChild.hash, rightChild.hash),
-        left: leftChild,
-        right: rightChild
-      };
-    };
-
-    return buildNode(0, height - 1);
-  }
-
-  /**
-   * Get proof indices for a given leaf index
-   */
   getProofIndices(leafIndex: number): number[] {
-    const indices: number[] = [];
-    let currentIndex = leafIndex;
+    this.ensureTreeBuilt();
 
-    for (let level = 0; level < this.getTreeHeight() - 1; level++) {
-      const siblingIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
-      indices.push(siblingIndex);
-      currentIndex = Math.floor(currentIndex / 2);
+    if (leafIndex < 0 || leafIndex >= this.leaves.length) {
+      throw new MerkleTreeError(`Invalid leaf index: ${leafIndex}`);
+    }
+
+    const indices: number[] = [];
+    let index = leafIndex;
+
+    for (let level = 0; level < this.layers.length - 1; level++) {
+      const layer = this.layers[level];
+      const siblingIndex = index % 2 === 0 ? index + 1 : index - 1;
+      indices.push(Math.min(siblingIndex, layer.length - 1));
+      index = Math.floor(index / 2);
     }
 
     return indices;
   }
 
-  /**
-   * Verify tree consistency
-   */
   verifyTree(): boolean {
-    try {
-      if (this.tree.length === 0) return false;
-
-      // Verify each level
-      for (let level = 0; level < this.getTreeHeight() - 1; level++) {
-        const currentLevel = this.getLevel(level);
-        const nextLevel = this.getLevel(level + 1);
-
-        for (let i = 0; i < nextLevel.length; i++) {
-          const leftIndex = i * 2;
-          const rightIndex = i * 2 + 1;
-
-          const leftHash = currentLevel[leftIndex].hash;
-          const rightHash = rightIndex < currentLevel.length ? currentLevel[rightIndex].hash : leftHash;
-
-          const expectedHash = this.hashPair(leftHash, rightHash);
-          if (expectedHash !== nextLevel[i].hash) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    } catch (error) {
+    if (!this.rootNode || this.leaves.length === 0) {
       return false;
     }
+
+    try {
+      const recomputedRoot = this.computeRootFromLeaves();
+      return recomputedRoot === this.rootNode.hash;
+    } catch {
+      return false;
+    }
+  }
+
+  private ensureTreeBuilt(): void {
+    if (!this.rootNode) {
+      throw new MerkleTreeError('Tree not built yet');
+    }
+  }
+
+  private computeRootFromLeaves(): string {
+    let level = this.leaves.map(leaf => this.hashLeaf(leaf));
+
+    while (level.length > 1) {
+      const nextLevel: Buffer[] = [];
+
+      for (let index = 0; index < level.length; index += 2) {
+        const left = level[index];
+        const right = level[index + 1] ?? left;
+        const [orderedLeft, orderedRight] = this.orderPair(left, right);
+        nextLevel.push(this.hashPair(orderedLeft, orderedRight));
+      }
+
+      level = nextLevel;
+    }
+
+    return level[0].toString('hex');
+  }
+
+  private hashLeaf(leaf: string): Buffer {
+    const payload = this.encodeLeaf(leaf);
+    return crypto.createHash(this.config.algorithm).update(payload).digest();
+  }
+
+  private hashPair(left: Buffer, right: Buffer): Buffer {
+    return crypto.createHash(this.config.algorithm).update(Buffer.concat([left, right])).digest();
+  }
+
+  private orderPair(left: Buffer, right: Buffer): [Buffer, Buffer] {
+    if (!this.config.sortPairs || Buffer.compare(left, right) <= 0) {
+      return [left, right];
+    }
+    return [right, left];
+  }
+
+  private encodeLeaf(leaf: string): Buffer {
+    if (this.config.leafEncoding === 'hex') {
+      return this.isHexString(leaf) ? Buffer.from(leaf, 'hex') : Buffer.from(leaf, 'utf8');
+    }
+    return Buffer.from(leaf, this.config.leafEncoding);
+  }
+
+  private isHexString(value: string): boolean {
+    return /^[0-9a-fA-F]+$/.test(value) && value.length % 2 === 0;
   }
 }

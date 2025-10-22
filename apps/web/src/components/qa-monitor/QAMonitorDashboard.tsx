@@ -1,7 +1,12 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { getJSON } from "@/src/lib/api"
+import type { MetricsSummary } from "@/src/lib/adapters/trends"
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Progress } from '../ui/progress';
 import { Alert, AlertDescription } from '../ui/alert';
@@ -47,6 +52,63 @@ interface BenchmarkData {
   timestamp: Date;
 }
 
+function buildAnomalies(summary: MetricsSummary): AnomalyData[] {
+  const now = new Date();
+  const anomalies: AnomalyData[] = [];
+
+  if (summary.jobs.errored > 0) {
+    anomalies.push({
+      id: "jobs-error",
+      type: "error",
+      severity: summary.jobs.errored > 3 ? "high" : "medium",
+      component: "agents",
+      message: `${summary.jobs.errored} job${summary.jobs.errored > 1 ? "s" : ""} failed in the last window`,
+      timestamp: now,
+      resolved: summary.jobs.successRate > 90,
+    });
+  }
+
+  if (summary.jobs.avgLatencyMs > 4000) {
+    anomalies.push({
+      id: "latency",
+      type: "performance",
+      severity: summary.jobs.avgLatencyMs > 6000 ? "high" : "medium",
+      component: "infrastructure",
+      message: `Average latency ${summary.jobs.avgLatencyMs}ms`,
+      timestamp: now,
+      resolved: false,
+    });
+  }
+
+  if (!anomalies.length) {
+    anomalies.push({
+      id: "healthy",
+      type: "behavior",
+      severity: "low",
+      component: "system",
+      message: "No anomalies detected",
+      timestamp: now,
+      resolved: true,
+    });
+  }
+
+  return anomalies;
+}
+
+function buildBenchmarks(summary: MetricsSummary): BenchmarkData[] {
+  return [
+    {
+      buildId: `metrics-${summary.startDate}`,
+      baselineVersion: "v6.0",
+      responseTime: summary.jobs.avgLatencyMs,
+      throughput: summary.jobs.total,
+      errorRate: summary.jobs.total > 0 ? summary.jobs.errored / summary.jobs.total : 0,
+      performanceDelta: summary.jobs.successRate - 90,
+      timestamp: new Date(),
+    },
+  ];
+}
+
 export const QAMonitorDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<QAMetrics>({
     testCoverage: 0,
@@ -59,104 +121,43 @@ export const QAMonitorDashboard: React.FC = () => {
 
   const [anomalies, setAnomalies] = useState<AnomalyData[]>([]);
   const [benchmarks, setBenchmarks] = useState<BenchmarkData[]>([]);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     fetchQAMetrics();
-    fetchAnomalies();
-    fetchBenchmarks();
 
-    // Set up real-time updates
     const interval = setInterval(() => {
       fetchQAMetrics();
-      fetchAnomalies();
-    }, 30000); // Update every 30 seconds
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
 
   const fetchQAMetrics = async () => {
     try {
-      // In a real implementation, this would fetch from the QA Sentinel API
-      const response = await fetch('/api/qa/metrics');
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data);
-      } else {
-        // Mock data for demonstration
-        setMetrics({
-          testCoverage: 87.5,
-          testPassRate: 94.2,
-          performanceScore: 92.1,
-          anomalyCount: 3,
-          selfHealingTriggered: 2,
-          lastUpdated: new Date()
-        });
+      const result = await getJSON<{ success?: boolean; data?: MetricsSummary }>('metrics/summary');
+      const summary = (result && 'data' in result ? result.data : result) as MetricsSummary | undefined;
+
+      if (!summary) {
+        throw new Error('Missing metrics summary');
       }
+
+      setMetrics({
+        testCoverage: Math.min(100, Math.round(summary.jobs.successRate)),
+        testPassRate: Math.min(100, Math.round(summary.jobs.successRate)),
+        performanceScore: Math.max(0, Math.min(100, 100 - summary.jobs.avgLatencyMs / 100)),
+        anomalyCount: summary.jobs.errored,
+        selfHealingTriggered: summary.jobs.errored,
+        lastUpdated: new Date(),
+      });
+
+      setAnomalies(buildAnomalies(summary));
+      setBenchmarks(buildBenchmarks(summary));
     } catch (error) {
       console.error('Failed to fetch QA metrics:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchAnomalies = async () => {
-    try {
-      const response = await fetch('/api/qa/anomalies');
-      if (response.ok) {
-        const data = await response.json();
-        setAnomalies(data);
-      } else {
-        // Mock anomalies for demonstration
-        setAnomalies([
-          {
-            id: '1',
-            type: 'performance',
-            severity: 'medium',
-            component: 'api',
-            message: 'Response time increased by 15%',
-            timestamp: new Date(Date.now() - 300000),
-            resolved: false
-          },
-          {
-            id: '2',
-            type: 'error',
-            severity: 'high',
-            component: 'database',
-            message: 'Connection pool exhausted',
-            timestamp: new Date(Date.now() - 600000),
-            resolved: true
-          }
-        ]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch anomalies:', error);
-    }
-  };
-
-  const fetchBenchmarks = async () => {
-    try {
-      const response = await fetch('/api/qa/benchmarks');
-      if (response.ok) {
-        const data = await response.json();
-        setBenchmarks(data);
-      } else {
-        // Mock benchmark data
-        setBenchmarks([
-          {
-            buildId: 'build-123',
-            baselineVersion: 'v5.0',
-            responseTime: 145,
-            throughput: 98,
-            errorRate: 0.015,
-            performanceDelta: -2.1,
-            timestamp: new Date()
-          }
-        ]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch benchmarks:', error);
     }
   };
 

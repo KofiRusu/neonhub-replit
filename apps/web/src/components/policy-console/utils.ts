@@ -2,7 +2,11 @@
  * Utility Functions for Policy Console
  */
 
-import type { ApiResponse } from '../../types/governance';
+import type { ApiResponse, ApiErrorResponse } from '../../types/governance';
+
+function isErrorResponse<T>(response: ApiResponse<T>): response is ApiErrorResponse {
+  return response.success === false;
+}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -27,8 +31,8 @@ export async function fetchAPI<T>(
     }
 
     const data: ApiResponse<T> = await response.json();
-    
-    if (!data.success) {
+
+    if (isErrorResponse(data)) {
       throw new Error(data.error || 'API request failed');
     }
 
@@ -135,7 +139,7 @@ export function getSeverityColor(severity: string): string {
 /**
  * Export data as JSON
  */
-export function exportAsJSON(data: any, filename: string): void {
+export function exportAsJSON<T>(data: T, filename: string): void {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',
   });
@@ -145,18 +149,19 @@ export function exportAsJSON(data: any, filename: string): void {
 /**
  * Export data as CSV
  */
-export function exportAsCSV(data: any[], filename: string): void {
+export function exportAsCSV<T extends Record<string, unknown>>(data: T[], filename: string): void {
   if (!data.length) return;
 
   const headers = Object.keys(data[0]);
   const csv = [
     headers.join(','),
-    ...data.map(row =>
-      headers.map(header => {
+    ...data.map((row) =>
+      headers.map((header) => {
         const value = row[header];
-        return typeof value === 'string' && value.includes(',')
-          ? `"${value}"`
-          : value;
+        if (typeof value === 'string') {
+          return value.includes(',') ? `"${value}"` : value;
+        }
+        return value != null ? String(value) : '';
       }).join(',')
     ),
   ].join('\n');
@@ -182,12 +187,12 @@ function downloadBlob(blob: Blob, filename: string): void {
 /**
  * Debounce function
  */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
+export function debounce<Args extends unknown[]>(
+  func: (...args: Args) => void,
+  wait = 300
+): (...args: Args) => void {
   let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };

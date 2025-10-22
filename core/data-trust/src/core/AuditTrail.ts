@@ -63,10 +63,12 @@ export class AuditTrail implements AuditTrailInterface {
   async log(event: Omit<AuditEvent, 'id' | 'timestamp'>): Promise<string> {
     try {
       const eventId = uuidv4();
+      const details: Record<string, unknown> = event.details ?? {};
       const fullEvent: AuditEvent = {
         id: eventId,
         timestamp: new Date(),
-        ...event
+        ...event,
+        details
       };
 
       // Store in memory
@@ -78,7 +80,7 @@ export class AuditTrail implements AuditTrailInterface {
         category: event.category,
         actor: event.actor,
         resource: event.resource,
-        details: event.details,
+        details,
         ipAddress: event.ipAddress,
         userAgent: event.userAgent,
         sessionId: event.sessionId,
@@ -278,7 +280,7 @@ export class AuditTrail implements AuditTrailInterface {
     actor: string,
     action: 'login' | 'logout' | 'failed_login',
     success: boolean,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<string> {
     return this.log({
       level: success ? 'info' : 'warn',
@@ -286,7 +288,7 @@ export class AuditTrail implements AuditTrailInterface {
       actor,
       action,
       resource: 'authentication',
-      details: { success, ...(details || {}) }
+      details: { success, ...(details ?? {}) }
     });
   }
 
@@ -298,7 +300,7 @@ export class AuditTrail implements AuditTrailInterface {
     action: 'access_granted' | 'access_denied' | 'permission_changed',
     resource: string,
     success: boolean,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<string> {
     return this.log({
       level: success ? 'info' : 'warn',
@@ -306,7 +308,7 @@ export class AuditTrail implements AuditTrailInterface {
       actor,
       action,
       resource,
-      details: { success, ...(details || {}) }
+      details: { success, ...(details ?? {}) }
     });
   }
 
@@ -317,7 +319,7 @@ export class AuditTrail implements AuditTrailInterface {
     actor: string,
     action: 'read' | 'write' | 'delete',
     resource: string,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<string> {
     return this.log({
       level: 'info',
@@ -325,7 +327,7 @@ export class AuditTrail implements AuditTrailInterface {
       actor,
       action,
       resource,
-      details
+      details: details ?? {}
     });
   }
 
@@ -336,7 +338,7 @@ export class AuditTrail implements AuditTrailInterface {
     actor: string,
     resource: string,
     success: boolean,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<string> {
     return this.log({
       level: success ? 'info' : 'error',
@@ -344,7 +346,7 @@ export class AuditTrail implements AuditTrailInterface {
       actor,
       action: 'integrity_check',
       resource,
-      details: { success, ...details }
+      details: { success, ...(details ?? {}) }
     });
   }
 
@@ -355,7 +357,7 @@ export class AuditTrail implements AuditTrailInterface {
     actor: string,
     action: string,
     txHash?: string,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<string> {
     return this.log({
       level: 'info',
@@ -364,7 +366,7 @@ export class AuditTrail implements AuditTrailInterface {
       action,
       resource: 'blockchain',
       blockchainTx: txHash,
-      details
+      details: details ?? {}
     });
   }
 
