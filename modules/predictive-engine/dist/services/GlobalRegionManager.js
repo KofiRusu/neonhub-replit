@@ -1,44 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalRegionManager = void 0;
-const AWSIntegration_1 = require("./AWSIntegration");
-const GCPIntegration_1 = require("./GCPIntegration");
-const AzureIntegration_1 = require("./AzureIntegration");
-const winston = __importStar(require("winston"));
-class GlobalRegionManager {
+import { AWSIntegration } from './AWSIntegration';
+import { GCPIntegration } from './GCPIntegration';
+import { AzureIntegration } from './AzureIntegration';
+import * as winston from 'winston';
+export class GlobalRegionManager {
     constructor() {
         this.regions = new Map();
         this.logger = winston.createLogger({
@@ -53,17 +17,17 @@ class GlobalRegionManager {
     async initializeCloudProviders(awsConfig, gcpConfig, azureConfig) {
         try {
             if (awsConfig) {
-                this.awsIntegration = new AWSIntegration_1.AWSIntegration(awsConfig.accessKeyId, awsConfig.secretAccessKey, awsConfig.region);
+                this.awsIntegration = new AWSIntegration(awsConfig.accessKeyId, awsConfig.secretAccessKey, awsConfig.region);
                 const awsRegions = await this.awsIntegration.getRegions();
                 awsRegions.forEach(region => this.regions.set(`aws-${region.name}`, region));
             }
             if (gcpConfig) {
-                this.gcpIntegration = new GCPIntegration_1.GCPIntegration(gcpConfig.projectId, gcpConfig.serviceAccountKey, gcpConfig.region);
+                this.gcpIntegration = new GCPIntegration(gcpConfig.projectId, gcpConfig.serviceAccountKey, gcpConfig.region);
                 const gcpRegions = await this.gcpIntegration.getRegions();
                 gcpRegions.forEach(region => this.regions.set(`gcp-${region.name}`, region));
             }
             if (azureConfig) {
-                this.azureIntegration = new AzureIntegration_1.AzureIntegration(azureConfig.subscriptionId, azureConfig.tenantId, azureConfig.clientId, azureConfig.clientSecret, azureConfig.region);
+                this.azureIntegration = new AzureIntegration(azureConfig.subscriptionId, azureConfig.tenantId, azureConfig.clientId, azureConfig.clientSecret, azureConfig.region);
                 await this.azureIntegration.authenticate();
                 const azureLocations = await this.azureIntegration.getLocations();
                 azureLocations.forEach(location => this.regions.set(`azure-${location.name}`, location));
@@ -286,5 +250,4 @@ class GlobalRegionManager {
         return this.geoConfig;
     }
 }
-exports.GlobalRegionManager = GlobalRegionManager;
 //# sourceMappingURL=GlobalRegionManager.js.map

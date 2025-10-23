@@ -1,45 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AWSIntegration = void 0;
-const winston = __importStar(require("winston"));
-const axios_1 = __importDefault(require("axios"));
-class AWSIntegration {
+import * as winston from 'winston';
+import axios from 'axios';
+export class AWSIntegration {
     constructor(accessKeyId, secretAccessKey, region = 'us-east-1') {
         this.accessKeyId = accessKeyId;
         this.secretAccessKey = secretAccessKey;
@@ -326,7 +287,7 @@ class AWSIntegration {
     }
     async makeAWSCall(action, params) {
         // Simplified AWS API call - in real implementation would use AWS SDK
-        const response = await axios_1.default.post(this.baseUrl, {
+        const response = await axios.post(this.baseUrl, {
             Action: action,
             Version: '2016-11-15',
             ...params
@@ -339,7 +300,7 @@ class AWSIntegration {
         return response.data;
     }
     async makeECSCall(action, params) {
-        const response = await axios_1.default.post(`https://ecs.${this.region}.amazonaws.com`, {
+        const response = await axios.post(`https://ecs.${this.region}.amazonaws.com`, {
             Action: action,
             Version: '2014-11-13',
             ...params
@@ -352,7 +313,7 @@ class AWSIntegration {
         return response.data;
     }
     async makeLambdaCall(action, params) {
-        const response = await axios_1.default.post(`https://lambda.${this.region}.amazonaws.com/2015-03-31/functions`, params, {
+        const response = await axios.post(`https://lambda.${this.region}.amazonaws.com/2015-03-31/functions`, params, {
             headers: {
                 'Authorization': `AWS4-HMAC-SHA256 Credential=${this.accessKeyId}`,
                 'Content-Type': 'application/json'
@@ -361,7 +322,7 @@ class AWSIntegration {
         return response.data;
     }
     async makeCloudWatchCall(action, params) {
-        const response = await axios_1.default.post(`https://monitoring.${this.region}.amazonaws.com`, {
+        const response = await axios.post(`https://monitoring.${this.region}.amazonaws.com`, {
             Action: action,
             Version: '2010-08-01',
             ...params
@@ -396,5 +357,4 @@ class AWSIntegration {
         return coordinates[region] || { lat: 0, lng: 0 };
     }
 }
-exports.AWSIntegration = AWSIntegration;
 //# sourceMappingURL=AWSIntegration.js.map

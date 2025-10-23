@@ -1,44 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuditLogger = void 0;
-const events_1 = require("events");
-const winston = __importStar(require("winston"));
-const uuid_1 = require("uuid");
-const index_js_1 = require("../types/index.js");
-class AuditLogger extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import * as winston from 'winston';
+import { v4 as uuidv4 } from 'uuid';
+import { AuditAction, AuditResult, GovernanceError } from '../types/index.js';
+export class AuditLogger extends EventEmitter {
     constructor(options = {}) {
         super();
         this.auditEntries = [];
@@ -77,7 +41,7 @@ class AuditLogger extends events_1.EventEmitter {
     async log(entry) {
         try {
             const auditEntry = {
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 ...entry
             };
@@ -103,7 +67,7 @@ class AuditLogger extends events_1.EventEmitter {
         catch (error) {
             // Fallback logging if audit logging fails
             console.error('Failed to log audit entry:', error);
-            throw new index_js_1.GovernanceError(`Audit logging failed: ${error.message}`, 'AUDIT_LOG_ERROR');
+            throw new GovernanceError(`Audit logging failed: ${error.message}`, 'AUDIT_LOG_ERROR');
         }
     }
     /**
@@ -111,7 +75,7 @@ class AuditLogger extends events_1.EventEmitter {
      */
     async logPolicyEvaluation(policyId, subject, result, details) {
         return this.log({
-            action: index_js_1.AuditAction.POLICY_EVALUATION,
+            action: AuditAction.POLICY_EVALUATION,
             subject,
             result,
             policyId,
@@ -123,7 +87,7 @@ class AuditLogger extends events_1.EventEmitter {
      */
     async logRuleTrigger(policyId, ruleId, subject, result, details) {
         return this.log({
-            action: index_js_1.AuditAction.RULE_TRIGGERED,
+            action: AuditAction.RULE_TRIGGERED,
             subject,
             result,
             policyId,
@@ -136,7 +100,7 @@ class AuditLogger extends events_1.EventEmitter {
      */
     async logComplianceCheck(subject, jurisdiction, result, details) {
         return this.log({
-            action: index_js_1.AuditAction.COMPLIANCE_CHECK,
+            action: AuditAction.COMPLIANCE_CHECK,
             subject,
             result,
             policyId: '',
@@ -148,9 +112,9 @@ class AuditLogger extends events_1.EventEmitter {
      */
     async logViolation(policyId, ruleId, subject, severity, details) {
         return this.log({
-            action: index_js_1.AuditAction.VIOLATION_DETECTED,
+            action: AuditAction.VIOLATION_DETECTED,
             subject,
-            result: index_js_1.AuditResult.DENIED,
+            result: AuditResult.DENIED,
             policyId,
             ruleId,
             details: { severity, ...details }
@@ -219,7 +183,7 @@ class AuditLogger extends events_1.EventEmitter {
             // Count by result
             stats.entriesByResult[entry.result] = (stats.entriesByResult[entry.result] || 0) + 1;
             // Count violations
-            if (entry.action === index_js_1.AuditAction.VIOLATION_DETECTED) {
+            if (entry.action === AuditAction.VIOLATION_DETECTED) {
                 stats.violationsCount++;
             }
             // Track unique subjects
@@ -285,5 +249,4 @@ class AuditLogger extends events_1.EventEmitter {
         });
     }
 }
-exports.AuditLogger = AuditLogger;
 //# sourceMappingURL=AuditLogger.js.map

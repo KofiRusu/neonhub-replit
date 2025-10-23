@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataRetentionManager = void 0;
-class DataRetentionManager {
+export class DataRetentionManager {
     constructor() {
         this.retentionPolicies = new Map();
         this.scheduledDeletions = new Map();
@@ -118,5 +115,4 @@ class DataRetentionManager {
         console.log(`[RETENTION] Data ${dataId} deleted: ${reason}`);
     }
 }
-exports.DataRetentionManager = DataRetentionManager;
 //# sourceMappingURL=DataRetentionManager.js.map

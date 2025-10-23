@@ -1,27 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnifiedComplianceIntegration = exports.RegulatoryFrameworks = exports.FederationComplianceManager = exports.CrossBorderTransferManager = exports.DataSubjectRightsManager = exports.ComplianceMonitor = exports.AuditTrail = exports.DataRetentionManager = exports.DataGovernance = exports.ConsentManager = exports.ComplianceManager = void 0;
 // Main exports for the Compliance & Consent Layer
-var ComplianceManager_1 = require("./ComplianceManager");
-Object.defineProperty(exports, "ComplianceManager", { enumerable: true, get: function () { return ComplianceManager_1.ComplianceManager; } });
-var ConsentManager_1 = require("./consent/ConsentManager");
-Object.defineProperty(exports, "ConsentManager", { enumerable: true, get: function () { return ConsentManager_1.ConsentManager; } });
-var DataGovernance_1 = require("./governance/DataGovernance");
-Object.defineProperty(exports, "DataGovernance", { enumerable: true, get: function () { return DataGovernance_1.DataGovernance; } });
-var DataRetentionManager_1 = require("./governance/DataRetentionManager");
-Object.defineProperty(exports, "DataRetentionManager", { enumerable: true, get: function () { return DataRetentionManager_1.DataRetentionManager; } });
-var AuditTrail_1 = require("./monitoring/AuditTrail");
-Object.defineProperty(exports, "AuditTrail", { enumerable: true, get: function () { return AuditTrail_1.AuditTrail; } });
-var ComplianceMonitor_1 = require("./monitoring/ComplianceMonitor");
-Object.defineProperty(exports, "ComplianceMonitor", { enumerable: true, get: function () { return ComplianceMonitor_1.ComplianceMonitor; } });
-var DataSubjectRightsManager_1 = require("./compliance/DataSubjectRightsManager");
-Object.defineProperty(exports, "DataSubjectRightsManager", { enumerable: true, get: function () { return DataSubjectRightsManager_1.DataSubjectRightsManager; } });
-var CrossBorderTransferManager_1 = require("./compliance/CrossBorderTransferManager");
-Object.defineProperty(exports, "CrossBorderTransferManager", { enumerable: true, get: function () { return CrossBorderTransferManager_1.CrossBorderTransferManager; } });
-var FederationComplianceManager_1 = require("./compliance/FederationComplianceManager");
-Object.defineProperty(exports, "FederationComplianceManager", { enumerable: true, get: function () { return FederationComplianceManager_1.FederationComplianceManager; } });
-var RegulatoryFrameworks_1 = require("./compliance/RegulatoryFrameworks");
-Object.defineProperty(exports, "RegulatoryFrameworks", { enumerable: true, get: function () { return RegulatoryFrameworks_1.RegulatoryFrameworks; } });
+export { ComplianceManager } from './ComplianceManager';
+export { ConsentManager } from './consent/ConsentManager';
+export { DataGovernance } from './governance/DataGovernance';
+export { DataRetentionManager } from './governance/DataRetentionManager';
+export { AuditTrail } from './monitoring/AuditTrail';
+export { ComplianceMonitor } from './monitoring/ComplianceMonitor';
+export { DataSubjectRightsManager } from './compliance/DataSubjectRightsManager';
+export { CrossBorderTransferManager } from './compliance/CrossBorderTransferManager';
+export { FederationComplianceManager } from './compliance/FederationComplianceManager';
+export { RegulatoryFrameworks } from './compliance/RegulatoryFrameworks';
 // ============================================================================
 // V6.0 GOVERNANCE INTEGRATIONS
 // ============================================================================
@@ -29,7 +16,7 @@ Object.defineProperty(exports, "RegulatoryFrameworks", { enumerable: true, get: 
  * Unified Compliance Integration Manager
  * Integrates AI governance policies and data trust verification with compliance workflows
  */
-class UnifiedComplianceIntegration {
+export class UnifiedComplianceIntegration {
     constructor(config) {
         this.complianceManager = config.complianceManager;
         this.aiGovernance = config.aiGovernance;
@@ -150,5 +137,4 @@ class UnifiedComplianceIntegration {
         return status;
     }
 }
-exports.UnifiedComplianceIntegration = UnifiedComplianceIntegration;
 //# sourceMappingURL=index.js.map

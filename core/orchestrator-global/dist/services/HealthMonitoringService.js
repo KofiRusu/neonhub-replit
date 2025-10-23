@@ -1,47 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.HealthMonitoringService = void 0;
-const events_1 = require("events");
-const axios_1 = __importDefault(require("axios"));
-const cron = __importStar(require("node-cron"));
-const types_1 = require("../types");
-class HealthMonitoringService extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import axios from 'axios';
+import * as cron from 'node-cron';
+import { HealthStatus, GlobalOrchestratorError, GlobalOrchestratorErrorCode } from '../types';
+export class HealthMonitoringService extends EventEmitter {
     constructor(config, logger) {
         super();
         this.nodeHealthStatus = new Map();
@@ -71,7 +32,7 @@ class HealthMonitoringService extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to start health monitoring service', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.HEALTH_CHECK_FAILED, 'Failed to start health monitoring service', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.HEALTH_CHECK_FAILED, 'Failed to start health monitoring service', undefined, undefined, { originalError: error.message });
         }
     }
     async stop() {
@@ -103,14 +64,14 @@ class HealthMonitoringService extends events_1.EventEmitter {
     async checkNodeHealth(node) {
         try {
             const healthCheckUrl = `http://${node.address}:${node.port}/health`;
-            const response = await axios_1.default.get(healthCheckUrl, {
+            const response = await axios.get(healthCheckUrl, {
                 timeout: this.config.timeout,
                 headers: {
                     'User-Agent': 'GlobalOrchestrator-HealthCheck/1.0'
                 }
             });
             const isHealthy = response.status === 200 && response.data.status === 'healthy';
-            const newStatus = isHealthy ? types_1.HealthStatus.HEALTHY : types_1.HealthStatus.UNHEALTHY;
+            const newStatus = isHealthy ? HealthStatus.HEALTHY : HealthStatus.UNHEALTHY;
             const previousStatus = this.nodeHealthStatus.get(node.nodeId);
             if (previousStatus !== newStatus) {
                 this.nodeHealthStatus.set(node.nodeId, newStatus);
@@ -122,7 +83,7 @@ class HealthMonitoringService extends events_1.EventEmitter {
             return newStatus;
         }
         catch (error) {
-            const newStatus = types_1.HealthStatus.UNHEALTHY;
+            const newStatus = HealthStatus.UNHEALTHY;
             const previousStatus = this.nodeHealthStatus.get(node.nodeId);
             if (previousStatus !== newStatus) {
                 this.nodeHealthStatus.set(node.nodeId, newStatus);
@@ -141,7 +102,7 @@ class HealthMonitoringService extends events_1.EventEmitter {
     async collectNodeMetrics(node) {
         try {
             const metricsUrl = `http://${node.address}:${node.port}/metrics`;
-            const response = await axios_1.default.get(metricsUrl, {
+            const response = await axios.get(metricsUrl, {
                 timeout: 5000,
                 headers: {
                     'User-Agent': 'GlobalOrchestrator-Metrics/1.0'
@@ -169,7 +130,7 @@ class HealthMonitoringService extends events_1.EventEmitter {
         }
     }
     getNodeHealthStatus(nodeId) {
-        return this.nodeHealthStatus.get(nodeId) || types_1.HealthStatus.UNKNOWN;
+        return this.nodeHealthStatus.get(nodeId) || HealthStatus.UNKNOWN;
     }
     getNodeMetrics(nodeId, limit = 10) {
         const metrics = this.nodeMetrics.get(nodeId) || [];
@@ -180,20 +141,20 @@ class HealthMonitoringService extends events_1.EventEmitter {
     }
     getHealthyNodes() {
         return Array.from(this.nodeHealthStatus.entries())
-            .filter(([, status]) => status === types_1.HealthStatus.HEALTHY)
+            .filter(([, status]) => status === HealthStatus.HEALTHY)
             .map(([nodeId]) => nodeId);
     }
     getUnhealthyNodes() {
         return Array.from(this.nodeHealthStatus.entries())
-            .filter(([, status]) => status === types_1.HealthStatus.UNHEALTHY)
+            .filter(([, status]) => status === HealthStatus.UNHEALTHY)
             .map(([nodeId]) => nodeId);
     }
     getHealthSummary() {
         const statuses = Array.from(this.nodeHealthStatus.values());
-        const healthy = statuses.filter(s => s === types_1.HealthStatus.HEALTHY).length;
-        const unhealthy = statuses.filter(s => s === types_1.HealthStatus.UNHEALTHY).length;
-        const degraded = statuses.filter(s => s === types_1.HealthStatus.DEGRADED).length;
-        const unknown = statuses.filter(s => s === types_1.HealthStatus.UNKNOWN).length;
+        const healthy = statuses.filter(s => s === HealthStatus.HEALTHY).length;
+        const unhealthy = statuses.filter(s => s === HealthStatus.UNHEALTHY).length;
+        const degraded = statuses.filter(s => s === HealthStatus.DEGRADED).length;
+        const unknown = statuses.filter(s => s === HealthStatus.UNKNOWN).length;
         return {
             totalNodes: statuses.length,
             healthy,
@@ -205,7 +166,7 @@ class HealthMonitoringService extends events_1.EventEmitter {
         };
     }
     updateNodeHealth(nodeId, isHealthy) {
-        const status = isHealthy ? types_1.HealthStatus.HEALTHY : types_1.HealthStatus.UNHEALTHY;
+        const status = isHealthy ? HealthStatus.HEALTHY : HealthStatus.UNHEALTHY;
         this.nodeHealthStatus.set(nodeId, status);
         this.logger.debug(`Updated health status for node ${nodeId}: ${status}`);
     }
@@ -235,5 +196,4 @@ class HealthMonitoringService extends events_1.EventEmitter {
         };
     }
 }
-exports.HealthMonitoringService = HealthMonitoringService;
 //# sourceMappingURL=HealthMonitoringService.js.map

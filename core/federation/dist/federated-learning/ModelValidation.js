@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ModelValidation = void 0;
-class ModelValidation {
+export class ModelValidation {
     constructor(logger) {
         this.logger = logger;
     }
@@ -165,5 +162,4 @@ class ModelValidation {
         return layerCount > 0 ? totalDifference / layerCount : 1.0;
     }
 }
-exports.ModelValidation = ModelValidation;
 //# sourceMappingURL=ModelValidation.js.map

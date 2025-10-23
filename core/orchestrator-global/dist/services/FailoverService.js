@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FailoverService = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-class FailoverService extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { FailoverType, GlobalOrchestratorError, GlobalOrchestratorErrorCode } from '../types';
+export class FailoverService extends EventEmitter {
     constructor(config, logger) {
         super();
         this.failoverGroups = new Map();
@@ -32,7 +29,7 @@ class FailoverService extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to handle node failure', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'Failed to handle node failure', nodeId, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'Failed to handle node failure', nodeId, undefined, { originalError: error.message });
         }
     }
     async initiateFailover(group, failedNodeId, reason) {
@@ -58,7 +55,7 @@ class FailoverService extends events_1.EventEmitter {
             // Execute failover
             await this.executeFailover(failoverEvent, group);
             // Update group state
-            if (failoverEvent.type === types_1.FailoverType.AUTOMATIC) {
+            if (failoverEvent.type === FailoverType.AUTOMATIC) {
                 group.primaryNodeId = failoverEvent.backupNodeId;
                 // Remove the new primary from backup list and add failed node as backup
                 group.backupNodeIds = group.backupNodeIds.filter(id => id !== failoverEvent.backupNodeId);
@@ -80,9 +77,9 @@ class FailoverService extends events_1.EventEmitter {
     }
     determineFailoverType(group, failedNodeId) {
         if (group.failoverStrategy === 'automatic' && this.config.autoRecovery) {
-            return types_1.FailoverType.AUTOMATIC;
+            return FailoverType.AUTOMATIC;
         }
-        return types_1.FailoverType.MANUAL;
+        return FailoverType.MANUAL;
     }
     selectBackupNode(group, failedNodeId) {
         // Find the healthiest backup node
@@ -91,7 +88,7 @@ class FailoverService extends events_1.EventEmitter {
             return isHealthy && nodeId !== failedNodeId;
         });
         if (availableBackups.length === 0) {
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'No healthy backup nodes available', failedNodeId);
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'No healthy backup nodes available', failedNodeId);
         }
         // For now, return the first available backup
         // In a real implementation, this could consider load, priority, etc.
@@ -114,13 +111,13 @@ class FailoverService extends events_1.EventEmitter {
     async manualFailover(groupId, targetNodeId, reason) {
         const group = this.failoverGroups.get(groupId);
         if (!group) {
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.FAILOVER_FAILED, `Failover group ${groupId} not found`);
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.FAILOVER_FAILED, `Failover group ${groupId} not found`);
         }
         if (!group.backupNodeIds.includes(targetNodeId) && group.primaryNodeId !== targetNodeId) {
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.FAILOVER_FAILED, `Node ${targetNodeId} is not a valid failover target for group ${groupId}`);
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.FAILOVER_FAILED, `Node ${targetNodeId} is not a valid failover target for group ${groupId}`);
         }
         const failoverEvent = {
-            type: types_1.FailoverType.MANUAL,
+            type: FailoverType.MANUAL,
             primaryNodeId: group.primaryNodeId,
             backupNodeId: targetNodeId,
             reason,
@@ -150,7 +147,7 @@ class FailoverService extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error(`Failed to recover node ${nodeId}`, error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'Failed to recover node', nodeId, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.FAILOVER_FAILED, 'Failed to recover node', nodeId, undefined, { originalError: error.message });
         }
     }
     async attemptFailback(group, recoveredNodeId) {
@@ -202,5 +199,4 @@ class FailoverService extends events_1.EventEmitter {
         }
     }
 }
-exports.FailoverService = FailoverService;
 //# sourceMappingURL=FailoverService.js.map

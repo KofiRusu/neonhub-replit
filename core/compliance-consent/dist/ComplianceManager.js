@@ -1,39 +1,36 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ComplianceManager = void 0;
-const RegulatoryFrameworks_1 = require("./compliance/RegulatoryFrameworks");
-const ConsentManager_1 = require("./consent/ConsentManager");
-const DataGovernance_1 = require("./governance/DataGovernance");
-const DataRetentionManager_1 = require("./governance/DataRetentionManager");
-const AuditTrail_1 = require("./monitoring/AuditTrail");
-const ComplianceMonitor_1 = require("./monitoring/ComplianceMonitor");
-const DataSubjectRightsManager_1 = require("./compliance/DataSubjectRightsManager");
-const CrossBorderTransferManager_1 = require("./compliance/CrossBorderTransferManager");
-class ComplianceManager {
+import { RegulatoryFrameworks } from './compliance/RegulatoryFrameworks';
+import { ConsentManager } from './consent/ConsentManager';
+import { DataGovernance } from './governance/DataGovernance';
+import { DataRetentionManager } from './governance/DataRetentionManager';
+import { AuditTrail } from './monitoring/AuditTrail';
+import { ComplianceMonitor } from './monitoring/ComplianceMonitor';
+import { DataSubjectRightsManager } from './compliance/DataSubjectRightsManager';
+import { CrossBorderTransferManager } from './compliance/CrossBorderTransferManager';
+export class ComplianceManager {
     constructor(config) {
         this.config = config;
-        this.regulatoryFrameworks = RegulatoryFrameworks_1.RegulatoryFrameworks;
-        this.consentManager = new ConsentManager_1.ConsentManager({
+        this.regulatoryFrameworks = RegulatoryFrameworks;
+        this.consentManager = new ConsentManager({
             storage: 'encrypted',
             retentionPeriod: 365 * 24 * 60 * 60 * 1000, // 1 year
             requiredPurposes: ['data_processing', 'analytics'],
             consentTypes: ['explicit', 'implicit']
         });
-        this.dataGovernance = new DataGovernance_1.DataGovernance({
+        this.dataGovernance = new DataGovernance({
             classificationLevels: ['public', 'internal', 'confidential', 'restricted'],
             retentionPolicies: {},
             encryptionRequired: true,
             crossBorderControls: true
         });
-        this.retentionManager = new DataRetentionManager_1.DataRetentionManager();
-        this.auditTrail = new AuditTrail_1.AuditTrail();
-        this.complianceMonitor = new ComplianceMonitor_1.ComplianceMonitor({
+        this.retentionManager = new DataRetentionManager();
+        this.auditTrail = new AuditTrail();
+        this.complianceMonitor = new ComplianceMonitor({
             monitoringInterval: config.monitoringInterval,
             alertThresholds: config.alertThresholds,
             reportRetention: 90 * 24 * 60 * 60 * 1000 // 90 days
         });
-        this.dataSubjectRights = new DataSubjectRightsManager_1.DataSubjectRightsManager();
-        this.crossBorderManager = new CrossBorderTransferManager_1.CrossBorderTransferManager();
+        this.dataSubjectRights = new DataSubjectRightsManager();
+        this.crossBorderManager = new CrossBorderTransferManager();
         if (config.federationEnabled) {
             // Initialize federation compliance when federation manager is available
             // this.federationCompliance = new FederationComplianceManager({
@@ -55,7 +52,7 @@ class ComplianceManager {
     }
     setupRetentionPolicies() {
         // Set up default retention policies based on regulations
-        for (const framework of RegulatoryFrameworks_1.RegulatoryFrameworks.getAllFrameworks()) {
+        for (const framework of RegulatoryFrameworks.getAllFrameworks()) {
             for (const [key, policy] of Object.entries(framework.retentionRules)) {
                 this.retentionManager.setRetentionPolicy(key, policy);
             }
@@ -140,7 +137,7 @@ class ComplianceManager {
     }
     // Utility methods
     validateCompliance(data, regulations) {
-        return RegulatoryFrameworks_1.RegulatoryFrameworks.validateCompliance(data, regulations);
+        return RegulatoryFrameworks.validateCompliance(data, regulations);
     }
     getAuditEvents(filters, limit) {
         return this.auditTrail.getEvents(filters, limit);
@@ -149,5 +146,4 @@ class ComplianceManager {
         return this.auditTrail.getComplianceViolations(regulation, limit);
     }
 }
-exports.ComplianceManager = ComplianceManager;
 //# sourceMappingURL=ComplianceManager.js.map

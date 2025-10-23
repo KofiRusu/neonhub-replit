@@ -1,19 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FederatedLearningCoordinator = void 0;
-const events_1 = require("events");
-const Logger_1 = require("../utils/Logger");
-const DifferentialPrivacy_1 = require("../privacy/DifferentialPrivacy");
-const HomomorphicEncryption_1 = require("../crypto/HomomorphicEncryption");
-class FederatedLearningCoordinator extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { ConsoleLogger } from '../utils/Logger';
+import { DifferentialPrivacy } from '../privacy/DifferentialPrivacy';
+import { HomomorphicEncryption } from '../crypto/HomomorphicEncryption';
+export class FederatedLearningCoordinator extends EventEmitter {
     constructor(logger) {
         super();
         this.activeRounds = new Map();
         this.participants = new Map();
         this.globalModelVersion = 'v1.0.0';
-        this.logger = logger || new Logger_1.ConsoleLogger();
-        this.dp = new DifferentialPrivacy_1.DifferentialPrivacy(this.logger);
-        this.he = new HomomorphicEncryption_1.HomomorphicEncryption(this.logger);
+        this.logger = logger || new ConsoleLogger();
+        this.dp = new DifferentialPrivacy(this.logger);
+        this.he = new HomomorphicEncryption(this.logger);
     }
     /**
      * Registers a participant in the federated learning system
@@ -190,5 +187,4 @@ class FederatedLearningCoordinator extends events_1.EventEmitter {
         });
     }
 }
-exports.FederatedLearningCoordinator = FederatedLearningCoordinator;
 //# sourceMappingURL=FederatedLearningCoordinator.js.map

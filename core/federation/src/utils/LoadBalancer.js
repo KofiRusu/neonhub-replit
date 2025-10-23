@@ -1,16 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoadBalancer = exports.LoadBalancingStrategy = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-var LoadBalancingStrategy;
+import { EventEmitter } from 'events';
+import { NodeCapability } from '../types';
+export var LoadBalancingStrategy;
 (function (LoadBalancingStrategy) {
     LoadBalancingStrategy["ROUND_ROBIN"] = "round_robin";
     LoadBalancingStrategy["LEAST_CONNECTIONS"] = "least_connections";
     LoadBalancingStrategy["RANDOM"] = "random";
     LoadBalancingStrategy["WEIGHTED"] = "weighted";
-})(LoadBalancingStrategy || (exports.LoadBalancingStrategy = LoadBalancingStrategy = {}));
-class LoadBalancer extends events_1.EventEmitter {
+})(LoadBalancingStrategy || (LoadBalancingStrategy = {}));
+export class LoadBalancer extends EventEmitter {
     constructor(strategy, logger, connectionPool) {
         super();
         this.nodes = new Map();
@@ -97,13 +94,13 @@ class LoadBalancer extends events_1.EventEmitter {
     calculateWeight(nodeInfo) {
         // Calculate weight based on node capabilities and status
         let weight = 1;
-        if (nodeInfo.capabilities.includes(types_1.NodeCapability.COMPUTE)) {
+        if (nodeInfo.capabilities.includes(NodeCapability.COMPUTE)) {
             weight += 2;
         }
-        if (nodeInfo.capabilities.includes(types_1.NodeCapability.STORAGE)) {
+        if (nodeInfo.capabilities.includes(NodeCapability.STORAGE)) {
             weight += 1;
         }
-        if (nodeInfo.capabilities.includes(types_1.NodeCapability.COORDINATION)) {
+        if (nodeInfo.capabilities.includes(NodeCapability.COORDINATION)) {
             weight += 1;
         }
         return weight;
@@ -161,5 +158,4 @@ class LoadBalancer extends events_1.EventEmitter {
         };
     }
 }
-exports.LoadBalancer = LoadBalancer;
 //# sourceMappingURL=LoadBalancer.js.map

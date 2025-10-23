@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataGovernance = void 0;
-class DataGovernance {
+export class DataGovernance {
     constructor(config) {
         this.classifications = new Map();
         this.config = config;
@@ -146,5 +143,4 @@ class DataGovernance {
         return adequateRegions.some(r => region.includes(r));
     }
 }
-exports.DataGovernance = DataGovernance;
 //# sourceMappingURL=DataGovernance.js.map

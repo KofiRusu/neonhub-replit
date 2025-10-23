@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PolicyEngine = void 0;
-const events_1 = require("events");
-const uuid_1 = require("uuid");
-const index_js_1 = require("../types/index.js");
-class PolicyEngine extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { v4 as uuidv4 } from 'uuid';
+import { AuditAction, AuditResult, PolicyViolationError, GovernanceError, ConditionType, ConditionOperator, ActionType, SubjectType } from '../types/index.js';
+export class PolicyEngine extends EventEmitter {
     constructor(config, auditLogger) {
         super();
         this.policies = new Map();
@@ -27,22 +24,22 @@ class PolicyEngine extends events_1.EventEmitter {
             // Log audit entry
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
                     policyId: policy.id,
-                    action: index_js_1.AuditAction.POLICY_UPDATE,
+                    action: AuditAction.POLICY_UPDATE,
                     subject: {
-                        type: index_js_1.SubjectType.SYSTEM,
+                        type: SubjectType.SYSTEM,
                         id: 'policy-engine',
                         attributes: { action: 'load_policy' }
                     },
-                    result: index_js_1.AuditResult.ALLOWED,
+                    result: AuditResult.ALLOWED,
                     details: { policyName: policy.name, version: policy.version }
                 });
             }
         }
         catch (error) {
-            throw new index_js_1.GovernanceError(`Failed to load policy ${policy.id}: ${error.message}`, 'POLICY_LOAD_ERROR', { policyId: policy.id });
+            throw new GovernanceError(`Failed to load policy ${policy.id}: ${error.message}`, 'POLICY_LOAD_ERROR', { policyId: policy.id });
         }
     }
     /**
@@ -66,11 +63,11 @@ class PolicyEngine extends events_1.EventEmitter {
             // Log evaluation result
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
-                    action: index_js_1.AuditAction.POLICY_EVALUATION,
+                    action: AuditAction.POLICY_EVALUATION,
                     subject,
-                    result: allowed ? index_js_1.AuditResult.ALLOWED : index_js_1.AuditResult.DENIED,
+                    result: allowed ? AuditResult.ALLOWED : AuditResult.DENIED,
                     details: {
                         appliedPolicies,
                         violationCount: violations.length,
@@ -84,11 +81,11 @@ class PolicyEngine extends events_1.EventEmitter {
             // Log evaluation error
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
-                    action: index_js_1.AuditAction.POLICY_EVALUATION,
+                    action: AuditAction.POLICY_EVALUATION,
                     subject,
-                    result: index_js_1.AuditResult.ERROR,
+                    result: AuditResult.ERROR,
                     details: { error: error.message, context }
                 });
             }
@@ -101,7 +98,7 @@ class PolicyEngine extends events_1.EventEmitter {
     async updatePolicy(policyId, updates) {
         const existingPolicy = this.policies.get(policyId);
         if (!existingPolicy) {
-            throw new index_js_1.GovernanceError(`Policy ${policyId} not found`, 'POLICY_NOT_FOUND');
+            throw new GovernanceError(`Policy ${policyId} not found`, 'POLICY_NOT_FOUND');
         }
         const updatedPolicy = {
             ...existingPolicy,
@@ -119,16 +116,16 @@ class PolicyEngine extends events_1.EventEmitter {
         // Log audit entry
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 policyId,
-                action: index_js_1.AuditAction.POLICY_UPDATE,
+                action: AuditAction.POLICY_UPDATE,
                 subject: {
-                    type: index_js_1.SubjectType.SYSTEM,
+                    type: SubjectType.SYSTEM,
                     id: 'policy-engine',
                     attributes: { action: 'update_policy' }
                 },
-                result: index_js_1.AuditResult.ALLOWED,
+                result: AuditResult.ALLOWED,
                 details: { updates }
             });
         }
@@ -138,7 +135,7 @@ class PolicyEngine extends events_1.EventEmitter {
      */
     async removePolicy(policyId) {
         if (!this.policies.has(policyId)) {
-            throw new index_js_1.GovernanceError(`Policy ${policyId} not found`, 'POLICY_NOT_FOUND');
+            throw new GovernanceError(`Policy ${policyId} not found`, 'POLICY_NOT_FOUND');
         }
         this.policies.delete(policyId);
         // Emit removal event
@@ -146,16 +143,16 @@ class PolicyEngine extends events_1.EventEmitter {
         // Log audit entry
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 policyId,
-                action: index_js_1.AuditAction.POLICY_UPDATE,
+                action: AuditAction.POLICY_UPDATE,
                 subject: {
-                    type: index_js_1.SubjectType.SYSTEM,
+                    type: SubjectType.SYSTEM,
                     id: 'policy-engine',
                     attributes: { action: 'remove_policy' }
                 },
-                result: index_js_1.AuditResult.ALLOWED,
+                result: AuditResult.ALLOWED,
                 details: {}
             });
         }
@@ -202,7 +199,7 @@ class PolicyEngine extends events_1.EventEmitter {
                 const ruleResult = this.evaluateRule(rule, subject, context);
                 if (!ruleResult.allowed) {
                     policyAllowed = false;
-                    violations.push(new index_js_1.PolicyViolationError(policy.id, rule.id, {
+                    violations.push(new PolicyViolationError(policy.id, rule.id, {
                         policyName: policy.name,
                         ruleName: rule.name,
                         subject,
@@ -213,13 +210,13 @@ class PolicyEngine extends events_1.EventEmitter {
                     // Log rule trigger
                     if (this.auditLogger) {
                         await this.auditLogger.log({
-                            id: (0, uuid_1.v4)(),
+                            id: uuidv4(),
                             timestamp: new Date(),
                             policyId: policy.id,
                             ruleId: rule.id,
-                            action: index_js_1.AuditAction.RULE_TRIGGERED,
+                            action: AuditAction.RULE_TRIGGERED,
                             subject,
-                            result: index_js_1.AuditResult.DENIED,
+                            result: AuditResult.DENIED,
                             details: { ruleName: rule.name, context }
                         });
                     }
@@ -229,13 +226,13 @@ class PolicyEngine extends events_1.EventEmitter {
                 // Log rule evaluation error
                 if (this.auditLogger) {
                     await this.auditLogger.log({
-                        id: (0, uuid_1.v4)(),
+                        id: uuidv4(),
                         timestamp: new Date(),
                         policyId: policy.id,
                         ruleId: rule.id,
-                        action: index_js_1.AuditAction.RULE_TRIGGERED,
+                        action: AuditAction.RULE_TRIGGERED,
                         subject,
-                        result: index_js_1.AuditResult.ERROR,
+                        result: AuditResult.ERROR,
                         details: { error: error.message, context }
                     });
                 }
@@ -251,17 +248,17 @@ class PolicyEngine extends events_1.EventEmitter {
         const { condition } = rule;
         // Evaluate condition based on type
         switch (condition.type) {
-            case index_js_1.ConditionType.ATTRIBUTE:
+            case ConditionType.ATTRIBUTE:
                 return this.evaluateAttributeCondition(condition, subject, context);
-            case index_js_1.ConditionType.METRIC:
+            case ConditionType.METRIC:
                 return this.evaluateMetricCondition(condition, subject, context);
-            case index_js_1.ConditionType.TIME:
+            case ConditionType.TIME:
                 return this.evaluateTimeCondition(condition, context);
-            case index_js_1.ConditionType.LOCATION:
+            case ConditionType.LOCATION:
                 return this.evaluateLocationCondition(condition, subject, context);
-            case index_js_1.ConditionType.USER:
+            case ConditionType.USER:
                 return this.evaluateUserCondition(condition, subject, context);
-            case index_js_1.ConditionType.SYSTEM:
+            case ConditionType.SYSTEM:
                 return this.evaluateSystemCondition(condition, context);
             default:
                 return { allowed: true }; // Allow by default for unknown condition types
@@ -273,7 +270,7 @@ class PolicyEngine extends events_1.EventEmitter {
     async executeRuleAction(rule, subject, context) {
         const { action } = rule;
         switch (action.type) {
-            case index_js_1.ActionType.LOG:
+            case ActionType.LOG:
                 this.emit('ruleAction', {
                     type: 'log',
                     ruleId: rule.id,
@@ -282,7 +279,7 @@ class PolicyEngine extends events_1.EventEmitter {
                     details: action.parameters
                 });
                 break;
-            case index_js_1.ActionType.ALERT:
+            case ActionType.ALERT:
                 this.emit('ruleAction', {
                     type: 'alert',
                     ruleId: rule.id,
@@ -291,10 +288,10 @@ class PolicyEngine extends events_1.EventEmitter {
                     message: action.parameters.message || 'Policy violation detected'
                 });
                 break;
-            case index_js_1.ActionType.DENY:
+            case ActionType.DENY:
                 // Action handled by caller
                 break;
-            case index_js_1.ActionType.QUARANTINE:
+            case ActionType.QUARANTINE:
                 this.emit('ruleAction', {
                     type: 'quarantine',
                     ruleId: rule.id,
@@ -303,7 +300,7 @@ class PolicyEngine extends events_1.EventEmitter {
                     duration: action.parameters.duration
                 });
                 break;
-            case index_js_1.ActionType.THROTTLE:
+            case ActionType.THROTTLE:
                 this.emit('ruleAction', {
                     type: 'throttle',
                     ruleId: rule.id,
@@ -312,7 +309,7 @@ class PolicyEngine extends events_1.EventEmitter {
                     rateLimit: action.parameters.rateLimit
                 });
                 break;
-            case index_js_1.ActionType.NOTIFY:
+            case ActionType.NOTIFY:
                 this.emit('ruleAction', {
                     type: 'notify',
                     ruleId: rule.id,
@@ -362,7 +359,7 @@ class PolicyEngine extends events_1.EventEmitter {
      * Evaluate user-based conditions
      */
     evaluateUserCondition(condition, subject, context) {
-        if (subject.type !== index_js_1.SubjectType.USER)
+        if (subject.type !== SubjectType.USER)
             return { allowed: true };
         const userAttribute = subject.attributes[condition.attribute];
         return this.evaluateOperator(condition.operator, userAttribute, condition.value);
@@ -379,23 +376,23 @@ class PolicyEngine extends events_1.EventEmitter {
      */
     evaluateOperator(operator, left, right) {
         switch (operator) {
-            case index_js_1.ConditionOperator.EQUALS:
+            case ConditionOperator.EQUALS:
                 return { allowed: left === right };
-            case index_js_1.ConditionOperator.NOT_EQUALS:
+            case ConditionOperator.NOT_EQUALS:
                 return { allowed: left !== right };
-            case index_js_1.ConditionOperator.GREATER_THAN:
+            case ConditionOperator.GREATER_THAN:
                 return { allowed: left > right };
-            case index_js_1.ConditionOperator.LESS_THAN:
+            case ConditionOperator.LESS_THAN:
                 return { allowed: left < right };
-            case index_js_1.ConditionOperator.CONTAINS:
+            case ConditionOperator.CONTAINS:
                 return { allowed: String(left).includes(String(right)) };
-            case index_js_1.ConditionOperator.NOT_CONTAINS:
+            case ConditionOperator.NOT_CONTAINS:
                 return { allowed: !String(left).includes(String(right)) };
-            case index_js_1.ConditionOperator.IN:
+            case ConditionOperator.IN:
                 return { allowed: Array.isArray(right) ? right.includes(left) : false };
-            case index_js_1.ConditionOperator.NOT_IN:
+            case ConditionOperator.NOT_IN:
                 return { allowed: Array.isArray(right) ? !right.includes(left) : true };
-            case index_js_1.ConditionOperator.REGEX:
+            case ConditionOperator.REGEX:
                 try {
                     const regex = new RegExp(right);
                     return { allowed: regex.test(String(left)) };
@@ -412,12 +409,12 @@ class PolicyEngine extends events_1.EventEmitter {
      */
     validatePolicy(policy) {
         if (!policy.id || !policy.name || !policy.rules) {
-            throw new index_js_1.GovernanceError('Invalid policy structure', 'INVALID_POLICY');
+            throw new GovernanceError('Invalid policy structure', 'INVALID_POLICY');
         }
         // Validate rules
         for (const rule of policy.rules) {
             if (!rule.id || !rule.condition || !rule.action) {
-                throw new index_js_1.GovernanceError(`Invalid rule structure in policy ${policy.id}`, 'INVALID_RULE');
+                throw new GovernanceError(`Invalid rule structure in policy ${policy.id}`, 'INVALID_RULE');
             }
         }
     }
@@ -436,5 +433,4 @@ class PolicyEngine extends events_1.EventEmitter {
         }
     }
 }
-exports.PolicyEngine = PolicyEngine;
 //# sourceMappingURL=PolicyEngine.js.map

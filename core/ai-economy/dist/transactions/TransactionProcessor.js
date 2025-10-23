@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionProcessor = void 0;
-const rxjs_1 = require("rxjs");
-class TransactionProcessor {
+import { BehaviorSubject } from 'rxjs';
+export class TransactionProcessor {
     constructor(tokenManager, pricingEngine) {
         this.pendingTransactions = new Map();
         this.confirmedTransactions = [];
         this.economicAgents = new Map();
-        this.transactionMetrics = new rxjs_1.BehaviorSubject(null);
+        this.transactionMetrics = new BehaviorSubject(null);
         this.tokenManager = tokenManager;
         this.pricingEngine = pricingEngine;
     }
@@ -288,5 +285,4 @@ class TransactionProcessor {
         return agent ? agent.reputation : 0;
     }
 }
-exports.TransactionProcessor = TransactionProcessor;
 //# sourceMappingURL=TransactionProcessor.js.map

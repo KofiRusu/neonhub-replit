@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SelfHealingManager = void 0;
-const logger_1 = require("../../apps/api/src/lib/logger");
-class SelfHealingManager {
+import { logger } from '../../apps/api/src/lib/logger';
+export class SelfHealingManager {
     constructor(aib, federationManager) {
         this.diagnostics = new Map();
         this.repairHistory = [];
@@ -25,7 +22,7 @@ class SelfHealingManager {
     }
     async startMonitoring() {
         this.isMonitoring = true;
-        logger_1.logger.info('Self-healing monitoring started');
+        logger.info('Self-healing monitoring started');
         // Initial health check
         await this.performSystemHealthCheck();
         // Set up periodic health checks
@@ -33,7 +30,7 @@ class SelfHealingManager {
     }
     async stopMonitoring() {
         this.isMonitoring = false;
-        logger_1.logger.info('Self-healing monitoring stopped');
+        logger.info('Self-healing monitoring stopped');
     }
     async performSystemHealthCheck() {
         const components = ['database', 'api', 'agents', 'message-queue'];
@@ -46,7 +43,7 @@ class SelfHealingManager {
                 }
             }
             catch (error) {
-                logger_1.logger.error({ component, error }, `Health check failed for ${component}`);
+                logger.error({ component, error }, `Health check failed for ${component}`);
             }
         }
         // Perform tenant-specific health checks
@@ -162,10 +159,10 @@ class SelfHealingManager {
         try {
             await this.executeRepairAction(repairAction);
             repairAction.success = true;
-            logger_1.logger.info({ component, repairId: repairAction.id }, `Auto-repair successful for ${component}`);
+            logger.info({ component, repairId: repairAction.id }, `Auto-repair successful for ${component}`);
         }
         catch (error) {
-            logger_1.logger.error({ component, error, repairId: repairAction.id }, `Auto-repair failed for ${component}`);
+            logger.error({ component, error, repairId: repairAction.id }, `Auto-repair failed for ${component}`);
         }
         this.repairHistory.push(repairAction);
     }
@@ -197,18 +194,18 @@ class SelfHealingManager {
         });
     }
     handleAgentError(event) {
-        logger_1.logger.warn({ agentId: event.agentId, error: event.error }, 'Agent error detected, initiating repair');
+        logger.warn({ agentId: event.agentId, error: event.error }, 'Agent error detected, initiating repair');
         // Trigger immediate repair for agent errors
     }
     handleHealthCheck(event) {
-        logger_1.logger.debug({ component: event.component, status: event.status }, 'Health check event received');
+        logger.debug({ component: event.component, status: event.status }, 'Health check event received');
     }
     handleTenantHealthCheck(event) {
-        logger_1.logger.debug({ tenantId: event.tenantId, component: event.component, status: event.status }, 'Tenant health check event received');
+        logger.debug({ tenantId: event.tenantId, component: event.component, status: event.status }, 'Tenant health check event received');
         // Handle tenant-specific health checks
     }
     handleTenantResourceUsage(event) {
-        logger_1.logger.debug({ tenantId: event.tenantId, usage: event.usage }, 'Tenant resource usage event received');
+        logger.debug({ tenantId: event.tenantId, usage: event.usage }, 'Tenant resource usage event received');
         // Update tenant resource usage tracking
         this.tenantResourceUsage.set(event.tenantId, {
             tenantId: event.tenantId,
@@ -229,7 +226,7 @@ class SelfHealingManager {
                 }
             }
             catch (error) {
-                logger_1.logger.error({ tenantId, error }, `Tenant health check failed for ${tenantId}`);
+                logger.error({ tenantId, error }, `Tenant health check failed for ${tenantId}`);
             }
         }
     }
@@ -282,7 +279,7 @@ class SelfHealingManager {
         const policies = this.tenantPolicies.get(tenantId) || [];
         const repairPolicy = policies.find(p => p.type === 'repair' && p.enabled);
         if (!repairPolicy) {
-            logger_1.logger.warn({ tenantId }, `No repair policy found for tenant ${tenantId}`);
+            logger.warn({ tenantId }, `No repair policy found for tenant ${tenantId}`);
             return;
         }
         const repairAction = {
@@ -298,10 +295,10 @@ class SelfHealingManager {
         try {
             await this.executeTenantRepairAction(repairAction);
             repairAction.success = true;
-            logger_1.logger.info({ tenantId, repairId: repairAction.id }, `Tenant auto-repair successful for ${tenantId}`);
+            logger.info({ tenantId, repairId: repairAction.id }, `Tenant auto-repair successful for ${tenantId}`);
         }
         catch (error) {
-            logger_1.logger.error({ tenantId, error, repairId: repairAction.id }, `Tenant auto-repair failed for ${tenantId}`);
+            logger.error({ tenantId, error, repairId: repairAction.id }, `Tenant auto-repair failed for ${tenantId}`);
         }
         this.repairHistory.push(repairAction);
     }
@@ -345,7 +342,7 @@ class SelfHealingManager {
         this.tenantConfigs.set(config.id, config);
         this.tenantIsolationContexts.set(config.id, this.createTenantIsolationContext(config));
         this.tenantPolicies.set(config.id, config.policies);
-        logger_1.logger.info({ tenantId: config.id }, `Tenant registered: ${config.id}`);
+        logger.info({ tenantId: config.id }, `Tenant registered: ${config.id}`);
     }
     unregisterTenant(tenantId) {
         this.tenantConfigs.delete(tenantId);
@@ -353,7 +350,7 @@ class SelfHealingManager {
         this.tenantResourceUsage.delete(tenantId);
         this.tenantCommunicationChannels.delete(tenantId);
         this.tenantPolicies.delete(tenantId);
-        logger_1.logger.info({ tenantId }, `Tenant unregistered: ${tenantId}`);
+        logger.info({ tenantId }, `Tenant unregistered: ${tenantId}`);
     }
     createTenantIsolationContext(config) {
         return {
@@ -382,17 +379,17 @@ class SelfHealingManager {
         if (!config) {
             throw new Error(`Tenant ${tenantId} not found`);
         }
-        logger_1.logger.info({ tenantId, targetCluster }, `Migrating tenant ${tenantId} to cluster ${targetCluster}`);
+        logger.info({ tenantId, targetCluster }, `Migrating tenant ${tenantId} to cluster ${targetCluster}`);
         // Use federation manager to coordinate cross-cluster migration
         // Note: FederationManager.migrateTenant method would need to be implemented
         // For now, simulate the migration coordination
-        logger_1.logger.info({ tenantId, targetCluster }, `Coordinating tenant migration with federation manager for ${tenantId} to ${targetCluster}`);
+        logger.info({ tenantId, targetCluster }, `Coordinating tenant migration with federation manager for ${tenantId} to ${targetCluster}`);
         // Update tenant config with new cluster
         config.federationEnabled = true;
         this.tenantConfigs.set(tenantId, config);
     }
     async failoverTenant(tenantId, targetCluster) {
-        logger_1.logger.warn({ tenantId, targetCluster }, `Initiating tenant failover for ${tenantId} to ${targetCluster}`);
+        logger.warn({ tenantId, targetCluster }, `Initiating tenant failover for ${tenantId} to ${targetCluster}`);
         // Similar to migration but for emergency scenarios
         await this.migrateTenant(tenantId, targetCluster);
         // Trigger tenant-specific recovery policies
@@ -403,7 +400,7 @@ class SelfHealingManager {
         }
     }
     async executeTenantPolicy(tenantId, policy) {
-        logger_1.logger.info({ tenantId, policyName: policy.name }, `Executing tenant policy ${policy.name} for ${tenantId}`);
+        logger.info({ tenantId, policyName: policy.name }, `Executing tenant policy ${policy.name} for ${tenantId}`);
         // Simulate policy execution
         await new Promise(resolve => setTimeout(resolve, 2000));
         // Broadcast policy execution
@@ -427,7 +424,7 @@ class SelfHealingManager {
             encrypted: true,
             authenticated: true
         });
-        logger_1.logger.info({ channelId, tenantId, peerTenantId }, `Secure tenant channel created: ${channelId}`);
+        logger.info({ channelId, tenantId, peerTenantId }, `Secure tenant channel created: ${channelId}`);
     }
     getTenantDiagnostics() {
         return Array.from(this.diagnostics.values())
@@ -444,8 +441,7 @@ class SelfHealingManager {
         }
         config.resourceQuotas = { ...config.resourceQuotas, ...quotas };
         this.tenantConfigs.set(tenantId, config);
-        logger_1.logger.info({ tenantId, quotas }, `Updated resource quotas for tenant ${tenantId}`);
+        logger.info({ tenantId, quotas }, `Updated resource quotas for tenant ${tenantId}`);
     }
 }
-exports.SelfHealingManager = SelfHealingManager;
 //# sourceMappingURL=index.js.map

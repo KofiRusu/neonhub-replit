@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SecureAggregation = void 0;
-class SecureAggregation {
+export class SecureAggregation {
     constructor(logger, he) {
         this.logger = logger;
         this.he = he;
@@ -151,5 +148,4 @@ class SecureAggregation {
         ];
     }
 }
-exports.SecureAggregation = SecureAggregation;
 //# sourceMappingURL=SecureAggregation.js.map

@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EthicalFramework = void 0;
-const events_1 = require("events");
-const uuid_1 = require("uuid");
-const index_js_1 = require("../types/index.js");
-class EthicalFramework extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { v4 as uuidv4 } from 'uuid';
+import { EthicalSeverity, SubjectType, GovernanceError } from '../types/index.js';
+export class EthicalFramework extends EventEmitter {
     constructor(config, auditLogger) {
         super();
         this.principles = [];
@@ -67,7 +64,7 @@ class EthicalFramework extends events_1.EventEmitter {
     async assessEthicalImpact(subject, context) {
         try {
             const assessment = {
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 subject,
                 principles: [],
@@ -91,7 +88,7 @@ class EthicalFramework extends events_1.EventEmitter {
             // Log assessment
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
                     action: 'ethical_assessment',
                     subject,
@@ -107,7 +104,7 @@ class EthicalFramework extends events_1.EventEmitter {
             return assessment;
         }
         catch (error) {
-            throw new index_js_1.GovernanceError(`Ethical assessment failed: ${error.message}`, 'ETHICAL_ASSESSMENT_ERROR', { subject });
+            throw new GovernanceError(`Ethical assessment failed: ${error.message}`, 'ETHICAL_ASSESSMENT_ERROR', { subject });
         }
     }
     /**
@@ -162,7 +159,7 @@ class EthicalFramework extends events_1.EventEmitter {
         // Analyze potential benefits
         let score = 0.5; // Baseline
         // Check for positive outcomes
-        if (subject.type === index_js_1.SubjectType.MODEL && context?.accuracy) {
+        if (subject.type === SubjectType.MODEL && context?.accuracy) {
             score += context.accuracy > 0.8 ? 0.3 : 0;
         }
         if (context?.userBenefit) {
@@ -269,18 +266,18 @@ class EthicalFramework extends events_1.EventEmitter {
         const concerns = [];
         for (const principle of principles) {
             if (principle.score < 0.6) { // Threshold for concern
-                let severity = index_js_1.EthicalSeverity.MINOR;
+                let severity = EthicalSeverity.MINOR;
                 let mitigation;
                 if (principle.score < 0.3) {
-                    severity = index_js_1.EthicalSeverity.CRITICAL;
+                    severity = EthicalSeverity.CRITICAL;
                     mitigation = `Immediate review required for ${principle.name}`;
                 }
                 else if (principle.score < 0.5) {
-                    severity = index_js_1.EthicalSeverity.MAJOR;
+                    severity = EthicalSeverity.MAJOR;
                     mitigation = `Address ${principle.name} concerns before deployment`;
                 }
                 else {
-                    severity = index_js_1.EthicalSeverity.MODERATE;
+                    severity = EthicalSeverity.MODERATE;
                     mitigation = `Monitor and improve ${principle.name} compliance`;
                 }
                 concerns.push({
@@ -335,5 +332,4 @@ class EthicalFramework extends events_1.EventEmitter {
         return assessment.score >= this.config.assessmentThreshold;
     }
 }
-exports.EthicalFramework = EthicalFramework;
 //# sourceMappingURL=EthicalFramework.js.map

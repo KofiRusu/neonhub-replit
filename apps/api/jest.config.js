@@ -1,32 +1,35 @@
-export default {
-  preset: "ts-jest/presets/default-esm",
-  testEnvironment: "node",
-  extensionsToTreatAsEsm: [".ts"],
-  moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1",
-  },
+const config = {
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!**/node_modules/**'],
   transform: {
-    "^.+\\.ts$": [
-      "ts-jest",
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
       {
-        useESM: true,
-      },
-    ],
+        tsconfig: 'tsconfig.json',
+        useESM: true
+      }
+    ]
   },
-  testMatch: ["**/__tests__/**/*.test.ts", "**/?(*.)+(spec|test).ts"],
-  collectCoverageFrom: [
-    "src/**/*.ts",
-    "!src/**/*.d.ts",
-    "!src/**/__tests__/**",
-    "!src/**/types/**",
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
+  passWithNoTests: true,
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  },
+  collectCoverage: true,
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
   coverageThreshold: {
     global: {
       branches: 70,
       functions: 75,
       lines: 80,
-      statements: 80,
-    },
-  },
-  coverageReporters: ["text", "lcov", "html", "json-summary"],
+      statements: 80
+    }
+  }
 };
+
+export default config;

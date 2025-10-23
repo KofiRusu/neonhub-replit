@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ModelCompression = void 0;
-const types_1 = require("../types");
-const Logger_1 = require("../utils/Logger");
-class ModelCompression {
+import { CompressionAlgorithm } from '../types';
+import { ConsoleLogger } from '../utils/Logger';
+export class ModelCompression {
     constructor(logger) {
-        this.logger = logger || new Logger_1.ConsoleLogger();
+        this.logger = logger || new ConsoleLogger();
     }
     /**
      * Compress model weights using quantization
@@ -107,24 +104,24 @@ class ModelCompression {
     async compress(modelData, config) {
         let compressedData = { ...modelData };
         switch (config.algorithm) {
-            case types_1.CompressionAlgorithm.QUANTIZATION:
+            case CompressionAlgorithm.QUANTIZATION:
                 if (config.quantizationBits && modelData.weights) {
                     compressedData.weights = this.quantizeWeights(modelData.weights, config.quantizationBits);
                 }
                 break;
-            case types_1.CompressionAlgorithm.PRUNING:
+            case CompressionAlgorithm.PRUNING:
                 if (modelData.weights) {
                     compressedData.weights = this.pruneWeights(modelData.weights, config.pruningRatio || 0.01);
                 }
                 break;
-            case types_1.CompressionAlgorithm.SPARSE_CODING:
+            case CompressionAlgorithm.SPARSE_CODING:
                 if (modelData.weights) {
                     const { encoded, mask } = this.sparseEncode(modelData.weights, config.pruningRatio || 0.1);
                     compressedData.weights = encoded;
                     compressedData.sparseMask = mask;
                 }
                 break;
-            case types_1.CompressionAlgorithm.LOW_RANK_APPROXIMATION:
+            case CompressionAlgorithm.LOW_RANK_APPROXIMATION:
                 if (modelData.weights) {
                     compressedData.weights = this.lowRankApproximation(modelData.weights, config.quantizationBits || 10);
                 }
@@ -145,7 +142,7 @@ class ModelCompression {
         }
         let decompressedData = { ...compressedData };
         switch (compressedData.compressionConfig.algorithm) {
-            case types_1.CompressionAlgorithm.SPARSE_CODING:
+            case CompressionAlgorithm.SPARSE_CODING:
                 if (decompressedData.weights && decompressedData.sparseMask) {
                     decompressedData.weights = this.sparseDecode(decompressedData.weights, decompressedData.sparseMask);
                     delete decompressedData.sparseMask;
@@ -191,5 +188,4 @@ class ModelCompression {
         return JSON.stringify(data).length;
     }
 }
-exports.ModelCompression = ModelCompression;
 //# sourceMappingURL=ModelCompression.js.map

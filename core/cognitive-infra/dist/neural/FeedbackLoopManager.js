@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FeedbackLoopManager = void 0;
-const rxjs_1 = require("rxjs");
-class FeedbackLoopManager {
+import { BehaviorSubject } from 'rxjs';
+export class FeedbackLoopManager {
     constructor(neuralNetwork) {
         this.feedbackLoops = new Map();
-        this.metricsSubject = new rxjs_1.BehaviorSubject(null);
+        this.metricsSubject = new BehaviorSubject(null);
         this.adaptationThreshold = 0.1;
         this.maxFeedbackStrength = 1.0;
         this.neuralNetwork = neuralNetwork;
@@ -151,5 +148,4 @@ class FeedbackLoopManager {
         };
     }
 }
-exports.FeedbackLoopManager = FeedbackLoopManager;
 //# sourceMappingURL=FeedbackLoopManager.js.map

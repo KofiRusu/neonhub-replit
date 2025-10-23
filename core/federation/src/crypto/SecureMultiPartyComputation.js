@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SecureMultiPartyComputation = void 0;
-const types_1 = require("../types");
-class SecureMultiPartyComputation {
+import { SecureComputationProtocol } from '../types';
+export class SecureMultiPartyComputation {
     constructor(logger) {
         this.logger = logger;
     }
@@ -12,11 +9,11 @@ class SecureMultiPartyComputation {
     async performComputation(request) {
         this.logger.info(`Starting secure computation: ${request.computationId} with protocol ${request.protocol}`);
         switch (request.protocol) {
-            case types_1.SecureComputationProtocol.SECRET_SHARING:
+            case SecureComputationProtocol.SECRET_SHARING:
                 return this.secretSharingComputation(request);
-            case types_1.SecureComputationProtocol.HOMOMORPHIC_ENCRYPTION:
+            case SecureComputationProtocol.HOMOMORPHIC_ENCRYPTION:
                 return this.homomorphicComputation(request);
-            case types_1.SecureComputationProtocol.MULTI_PARTY_COMPUTATION:
+            case SecureComputationProtocol.MULTI_PARTY_COMPUTATION:
                 return this.multiPartyComputation(request);
             default:
                 throw new Error(`Unsupported protocol: ${request.protocol}`);
@@ -194,5 +191,4 @@ class SecureMultiPartyComputation {
         return { isValid: true };
     }
 }
-exports.SecureMultiPartyComputation = SecureMultiPartyComputation;
 //# sourceMappingURL=SecureMultiPartyComputation.js.map

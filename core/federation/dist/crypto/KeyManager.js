@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyManager = void 0;
-const types_1 = require("../types");
-class KeyManager {
+import { KeyPurpose } from '../types';
+export class KeyManager {
     constructor(logger) {
         this.keyStore = new Map();
         this.keyExchanges = new Map();
@@ -162,9 +159,9 @@ class KeyManager {
         const keys = Array.from(this.keyStore.values());
         const totalKeys = keys.length;
         const keysByPurpose = {
-            [types_1.KeyPurpose.HOMOMORPHIC_ENCRYPTION]: 0,
-            [types_1.KeyPurpose.SECURE_AGGREGATION]: 0,
-            [types_1.KeyPurpose.SIGNATURE_VERIFICATION]: 0
+            [KeyPurpose.HOMOMORPHIC_ENCRYPTION]: 0,
+            [KeyPurpose.SECURE_AGGREGATION]: 0,
+            [KeyPurpose.SIGNATURE_VERIFICATION]: 0
         };
         let totalUsage = 0;
         let expiredKeys = 0;
@@ -211,5 +208,4 @@ class KeyManager {
         return result;
     }
 }
-exports.KeyManager = KeyManager;
 //# sourceMappingURL=KeyManager.js.map

@@ -1,15 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuditTrail = void 0;
-const uuid_1 = require("uuid");
-class AuditTrail {
+import { v4 as uuidv4 } from 'uuid';
+export class AuditTrail {
     constructor() {
         this.events = [];
         this.maxEvents = 10000; // Configurable limit
     }
     logEvent(action, resource, userId, details = {}, compliance) {
         const event = {
-            id: (0, uuid_1.v4)(),
+            id: uuidv4(),
             timestamp: new Date(),
             action,
             userId,
@@ -129,5 +126,4 @@ class AuditTrail {
             JSON.stringify(event.details).toLowerCase().includes(lowercaseQuery));
     }
 }
-exports.AuditTrail = AuditTrail;
 //# sourceMappingURL=AuditTrail.js.map

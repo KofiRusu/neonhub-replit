@@ -1,20 +1,17 @@
-"use strict";
 /**
  * Mesh Resilience Manager
  * Central coordinator for distributed mesh resilience with CRDT, BFT, and self-reconstruction
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MeshResilienceManager = void 0;
-const eventemitter3_1 = require("eventemitter3");
-const CRDTManager_1 = require("../crdt/CRDTManager");
-const ByzantineFaultTolerance_1 = require("../byzantine/ByzantineFaultTolerance");
-class MeshResilienceManager extends eventemitter3_1.EventEmitter {
+import { EventEmitter } from 'eventemitter3';
+import { CRDTManager } from '../crdt/CRDTManager';
+import { ByzantineFaultTolerance } from '../byzantine/ByzantineFaultTolerance';
+export class MeshResilienceManager extends EventEmitter {
     constructor(nodeId, config) {
         super();
         this.nodeId = nodeId;
         this.config = config;
-        this.crdtManager = new CRDTManager_1.CRDTManager(nodeId);
-        this.bftManager = new ByzantineFaultTolerance_1.ByzantineFaultTolerance(nodeId, config.minConsensusNodes);
+        this.crdtManager = new CRDTManager(nodeId);
+        this.bftManager = new ByzantineFaultTolerance(nodeId, config.minConsensusNodes);
         this.meshNodes = new Map();
         this.offlineOperations = [];
         this.recoveryPlaybooks = new Map();
@@ -349,4 +346,4 @@ class MeshResilienceManager extends eventemitter3_1.EventEmitter {
         this.removeAllListeners();
     }
 }
-exports.MeshResilienceManager = MeshResilienceManager;
+//# sourceMappingURL=MeshResilienceManager.js.map

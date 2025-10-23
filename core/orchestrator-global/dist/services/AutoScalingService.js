@@ -1,43 +1,7 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AutoScalingService = void 0;
-const events_1 = require("events");
-const cron = __importStar(require("node-cron"));
-const types_1 = require("../types");
-class AutoScalingService extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import * as cron from 'node-cron';
+import { ScalingAction, GlobalOrchestratorError, GlobalOrchestratorErrorCode } from '../types';
+export class AutoScalingService extends EventEmitter {
     constructor(config, logger) {
         super();
         this.lastScalingAction = new Map();
@@ -63,7 +27,7 @@ class AutoScalingService extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to start auto-scaling service', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.SCALING_FAILED, 'Failed to start auto-scaling service', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.SCALING_FAILED, 'Failed to start auto-scaling service', undefined, undefined, { originalError: error.message });
         }
     }
     async stop() {
@@ -110,7 +74,7 @@ class AutoScalingService extends events_1.EventEmitter {
         // For demo purposes, we'll create a mock scaling decision
         if (Math.random() > 0.95) { // 5% chance of scaling event
             const decision = {
-                action: Math.random() > 0.5 ? types_1.ScalingAction.SCALE_UP : types_1.ScalingAction.SCALE_DOWN,
+                action: Math.random() > 0.5 ? ScalingAction.SCALE_UP : ScalingAction.SCALE_DOWN,
                 targetNodes: ['node-1', 'node-2'], // Mock node IDs
                 reason: 'Simulated scaling based on load analysis',
                 expectedImpact: {
@@ -136,13 +100,13 @@ class AutoScalingService extends events_1.EventEmitter {
             this.logger.info(`Executing scaling decision: ${decision.action} for nodes: ${decision.targetNodes.join(', ')}`);
             // Execute the scaling action
             switch (decision.action) {
-                case types_1.ScalingAction.SCALE_UP:
+                case ScalingAction.SCALE_UP:
                     await this.scaleUp(decision.targetNodes);
                     break;
-                case types_1.ScalingAction.SCALE_DOWN:
+                case ScalingAction.SCALE_DOWN:
                     await this.scaleDown(decision.targetNodes);
                     break;
-                case types_1.ScalingAction.NO_ACTION:
+                case ScalingAction.NO_ACTION:
                     // No action needed
                     break;
             }
@@ -157,7 +121,7 @@ class AutoScalingService extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to execute scaling decision', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.SCALING_FAILED, 'Failed to execute scaling decision', undefined, undefined, { decision, originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.SCALING_FAILED, 'Failed to execute scaling decision', undefined, undefined, { decision, originalError: error.message });
         }
     }
     async scaleUp(targetNodes) {
@@ -198,8 +162,8 @@ class AutoScalingService extends events_1.EventEmitter {
     }
     getScalingStats() {
         const recentHistory = this.scalingHistory.slice(-100);
-        const scaleUpCount = recentHistory.filter(d => d.action === types_1.ScalingAction.SCALE_UP).length;
-        const scaleDownCount = recentHistory.filter(d => d.action === types_1.ScalingAction.SCALE_DOWN).length;
+        const scaleUpCount = recentHistory.filter(d => d.action === ScalingAction.SCALE_UP).length;
+        const scaleDownCount = recentHistory.filter(d => d.action === ScalingAction.SCALE_DOWN).length;
         return {
             totalScalingEvents: this.scalingHistory.length,
             recentScaleUpEvents: scaleUpCount,
@@ -235,5 +199,4 @@ class AutoScalingService extends events_1.EventEmitter {
         this.logger.info(`Updated scaling thresholds: up=${scaleUpThreshold}, down=${scaleDownThreshold}`);
     }
 }
-exports.AutoScalingService = AutoScalingService;
 //# sourceMappingURL=AutoScalingService.js.map

@@ -1,42 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MLTestGenerator = void 0;
-const tf = __importStar(require("@tensorflow/tfjs-node"));
-const stats_lite_1 = require("stats-lite");
-class MLTestGenerator {
+import * as tf from '@tensorflow/tfjs-node';
+import { mean, std, min, max } from 'stats-lite';
+export class MLTestGenerator {
     constructor(config) {
         this.model = null;
         this.trainingData = [];
@@ -105,8 +69,8 @@ class MLTestGenerator {
         for (const [metric, values] of metricsByType) {
             if (values.length > 1) {
                 this.featureStats.set(metric, {
-                    mean: (0, stats_lite_1.mean)(values),
-                    std: (0, stats_lite_1.std)(values)
+                    mean: mean(values),
+                    std: std(values)
                 });
             }
         }
@@ -122,7 +86,7 @@ class MLTestGenerator {
             const metricData = telemetryData.filter(d => d.metric === metric);
             if (metricData.length > 0) {
                 const values = metricData.map(d => d.value);
-                features.push((0, stats_lite_1.mean)(values), (0, stats_lite_1.std)(values), (0, stats_lite_1.min)(values), (0, stats_lite_1.max)(values));
+                features.push(mean(values), std(values), min(values), max(values));
             }
             else {
                 features.push(0, 0, 0, 0);
@@ -297,5 +261,4 @@ class MLTestGenerator {
         }
     }
 }
-exports.MLTestGenerator = MLTestGenerator;
 //# sourceMappingURL=TestGenerator.js.map

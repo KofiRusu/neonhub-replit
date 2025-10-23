@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ModelEvaluator = void 0;
-const Logger_1 = require("../utils/Logger");
-class ModelEvaluator {
+import { ConsoleLogger } from '../utils/Logger';
+export class ModelEvaluator {
     constructor(logger) {
-        this.logger = logger || new Logger_1.ConsoleLogger();
+        this.logger = logger || new ConsoleLogger();
     }
     /**
      * Evaluate a model against test data
@@ -272,5 +269,4 @@ class ModelEvaluator {
             request.benchmarkConfig);
     }
 }
-exports.ModelEvaluator = ModelEvaluator;
 //# sourceMappingURL=ModelEvaluator.js.map

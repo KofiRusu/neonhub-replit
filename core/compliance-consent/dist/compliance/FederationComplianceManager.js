@@ -1,8 +1,5 @@
-"use strict";
 // import { FederationManager } from '@neonhub/federation'; // Will be available when federation module is built
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FederationComplianceManager = void 0;
-class FederationComplianceManager {
+export class FederationComplianceManager {
     constructor(config) {
         this.nodeCompliance = new Map();
         this.config = config;
@@ -149,5 +146,4 @@ class FederationComplianceManager {
         console.log(`[FEDERATION-COMPLIANCE] ${type}:`, details);
     }
 }
-exports.FederationComplianceManager = FederationComplianceManager;
 //# sourceMappingURL=FederationComplianceManager.js.map

@@ -1,14 +1,11 @@
-"use strict";
 /**
  * Byzantine Fault Tolerance Manager
  * Implements consensus algorithms to handle malicious or faulty nodes
  * in the distributed mesh network
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ByzantineFaultTolerance = void 0;
-const eventemitter3_1 = require("eventemitter3");
-const uuid_1 = require("uuid");
-class ByzantineFaultTolerance extends eventemitter3_1.EventEmitter {
+import { EventEmitter } from 'eventemitter3';
+import { v4 as uuidv4 } from 'uuid';
+export class ByzantineFaultTolerance extends EventEmitter {
     constructor(nodeId, minConsensusNodes = 3) {
         super();
         this.nodeId = nodeId;
@@ -40,7 +37,7 @@ class ByzantineFaultTolerance extends eventemitter3_1.EventEmitter {
      * Initiate a new consensus round
      */
     async proposeConsensus(proposal, timeout = 30000) {
-        const roundId = (0, uuid_1.v4)();
+        const roundId = uuidv4();
         const healthyNodes = this.getHealthyNodes();
         if (healthyNodes.length < this.minConsensusNodes) {
             throw new Error(`Insufficient nodes for consensus. Required: ${this.minConsensusNodes}, Available: ${healthyNodes.length}`);
@@ -261,4 +258,4 @@ class ByzantineFaultTolerance extends eventemitter3_1.EventEmitter {
         this.removeAllListeners();
     }
 }
-exports.ByzantineFaultTolerance = ByzantineFaultTolerance;
+//# sourceMappingURL=ByzantineFaultTolerance.js.map

@@ -1,39 +1,19 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AIEconomy = exports.TransactionProcessor = exports.DynamicPricingEngine = exports.TokenManager = void 0;
-var TokenManager_1 = require("./tokens/TokenManager");
-Object.defineProperty(exports, "TokenManager", { enumerable: true, get: function () { return TokenManager_1.TokenManager; } });
-var DynamicPricingEngine_1 = require("./pricing/DynamicPricingEngine");
-Object.defineProperty(exports, "DynamicPricingEngine", { enumerable: true, get: function () { return DynamicPricingEngine_1.DynamicPricingEngine; } });
-var TransactionProcessor_1 = require("./transactions/TransactionProcessor");
-Object.defineProperty(exports, "TransactionProcessor", { enumerable: true, get: function () { return TransactionProcessor_1.TransactionProcessor; } });
+export { TokenManager } from './tokens/TokenManager';
+export { DynamicPricingEngine } from './pricing/DynamicPricingEngine';
+export { TransactionProcessor } from './transactions/TransactionProcessor';
 // Types
-__exportStar(require("./types"), exports);
+export * from './types';
 // AI Economy Manager - Main orchestrator
-const TokenManager_2 = require("./tokens/TokenManager");
-const DynamicPricingEngine_2 = require("./pricing/DynamicPricingEngine");
-const TransactionProcessor_2 = require("./transactions/TransactionProcessor");
-class AIEconomy {
+import { TokenManager } from './tokens/TokenManager';
+import { DynamicPricingEngine } from './pricing/DynamicPricingEngine';
+import { TransactionProcessor } from './transactions/TransactionProcessor';
+export class AIEconomy {
     constructor(config) {
         this.isActive = false;
         this.config = config;
-        this.tokenManager = new TokenManager_2.TokenManager(config);
-        this.pricingEngine = new DynamicPricingEngine_2.DynamicPricingEngine();
-        this.transactionProcessor = new TransactionProcessor_2.TransactionProcessor(this.tokenManager, this.pricingEngine);
+        this.tokenManager = new TokenManager(config);
+        this.pricingEngine = new DynamicPricingEngine();
+        this.transactionProcessor = new TransactionProcessor(this.tokenManager, this.pricingEngine);
         this.setupEventHandlers();
     }
     setupEventHandlers() {
@@ -185,5 +165,4 @@ class AIEconomy {
         return this.transactionProcessor.getPendingTransactions();
     }
 }
-exports.AIEconomy = AIEconomy;
 //# sourceMappingURL=index.js.map

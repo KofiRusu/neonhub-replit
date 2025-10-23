@@ -1,46 +1,10 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GRPCServer = void 0;
-const grpc = __importStar(require("@grpc/grpc-js"));
-const protoLoader = __importStar(require("@grpc/proto-loader"));
-const path = __importStar(require("path"));
-const events_1 = require("events");
-const fs = __importStar(require("fs"));
-const types_1 = require("../types");
-class GRPCServer extends events_1.EventEmitter {
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import * as path from 'path';
+import { EventEmitter } from 'events';
+import * as fs from 'fs';
+import { FederationError, FederationErrorCode } from '../types';
+export class GRPCServer extends EventEmitter {
     constructor(config, logger) {
         super();
         this.server = null;
@@ -58,7 +22,7 @@ class GRPCServer extends events_1.EventEmitter {
             this.server.bindAsync(`${this.config.host}:${this.config.port}`, credentials, (error, port) => {
                 if (error) {
                     this.logger.error('Failed to bind gRPC server', error);
-                    throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, error.message);
+                    throw new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message);
                 }
                 this.server.start();
                 this.logger.info(`gRPC server started on ${this.config.host}:${port}`);
@@ -68,7 +32,7 @@ class GRPCServer extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error('Failed to start gRPC server', error);
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     async loadServices() {
@@ -219,5 +183,4 @@ message StreamRequest {
         this.logger.info('gRPC server stopped');
     }
 }
-exports.GRPCServer = GRPCServer;
 //# sourceMappingURL=GRPCServer.js.map

@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnomalyDetector = void 0;
-const stats_lite_1 = require("stats-lite");
-class AnomalyDetector {
+import { mean, std } from 'stats-lite';
+export class AnomalyDetector {
     constructor(threshold = 3.0, windowSize = 100) {
         this.historicalData = new Map();
         this.anomalyThreshold = 3.0; // Standard deviations
@@ -46,8 +43,8 @@ class AnomalyDetector {
         const historical = this.historicalData.get(metricKey) || [];
         if (historical.length < 20)
             return anomalies; // Need historical baseline
-        const baselineMean = (0, stats_lite_1.mean)(historical);
-        const baselineStd = (0, stats_lite_1.std)(historical);
+        const baselineMean = mean(historical);
+        const baselineStd = std(historical);
         if (baselineStd === 0)
             return anomalies; // Cannot detect anomalies without variance
         for (let i = 0; i < values.length; i++) {
@@ -215,7 +212,7 @@ class AnomalyDetector {
         const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
         const baseline = sumY / n;
         // Calculate threshold based on standard deviation
-        const stdDev = (0, stats_lite_1.std)(values);
+        const stdDev = std(values);
         const threshold = stdDev * 2; // 2 standard deviations
         return { slope, baseline, threshold };
     }
@@ -237,5 +234,4 @@ class AnomalyDetector {
         return this.historicalData.get(metricKey) || [];
     }
 }
-exports.AnomalyDetector = AnomalyDetector;
 //# sourceMappingURL=AnomalyDetector.js.map

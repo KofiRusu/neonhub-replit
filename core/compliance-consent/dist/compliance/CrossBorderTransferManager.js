@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CrossBorderTransferManager = void 0;
-const uuid_1 = require("uuid");
-class CrossBorderTransferManager {
+import { v4 as uuidv4 } from 'uuid';
+export class CrossBorderTransferManager {
     constructor() {
         this.transfers = new Map();
     }
     async initiateTransfer(sourceRegion, destinationRegion, dataClassification, legalBasis, safeguards) {
         const transfer = {
-            id: (0, uuid_1.v4)(),
+            id: uuidv4(),
             sourceRegion,
             destinationRegion,
             dataClassification,
@@ -147,5 +144,4 @@ class CrossBorderTransferManager {
         console.log(`[TRANSFER] Transfer ${transfer.id} ${action}${reasonText}`);
     }
 }
-exports.CrossBorderTransferManager = CrossBorderTransferManager;
 //# sourceMappingURL=CrossBorderTransferManager.js.map

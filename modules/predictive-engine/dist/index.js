@@ -1,69 +1,20 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FederationIntegration = exports.GeoDistributionManager = exports.WorkloadPatternAnalyzer = exports.UnifiedScalingAPI = exports.CostOptimizer = exports.GlobalRegionManager = exports.AzureIntegration = exports.GCPIntegration = exports.AWSIntegration = exports.BaselineLoader = exports.AdaptiveAgent = exports.KubernetesAutoscaler = exports.PredictiveEngine = exports.NeonHubPredictiveEngine = void 0;
-const PredictiveEngine_1 = require("./core/PredictiveEngine");
-Object.defineProperty(exports, "PredictiveEngine", { enumerable: true, get: function () { return PredictiveEngine_1.PredictiveEngine; } });
-const KubernetesAutoscaler_1 = require("./services/KubernetesAutoscaler");
-Object.defineProperty(exports, "KubernetesAutoscaler", { enumerable: true, get: function () { return KubernetesAutoscaler_1.KubernetesAutoscaler; } });
-const AdaptiveAgent_1 = require("./models/AdaptiveAgent");
-Object.defineProperty(exports, "AdaptiveAgent", { enumerable: true, get: function () { return AdaptiveAgent_1.AdaptiveAgent; } });
-const baselineLoader_1 = require("./utils/baselineLoader");
-Object.defineProperty(exports, "BaselineLoader", { enumerable: true, get: function () { return baselineLoader_1.BaselineLoader; } });
-const AWSIntegration_1 = require("./services/AWSIntegration");
-Object.defineProperty(exports, "AWSIntegration", { enumerable: true, get: function () { return AWSIntegration_1.AWSIntegration; } });
-const GCPIntegration_1 = require("./services/GCPIntegration");
-Object.defineProperty(exports, "GCPIntegration", { enumerable: true, get: function () { return GCPIntegration_1.GCPIntegration; } });
-const AzureIntegration_1 = require("./services/AzureIntegration");
-Object.defineProperty(exports, "AzureIntegration", { enumerable: true, get: function () { return AzureIntegration_1.AzureIntegration; } });
-const GlobalRegionManager_1 = require("./services/GlobalRegionManager");
-Object.defineProperty(exports, "GlobalRegionManager", { enumerable: true, get: function () { return GlobalRegionManager_1.GlobalRegionManager; } });
-const CostOptimizer_1 = require("./services/CostOptimizer");
-Object.defineProperty(exports, "CostOptimizer", { enumerable: true, get: function () { return CostOptimizer_1.CostOptimizer; } });
-const UnifiedScalingAPI_1 = require("./services/UnifiedScalingAPI");
-Object.defineProperty(exports, "UnifiedScalingAPI", { enumerable: true, get: function () { return UnifiedScalingAPI_1.UnifiedScalingAPI; } });
-const WorkloadPatternAnalyzer_1 = require("./services/WorkloadPatternAnalyzer");
-Object.defineProperty(exports, "WorkloadPatternAnalyzer", { enumerable: true, get: function () { return WorkloadPatternAnalyzer_1.WorkloadPatternAnalyzer; } });
-const GeoDistributionManager_1 = require("./services/GeoDistributionManager");
-Object.defineProperty(exports, "GeoDistributionManager", { enumerable: true, get: function () { return GeoDistributionManager_1.GeoDistributionManager; } });
-const FederationIntegration_1 = require("./services/FederationIntegration");
-Object.defineProperty(exports, "FederationIntegration", { enumerable: true, get: function () { return FederationIntegration_1.FederationIntegration; } });
-const dotenv = __importStar(require("dotenv"));
+import { PredictiveEngine } from './core/PredictiveEngine';
+import { KubernetesAutoscaler } from './services/KubernetesAutoscaler';
+import { AdaptiveAgent } from './models/AdaptiveAgent';
+import { BaselineLoader } from './utils/baselineLoader';
+import { AWSIntegration } from './services/AWSIntegration';
+import { GCPIntegration } from './services/GCPIntegration';
+import { AzureIntegration } from './services/AzureIntegration';
+import { GlobalRegionManager } from './services/GlobalRegionManager';
+import { CostOptimizer } from './services/CostOptimizer';
+import { UnifiedScalingAPI } from './services/UnifiedScalingAPI';
+import { WorkloadPatternAnalyzer } from './services/WorkloadPatternAnalyzer';
+import { GeoDistributionManager } from './services/GeoDistributionManager';
+import { FederationIntegration } from './services/FederationIntegration';
+import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
-class NeonHubPredictiveEngine {
+export class NeonHubPredictiveEngine {
     constructor() {
         this.isInitialized = false;
         const thresholds = {
@@ -74,18 +25,18 @@ class NeonHubPredictiveEngine {
             cpuUtilizationThreshold: parseFloat(process.env.CPU_UTILIZATION_THRESHOLD || '0.8'),
             memoryUtilizationThreshold: parseFloat(process.env.MEMORY_UTILIZATION_THRESHOLD || '0.85')
         };
-        this.predictiveEngine = new PredictiveEngine_1.PredictiveEngine(thresholds);
+        this.predictiveEngine = new PredictiveEngine(thresholds);
         const neonHubApiUrl = process.env.NEONHUB_API_URL || 'http://localhost:3001';
         const prometheusUrl = process.env.PROMETHEUS_URL || 'http://localhost:9090';
-        this.kubernetesAutoscaler = new KubernetesAutoscaler_1.KubernetesAutoscaler(neonHubApiUrl, prometheusUrl);
-        this.adaptiveAgent = new AdaptiveAgent_1.AdaptiveAgent();
+        this.kubernetesAutoscaler = new KubernetesAutoscaler(neonHubApiUrl, prometheusUrl);
+        this.adaptiveAgent = new AdaptiveAgent();
         // Initialize cloud integrations
-        this.globalRegionManager = new GlobalRegionManager_1.GlobalRegionManager();
-        this.costOptimizer = new CostOptimizer_1.CostOptimizer();
-        this.unifiedScalingAPI = new UnifiedScalingAPI_1.UnifiedScalingAPI(this.globalRegionManager, this.costOptimizer, this.predictiveEngine);
-        this.workloadPatternAnalyzer = new WorkloadPatternAnalyzer_1.WorkloadPatternAnalyzer();
-        this.geoDistributionManager = new GeoDistributionManager_1.GeoDistributionManager(this.globalRegionManager);
-        this.federationIntegration = new FederationIntegration_1.FederationIntegration(this.globalRegionManager);
+        this.globalRegionManager = new GlobalRegionManager();
+        this.costOptimizer = new CostOptimizer();
+        this.unifiedScalingAPI = new UnifiedScalingAPI(this.globalRegionManager, this.costOptimizer, this.predictiveEngine);
+        this.workloadPatternAnalyzer = new WorkloadPatternAnalyzer();
+        this.geoDistributionManager = new GeoDistributionManager(this.globalRegionManager);
+        this.federationIntegration = new FederationIntegration(this.globalRegionManager);
     }
     async initialize() {
         if (this.isInitialized)
@@ -100,11 +51,11 @@ class NeonHubPredictiveEngine {
             if (awsConfig || gcpConfig || azureConfig) {
                 await this.globalRegionManager.initializeCloudProviders(awsConfig, gcpConfig, azureConfig);
                 // Initialize cost optimizer with integrations
-                const awsIntegration = awsConfig ? new AWSIntegration_1.AWSIntegration(awsConfig.accessKeyId, awsConfig.secretAccessKey, awsConfig.region) : undefined;
-                const gcpIntegration = gcpConfig ? new GCPIntegration_1.GCPIntegration(gcpConfig.projectId, gcpConfig.serviceAccountKey, gcpConfig.region) : undefined;
-                const azureIntegration = azureConfig ? new AzureIntegration_1.AzureIntegration(azureConfig.subscriptionId, azureConfig.tenantId, azureConfig.clientId, azureConfig.clientSecret, azureConfig.region) : undefined;
-                this.costOptimizer = new CostOptimizer_1.CostOptimizer(awsIntegration, gcpIntegration, azureIntegration);
-                this.unifiedScalingAPI = new UnifiedScalingAPI_1.UnifiedScalingAPI(this.globalRegionManager, this.costOptimizer, this.predictiveEngine);
+                const awsIntegration = awsConfig ? new AWSIntegration(awsConfig.accessKeyId, awsConfig.secretAccessKey, awsConfig.region) : undefined;
+                const gcpIntegration = gcpConfig ? new GCPIntegration(gcpConfig.projectId, gcpConfig.serviceAccountKey, gcpConfig.region) : undefined;
+                const azureIntegration = azureConfig ? new AzureIntegration(azureConfig.subscriptionId, azureConfig.tenantId, azureConfig.clientId, azureConfig.clientSecret, azureConfig.region) : undefined;
+                this.costOptimizer = new CostOptimizer(awsIntegration, gcpIntegration, azureIntegration);
+                this.unifiedScalingAPI = new UnifiedScalingAPI(this.globalRegionManager, this.costOptimizer, this.predictiveEngine);
             }
             this.isInitialized = true;
             console.log('NeonHub Predictive Engine v3.2 with Cloud Integrations initialized successfully');
@@ -193,10 +144,10 @@ class NeonHubPredictiveEngine {
     }
     // Utility methods for external integration
     static async loadBaselineMetrics() {
-        return await baselineLoader_1.BaselineLoader.loadV31Baseline();
+        return await BaselineLoader.loadV31Baseline();
     }
     static async validateMetrics(metrics) {
-        return baselineLoader_1.BaselineLoader.validateBaseline(metrics);
+        return BaselineLoader.validateBaseline(metrics);
     }
     getAWSConfig() {
         const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
@@ -228,7 +179,8 @@ class NeonHubPredictiveEngine {
         return undefined;
     }
 }
-exports.NeonHubPredictiveEngine = NeonHubPredictiveEngine;
+// Export individual components for advanced usage
+export { PredictiveEngine, KubernetesAutoscaler, AdaptiveAgent, BaselineLoader, AWSIntegration, GCPIntegration, AzureIntegration, GlobalRegionManager, CostOptimizer, UnifiedScalingAPI, WorkloadPatternAnalyzer, GeoDistributionManager, FederationIntegration };
 // Default export for easy importing
-exports.default = NeonHubPredictiveEngine;
+export default NeonHubPredictiveEngine;
 //# sourceMappingURL=index.js.map

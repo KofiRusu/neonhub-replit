@@ -1,28 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalOrchestratorManager = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-const NodeDiscoveryService_1 = require("../services/NodeDiscoveryService");
-const HealthMonitoringService_1 = require("../services/HealthMonitoringService");
-const IntelligentRoutingService_1 = require("../services/IntelligentRoutingService");
-const AutoScalingService_1 = require("../services/AutoScalingService");
-const FailoverService_1 = require("../services/FailoverService");
-const ConfigurationManager_1 = require("../services/ConfigurationManager");
-class GlobalOrchestratorManager extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { ConsoleLogger, GlobalOrchestratorError, GlobalOrchestratorErrorCode, GlobalCapability } from '../types';
+import { NodeDiscoveryService } from '../services/NodeDiscoveryService';
+import { HealthMonitoringService } from '../services/HealthMonitoringService';
+import { IntelligentRoutingService } from '../services/IntelligentRoutingService';
+import { AutoScalingService } from '../services/AutoScalingService';
+import { FailoverService } from '../services/FailoverService';
+import { ConfigurationManager } from '../services/ConfigurationManager';
+export class GlobalOrchestratorManager extends EventEmitter {
     constructor(config) {
         super();
         this.isRunning = false;
         this.startTime = 0;
         this.config = config;
-        this.logger = config.logger || new types_1.ConsoleLogger();
+        this.logger = config.logger || new ConsoleLogger();
         // Initialize services
-        this.discoveryService = new NodeDiscoveryService_1.NodeDiscoveryService(this.config.discovery, this.logger);
-        this.healthService = new HealthMonitoringService_1.HealthMonitoringService(this.config.healthMonitoring, this.logger);
-        this.routingService = new IntelligentRoutingService_1.IntelligentRoutingService(this.config.routing, this.logger);
-        this.scalingService = new AutoScalingService_1.AutoScalingService(this.config.scaling, this.logger);
-        this.failoverService = new FailoverService_1.FailoverService(this.config.failover, this.logger);
-        this.configManager = new ConfigurationManager_1.ConfigurationManager('./config/orchestrator-config.json', this.logger);
+        this.discoveryService = new NodeDiscoveryService(this.config.discovery, this.logger);
+        this.healthService = new HealthMonitoringService(this.config.healthMonitoring, this.logger);
+        this.routingService = new IntelligentRoutingService(this.config.routing, this.logger);
+        this.scalingService = new AutoScalingService(this.config.scaling, this.logger);
+        this.failoverService = new FailoverService(this.config.failover, this.logger);
+        this.configManager = new ConfigurationManager('./config/orchestrator-config.json', this.logger);
         // Initialize topology
         this.globalTopology = {
             federations: [],
@@ -57,7 +54,7 @@ class GlobalOrchestratorManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to start Global Orchestrator Manager', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to start orchestrator manager', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to start orchestrator manager', undefined, undefined, { originalError: error.message });
         }
     }
     async stop() {
@@ -91,7 +88,7 @@ class GlobalOrchestratorManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to route message', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.ROUTING_FAILED, 'Failed to route message', undefined, undefined, { messageId: message.id, originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.ROUTING_FAILED, 'Failed to route message', undefined, undefined, { messageId: message.id, originalError: error.message });
         }
     }
     async handleNodeFailure(nodeId, reason) {
@@ -217,7 +214,7 @@ class GlobalOrchestratorManager extends events_1.EventEmitter {
             federations: Array.from(federations.entries()).map(([federationId, nodes]) => ({
                 federationId,
                 nodes,
-                leaderNodeId: nodes.find(n => n.capabilities.includes(types_1.GlobalCapability.FEDERATION_COORDINATION))?.nodeId,
+                leaderNodeId: nodes.find(n => n.capabilities.includes(GlobalCapability.FEDERATION_COORDINATION))?.nodeId,
                 lastSync: Date.now(),
                 capabilities: nodes.flatMap(n => n.capabilities),
                 status: 'active' // Would be determined by federation state
@@ -284,5 +281,4 @@ class GlobalOrchestratorManager extends events_1.EventEmitter {
         }
     }
 }
-exports.GlobalOrchestratorManager = GlobalOrchestratorManager;
 //# sourceMappingURL=GlobalOrchestratorManager.js.map

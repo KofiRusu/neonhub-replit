@@ -1,46 +1,10 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GRPCClient = void 0;
-const grpc = __importStar(require("@grpc/grpc-js"));
-const protoLoader = __importStar(require("@grpc/proto-loader"));
-const path = __importStar(require("path"));
-const events_1 = require("events");
-const fs = __importStar(require("fs"));
-const types_1 = require("../types");
-class GRPCClient extends events_1.EventEmitter {
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import * as path from 'path';
+import { EventEmitter } from 'events';
+import * as fs from 'fs';
+import { FederationError, FederationErrorCode } from '../types';
+export class GRPCClient extends EventEmitter {
     constructor(nodeId, config, logger) {
         super();
         this.client = null;
@@ -69,7 +33,7 @@ class GRPCClient extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error('Failed to connect gRPC client', error);
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     createClientCredentials() {
@@ -140,7 +104,7 @@ message StreamRequest {
     async sendMessage(message) {
         return new Promise((resolve, reject) => {
             if (!this.client) {
-                reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
+                reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
                 return;
             }
             const request = {
@@ -156,7 +120,7 @@ message StreamRequest {
             this.client.SendMessage(request, (error, response) => {
                 if (error) {
                     this.logger.error('Error sending message via gRPC', error);
-                    reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, error.message));
+                    reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message));
                     return;
                 }
                 resolve(response.success);
@@ -166,13 +130,13 @@ message StreamRequest {
     async getNodeInfo(nodeId) {
         return new Promise((resolve, reject) => {
             if (!this.client) {
-                reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
+                reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
                 return;
             }
             this.client.GetNodeInfo({ node_id: nodeId }, (error, response) => {
                 if (error) {
                     this.logger.error('Error getting node info via gRPC', error);
-                    reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, error.message));
+                    reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message));
                     return;
                 }
                 resolve(response);
@@ -182,13 +146,13 @@ message StreamRequest {
     async healthCheck() {
         return new Promise((resolve, reject) => {
             if (!this.client) {
-                reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
+                reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Client not connected'));
                 return;
             }
             this.client.HealthCheck({}, (error, response) => {
                 if (error) {
                     this.logger.error('Error performing health check via gRPC', error);
-                    reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, error.message));
+                    reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, error.message));
                     return;
                 }
                 resolve(response);
@@ -203,5 +167,4 @@ message StreamRequest {
         this.logger.info('gRPC client disconnected');
     }
 }
-exports.GRPCClient = GRPCClient;
 //# sourceMappingURL=GRPCClient.js.map

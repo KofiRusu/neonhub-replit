@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.HealthChecker = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-const GRPCClient_1 = require("../grpc/GRPCClient");
-class HealthChecker extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { FederationError, FederationErrorCode } from '../types';
+import { GRPCClient } from '../grpc/GRPCClient';
+export class HealthChecker extends EventEmitter {
     constructor(config, logger) {
         super();
         this.healthStatuses = new Map();
@@ -36,7 +33,7 @@ class HealthChecker extends events_1.EventEmitter {
         };
         this.healthStatuses.set(nodeInfo.nodeId, status);
         // Create gRPC client for health checks
-        const grpcClient = new GRPCClient_1.GRPCClient(nodeInfo.nodeId, {
+        const grpcClient = new GRPCClient(nodeInfo.nodeId, {
             host: nodeInfo.address,
             port: 9090, // Default gRPC port
             tls: { enabled: false } // Would be configured based on node settings
@@ -97,7 +94,7 @@ class HealthChecker extends events_1.EventEmitter {
         }
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
-            throw new types_1.FederationError(types_1.FederationErrorCode.HEALTH_CHECK_FAILED, message);
+            throw new FederationError(FederationErrorCode.HEALTH_CHECK_FAILED, message);
         }
     }
     handleUnhealthyNode(nodeId, status, error) {
@@ -155,5 +152,4 @@ class HealthChecker extends events_1.EventEmitter {
         };
     }
 }
-exports.HealthChecker = HealthChecker;
 //# sourceMappingURL=HealthChecker.js.map

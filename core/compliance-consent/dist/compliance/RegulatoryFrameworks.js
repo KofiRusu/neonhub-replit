@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegulatoryFrameworks = void 0;
-const types_1 = require("../types");
-class RegulatoryFrameworks {
+import { RegulationType } from '../types';
+export class RegulatoryFrameworks {
     static initialize() {
-        this.frameworks.set(types_1.RegulationType.GDPR, {
-            type: types_1.RegulationType.GDPR,
+        this.frameworks.set(RegulationType.GDPR, {
+            type: RegulationType.GDPR,
             version: '2018',
             requirements: [
                 'lawful_basis_processing',
@@ -48,8 +45,8 @@ class RegulatoryFrameworks {
                 }
             }
         });
-        this.frameworks.set(types_1.RegulationType.CCPA, {
-            type: types_1.RegulationType.CCPA,
+        this.frameworks.set(RegulationType.CCPA, {
+            type: RegulationType.CCPA,
             version: '2020',
             requirements: [
                 'notice_at_collection',
@@ -79,8 +76,8 @@ class RegulatoryFrameworks {
                 }
             }
         });
-        this.frameworks.set(types_1.RegulationType.HIPAA, {
-            type: types_1.RegulationType.HIPAA,
+        this.frameworks.set(RegulationType.HIPAA, {
+            type: RegulationType.HIPAA,
             version: '1996',
             requirements: [
                 'privacy_rule',
@@ -196,7 +193,6 @@ class RegulatoryFrameworks {
         return true;
     }
 }
-exports.RegulatoryFrameworks = RegulatoryFrameworks;
 RegulatoryFrameworks.frameworks = new Map();
 // Initialize frameworks on module load
 RegulatoryFrameworks.initialize();

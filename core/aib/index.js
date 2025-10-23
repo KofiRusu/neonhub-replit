@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AIB = exports.AgentIntelligenceBus = void 0;
-const events_1 = require("events");
+import { EventEmitter } from 'events';
 // Simple logger implementation
 const logger = {
     info: (message, meta) => console.log(`[AIB INFO] ${message}`, meta || ''),
@@ -9,7 +6,7 @@ const logger = {
     error: (message, meta) => console.error(`[AIB ERROR] ${message}`, meta || ''),
     warn: (message, meta) => console.warn(`[AIB WARN] ${message}`, meta || '')
 };
-class AgentIntelligenceBus extends events_1.EventEmitter {
+export class AgentIntelligenceBus extends EventEmitter {
     constructor() {
         super();
         this.agents = new Map();
@@ -101,6 +98,5 @@ class AgentIntelligenceBus extends events_1.EventEmitter {
         return this.agents.get(agentId);
     }
 }
-exports.AgentIntelligenceBus = AgentIntelligenceBus;
-exports.AIB = AgentIntelligenceBus;
+export { AgentIntelligenceBus as AIB };
 //# sourceMappingURL=index.js.map

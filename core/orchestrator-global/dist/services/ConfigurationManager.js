@@ -1,44 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfigurationManager = void 0;
-const events_1 = require("events");
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
-const types_1 = require("../types");
-class ConfigurationManager extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import * as fs from 'fs';
+import * as path from 'path';
+import { GlobalOrchestratorError, GlobalOrchestratorErrorCode, RoutingAlgorithm, LoadBalancingStrategy } from '../types';
+export class ConfigurationManager extends EventEmitter {
     constructor(configFilePath, logger) {
         super();
         this.configWatchers = new Map();
@@ -66,8 +30,8 @@ class ConfigurationManager extends events_1.EventEmitter {
                 metricsCollectionInterval: 30000 // 30 seconds
             },
             routing: {
-                algorithm: types_1.RoutingAlgorithm.ADAPTIVE,
-                loadBalancingStrategy: types_1.LoadBalancingStrategy.WEIGHTED,
+                algorithm: RoutingAlgorithm.ADAPTIVE,
+                loadBalancingStrategy: LoadBalancingStrategy.WEIGHTED,
                 geoRoutingEnabled: true,
                 latencyThreshold: 100, // ms
                 capacityThreshold: 80, // percent
@@ -114,7 +78,7 @@ class ConfigurationManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to initialize configuration manager', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to initialize configuration manager', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to initialize configuration manager', undefined, undefined, { originalError: error.message });
         }
     }
     async loadConfiguration() {
@@ -149,7 +113,7 @@ class ConfigurationManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to save configuration', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to save configuration', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to save configuration', undefined, undefined, { originalError: error.message });
         }
     }
     setupConfigWatching() {
@@ -187,7 +151,7 @@ class ConfigurationManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to update configuration', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to update configuration', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to update configuration', undefined, undefined, { originalError: error.message });
         }
     }
     async validateConfigUpdates(updates) {
@@ -235,7 +199,7 @@ class ConfigurationManager extends events_1.EventEmitter {
         }
         catch (error) {
             this.logger.error('Failed to reset configuration', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to reset configuration', undefined, undefined, { originalError: error.message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.CONFIGURATION_ERROR, 'Failed to reset configuration', undefined, undefined, { originalError: error.message });
         }
     }
     getConfigValue(path) {
@@ -280,5 +244,4 @@ class ConfigurationManager extends events_1.EventEmitter {
         this.logger.info('Configuration manager destroyed');
     }
 }
-exports.ConfigurationManager = ConfigurationManager;
 //# sourceMappingURL=ConfigurationManager.js.map

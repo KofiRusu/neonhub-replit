@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LegalComplianceManager = void 0;
-const events_1 = require("events");
-const uuid_1 = require("uuid");
-const index_js_1 = require("../types/index.js");
-class LegalComplianceManager extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { v4 as uuidv4 } from 'uuid';
+import { ComplianceStatus, LegalSeverity, SubjectType, GovernanceError, ComplianceError } from '../types/index.js';
+export class LegalComplianceManager extends EventEmitter {
     constructor(config, auditLogger) {
         super();
         this.requirements = new Map();
@@ -24,35 +21,35 @@ class LegalComplianceManager extends events_1.EventEmitter {
                     description: 'Lawful basis for processing personal data',
                     category: 'data-processing',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'gdpr-data-minimization',
                     description: 'Data minimization principle',
                     category: 'data-protection',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'gdpr-purpose-limitation',
                     description: 'Purpose limitation principle',
                     category: 'data-processing',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'gdpr-storage-limitation',
                     description: 'Storage limitation principle',
                     category: 'data-retention',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'gdpr-data-subject-rights',
                     description: 'Data subject rights implementation',
                     category: 'rights-management',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 }
             ]);
         }
@@ -64,21 +61,21 @@ class LegalComplianceManager extends events_1.EventEmitter {
                     description: 'Privacy notice requirements',
                     category: 'transparency',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'ccpa-do-not-sell',
                     description: 'Do Not Sell mechanism',
                     category: 'consent-management',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'ccpa-data-subject-rights',
                     description: 'Consumer rights implementation',
                     category: 'rights-management',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 }
             ]);
         }
@@ -90,14 +87,14 @@ class LegalComplianceManager extends events_1.EventEmitter {
                     description: 'Privacy Rule compliance',
                     category: 'health-data',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 },
                 {
                     id: 'hipaa-security-rule',
                     description: 'Security Rule compliance',
                     category: 'data-security',
                     mandatory: true,
-                    status: index_js_1.ComplianceStatus.UNKNOWN
+                    status: ComplianceStatus.UNKNOWN
                 }
             ]);
         }
@@ -108,7 +105,7 @@ class LegalComplianceManager extends events_1.EventEmitter {
     async checkCompliance(jurisdiction, framework) {
         try {
             const check = {
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 jurisdiction,
                 framework: framework || this.config.frameworks[0],
@@ -123,7 +120,7 @@ class LegalComplianceManager extends events_1.EventEmitter {
                 const evaluatedRequirement = await this.evaluateRequirement(requirement, jurisdiction);
                 check.requirements.push(evaluatedRequirement);
                 // Check for violations
-                if (evaluatedRequirement.status === index_js_1.ComplianceStatus.NON_COMPLIANT) {
+                if (evaluatedRequirement.status === ComplianceStatus.NON_COMPLIANT) {
                     check.violations.push({
                         requirementId: requirement.id,
                         description: `Non-compliant: ${requirement.description}`,
@@ -133,18 +130,18 @@ class LegalComplianceManager extends events_1.EventEmitter {
                 }
             }
             // Calculate overall compliance percentage
-            const compliantCount = check.requirements.filter(r => r.status === index_js_1.ComplianceStatus.COMPLIANT).length;
+            const compliantCount = check.requirements.filter(r => r.status === ComplianceStatus.COMPLIANT).length;
             check.compliance = (compliantCount / check.requirements.length) * 100;
             // Emit compliance check event
             this.emit('complianceChecked', check);
             // Log compliance check
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
                     action: 'compliance_check',
                     subject: {
-                        type: index_js_1.SubjectType.SYSTEM,
+                        type: SubjectType.SYSTEM,
                         id: 'legal-compliance-manager',
                         attributes: { jurisdiction, framework: check.framework }
                     },
@@ -159,7 +156,7 @@ class LegalComplianceManager extends events_1.EventEmitter {
             return check;
         }
         catch (error) {
-            throw new index_js_1.ComplianceError(`Compliance check failed: ${error.message}`, jurisdiction);
+            throw new ComplianceError(`Compliance check failed: ${error.message}`, jurisdiction);
         }
     }
     /**
@@ -196,11 +193,11 @@ class LegalComplianceManager extends events_1.EventEmitter {
                     evaluated.status = await this.checkDataSecurityCompliance(requirement, jurisdiction);
                     break;
                 default:
-                    evaluated.status = index_js_1.ComplianceStatus.UNKNOWN;
+                    evaluated.status = ComplianceStatus.UNKNOWN;
             }
         }
         catch (error) {
-            evaluated.status = index_js_1.ComplianceStatus.UNKNOWN;
+            evaluated.status = ComplianceStatus.UNKNOWN;
             console.warn(`Failed to evaluate requirement ${requirement.id}: ${error.message}`);
         }
         return evaluated;
@@ -211,65 +208,65 @@ class LegalComplianceManager extends events_1.EventEmitter {
     async checkDataProcessingCompliance(requirement, jurisdiction) {
         // Mock implementation - would check actual data processing practices
         // against legal requirements
-        return index_js_1.ComplianceStatus.COMPLIANT; // Assume compliant for demo
+        return ComplianceStatus.COMPLIANT; // Assume compliant for demo
     }
     /**
      * Check data protection compliance
      */
     async checkDataProtectionCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check data retention compliance
      */
     async checkDataRetentionCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check rights management compliance
      */
     async checkRightsManagementCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check transparency compliance
      */
     async checkTransparencyCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check consent management compliance
      */
     async checkConsentManagementCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check health data compliance
      */
     async checkHealthDataCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Check data security compliance
      */
     async checkDataSecurityCompliance(requirement, jurisdiction) {
         // Mock implementation
-        return index_js_1.ComplianceStatus.COMPLIANT;
+        return ComplianceStatus.COMPLIANT;
     }
     /**
      * Determine violation severity
      */
     determineViolationSeverity(requirement) {
         if (requirement.mandatory) {
-            return index_js_1.LegalSeverity.REGULATORY;
+            return LegalSeverity.REGULATORY;
         }
-        return index_js_1.LegalSeverity.CIVIL;
+        return LegalSeverity.CIVIL;
     }
     /**
      * Get remediation steps for a requirement
@@ -295,11 +292,11 @@ class LegalComplianceManager extends events_1.EventEmitter {
     async updateRequirementStatus(framework, requirementId, status) {
         const frameworkRequirements = this.requirements.get(framework);
         if (!frameworkRequirements) {
-            throw new index_js_1.GovernanceError(`Framework ${framework} not found`, 'FRAMEWORK_NOT_FOUND');
+            throw new GovernanceError(`Framework ${framework} not found`, 'FRAMEWORK_NOT_FOUND');
         }
         const requirement = frameworkRequirements.find(r => r.id === requirementId);
         if (!requirement) {
-            throw new index_js_1.GovernanceError(`Requirement ${requirementId} not found in framework ${framework}`, 'REQUIREMENT_NOT_FOUND');
+            throw new GovernanceError(`Requirement ${requirementId} not found in framework ${framework}`, 'REQUIREMENT_NOT_FOUND');
         }
         requirement.status = status;
         // Emit status update event
@@ -307,11 +304,11 @@ class LegalComplianceManager extends events_1.EventEmitter {
         // Log status update
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
                 action: 'compliance_update',
                 subject: {
-                    type: index_js_1.SubjectType.SYSTEM,
+                    type: SubjectType.SYSTEM,
                     id: 'legal-compliance-manager',
                     attributes: { framework, requirementId }
                 },
@@ -339,5 +336,4 @@ class LegalComplianceManager extends events_1.EventEmitter {
         return check.compliance >= 80; // 80% compliance threshold
     }
 }
-exports.LegalComplianceManager = LegalComplianceManager;
 //# sourceMappingURL=LegalComplianceManager.js.map

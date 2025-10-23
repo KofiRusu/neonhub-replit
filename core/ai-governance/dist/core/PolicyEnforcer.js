@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PolicyEnforcer = void 0;
-const events_1 = require("events");
-const uuid_1 = require("uuid");
-const index_js_1 = require("../types/index.js");
-class PolicyEnforcer extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { v4 as uuidv4 } from 'uuid';
+import { AuditAction, AuditResult, SubjectType, GovernanceError } from '../types/index.js';
+export class PolicyEnforcer extends EventEmitter {
     constructor(policyEngine, ethicalFramework, legalComplianceManager, auditLogger) {
         super();
         this.policyEngine = policyEngine;
@@ -58,11 +55,11 @@ class PolicyEnforcer extends events_1.EventEmitter {
             // Log enforcement result
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
-                    action: index_js_1.AuditAction.POLICY_EVALUATION,
+                    action: AuditAction.POLICY_EVALUATION,
                     subject,
-                    result: enforcementResult.allowed ? index_js_1.AuditResult.ALLOWED : index_js_1.AuditResult.DENIED,
+                    result: enforcementResult.allowed ? AuditResult.ALLOWED : AuditResult.DENIED,
                     details: {
                         action,
                         reason: enforcementResult.reason,
@@ -85,15 +82,15 @@ class PolicyEnforcer extends events_1.EventEmitter {
             // Log enforcement error
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: (0, uuid_1.v4)(),
+                    id: uuidv4(),
                     timestamp: new Date(),
-                    action: index_js_1.AuditAction.POLICY_EVALUATION,
+                    action: AuditAction.POLICY_EVALUATION,
                     subject,
-                    result: index_js_1.AuditResult.ERROR,
+                    result: AuditResult.ERROR,
                     details: { error: error.message, action, context }
                 });
             }
-            throw new index_js_1.GovernanceError(`Policy enforcement failed: ${error.message}`, 'ENFORCEMENT_ERROR');
+            throw new GovernanceError(`Policy enforcement failed: ${error.message}`, 'ENFORCEMENT_ERROR');
         }
     }
     /**
@@ -124,15 +121,15 @@ class PolicyEnforcer extends events_1.EventEmitter {
      */
     determineEnforcementAction(subject, context) {
         // High-risk subjects get blocked
-        if (subject.type === index_js_1.SubjectType.MODEL && context?.highRisk) {
+        if (subject.type === SubjectType.MODEL && context?.highRisk) {
             return 'block';
         }
         // Data-related actions might be quarantined
-        if (subject.type === index_js_1.SubjectType.DATASET && context?.sensitive) {
+        if (subject.type === SubjectType.DATASET && context?.sensitive) {
             return 'quarantine';
         }
         // User actions typically get alerts
-        if (subject.type === index_js_1.SubjectType.USER) {
+        if (subject.type === SubjectType.USER) {
             return 'alert';
         }
         // Default to logging
@@ -153,11 +150,11 @@ class PolicyEnforcer extends events_1.EventEmitter {
         // Log blocking action
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
-                action: index_js_1.AuditAction.POLICY_EVALUATION,
+                action: AuditAction.POLICY_EVALUATION,
                 subject,
-                result: index_js_1.AuditResult.DENIED,
+                result: AuditResult.DENIED,
                 details: { enforcementAction: 'block', action, context }
             });
         }
@@ -177,11 +174,11 @@ class PolicyEnforcer extends events_1.EventEmitter {
         // Log quarantine action
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
-                action: index_js_1.AuditAction.POLICY_EVALUATION,
+                action: AuditAction.POLICY_EVALUATION,
                 subject,
-                result: index_js_1.AuditResult.DENIED,
+                result: AuditResult.DENIED,
                 details: { enforcementAction: 'quarantine', action, context }
             });
         }
@@ -202,11 +199,11 @@ class PolicyEnforcer extends events_1.EventEmitter {
         // Log alert action
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
-                action: index_js_1.AuditAction.POLICY_EVALUATION,
+                action: AuditAction.POLICY_EVALUATION,
                 subject,
-                result: index_js_1.AuditResult.WARNING,
+                result: AuditResult.WARNING,
                 details: { enforcementAction: 'alert', action, context }
             });
         }
@@ -226,11 +223,11 @@ class PolicyEnforcer extends events_1.EventEmitter {
         // Log logging action (meta-logging)
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: (0, uuid_1.v4)(),
+                id: uuidv4(),
                 timestamp: new Date(),
-                action: index_js_1.AuditAction.POLICY_EVALUATION,
+                action: AuditAction.POLICY_EVALUATION,
                 subject,
-                result: index_js_1.AuditResult.ALLOWED, // Logging doesn't prevent action
+                result: AuditResult.ALLOWED, // Logging doesn't prevent action
                 details: { enforcementAction: 'log', action, context }
             });
         }
@@ -244,7 +241,7 @@ class PolicyEnforcer extends events_1.EventEmitter {
             return true;
         }
         // Administrative override
-        if (subject.type === index_js_1.SubjectType.USER && subject.attributes.role === 'admin') {
+        if (subject.type === SubjectType.USER && subject.attributes.role === 'admin') {
             return context?.adminOverride === true;
         }
         return false;
@@ -280,5 +277,4 @@ class PolicyEnforcer extends events_1.EventEmitter {
         }
     }
 }
-exports.PolicyEnforcer = PolicyEnforcer;
 //# sourceMappingURL=PolicyEnforcer.js.map

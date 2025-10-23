@@ -20,6 +20,11 @@ jobs:
         submodules: recursive
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Sync & init submodules
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --recursive
+
     - name: Verify submodules
       run: |
         git submodule sync --recursive
@@ -73,6 +78,11 @@ jobs:
         submodules: recursive
         token: ${{ secrets.GITHUB_TOKEN }}
     
+    - name: Sync & init submodules
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --recursive
+    
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -102,6 +112,11 @@ jobs:
       with:
         submodules: recursive
         token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Sync & init submodules
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --recursive
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master

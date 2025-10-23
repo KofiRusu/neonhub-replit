@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RedisLogger = exports.ConsoleLogger = void 0;
-class ConsoleLogger {
+export class ConsoleLogger {
     constructor(prefix = '[GlobalOrchestrator]') {
         this.prefix = prefix;
     }
@@ -20,8 +17,7 @@ class ConsoleLogger {
         }
     }
 }
-exports.ConsoleLogger = ConsoleLogger;
-class RedisLogger {
+export class RedisLogger {
     constructor(redisClient, keyPrefix = 'orchestrator:logs') {
         this.redis = redisClient;
         this.keyPrefix = keyPrefix;
@@ -68,5 +64,4 @@ class RedisLogger {
         }
     }
 }
-exports.RedisLogger = RedisLogger;
 //# sourceMappingURL=Logger.js.map

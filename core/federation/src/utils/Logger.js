@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConsoleLogger = void 0;
-class ConsoleLogger {
+export class ConsoleLogger {
     info(message, meta) {
         console.log(`[INFO] ${message}`, meta ? JSON.stringify(meta) : '');
     }
@@ -15,5 +12,4 @@ class ConsoleLogger {
         console.debug(`[DEBUG] ${message}`, meta ? JSON.stringify(meta) : '');
     }
 }
-exports.ConsoleLogger = ConsoleLogger;
 //# sourceMappingURL=Logger.js.map

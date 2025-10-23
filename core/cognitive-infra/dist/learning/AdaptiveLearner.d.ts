@@ -21,7 +21,7 @@ export declare class AdaptiveLearner {
     private getRecentLosses;
     predict(input: any): number[];
     getCognitiveState(): CognitiveState;
-    getCognitiveStateObservable(): import("rxjs").Observable<CognitiveState | null>;
+    getCognitiveStateObservable(): any;
     getLearningMetrics(): {
         networkComplexity: number;
         topologyChanges: number;

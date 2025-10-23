@@ -1,77 +1,36 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FederatedGovernanceIntegration = exports.ModelEvaluator = exports.IntelligenceAggregator = exports.ModelCompression = exports.AIXProtocolManager = exports.HealthChecker = exports.LoadBalancingStrategy = exports.LoadBalancer = exports.ConnectionPool = exports.ConsoleLogger = exports.KeyManager = exports.SecureMultiPartyComputation = exports.HomomorphicEncryption = exports.PrivacyBudgetManager = exports.DifferentialPrivacy = exports.ParticipantManager = exports.ModelValidation = exports.SecureAggregation = exports.FederatedLearningCoordinator = exports.AuthManager = exports.GRPCClient = exports.GRPCServer = exports.WebSocketClient = exports.WebSocketServer = exports.FederationManager = void 0;
 // Main exports
-var FederationManager_1 = require("./FederationManager");
-Object.defineProperty(exports, "FederationManager", { enumerable: true, get: function () { return FederationManager_1.FederationManager; } });
+export { FederationManager } from './FederationManager';
 // Types and interfaces
-__exportStar(require("./types"), exports);
+export * from './types';
 // WebSocket components
-var WebSocketServer_1 = require("./websocket/WebSocketServer");
-Object.defineProperty(exports, "WebSocketServer", { enumerable: true, get: function () { return WebSocketServer_1.WebSocketServer; } });
-var WebSocketClient_1 = require("./websocket/WebSocketClient");
-Object.defineProperty(exports, "WebSocketClient", { enumerable: true, get: function () { return WebSocketClient_1.WebSocketClient; } });
+export { WebSocketServer } from './websocket/WebSocketServer';
+export { WebSocketClient } from './websocket/WebSocketClient';
 // gRPC components
-var GRPCServer_1 = require("./grpc/GRPCServer");
-Object.defineProperty(exports, "GRPCServer", { enumerable: true, get: function () { return GRPCServer_1.GRPCServer; } });
-var GRPCClient_1 = require("./grpc/GRPCClient");
-Object.defineProperty(exports, "GRPCClient", { enumerable: true, get: function () { return GRPCClient_1.GRPCClient; } });
+export { GRPCServer } from './grpc/GRPCServer';
+export { GRPCClient } from './grpc/GRPCClient';
 // Authentication
-var AuthManager_1 = require("./auth/AuthManager");
-Object.defineProperty(exports, "AuthManager", { enumerable: true, get: function () { return AuthManager_1.AuthManager; } });
+export { AuthManager } from './auth/AuthManager';
 // Federated Learning components
-var FederatedLearningCoordinator_1 = require("./federated-learning/FederatedLearningCoordinator");
-Object.defineProperty(exports, "FederatedLearningCoordinator", { enumerable: true, get: function () { return FederatedLearningCoordinator_1.FederatedLearningCoordinator; } });
-var SecureAggregation_1 = require("./federated-learning/SecureAggregation");
-Object.defineProperty(exports, "SecureAggregation", { enumerable: true, get: function () { return SecureAggregation_1.SecureAggregation; } });
-var ModelValidation_1 = require("./federated-learning/ModelValidation");
-Object.defineProperty(exports, "ModelValidation", { enumerable: true, get: function () { return ModelValidation_1.ModelValidation; } });
-var ParticipantManager_1 = require("./federated-learning/ParticipantManager");
-Object.defineProperty(exports, "ParticipantManager", { enumerable: true, get: function () { return ParticipantManager_1.ParticipantManager; } });
+export { FederatedLearningCoordinator } from './federated-learning/FederatedLearningCoordinator';
+export { SecureAggregation } from './federated-learning/SecureAggregation';
+export { ModelValidation } from './federated-learning/ModelValidation';
+export { ParticipantManager } from './federated-learning/ParticipantManager';
 // Privacy components
-var DifferentialPrivacy_1 = require("./privacy/DifferentialPrivacy");
-Object.defineProperty(exports, "DifferentialPrivacy", { enumerable: true, get: function () { return DifferentialPrivacy_1.DifferentialPrivacy; } });
-var PrivacyBudgetManager_1 = require("./privacy/PrivacyBudgetManager");
-Object.defineProperty(exports, "PrivacyBudgetManager", { enumerable: true, get: function () { return PrivacyBudgetManager_1.PrivacyBudgetManager; } });
+export { DifferentialPrivacy } from './privacy/DifferentialPrivacy';
+export { PrivacyBudgetManager } from './privacy/PrivacyBudgetManager';
 // Cryptographic components
-var HomomorphicEncryption_1 = require("./crypto/HomomorphicEncryption");
-Object.defineProperty(exports, "HomomorphicEncryption", { enumerable: true, get: function () { return HomomorphicEncryption_1.HomomorphicEncryption; } });
-var SecureMultiPartyComputation_1 = require("./crypto/SecureMultiPartyComputation");
-Object.defineProperty(exports, "SecureMultiPartyComputation", { enumerable: true, get: function () { return SecureMultiPartyComputation_1.SecureMultiPartyComputation; } });
-var KeyManager_1 = require("./crypto/KeyManager");
-Object.defineProperty(exports, "KeyManager", { enumerable: true, get: function () { return KeyManager_1.KeyManager; } });
-var Logger_1 = require("./utils/Logger");
-Object.defineProperty(exports, "ConsoleLogger", { enumerable: true, get: function () { return Logger_1.ConsoleLogger; } });
-var ConnectionPool_1 = require("./utils/ConnectionPool");
-Object.defineProperty(exports, "ConnectionPool", { enumerable: true, get: function () { return ConnectionPool_1.ConnectionPool; } });
-var LoadBalancer_1 = require("./utils/LoadBalancer");
-Object.defineProperty(exports, "LoadBalancer", { enumerable: true, get: function () { return LoadBalancer_1.LoadBalancer; } });
-Object.defineProperty(exports, "LoadBalancingStrategy", { enumerable: true, get: function () { return LoadBalancer_1.LoadBalancingStrategy; } });
-var HealthChecker_1 = require("./utils/HealthChecker");
-Object.defineProperty(exports, "HealthChecker", { enumerable: true, get: function () { return HealthChecker_1.HealthChecker; } });
+export { HomomorphicEncryption } from './crypto/HomomorphicEncryption';
+export { SecureMultiPartyComputation } from './crypto/SecureMultiPartyComputation';
+export { KeyManager } from './crypto/KeyManager';
+export { ConsoleLogger } from './utils/Logger';
+export { ConnectionPool } from './utils/ConnectionPool';
+export { LoadBalancer, LoadBalancingStrategy } from './utils/LoadBalancer';
+export { HealthChecker } from './utils/HealthChecker';
 // AI Intelligence Exchange (AIX) components
-var AIXProtocolManager_1 = require("./aix/AIXProtocolManager");
-Object.defineProperty(exports, "AIXProtocolManager", { enumerable: true, get: function () { return AIXProtocolManager_1.AIXProtocolManager; } });
-var ModelCompression_1 = require("./aix/ModelCompression");
-Object.defineProperty(exports, "ModelCompression", { enumerable: true, get: function () { return ModelCompression_1.ModelCompression; } });
-var IntelligenceAggregator_1 = require("./aix/IntelligenceAggregator");
-Object.defineProperty(exports, "IntelligenceAggregator", { enumerable: true, get: function () { return IntelligenceAggregator_1.IntelligenceAggregator; } });
-var ModelEvaluator_1 = require("./aix/ModelEvaluator");
-Object.defineProperty(exports, "ModelEvaluator", { enumerable: true, get: function () { return ModelEvaluator_1.ModelEvaluator; } });
+export { AIXProtocolManager } from './aix/AIXProtocolManager';
+export { ModelCompression } from './aix/ModelCompression';
+export { IntelligenceAggregator } from './aix/IntelligenceAggregator';
+export { ModelEvaluator } from './aix/ModelEvaluator';
 // ============================================================================
 // V6.0 GOVERNANCE INTEGRATIONS
 // ============================================================================
@@ -79,7 +38,7 @@ Object.defineProperty(exports, "ModelEvaluator", { enumerable: true, get: functi
  * Federated Governance Integration Manager
  * Integrates global orchestration, AI governance, and eco-optimization into federation workflows
  */
-class FederatedGovernanceIntegration {
+export class FederatedGovernanceIntegration {
     constructor(config) {
         this.federationManager = config.federationManager;
         this.orchestrator = config.orchestrator;
@@ -221,5 +180,4 @@ class FederatedGovernanceIntegration {
         };
     }
 }
-exports.FederatedGovernanceIntegration = FederatedGovernanceIntegration;
 //# sourceMappingURL=index.js.map

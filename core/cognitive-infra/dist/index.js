@@ -1,46 +1,25 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CognitiveInfrastructure = exports.AdaptiveLearner = exports.TopologyAdapter = exports.FeedbackLoopManager = exports.NeuralNetwork = void 0;
-var NeuralNetwork_1 = require("./neural/NeuralNetwork");
-Object.defineProperty(exports, "NeuralNetwork", { enumerable: true, get: function () { return NeuralNetwork_1.NeuralNetwork; } });
-var FeedbackLoopManager_1 = require("./neural/FeedbackLoopManager");
-Object.defineProperty(exports, "FeedbackLoopManager", { enumerable: true, get: function () { return FeedbackLoopManager_1.FeedbackLoopManager; } });
-var TopologyAdapter_1 = require("./adaptation/TopologyAdapter");
-Object.defineProperty(exports, "TopologyAdapter", { enumerable: true, get: function () { return TopologyAdapter_1.TopologyAdapter; } });
-var AdaptiveLearner_1 = require("./learning/AdaptiveLearner");
-Object.defineProperty(exports, "AdaptiveLearner", { enumerable: true, get: function () { return AdaptiveLearner_1.AdaptiveLearner; } });
+export { NeuralNetwork } from './neural/NeuralNetwork';
+export { FeedbackLoopManager } from './neural/FeedbackLoopManager';
+export { TopologyAdapter } from './adaptation/TopologyAdapter';
+export { AdaptiveLearner } from './learning/AdaptiveLearner';
 // Types
-__exportStar(require("./types"), exports);
+export * from './types';
 // Cognitive Infrastructure Manager - Main orchestrator
-const NeuralNetwork_2 = require("./neural/NeuralNetwork");
-const FeedbackLoopManager_2 = require("./neural/FeedbackLoopManager");
-const TopologyAdapter_2 = require("./adaptation/TopologyAdapter");
-const AdaptiveLearner_2 = require("./learning/AdaptiveLearner");
-class CognitiveInfrastructure {
+import { NeuralNetwork } from './neural/NeuralNetwork';
+import { FeedbackLoopManager } from './neural/FeedbackLoopManager';
+import { TopologyAdapter } from './adaptation/TopologyAdapter';
+import { AdaptiveLearner } from './learning/AdaptiveLearner';
+export class CognitiveInfrastructure {
     constructor(neuralConfig, adaptationConfig, learningContext) {
         this.isActive = false;
         // Initialize neural network
-        this.neuralNetwork = new NeuralNetwork_2.NeuralNetwork(neuralConfig);
+        this.neuralNetwork = new NeuralNetwork(neuralConfig);
         // Initialize feedback loop manager
-        this.feedbackManager = new FeedbackLoopManager_2.FeedbackLoopManager(this.neuralNetwork);
+        this.feedbackManager = new FeedbackLoopManager(this.neuralNetwork);
         // Initialize topology adapter
-        this.topologyAdapter = new TopologyAdapter_2.TopologyAdapter(this.neuralNetwork, adaptationConfig);
+        this.topologyAdapter = new TopologyAdapter(this.neuralNetwork, adaptationConfig);
         // Initialize adaptive learner
-        this.adaptiveLearner = new AdaptiveLearner_2.AdaptiveLearner(this.neuralNetwork, this.feedbackManager, this.topologyAdapter, learningContext);
+        this.adaptiveLearner = new AdaptiveLearner(this.neuralNetwork, this.feedbackManager, this.topologyAdapter, learningContext);
     }
     async startCognitiveProcessing() {
         this.isActive = true;
@@ -88,5 +67,4 @@ class CognitiveInfrastructure {
         }
     }
 }
-exports.CognitiveInfrastructure = CognitiveInfrastructure;
 //# sourceMappingURL=index.js.map

@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConnectionPool = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-const WebSocketClient_1 = require("../websocket/WebSocketClient");
-const GRPCClient_1 = require("../grpc/GRPCClient");
-class ConnectionPool extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { FederationError, FederationErrorCode } from '../types';
+import { WebSocketClient } from '../websocket/WebSocketClient';
+import { GRPCClient } from '../grpc/GRPCClient';
+export class ConnectionPool extends EventEmitter {
     constructor(config, connectionConfig, logger, authManager) {
         super();
         this.connections = new Map();
@@ -50,7 +47,7 @@ class ConnectionPool extends events_1.EventEmitter {
         };
         try {
             // Create WebSocket client
-            connection.wsClient = new WebSocketClient_1.WebSocketClient(nodeId, {
+            connection.wsClient = new WebSocketClient(nodeId, {
                 host: 'localhost', // This would be configured per node
                 port: 8080,
                 tls: { enabled: false },
@@ -58,7 +55,7 @@ class ConnectionPool extends events_1.EventEmitter {
                 reconnect: { enabled: true, maxAttempts: 5, initialDelay: 1000, maxDelay: 10000, backoffMultiplier: 2 }
             }, this.logger, this.authManager);
             // Create gRPC client
-            connection.grpcClient = new GRPCClient_1.GRPCClient(nodeId, {
+            connection.grpcClient = new GRPCClient(nodeId, {
                 host: 'localhost', // This would be configured per node
                 port: 9090,
                 tls: { enabled: false }
@@ -75,7 +72,7 @@ class ConnectionPool extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error(`Failed to create connection for node ${nodeId}`, error);
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     waitForConnection(nodeId) {
@@ -86,7 +83,7 @@ class ConnectionPool extends events_1.EventEmitter {
                 if (index !== -1) {
                     this.waitingQueue.splice(index, 1);
                 }
-                reject(new types_1.FederationError(types_1.FederationErrorCode.POOL_EXHAUSTED, 'Connection pool exhausted'));
+                reject(new FederationError(FederationErrorCode.POOL_EXHAUSTED, 'Connection pool exhausted'));
             }, this.config.acquireTimeout);
             this.waitingQueue.push({ resolve, reject, timeout });
         });
@@ -147,7 +144,7 @@ class ConnectionPool extends events_1.EventEmitter {
         // Reject all waiting requests
         for (const waiting of this.waitingQueue) {
             clearTimeout(waiting.timeout);
-            waiting.reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Pool shutting down'));
+            waiting.reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Pool shutting down'));
         }
         this.waitingQueue = [];
         // Close all connections
@@ -156,5 +153,4 @@ class ConnectionPool extends events_1.EventEmitter {
         this.logger.info('Connection pool shut down');
     }
 }
-exports.ConnectionPool = ConnectionPool;
 //# sourceMappingURL=ConnectionPool.js.map

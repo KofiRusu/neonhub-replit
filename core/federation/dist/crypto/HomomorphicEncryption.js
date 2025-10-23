@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.HomomorphicEncryption = void 0;
-class HomomorphicEncryption {
+export class HomomorphicEncryption {
     constructor(logger) {
         this.keyPairs = new Map();
         this.logger = logger;
@@ -106,5 +103,4 @@ class HomomorphicEncryption {
         return result;
     }
 }
-exports.HomomorphicEncryption = HomomorphicEncryption;
 //# sourceMappingURL=HomomorphicEncryption.js.map

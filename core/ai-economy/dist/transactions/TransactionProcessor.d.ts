@@ -33,7 +33,7 @@ export declare class TransactionProcessor {
     getTransactionHistory(address?: string, limit?: number): Transaction[];
     getPendingTransactions(): Transaction[];
     getEconomicMetrics(): EconomicMetrics | null;
-    getTransactionMetricsObservable(): import("rxjs").Observable<EconomicMetrics | null>;
+    getTransactionMetricsObservable(): any;
     getAgentReputation(agentId: string): number;
 }
 //# sourceMappingURL=TransactionProcessor.d.ts.map

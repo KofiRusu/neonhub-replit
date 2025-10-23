@@ -1,45 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AzureIntegration = void 0;
-const winston = __importStar(require("winston"));
-const axios_1 = __importDefault(require("axios"));
-class AzureIntegration {
+import * as winston from 'winston';
+import axios from 'axios';
+export class AzureIntegration {
     constructor(subscriptionId, tenantId, clientId, clientSecret, region = 'eastus') {
         this.accessToken = '';
         this.subscriptionId = subscriptionId;
@@ -59,7 +20,7 @@ class AzureIntegration {
     }
     async authenticate() {
         try {
-            const response = await axios_1.default.post(`https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/token`, new URLSearchParams({
+            const response = await axios.post(`https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/token`, new URLSearchParams({
                 grant_type: 'client_credentials',
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
@@ -230,7 +191,7 @@ class AzureIntegration {
             const optimizations = [];
             for (const vmSize of vmSizes) {
                 // Get spot pricing from Azure Retail Prices API
-                const response = await axios_1.default.get('https://prices.azure.com/api/retail/prices', {
+                const response = await axios.get('https://prices.azure.com/api/retail/prices', {
                     params: {
                         '$filter': `serviceName eq 'Virtual Machines' and armRegionName eq '${this.region}' and skuName eq '${vmSize}' and priceType eq 'Consumption'`
                     }
@@ -369,7 +330,7 @@ class AzureIntegration {
             config.data = data;
         if (params)
             config.params = params;
-        const response = await (0, axios_1.default)(config);
+        const response = await axios(config);
         return response.data;
     }
     getContinentFromLocation(location) {
@@ -385,5 +346,4 @@ class AzureIntegration {
         return continentMap[location] || 'Unknown';
     }
 }
-exports.AzureIntegration = AzureIntegration;
 //# sourceMappingURL=AzureIntegration.js.map

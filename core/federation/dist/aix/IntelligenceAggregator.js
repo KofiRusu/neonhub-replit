@@ -1,24 +1,21 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IntelligenceAggregator = void 0;
-const types_1 = require("../types");
-const Logger_1 = require("../utils/Logger");
-class IntelligenceAggregator {
+import { IntelligenceAggregationAlgorithm } from '../types';
+import { ConsoleLogger } from '../utils/Logger';
+export class IntelligenceAggregator {
     constructor(logger) {
-        this.logger = logger || new Logger_1.ConsoleLogger();
+        this.logger = logger || new ConsoleLogger();
     }
     /**
      * Aggregate intelligence from multiple models
      */
     async aggregateIntelligence(request, modelSummaries) {
         switch (request.algorithm) {
-            case types_1.IntelligenceAggregationAlgorithm.FED_AVG:
+            case IntelligenceAggregationAlgorithm.FED_AVG:
                 return this.federatedAverage(modelSummaries, request.weights);
-            case types_1.IntelligenceAggregationAlgorithm.ENSEMBLE_AVERAGE:
+            case IntelligenceAggregationAlgorithm.ENSEMBLE_AVERAGE:
                 return this.ensembleAverage(modelSummaries, request.weights);
-            case types_1.IntelligenceAggregationAlgorithm.STACKED_GENERALIZATION:
+            case IntelligenceAggregationAlgorithm.STACKED_GENERALIZATION:
                 return this.stackedGeneralization(modelSummaries);
-            case types_1.IntelligenceAggregationAlgorithm.META_LEARNING_AGGREGATION:
+            case IntelligenceAggregationAlgorithm.META_LEARNING_AGGREGATION:
                 return this.metaLearningAggregation(modelSummaries);
             default:
                 throw new Error(`Unsupported aggregation algorithm: ${request.algorithm}`);
@@ -254,5 +251,4 @@ class IntelligenceAggregator {
             request.minParticipants > 0);
     }
 }
-exports.IntelligenceAggregator = IntelligenceAggregator;
 //# sourceMappingURL=IntelligenceAggregator.js.map

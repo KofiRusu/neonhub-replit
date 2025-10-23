@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AIXProtocolManager = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-const Logger_1 = require("../utils/Logger");
-class AIXProtocolManager extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { IntelligenceSharingType, FederationMessageType, MessagePriority } from '../types';
+import { ConsoleLogger } from '../utils/Logger';
+export class AIXProtocolManager extends EventEmitter {
     constructor(config, logger) {
         super();
         this.modelRegistry = new Map();
@@ -13,7 +10,7 @@ class AIXProtocolManager extends events_1.EventEmitter {
         this.evaluationResults = new Map();
         this.privacyPolicies = new Map();
         this.config = config;
-        this.logger = logger || new Logger_1.ConsoleLogger();
+        this.logger = logger || new ConsoleLogger();
         this.setupEventHandlers();
     }
     /**
@@ -52,11 +49,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
         // Create federation message
         const message = {
             id: request.requestId,
-            type: types_1.FederationMessageType.INTELLIGENCE_SHARING_REQUEST,
+            type: FederationMessageType.INTELLIGENCE_SHARING_REQUEST,
             payload: request,
             timestamp: Date.now(),
             sourceNodeId: request.requesterNodeId,
-            priority: types_1.MessagePriority.NORMAL
+            priority: MessagePriority.NORMAL
         };
         this.emit('sharingRequestCreated', { request, message });
         return request.requestId;
@@ -80,13 +77,13 @@ class AIXProtocolManager extends events_1.EventEmitter {
             }
             // Process based on sharing type
             switch (request.sharingType) {
-                case types_1.IntelligenceSharingType.MODEL_SUMMARY:
+                case IntelligenceSharingType.MODEL_SUMMARY:
                     await this.handleModelSummaryRequest(request, message);
                     break;
-                case types_1.IntelligenceSharingType.GRADIENTS:
+                case IntelligenceSharingType.GRADIENTS:
                     await this.handleGradientSharingRequest(request, message);
                     break;
-                case types_1.IntelligenceSharingType.KNOWLEDGE_DISTILLATION:
+                case IntelligenceSharingType.KNOWLEDGE_DISTILLATION:
                     await this.handleKnowledgeDistillationRequest(request, message);
                     break;
                 default:
@@ -104,11 +101,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
     async initiateKnowledgeDistillation(distillationRequest) {
         const message = {
             id: `kd_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            type: types_1.FederationMessageType.KNOWLEDGE_DISTILLATION,
+            type: FederationMessageType.KNOWLEDGE_DISTILLATION,
             payload: distillationRequest,
             timestamp: Date.now(),
             sourceNodeId: distillationRequest.teacherModelId.split('_')[0], // Extract node ID
-            priority: types_1.MessagePriority.HIGH
+            priority: MessagePriority.HIGH
         };
         this.emit('knowledgeDistillationInitiated', { request: distillationRequest, message });
         return message.id;
@@ -119,11 +116,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
     async requestIntelligenceAggregation(aggregationRequest) {
         const message = {
             id: aggregationRequest.aggregationId,
-            type: types_1.FederationMessageType.INTELLIGENCE_AGGREGATION,
+            type: FederationMessageType.INTELLIGENCE_AGGREGATION,
             payload: aggregationRequest,
             timestamp: Date.now(),
             sourceNodeId: 'coordinator', // Would be set by coordinator
-            priority: types_1.MessagePriority.HIGH
+            priority: MessagePriority.HIGH
         };
         this.emit('aggregationRequestCreated', { request: aggregationRequest, message });
         return aggregationRequest.aggregationId;
@@ -140,11 +137,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
         this.marketplaceBids.set(bid.modelId, modelBids);
         const message = {
             id: bid.bidId,
-            type: types_1.FederationMessageType.MARKETPLACE_BID,
+            type: FederationMessageType.MARKETPLACE_BID,
             payload: bid,
             timestamp: bid.timestamp,
             sourceNodeId: bid.bidderNodeId,
-            priority: types_1.MessagePriority.NORMAL
+            priority: MessagePriority.NORMAL
         };
         this.emit('marketplaceBidSubmitted', { bid, message });
     }
@@ -154,11 +151,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
     async requestModelEvaluation(evaluationRequest) {
         const message = {
             id: evaluationRequest.evaluationId,
-            type: types_1.FederationMessageType.MODEL_EVALUATION_REQUEST,
+            type: FederationMessageType.MODEL_EVALUATION_REQUEST,
             payload: evaluationRequest,
             timestamp: Date.now(),
             sourceNodeId: evaluationRequest.evaluatorNodeId,
-            priority: types_1.MessagePriority.NORMAL
+            priority: MessagePriority.NORMAL
         };
         this.emit('evaluationRequestCreated', { request: evaluationRequest, message });
         return evaluationRequest.evaluationId;
@@ -170,11 +167,11 @@ class AIXProtocolManager extends events_1.EventEmitter {
         this.evaluationResults.set(result.evaluationId, result);
         const message = {
             id: `result_${result.evaluationId}`,
-            type: types_1.FederationMessageType.EVALUATION_RESULT,
+            type: FederationMessageType.EVALUATION_RESULT,
             payload: result,
             timestamp: result.timestamp,
             sourceNodeId: result.evaluatorNodeId,
-            priority: types_1.MessagePriority.NORMAL
+            priority: MessagePriority.NORMAL
         };
         this.emit('evaluationResultSubmitted', { result, message });
     }
@@ -307,12 +304,12 @@ class AIXProtocolManager extends events_1.EventEmitter {
         }
         const responseMessage = {
             id: `response_${message.id}`,
-            type: types_1.FederationMessageType.MODEL_SUMMARY_EXCHANGE,
+            type: FederationMessageType.MODEL_SUMMARY_EXCHANGE,
             payload,
             timestamp: Date.now(),
             sourceNodeId: message.targetNodeId || '',
             targetNodeId: message.sourceNodeId,
-            priority: types_1.MessagePriority.NORMAL
+            priority: MessagePriority.NORMAL
         };
         this.emit('modelSummaryShared', { request, modelSummary, message: responseMessage });
     }
@@ -327,5 +324,4 @@ class AIXProtocolManager extends events_1.EventEmitter {
         // Would create distillation task
     }
 }
-exports.AIXProtocolManager = AIXProtocolManager;
 //# sourceMappingURL=AIXProtocolManager.js.map

@@ -1,48 +1,9 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NodeDiscoveryService = void 0;
-const events_1 = require("events");
-const axios_1 = __importDefault(require("axios"));
-const cron = __importStar(require("node-cron"));
-const uuid_1 = require("uuid");
-const types_1 = require("../types");
-class NodeDiscoveryService extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import axios from 'axios';
+import * as cron from 'node-cron';
+import { v4 as uuidv4 } from 'uuid';
+import { GlobalOrchestratorError, GlobalOrchestratorErrorCode } from '../types';
+export class NodeDiscoveryService extends EventEmitter {
     constructor(config, logger) {
         super();
         this.discoveredNodes = new Map();
@@ -74,7 +35,7 @@ class NodeDiscoveryService extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error('Failed to start node discovery service', error);
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.DISCOVERY_FAILED, 'Failed to start discovery service', undefined, undefined, { originalError: message });
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.DISCOVERY_FAILED, 'Failed to start discovery service', undefined, undefined, { originalError: message });
         }
     }
     async stop() {
@@ -104,7 +65,7 @@ class NodeDiscoveryService extends events_1.EventEmitter {
         }
         try {
             this.logger.debug('Performing node discovery');
-            const response = await axios_1.default.get(`${this.config.serviceRegistryUrl}/nodes`, {
+            const response = await axios.get(`${this.config.serviceRegistryUrl}/nodes`, {
                 timeout: 5000,
                 headers: {
                     'User-Agent': 'GlobalOrchestrator-Discovery/1.0'
@@ -168,9 +129,9 @@ class NodeDiscoveryService extends events_1.EventEmitter {
             const heartbeatPayload = {
                 orchestratorId: 'global-orchestrator',
                 timestamp: Date.now(),
-                sequence: (0, uuid_1.v4)()
+                sequence: uuidv4()
             };
-            await axios_1.default.post(`http://${node.address}:${node.port}/heartbeat`, heartbeatPayload, {
+            await axios.post(`http://${node.address}:${node.port}/heartbeat`, heartbeatPayload, {
                 timeout: 2000
             });
             node.lastHealthCheck = Date.now();
@@ -217,5 +178,4 @@ class NodeDiscoveryService extends events_1.EventEmitter {
         };
     }
 }
-exports.NodeDiscoveryService = NodeDiscoveryService;
 //# sourceMappingURL=NodeDiscoveryService.js.map

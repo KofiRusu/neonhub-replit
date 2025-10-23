@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantManager = void 0;
-const types_1 = require("../types");
-class ParticipantManager {
+import { ParticipantStatus, NodeCapability } from '../types';
+export class ParticipantManager {
     constructor(logger) {
         this.participants = new Map();
         this.logger = logger;
@@ -47,7 +44,7 @@ class ParticipantManager {
      * Gets active participants
      */
     getActiveParticipants() {
-        return this.getParticipantsByStatus(types_1.ParticipantStatus.ACTIVE);
+        return this.getParticipantsByStatus(ParticipantStatus.ACTIVE);
     }
     /**
      * Updates participant reputation score
@@ -81,8 +78,8 @@ class ParticipantManager {
         const budgetScore = 1 - budgetUsageRatio; // Higher score for lower usage
         score += budgetScore * 0.2;
         // Capabilities bonus
-        const hasFederatedLearning = participant.capabilities.includes(types_1.NodeCapability.FEDERATED_LEARNING);
-        const hasSecureComputation = participant.capabilities.includes(types_1.NodeCapability.SECURE_COMPUTATION);
+        const hasFederatedLearning = participant.capabilities.includes(NodeCapability.FEDERATED_LEARNING);
+        const hasSecureComputation = participant.capabilities.includes(NodeCapability.SECURE_COMPUTATION);
         const capabilityBonus = (hasFederatedLearning ? 0.1 : 0) + (hasSecureComputation ? 0.1 : 0);
         score += capabilityBonus;
         return Math.max(0, Math.min(1, score));
@@ -108,7 +105,7 @@ class ParticipantManager {
     suspendParticipant(nodeId, reason) {
         const participant = this.participants.get(nodeId);
         if (participant) {
-            participant.status = types_1.ParticipantStatus.SUSPENDED;
+            participant.status = ParticipantStatus.SUSPENDED;
             this.logger.warn(`Suspended participant ${nodeId}: ${reason}`);
         }
     }
@@ -118,7 +115,7 @@ class ParticipantManager {
     blacklistParticipant(nodeId, reason) {
         const participant = this.participants.get(nodeId);
         if (participant) {
-            participant.status = types_1.ParticipantStatus.BLACKLISTED;
+            participant.status = ParticipantStatus.BLACKLISTED;
             this.logger.error(`Blacklisted participant ${nodeId}: ${reason}`);
         }
     }
@@ -127,8 +124,8 @@ class ParticipantManager {
      */
     reactivateParticipant(nodeId) {
         const participant = this.participants.get(nodeId);
-        if (participant && participant.status === types_1.ParticipantStatus.SUSPENDED) {
-            participant.status = types_1.ParticipantStatus.ACTIVE;
+        if (participant && participant.status === ParticipantStatus.SUSPENDED) {
+            participant.status = ParticipantStatus.ACTIVE;
             this.logger.info(`Reactivated participant ${nodeId}`);
         }
     }
@@ -180,5 +177,4 @@ class ParticipantManager {
         }
     }
 }
-exports.ParticipantManager = ParticipantManager;
 //# sourceMappingURL=ParticipantManager.js.map

@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IntelligentRoutingService = void 0;
-const events_1 = require("events");
-const types_1 = require("../types");
-class IntelligentRoutingService extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { RoutingAlgorithm, GlobalOrchestratorError, GlobalOrchestratorErrorCode } from '../types';
+export class IntelligentRoutingService extends EventEmitter {
     constructor(config, logger) {
         super();
         this.routingTable = new Map();
@@ -69,7 +66,7 @@ class IntelligentRoutingService extends events_1.EventEmitter {
             // Get available routing decisions for the federation
             const routingDecisions = this.routingTable.get(targetFederationId);
             if (!routingDecisions || routingDecisions.length === 0) {
-                throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.ROUTING_FAILED, `No routing decisions available for federation ${targetFederationId}`);
+                throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.ROUTING_FAILED, `No routing decisions available for federation ${targetFederationId}`);
             }
             // Apply routing algorithm
             const decision = await this.applyRoutingAlgorithm(routingDecisions, message);
@@ -91,7 +88,7 @@ class IntelligentRoutingService extends events_1.EventEmitter {
         // In a real implementation, this would use more sophisticated logic
         const federations = Array.from(this.routingTable.keys());
         if (federations.length === 0) {
-            throw new types_1.GlobalOrchestratorError(types_1.GlobalOrchestratorErrorCode.ROUTING_FAILED, 'No federations available for routing');
+            throw new GlobalOrchestratorError(GlobalOrchestratorErrorCode.ROUTING_FAILED, 'No federations available for routing');
         }
         // For now, return the first federation
         // This could be enhanced with load balancing, geographic routing, etc.
@@ -99,15 +96,15 @@ class IntelligentRoutingService extends events_1.EventEmitter {
     }
     async applyRoutingAlgorithm(routingDecisions, message) {
         switch (this.config.algorithm) {
-            case types_1.RoutingAlgorithm.ROUND_ROBIN:
+            case RoutingAlgorithm.ROUND_ROBIN:
                 return this.roundRobinRouting(routingDecisions);
-            case types_1.RoutingAlgorithm.LEAST_CONNECTIONS:
+            case RoutingAlgorithm.LEAST_CONNECTIONS:
                 return this.leastConnectionsRouting(routingDecisions);
-            case types_1.RoutingAlgorithm.LEAST_RESPONSE_TIME:
+            case RoutingAlgorithm.LEAST_RESPONSE_TIME:
                 return this.leastResponseTimeRouting(routingDecisions);
-            case types_1.RoutingAlgorithm.GEOGRAPHIC:
+            case RoutingAlgorithm.GEOGRAPHIC:
                 return this.geographicRouting(routingDecisions, message);
-            case types_1.RoutingAlgorithm.ADAPTIVE:
+            case RoutingAlgorithm.ADAPTIVE:
                 return this.adaptiveRouting(routingDecisions, message);
             default:
                 return this.weightedRoundRobinRouting(routingDecisions);
@@ -250,5 +247,4 @@ class IntelligentRoutingService extends events_1.EventEmitter {
         };
     }
 }
-exports.IntelligentRoutingService = IntelligentRoutingService;
 //# sourceMappingURL=IntelligentRoutingService.js.map

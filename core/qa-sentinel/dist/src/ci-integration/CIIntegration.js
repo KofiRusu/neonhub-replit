@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CIIntegration = void 0;
-const child_process_1 = require("child_process");
-const util_1 = require("util");
-const execAsync = (0, util_1.promisify)(child_process_1.exec);
-class CIIntegration {
+import { exec } from 'child_process';
+import { promisify } from 'util';
+const execAsync = promisify(exec);
+export class CIIntegration {
     constructor(ciProvider = 'github', repository = '', branch = 'main') {
         this.ciProvider = ciProvider;
         this.repository = repository;
@@ -287,5 +284,4 @@ class CIIntegration {
         return integration;
     }
 }
-exports.CIIntegration = CIIntegration;
 //# sourceMappingURL=CIIntegration.js.map

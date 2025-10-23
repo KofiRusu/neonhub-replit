@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataSubjectRightsManager = void 0;
-const uuid_1 = require("uuid");
-class DataSubjectRightsManager {
+import { v4 as uuidv4 } from 'uuid';
+export class DataSubjectRightsManager {
     constructor() {
         this.requests = new Map();
     }
     async submitRequest(userId, type, justification) {
         const request = {
-            id: (0, uuid_1.v4)(),
+            id: uuidv4(),
             userId,
             type,
             status: 'pending',
@@ -134,5 +131,4 @@ class DataSubjectRightsManager {
         console.log(`[DSR] Request ${request.id} ${action}: ${request.type} for user ${request.userId}`);
     }
 }
-exports.DataSubjectRightsManager = DataSubjectRightsManager;
 //# sourceMappingURL=DataSubjectRightsManager.js.map

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PrivacyBudgetManager = void 0;
-class PrivacyBudgetManager {
+export class PrivacyBudgetManager {
     constructor(logger) {
         this.participantBudgets = new Map();
         this.logger = logger;
@@ -128,5 +125,4 @@ class PrivacyBudgetManager {
         this.logger.info(`Removed privacy budget for participant ${nodeId}`);
     }
 }
-exports.PrivacyBudgetManager = PrivacyBudgetManager;
 //# sourceMappingURL=PrivacyBudgetManager.js.map

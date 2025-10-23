@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TokenManager = void 0;
-class TokenManager {
+export class TokenManager {
     constructor(config) {
         this.tokens = new Map();
         this.balances = new Map();
@@ -223,5 +220,4 @@ class TokenManager {
             .map(b => b.holderId);
     }
 }
-exports.TokenManager = TokenManager;
 //# sourceMappingURL=TokenManager.js.map

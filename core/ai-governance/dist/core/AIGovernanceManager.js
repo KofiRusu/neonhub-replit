@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AIGovernanceManager = exports.defaultAIGovernanceConfig = void 0;
-const PolicyEngine_1 = require("./PolicyEngine");
-const EthicalFramework_1 = require("./EthicalFramework");
-const PolicyEnforcer_1 = require("./PolicyEnforcer");
-const LegalComplianceManager_1 = require("../compliance/LegalComplianceManager");
-const AuditLogger_1 = require("../monitoring/AuditLogger");
-exports.defaultAIGovernanceConfig = {
+import { PolicyEngine } from './PolicyEngine';
+import { EthicalFramework } from './EthicalFramework';
+import { PolicyEnforcer } from './PolicyEnforcer';
+import { LegalComplianceManager } from '../compliance/LegalComplianceManager';
+import { AuditLogger } from '../monitoring/AuditLogger';
+export const defaultAIGovernanceConfig = {
     policyEngine: {
         enableDynamicUpdates: true,
         auditLevel: 'detailed',
@@ -27,15 +24,15 @@ exports.defaultAIGovernanceConfig = {
         alertThreshold: 'REGULATORY'
     }
 };
-class AIGovernanceManager {
-    constructor(config = exports.defaultAIGovernanceConfig) {
-        this.config = { ...exports.defaultAIGovernanceConfig, ...config };
+export class AIGovernanceManager {
+    constructor(config = defaultAIGovernanceConfig) {
+        this.config = { ...defaultAIGovernanceConfig, ...config };
         // Initialize components
-        this.auditLogger = new AuditLogger_1.AuditLogger();
-        this.policyEngine = new PolicyEngine_1.PolicyEngine(this.config.policyEngine, this.auditLogger);
-        this.ethicalFramework = new EthicalFramework_1.EthicalFramework(this.config.ethicalFramework, this.auditLogger);
-        this.legalComplianceManager = new LegalComplianceManager_1.LegalComplianceManager(this.config.legalCompliance);
-        this.policyEnforcer = new PolicyEnforcer_1.PolicyEnforcer(this.policyEngine, this.ethicalFramework, this.legalComplianceManager, this.auditLogger);
+        this.auditLogger = new AuditLogger();
+        this.policyEngine = new PolicyEngine(this.config.policyEngine, this.auditLogger);
+        this.ethicalFramework = new EthicalFramework(this.config.ethicalFramework, this.auditLogger);
+        this.legalComplianceManager = new LegalComplianceManager(this.config.legalCompliance);
+        this.policyEnforcer = new PolicyEnforcer(this.policyEngine, this.ethicalFramework, this.legalComplianceManager, this.auditLogger);
     }
     async initialize() {
         // Initialize any async components if needed
@@ -53,5 +50,4 @@ class AIGovernanceManager {
         };
     }
 }
-exports.AIGovernanceManager = AIGovernanceManager;
 //# sourceMappingURL=AIGovernanceManager.js.map

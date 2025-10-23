@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DynamicPricingEngine = void 0;
-const rxjs_1 = require("rxjs");
-class DynamicPricingEngine {
+import { BehaviorSubject } from 'rxjs';
+export class DynamicPricingEngine {
     constructor() {
         this.pricingModels = new Map();
         this.marketData = new Map();
         this.economicMetrics = null;
-        this.priceUpdates = new rxjs_1.BehaviorSubject(new Map());
+        this.priceUpdates = new BehaviorSubject(new Map());
         this.initializeDefaultPricingModels();
     }
     initializeDefaultPricingModels() {
@@ -191,5 +188,4 @@ class DynamicPricingEngine {
         };
     }
 }
-exports.DynamicPricingEngine = DynamicPricingEngine;
 //# sourceMappingURL=DynamicPricingEngine.js.map

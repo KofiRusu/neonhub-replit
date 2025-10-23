@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TopologyAdapter = void 0;
-class TopologyAdapter {
+export class TopologyAdapter {
     constructor(network, config) {
         this.topologyHistory = [];
         this.innovationCounter = 0;
@@ -271,5 +268,4 @@ class TopologyAdapter {
         };
     }
 }
-exports.TopologyAdapter = TopologyAdapter;
 //# sourceMappingURL=TopologyAdapter.js.map

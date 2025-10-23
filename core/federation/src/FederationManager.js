@@ -1,30 +1,27 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FederationManager = void 0;
-const events_1 = require("events");
-const types_1 = require("./types");
-const Logger_1 = require("./utils/Logger");
-const AuthManager_1 = require("./auth/AuthManager");
-const WebSocketServer_1 = require("./websocket/WebSocketServer");
-const WebSocketClient_1 = require("./websocket/WebSocketClient");
-const GRPCServer_1 = require("./grpc/GRPCServer");
-const GRPCClient_1 = require("./grpc/GRPCClient");
-const ConnectionPool_1 = require("./utils/ConnectionPool");
-const LoadBalancer_1 = require("./utils/LoadBalancer");
-const HealthChecker_1 = require("./utils/HealthChecker");
-const FederatedLearningCoordinator_1 = require("./federated-learning/FederatedLearningCoordinator");
-const SecureAggregation_1 = require("./federated-learning/SecureAggregation");
-const ModelValidation_1 = require("./federated-learning/ModelValidation");
-const ParticipantManager_1 = require("./federated-learning/ParticipantManager");
-const PrivacyBudgetManager_1 = require("./privacy/PrivacyBudgetManager");
-const HomomorphicEncryption_1 = require("./crypto/HomomorphicEncryption");
-const KeyManager_1 = require("./crypto/KeyManager");
-const SecureMultiPartyComputation_1 = require("./crypto/SecureMultiPartyComputation");
-const AIXProtocolManager_1 = require("./aix/AIXProtocolManager");
-const ModelCompression_1 = require("./aix/ModelCompression");
-const IntelligenceAggregator_1 = require("./aix/IntelligenceAggregator");
-const ModelEvaluator_1 = require("./aix/ModelEvaluator");
-class FederationManager extends events_1.EventEmitter {
+import { EventEmitter } from 'events';
+import { FederationError, FederationErrorCode, MessagePriority } from './types';
+import { ConsoleLogger } from './utils/Logger';
+import { AuthManager } from './auth/AuthManager';
+import { WebSocketServer } from './websocket/WebSocketServer';
+import { WebSocketClient } from './websocket/WebSocketClient';
+import { GRPCServer } from './grpc/GRPCServer';
+import { GRPCClient } from './grpc/GRPCClient';
+import { ConnectionPool } from './utils/ConnectionPool';
+import { LoadBalancer } from './utils/LoadBalancer';
+import { HealthChecker } from './utils/HealthChecker';
+import { FederatedLearningCoordinator } from './federated-learning/FederatedLearningCoordinator';
+import { SecureAggregation } from './federated-learning/SecureAggregation';
+import { ModelValidation } from './federated-learning/ModelValidation';
+import { ParticipantManager } from './federated-learning/ParticipantManager';
+import { PrivacyBudgetManager } from './privacy/PrivacyBudgetManager';
+import { HomomorphicEncryption } from './crypto/HomomorphicEncryption';
+import { KeyManager } from './crypto/KeyManager';
+import { SecureMultiPartyComputation } from './crypto/SecureMultiPartyComputation';
+import { AIXProtocolManager } from './aix/AIXProtocolManager';
+import { ModelCompression } from './aix/ModelCompression';
+import { IntelligenceAggregator } from './aix/IntelligenceAggregator';
+import { ModelEvaluator } from './aix/ModelEvaluator';
+export class FederationManager extends EventEmitter {
     constructor(config) {
         super();
         this.wsServer = null;
@@ -33,11 +30,11 @@ class FederationManager extends events_1.EventEmitter {
         this.grpcClients = new Map();
         this.isRunning = false;
         this.config = config;
-        this.logger = config.logger || new Logger_1.ConsoleLogger();
-        this.authManager = new AuthManager_1.AuthManager(this.config.wsConfig.auth || { enabled: false, type: 'jwt' }, this.logger);
-        this.connectionPool = new ConnectionPool_1.ConnectionPool(this.config.poolConfig, this.config.wsConfig, this.logger, this.authManager);
-        this.loadBalancer = new LoadBalancer_1.LoadBalancer(this.config.loadBalancingStrategy, this.logger, this.connectionPool);
-        this.healthChecker = new HealthChecker_1.HealthChecker(this.config.healthCheckConfig, this.logger);
+        this.logger = config.logger || new ConsoleLogger();
+        this.authManager = new AuthManager(this.config.wsConfig.auth || { enabled: false, type: 'jwt' }, this.logger);
+        this.connectionPool = new ConnectionPool(this.config.poolConfig, this.config.wsConfig, this.logger, this.authManager);
+        this.loadBalancer = new LoadBalancer(this.config.loadBalancingStrategy, this.logger, this.connectionPool);
+        this.healthChecker = new HealthChecker(this.config.healthCheckConfig, this.logger);
         this.metrics = this.initializeMetrics();
         this.setupEventHandlers();
         // Initialize federated learning components if enabled
@@ -56,8 +53,8 @@ class FederationManager extends events_1.EventEmitter {
         try {
             this.logger.info(`Starting federation manager for node ${this.config.nodeId}`);
             // Start servers
-            this.wsServer = new WebSocketServer_1.WebSocketServer(this.config.wsConfig, this.logger, this.authManager);
-            this.grpcServer = new GRPCServer_1.GRPCServer(this.config.grpcConfig, this.logger);
+            this.wsServer = new WebSocketServer(this.config.wsConfig, this.logger, this.authManager);
+            this.grpcServer = new GRPCServer(this.config.grpcConfig, this.logger);
             await Promise.all([
                 this.wsServer.start(),
                 this.grpcServer.start()
@@ -72,7 +69,7 @@ class FederationManager extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error('Failed to start federation manager', error);
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     async stop() {
@@ -113,14 +110,14 @@ class FederationManager extends events_1.EventEmitter {
             this.loadBalancer.addNode(nodeInfo);
             this.healthChecker.addNode(nodeInfo);
             // Create clients
-            const wsClient = new WebSocketClient_1.WebSocketClient(nodeInfo.nodeId, {
+            const wsClient = new WebSocketClient(nodeInfo.nodeId, {
                 host: nodeInfo.address,
                 port: nodeInfo.port,
                 tls: { enabled: false }, // Would be configured
                 auth: this.config.wsConfig.auth,
                 reconnect: { enabled: true, maxAttempts: 5, initialDelay: 1000, maxDelay: 10000, backoffMultiplier: 2 }
             }, this.logger, this.authManager);
-            const grpcClient = new GRPCClient_1.GRPCClient(nodeInfo.nodeId, {
+            const grpcClient = new GRPCClient(nodeInfo.nodeId, {
                 host: nodeInfo.address,
                 port: 9090, // Default gRPC port
                 tls: { enabled: false }
@@ -138,7 +135,7 @@ class FederationManager extends events_1.EventEmitter {
         catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             this.logger.error(`Failed to connect to node ${nodeInfo.nodeId}`, error);
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     async disconnectFromNode(nodeId) {
@@ -171,7 +168,7 @@ class FederationManager extends events_1.EventEmitter {
             if (!targetNodeId) {
                 targetNodeId = this.loadBalancer.selectNode() || undefined;
                 if (!targetNodeId) {
-                    throw new types_1.FederationError(types_1.FederationErrorCode.NODE_UNAVAILABLE, 'No available nodes');
+                    throw new FederationError(FederationErrorCode.NODE_UNAVAILABLE, 'No available nodes');
                 }
             }
             // Get connection from pool
@@ -181,12 +178,12 @@ class FederationManager extends events_1.EventEmitter {
             if (wsClient) {
                 const success = wsClient.send(message);
                 if (!success) {
-                    throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Failed to send WebSocket message');
+                    throw new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Failed to send WebSocket message');
                 }
             }
             // Send via gRPC if needed
             const grpcClient = connection.grpcClient;
-            if (grpcClient && message.priority >= types_1.MessagePriority.HIGH) {
+            if (grpcClient && message.priority >= MessagePriority.HIGH) {
                 await grpcClient.sendMessage(message);
             }
             this.connectionPool.releaseConnection(connection.id);
@@ -277,14 +274,14 @@ class FederationManager extends events_1.EventEmitter {
         if (!this.config.federatedLearning)
             return;
         this.logger.info('Initializing federated learning components');
-        this.homomorphicEncryption = new HomomorphicEncryption_1.HomomorphicEncryption(this.logger);
-        this.keyManager = new KeyManager_1.KeyManager(this.logger);
-        this.smpc = new SecureMultiPartyComputation_1.SecureMultiPartyComputation(this.logger);
-        this.privacyBudgetManager = new PrivacyBudgetManager_1.PrivacyBudgetManager(this.logger);
-        this.participantManager = new ParticipantManager_1.ParticipantManager(this.logger);
-        this.modelValidation = new ModelValidation_1.ModelValidation(this.logger);
-        this.secureAggregation = new SecureAggregation_1.SecureAggregation(this.logger, this.homomorphicEncryption);
-        this.flCoordinator = new FederatedLearningCoordinator_1.FederatedLearningCoordinator(this.logger);
+        this.homomorphicEncryption = new HomomorphicEncryption(this.logger);
+        this.keyManager = new KeyManager(this.logger);
+        this.smpc = new SecureMultiPartyComputation(this.logger);
+        this.privacyBudgetManager = new PrivacyBudgetManager(this.logger);
+        this.participantManager = new ParticipantManager(this.logger);
+        this.modelValidation = new ModelValidation(this.logger);
+        this.secureAggregation = new SecureAggregation(this.logger, this.homomorphicEncryption);
+        this.flCoordinator = new FederatedLearningCoordinator(this.logger);
         // Set up event handlers for FL coordinator
         this.setupFederatedLearningEventHandlers();
     }
@@ -295,10 +292,10 @@ class FederationManager extends events_1.EventEmitter {
         if (!this.config.aix)
             return;
         this.logger.info('Initializing AIX components');
-        this.aixProtocolManager = new AIXProtocolManager_1.AIXProtocolManager(this.config.aix, this.logger);
-        this.modelCompression = new ModelCompression_1.ModelCompression(this.logger);
-        this.intelligenceAggregator = new IntelligenceAggregator_1.IntelligenceAggregator(this.logger);
-        this.modelEvaluator = new ModelEvaluator_1.ModelEvaluator(this.logger);
+        this.aixProtocolManager = new AIXProtocolManager(this.config.aix, this.logger);
+        this.modelCompression = new ModelCompression(this.logger);
+        this.intelligenceAggregator = new IntelligenceAggregator(this.logger);
+        this.modelEvaluator = new ModelEvaluator(this.logger);
         // Set up event handlers for AIX
         this.setupAIXEventHandlers();
     }
@@ -570,5 +567,4 @@ class FederationManager extends events_1.EventEmitter {
         this.logger.info(`Processing evaluation result from ${message.sourceNodeId}`);
     }
 }
-exports.FederationManager = FederationManager;
 //# sourceMappingURL=FederationManager.js.map

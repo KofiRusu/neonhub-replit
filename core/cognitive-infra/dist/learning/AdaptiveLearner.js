@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdaptiveLearner = void 0;
-const rxjs_1 = require("rxjs");
-class AdaptiveLearner {
+import { BehaviorSubject } from 'rxjs';
+export class AdaptiveLearner {
     constructor(neuralNetwork, feedbackManager, topologyAdapter, learningContext) {
-        this.cognitiveStateSubject = new rxjs_1.BehaviorSubject(null);
+        this.cognitiveStateSubject = new BehaviorSubject(null);
         this.neuralNetwork = neuralNetwork;
         this.feedbackManager = feedbackManager;
         this.topologyAdapter = topologyAdapter;
@@ -169,5 +166,4 @@ class AdaptiveLearner {
         this.feedbackManager.resetFeedbackLoops();
     }
 }
-exports.AdaptiveLearner = AdaptiveLearner;
 //# sourceMappingURL=AdaptiveLearner.js.map

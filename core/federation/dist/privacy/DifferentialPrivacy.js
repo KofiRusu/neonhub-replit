@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DifferentialPrivacy = void 0;
-class DifferentialPrivacy {
+export class DifferentialPrivacy {
     constructor(logger) {
         this.logger = logger;
     }
@@ -91,5 +88,4 @@ class DifferentialPrivacy {
         return (budget.usedBudget + requiredEpsilon) <= budget.maxBudget;
     }
 }
-exports.DifferentialPrivacy = DifferentialPrivacy;
 //# sourceMappingURL=DifferentialPrivacy.js.map

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NeuralNetwork = void 0;
-class NeuralNetwork {
+export class NeuralNetwork {
     constructor(config) {
         this.nodes = new Map();
         this.connections = new Map();
@@ -260,5 +257,4 @@ class NeuralNetwork {
         return network;
     }
 }
-exports.NeuralNetwork = NeuralNetwork;
 //# sourceMappingURL=NeuralNetwork.js.map

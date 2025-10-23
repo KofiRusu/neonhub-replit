@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ComplianceMonitor = void 0;
-class ComplianceMonitor {
+export class ComplianceMonitor {
     constructor(config) {
         this.alerts = [];
         this.reports = [];
@@ -118,5 +115,4 @@ class ComplianceMonitor {
         };
     }
 }
-exports.ComplianceMonitor = ComplianceMonitor;
 //# sourceMappingURL=ComplianceMonitor.js.map

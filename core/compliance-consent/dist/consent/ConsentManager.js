@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConsentManager = void 0;
-const uuid_1 = require("uuid");
-class ConsentManager {
+import { v4 as uuidv4 } from 'uuid';
+export class ConsentManager {
     constructor(config) {
         this.consents = new Map();
         this.config = config;
@@ -21,7 +18,7 @@ class ConsentManager {
             }
         }
         const consent = {
-            id: (0, uuid_1.v4)(),
+            id: uuidv4(),
             userId,
             purposes,
             consentTypes,
@@ -135,5 +132,4 @@ class ConsentManager {
         console.log(`[AUDIT] ${action}:`, details);
     }
 }
-exports.ConsentManager = ConsentManager;
 //# sourceMappingURL=ConsentManager.js.map

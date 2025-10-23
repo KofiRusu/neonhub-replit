@@ -1,8 +1,5 @@
-"use strict";
 // Import types from federation module (will be available at runtime)
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FailoverStrategy = exports.FederationStatus = exports.QualityOfService = exports.GlobalOrchestratorErrorCode = exports.GlobalOrchestratorError = exports.ConsoleLogger = exports.FailoverType = exports.ScalingAction = exports.HealthStatus = exports.GlobalCapability = exports.LoadBalancingStrategy = exports.RoutingAlgorithm = void 0;
-var RoutingAlgorithm;
+export var RoutingAlgorithm;
 (function (RoutingAlgorithm) {
     RoutingAlgorithm["ROUND_ROBIN"] = "round_robin";
     RoutingAlgorithm["LEAST_CONNECTIONS"] = "least_connections";
@@ -10,16 +7,16 @@ var RoutingAlgorithm;
     RoutingAlgorithm["LEAST_RESPONSE_TIME"] = "least_response_time";
     RoutingAlgorithm["GEOGRAPHIC"] = "geographic";
     RoutingAlgorithm["ADAPTIVE"] = "adaptive";
-})(RoutingAlgorithm || (exports.RoutingAlgorithm = RoutingAlgorithm = {}));
-var LoadBalancingStrategy;
+})(RoutingAlgorithm || (RoutingAlgorithm = {}));
+export var LoadBalancingStrategy;
 (function (LoadBalancingStrategy) {
     LoadBalancingStrategy["RANDOM"] = "random";
     LoadBalancingStrategy["ROUND_ROBIN"] = "round_robin";
     LoadBalancingStrategy["LEAST_CONNECTIONS"] = "least_connections";
     LoadBalancingStrategy["IP_HASH"] = "ip_hash";
     LoadBalancingStrategy["WEIGHTED"] = "weighted";
-})(LoadBalancingStrategy || (exports.LoadBalancingStrategy = LoadBalancingStrategy = {}));
-var GlobalCapability;
+})(LoadBalancingStrategy || (LoadBalancingStrategy = {}));
+export var GlobalCapability;
 (function (GlobalCapability) {
     GlobalCapability["ROUTING"] = "routing";
     GlobalCapability["SCALING"] = "scaling";
@@ -27,27 +24,27 @@ var GlobalCapability;
     GlobalCapability["MONITORING"] = "monitoring";
     GlobalCapability["FEDERATION_COORDINATION"] = "federation_coordination";
     GlobalCapability["LOAD_BALANCING"] = "load_balancing";
-})(GlobalCapability || (exports.GlobalCapability = GlobalCapability = {}));
-var HealthStatus;
+})(GlobalCapability || (GlobalCapability = {}));
+export var HealthStatus;
 (function (HealthStatus) {
     HealthStatus["HEALTHY"] = "healthy";
     HealthStatus["DEGRADED"] = "degraded";
     HealthStatus["UNHEALTHY"] = "unhealthy";
     HealthStatus["UNKNOWN"] = "unknown";
-})(HealthStatus || (exports.HealthStatus = HealthStatus = {}));
-var ScalingAction;
+})(HealthStatus || (HealthStatus = {}));
+export var ScalingAction;
 (function (ScalingAction) {
     ScalingAction["SCALE_UP"] = "scale_up";
     ScalingAction["SCALE_DOWN"] = "scale_down";
     ScalingAction["NO_ACTION"] = "no_action";
-})(ScalingAction || (exports.ScalingAction = ScalingAction = {}));
-var FailoverType;
+})(ScalingAction || (ScalingAction = {}));
+export var FailoverType;
 (function (FailoverType) {
     FailoverType["AUTOMATIC"] = "automatic";
     FailoverType["MANUAL"] = "manual";
     FailoverType["RECOVERY"] = "recovery";
-})(FailoverType || (exports.FailoverType = FailoverType = {}));
-class ConsoleLogger {
+})(FailoverType || (FailoverType = {}));
+export class ConsoleLogger {
     constructor(prefix = '[GlobalOrchestrator]') {
         this.prefix = prefix;
     }
@@ -66,8 +63,7 @@ class ConsoleLogger {
         }
     }
 }
-exports.ConsoleLogger = ConsoleLogger;
-class GlobalOrchestratorError extends Error {
+export class GlobalOrchestratorError extends Error {
     constructor(code, message, nodeId, federationId, details) {
         super(message);
         this.name = 'GlobalOrchestratorError';
@@ -77,8 +73,7 @@ class GlobalOrchestratorError extends Error {
         this.details = details;
     }
 }
-exports.GlobalOrchestratorError = GlobalOrchestratorError;
-var GlobalOrchestratorErrorCode;
+export var GlobalOrchestratorErrorCode;
 (function (GlobalOrchestratorErrorCode) {
     GlobalOrchestratorErrorCode["DISCOVERY_FAILED"] = "DISCOVERY_FAILED";
     GlobalOrchestratorErrorCode["HEALTH_CHECK_FAILED"] = "HEALTH_CHECK_FAILED";
@@ -88,24 +83,24 @@ var GlobalOrchestratorErrorCode;
     GlobalOrchestratorErrorCode["CONFIGURATION_ERROR"] = "CONFIGURATION_ERROR";
     GlobalOrchestratorErrorCode["FEDERATION_INTEGRATION_ERROR"] = "FEDERATION_INTEGRATION_ERROR";
     GlobalOrchestratorErrorCode["REDIS_CONNECTION_ERROR"] = "REDIS_CONNECTION_ERROR";
-})(GlobalOrchestratorErrorCode || (exports.GlobalOrchestratorErrorCode = GlobalOrchestratorErrorCode = {}));
-var QualityOfService;
+})(GlobalOrchestratorErrorCode || (GlobalOrchestratorErrorCode = {}));
+export var QualityOfService;
 (function (QualityOfService) {
     QualityOfService["BEST_EFFORT"] = "best_effort";
     QualityOfService["RELIABLE"] = "reliable";
     QualityOfService["REAL_TIME"] = "real_time";
-})(QualityOfService || (exports.QualityOfService = QualityOfService = {}));
-var FederationStatus;
+})(QualityOfService || (QualityOfService = {}));
+export var FederationStatus;
 (function (FederationStatus) {
     FederationStatus["ACTIVE"] = "active";
     FederationStatus["INACTIVE"] = "inactive";
     FederationStatus["MAINTENANCE"] = "maintenance";
     FederationStatus["ERROR"] = "error";
-})(FederationStatus || (exports.FederationStatus = FederationStatus = {}));
-var FailoverStrategy;
+})(FederationStatus || (FederationStatus = {}));
+export var FailoverStrategy;
 (function (FailoverStrategy) {
     FailoverStrategy["AUTOMATIC"] = "automatic";
     FailoverStrategy["MANUAL"] = "manual";
     FailoverStrategy["LOAD_BALANCED"] = "load_balanced";
-})(FailoverStrategy || (exports.FailoverStrategy = FailoverStrategy = {}));
+})(FailoverStrategy || (FailoverStrategy = {}));
 //# sourceMappingURL=index.js.map

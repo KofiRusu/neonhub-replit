@@ -1,47 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebSocketClient = void 0;
-const ws_1 = __importDefault(require("ws"));
-const events_1 = require("events");
-const fs = __importStar(require("fs"));
-const types_1 = require("../types");
-class WebSocketClient extends events_1.EventEmitter {
+import WebSocket from 'ws';
+import { EventEmitter } from 'events';
+import * as fs from 'fs';
+import { FederationError, FederationErrorCode, MessagePriority } from '../types';
+export class WebSocketClient extends EventEmitter {
     constructor(nodeId, config, logger, authManager) {
         super();
         this.ws = null;
@@ -63,7 +24,7 @@ class WebSocketClient extends events_1.EventEmitter {
         this.authManager = authManager;
     }
     async connect() {
-        if (this.isConnecting || (this.ws && this.ws.readyState === ws_1.default.OPEN)) {
+        if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
             return;
         }
         this.isConnecting = true;
@@ -81,11 +42,11 @@ class WebSocketClient extends events_1.EventEmitter {
             if (this.config.auth?.enabled) {
                 wsOptions.headers = await this.getAuthHeaders();
             }
-            this.ws = new ws_1.default(url, wsOptions);
+            this.ws = new WebSocket(url, wsOptions);
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
                     this.isConnecting = false;
-                    reject(new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, 'Connection timeout'));
+                    reject(new FederationError(FederationErrorCode.CONNECTION_FAILED, 'Connection timeout'));
                 }, 10000);
                 this.ws.on('open', () => {
                     clearTimeout(timeout);
@@ -119,7 +80,7 @@ class WebSocketClient extends events_1.EventEmitter {
         catch (error) {
             this.isConnecting = false;
             const message = error instanceof Error ? error.message : 'Unknown error';
-            throw new types_1.FederationError(types_1.FederationErrorCode.CONNECTION_FAILED, message);
+            throw new FederationError(FederationErrorCode.CONNECTION_FAILED, message);
         }
     }
     buildConnectionUrl() {
@@ -169,14 +130,14 @@ class WebSocketClient extends events_1.EventEmitter {
     startHeartbeat() {
         this.lastHeartbeat = Date.now();
         this.heartbeatTimer = setInterval(() => {
-            if (this.ws && this.ws.readyState === ws_1.default.OPEN) {
+            if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                 const heartbeatMessage = {
                     id: `heartbeat-${Date.now()}`,
                     type: 'heartbeat',
                     payload: { timestamp: Date.now() },
                     timestamp: Date.now(),
                     sourceNodeId: this.nodeId,
-                    priority: types_1.MessagePriority.LOW,
+                    priority: MessagePriority.LOW,
                 };
                 this.send(heartbeatMessage);
             }
@@ -189,7 +150,7 @@ class WebSocketClient extends events_1.EventEmitter {
         }
     }
     send(message) {
-        if (!this.ws || this.ws.readyState !== ws_1.default.OPEN) {
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
             this.logger.warn('Cannot send message: connection not open');
             return false;
         }
@@ -216,11 +177,10 @@ class WebSocketClient extends events_1.EventEmitter {
         this.logger.info('WebSocket client disconnected');
     }
     isConnected() {
-        return this.ws?.readyState === ws_1.default.OPEN;
+        return this.ws?.readyState === WebSocket.OPEN;
     }
     getReconnectAttempts() {
         return this.reconnectAttempts;
     }
 }
-exports.WebSocketClient = WebSocketClient;
 //# sourceMappingURL=WebSocketClient.js.map

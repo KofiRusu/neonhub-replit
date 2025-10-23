@@ -5,6 +5,7 @@ const config = {
   extensionsToTreatAsEsm: ['.ts'],
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!**/node_modules/**'],
   testPathIgnorePatterns: ['/dist/'],
   transform: {
     '^.+\\.(ts|tsx)$': [
@@ -15,13 +16,14 @@ const config = {
       }
     ]
   },
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
+  passWithNoTests: true,
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^uuid$': '<rootDir>/__mocks__/uuid.ts'
-  },
-  transformIgnorePatterns: ['node_modules/(?!uuid)'],
-  passWithNoTests: true
+  }
 };
 
 module.exports = config;

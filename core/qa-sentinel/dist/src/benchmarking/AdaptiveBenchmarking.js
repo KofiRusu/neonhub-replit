@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdaptiveBenchmarking = void 0;
-const stats_lite_1 = require("stats-lite");
-class AdaptiveBenchmarking {
+import { mean } from 'stats-lite';
+export class AdaptiveBenchmarking {
     constructor() {
         this.baselineMetrics = new Map();
         this.historicalResults = [];
@@ -94,17 +91,17 @@ class AdaptiveBenchmarking {
             .map(d => d.value);
         return {
             responseTime: {
-                avg: responseTimes.length > 0 ? (0, stats_lite_1.mean)(responseTimes) : 200,
+                avg: responseTimes.length > 0 ? mean(responseTimes) : 200,
                 p95: this.calculatePercentile(responseTimes, 95),
                 p99: this.calculatePercentile(responseTimes, 99),
                 min: responseTimes.length > 0 ? Math.min(...responseTimes) : 100,
                 max: responseTimes.length > 0 ? Math.max(...responseTimes) : 500
             },
             throughput: {
-                requestsPerSecond: throughputData.length > 0 ? (0, stats_lite_1.mean)(throughputData) : 80,
+                requestsPerSecond: throughputData.length > 0 ? mean(throughputData) : 80,
                 concurrentUsers: 40 // Estimated
             },
-            errorRate: errorRates.length > 0 ? (0, stats_lite_1.mean)(errorRates) : 0.02,
+            errorRate: errorRates.length > 0 ? mean(errorRates) : 0.02,
             memoryUsage: 300, // MB - would come from system metrics
             cpuUsage: 50, // Percentage - would come from system metrics
             networkIO: {
@@ -231,5 +228,4 @@ class AdaptiveBenchmarking {
         return score >= threshold;
     }
 }
-exports.AdaptiveBenchmarking = AdaptiveBenchmarking;
 //# sourceMappingURL=AdaptiveBenchmarking.js.map
