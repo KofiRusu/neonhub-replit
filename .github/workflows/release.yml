@@ -29,14 +29,30 @@ jobs:
         run: pnpm type-check
       - name: Run tests
         run: pnpm test -- --coverage
+      - name: Verify coverage report generated
+        run: |
+          if [ ! -f "coverage/coverage-summary.json" ]; then
+            echo "❌ Coverage report not generated!"
+            echo "Jest must be configured with: collectCoverage: true"
+            echo "And coverageReporters must include: json-summary"
+            echo "See docs/JEST_COVERAGE_SETUP.md for configuration"
+            exit 1
+          fi
+          echo "✅ Coverage report found"
       - name: Check coverage thresholds
         run: |
+          if [ ! -f "coverage/coverage-summary.json" ]; then
+            echo "❌ Coverage report not found!"
+            echo "Ensure jest.config.js has: collectCoverage: true"
+            exit 1
+          fi
           COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
           echo "Test coverage: $COVERAGE%"
           if (( $(echo "$COVERAGE < 95" | bc -l) )); then
             echo "❌ Coverage below 95% threshold"
             exit 1
           fi
+          echo "✅ Coverage meets 95% requirement"
       - name: Security audit
         run: pnpm audit --prod
       - name: Upload coverage
