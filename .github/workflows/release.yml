@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'v*.*.*'
-      - 'release/*'
   workflow_dispatch:
     inputs:
       version:
@@ -115,8 +114,8 @@ jobs:
             - Web: Deploy to Vercel
             
             ### Validation
-            - ✅ All tests passing (>80% coverage)
-            - ✅ Security audit passed
+            - ✅ All tests passing (≥95% coverage required)
+            - ✅ Security audit passed (0 vulnerabilities)
             - ✅ Build successful
           draft: false
           prerelease: ${{ contains(steps.tag_version.outputs.version, '-alpha') || contains(steps.tag_version.outputs.version, '-beta') || contains(steps.tag_version.outputs.version, '-rc') }}
