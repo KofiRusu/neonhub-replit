@@ -4,18 +4,19 @@
 
 ### Prerequisites (Verified ✅)
 ```bash
-# Environment setup
-export PATH="/Users/kofirusu/.npm-global/bin:$PATH"
+# Environment setup (one time)
+export PATH="$PATH:$HOME/.npm-global/bin"
 
 # Verify all tools
 node --version          # v20.17.0+
 npm --version           # 10.9.0+
 pnpm --version          # 9.12.1+
-xcode-select --version  # /Library/Developer/CommandLineTools
+xcode-select --version  # macOS only: /Library/Developer/CommandLineTools
 ```
 
 ### Load Environment
 ```bash
+# From repo root
 source .env  # Loads DATABASE_URL, OPENAI_API_KEY, STRIPE_SECRET_KEY
 ```
 
@@ -23,20 +24,21 @@ source .env  # Loads DATABASE_URL, OPENAI_API_KEY, STRIPE_SECRET_KEY
 
 ### Phase 1: Local Development
 ```bash
-cd /Users/kofirusu/Desktop/NeonHub
-pnpm install           # Install all workspace dependencies
-pnpm dev              # Start dev servers (api + web)
+# From repo root
+cd $PWD  # Ensure you're in repo root
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 ### Phase 2: Code Quality
 ```bash
-# Skip Husky if needed
+# Skip Husky if needed (set once per session)
 export SKIP_HUSKY=1
 
-# Individual checks
+# From repo root - run quality checks
 pnpm lint              # ESLint across workspaces
 pnpm type-check        # TypeScript validation
-pnpm test              # Jest test suite
+pnpm test -- --coverage  # Jest test suite with coverage
 
 # Fix issues
 pnpm lint -- --fix     # Auto-fix linting errors
@@ -44,7 +46,7 @@ pnpm lint -- --fix     # Auto-fix linting errors
 
 ### Phase 3: Commit & Push
 ```bash
-# Stage changes
+# From repo root
 git add .
 
 # Commit with semantic message
@@ -68,7 +70,7 @@ SKIP_HUSKY=1 git push origin v3.2.0
 ## Workspace Structure
 
 ```
-NeonHub/
+.  (repository root)
 ├── apps/
 │   ├── api/              # Node.js + tRPC backend
 │   └── web/              # Next.js 14 frontend
@@ -85,22 +87,24 @@ NeonHub/
 
 ### ✅ When All Prerequisites Are Met
 ```bash
+# From repo root - set environment once
+export PATH="$PATH:$HOME/.npm-global/bin"
+source .env
+
 # Codex can safely run:
-pnpm install && pnpm lint && pnpm type-check && pnpm test && git push
+pnpm install --frozen-lockfile && pnpm lint && pnpm type-check && pnpm test -- --coverage && git push
 
 # With full automation:
-export PATH="/Users/kofirusu/.npm-global/bin:$PATH"
-source .env
 pnpm install --frozen-lockfile
 pnpm build
-pnpm test
+pnpm test -- --coverage
 npm run verify
 ```
 
 ### 🔄 Continuous Development Loop
 1. **Make Changes** → Edit files in editor
 2. **Verify Quality** → `pnpm lint && pnpm type-check`
-3. **Test Locally** → `pnpm test`
+3. **Test Locally** → `pnpm test -- --coverage`
 4. **Commit** → Semantic message with `git commit`
 5. **Push** → `SKIP_HUSKY=1 git push origin <branch>`
 6. **Wait for CI** → GitHub Actions validates
@@ -118,8 +122,8 @@ git push origin <branch>
 
 ### Issue: pnpm not in PATH
 ```bash
-# Workaround: Add to PATH
-export PATH="/Users/kofirusu/.npm-global/bin:$PATH"
+# Workaround: Add to PATH (one time per session)
+export PATH="$PATH:$HOME/.npm-global/bin"
 pnpm --version  # Should work now
 ```
 
@@ -173,7 +177,7 @@ main (production)
    ```bash
    pnpm lint
    pnpm type-check
-   pnpm test
+   pnpm test -- --coverage
    ```
 
 5. **Commit & Push**
@@ -197,7 +201,7 @@ System Requirements: ✅ MET
 
 Development Workflow: ✅ ESTABLISHED
 ├── Local dev: `pnpm install && pnpm dev`
-├── Quality checks: `pnpm lint && pnpm type-check && pnpm test`
+├── Quality checks: `pnpm lint && pnpm type-check && pnpm test -- --coverage`
 ├── Git workflow: Semantic commits + feature branches
 └── Release automation: GitHub Actions + semantic versioning
 
@@ -207,6 +211,6 @@ Codex Instructions: ✅ ACTIVE
 
 ## Support
 
-- **Slack**: #development
 - **Issues**: https://github.com/NeonHub3A/neonhub/issues
-- **Docs**: /Users/kofirusu/Desktop/NeonHub/docs/
+- **Docs**: ./docs/
+- **Slack**: #development channel
