@@ -1,0 +1,38 @@
+
+> @neonhub/backend-v3.2@3.2.0 test
+> NODE_ENV=test jest
+
+sh: jest: command not found
+npm error Lifecycle script `test` failed with error:
+npm error code 127
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c NODE_ENV=test jest
+
+
+> @neonhub/data-trust@1.0.0 test
+> jest
+
+sh: jest: command not found
+npm error Lifecycle script `test` failed with error:
+npm error code 127
+npm error path /Users/kofirusu/Desktop/NeonHub/core/data-trust
+npm error workspace @neonhub/data-trust@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/data-trust
+npm error command failed
+npm error command sh -c jest
+
+
+> @neonhub/eco-optimizer@1.0.0 test
+> jest
+
+sh: jest: command not found
+npm error Lifecycle script `test` failed with error:
+npm error code 127
+npm error path /Users/kofirusu/Desktop/NeonHub/core/eco-optimizer
+npm error workspace @neonhub/eco-optimizer@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/eco-optimizer
+npm error command failed
+npm error command sh -c jest

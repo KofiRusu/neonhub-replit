@@ -1,0 +1,144 @@
+
+> @neonhub/data-trust@1.0.0 test
+> jest --runInBand --reporters=default --verbose
+
+{"actor":"user@example.com","category":"data_access","details":{"operation":"getData"},"eventId":"678a69f3-0550-4d3f-8b17-5d8fff90a8b3","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.675Z"}
+{"actor":"system","blockchainTx":"0x1234567890abcdef","category":"blockchain","details":{"hash":"datahash123"},"eventId":"cfb03428-fa1d-4884-b341-4008eb54e2ea","level":"\u001b[32minfo\u001b[39m","message":"store_hash","resource":"blockchain","timestamp":"2025-10-23T20:57:32.678Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"78eb3aae-eca5-43ea-96b8-596cc6d9291d","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.678Z"}
+{"actor":"system","category":"system","details":{"error":"test error"},"eventId":"97b8ef94-2c57-4762-a778-494678c1eb47","level":"\u001b[31merror\u001b[39m","message":"error_occurred","resource":"system","timestamp":"2025-10-23T20:57:32.679Z"}
+{"actor":"user@example.com","category":"authentication","details":{},"eventId":"3bf86930-8722-4431-94db-b88bf7f1e263","level":"\u001b[32minfo\u001b[39m","message":"login","resource":"authentication","timestamp":"2025-10-23T20:57:32.680Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"9a508451-1331-4609-a70d-ccfb4be388a8","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-1","timestamp":"2025-10-23T20:57:32.682Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"84641838-0371-4d6c-8fd0-b5b8d023a8d7","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-2","timestamp":"2025-10-23T20:57:32.682Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"ac49ebc5-a731-4620-955f-9e8b22b678fe","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.683Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"7b474541-7f12-4c00-89b2-17b1e45f1163","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.690Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"163cd870-97ea-456e-aeef-de782c8c7e6f","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.690Z"}
+{"actor":"user@example.com","category":"authentication","details":{"success":true},"eventId":"049e27c5-b4da-4c91-b330-8cf2a1b57d47","level":"\u001b[32minfo\u001b[39m","message":"login","resource":"authentication","timestamp":"2025-10-23T20:57:32.691Z"}
+{"actor":"user@example.com","category":"authorization","details":{"success":true},"eventId":"d12f3940-c5b9-4a3a-a309-679d9f6d7a46","level":"\u001b[32minfo\u001b[39m","message":"access_granted","resource":"data-123","timestamp":"2025-10-23T20:57:32.691Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"7ec84677-a2c4-4ed9-b300-fe88c570d4cf","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.692Z"}
+{"actor":"system","category":"integrity_check","details":{"success":true},"eventId":"847bf134-b618-428e-a063-fcca88c1f9a6","level":"\u001b[32minfo\u001b[39m","message":"integrity_check","resource":"data-123","timestamp":"2025-10-23T20:57:32.692Z"}
+{"actor":"system","blockchainTx":"0xabc123","category":"blockchain","details":{},"eventId":"7d57ed86-effd-483b-b48f-419b34c67651","level":"\u001b[32minfo\u001b[39m","message":"store_hash","resource":"blockchain","timestamp":"2025-10-23T20:57:32.692Z"}
+{"actor":"user@example.com","category":"data_access","details":{"note":"special operation"},"eventId":"65d652a7-7210-4fdb-9521-44a3ba6986a5","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"important-data","timestamp":"2025-10-23T20:57:32.692Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"753961f9-6dfd-4412-854b-06085f406914","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.693Z"}
+{"actor":"system","category":"system","details":{},"eventId":"27240a8e-78d5-434c-bd9d-a3f8b55ce062","level":"\u001b[31merror\u001b[39m","message":"error","resource":"system","timestamp":"2025-10-23T20:57:32.693Z"}
+{"actor":"user@example.com","category":"data_access","details":{},"eventId":"11331699-b9a8-45d5-93ed-f96d04aca168","level":"\u001b[32minfo\u001b[39m","message":"read","resource":"data-123","timestamp":"2025-10-23T20:57:32.693Z"}
+{"fileAge":0.007148067129629629,"level":"\u001b[32minfo\u001b[39m","message":"Log file cleanup needed","retentionDays":0,"timestamp":"2025-10-23T20:57:32.695Z"}
+PASS src/__tests__/AuditTrail.test.ts
+  AuditTrail
+    log
+      ✓ should log an audit event (6 ms)
+      ✓ should log event with blockchain transaction (1 ms)
+    query
+      ✓ should query events by date range (1 ms)
+      ✓ should filter by level
+      ✓ should filter by category (1 ms)
+      ✓ should apply limit and offset (2 ms)
+    getEvent
+      ✓ should get specific event (1 ms)
+      ✓ should throw error for non-existing event (6 ms)
+    exportAuditLog
+      ✓ should export as JSON (1 ms)
+      ✓ should export as CSV
+    helper methods
+      ✓ should log authentication event
+      ✓ should log authorization event
+      ✓ should log data access event (1 ms)
+      ✓ should log integrity check event
+      ✓ should log blockchain event
+    searchEvents
+      ✓ should search events by text (1 ms)
+    getAuditStats
+      ✓ should return audit statistics
+    cleanup
+      ✓ should cleanup old events (2 ms)
+
+PASS src/__tests__/IntegrityVerifier.test.ts
+  IntegrityVerifier
+    checkIntegrity
+      ✓ should verify data integrity with expected hash
+      ✓ should detect invalid hash
+      ✓ should work without expected hash
+    batchCheckIntegrity
+      ✓ should check multiple data items (2 ms)
+    createMerkleTree
+      ✓ should create Merkle tree for dataset
+    generateMerkleProof
+      ✓ should generate proof for data item
+      ✓ should throw error for non-existing tree (3 ms)
+    verifyMerkleProof
+      ✓ should verify valid Merkle proof
+    comprehensiveIntegrityCheck
+      ✓ should perform comprehensive integrity check (1 ms)
+    validateDataFormat
+      ✓ should validate JSON format
+      ✓ should reject invalid JSON format
+      ✓ should validate CSV format
+    checkConsistency
+      ✓ should check consistency across sources
+      ✓ should detect inconsistency
+
+PASS src/__tests__/ProvenanceTracker.test.ts
+  ProvenanceTracker
+    recordEvent
+      ✓ should record a provenance event (1 ms)
+    getProvenance
+      ✓ should get provenance for existing data
+      ✓ should throw error for non-existing data (5 ms)
+    getEventHistory
+      ✓ should get event history (2 ms)
+      ✓ should limit results when specified
+    updateDataHash
+      ✓ should update data hash
+    transferOwnership
+      ✓ should transfer ownership
+      ✓ should reject transfer from non-owner
+    verifyIntegrity
+      ✓ should verify data integrity
+    getDataByOwner
+      ✓ should get data by owner
+
+PASS src/__tests__/MerkleTree.test.ts
+  MerkleTree
+    build
+      ✓ should build tree with single leaf
+      ✓ should build tree with multiple leaves
+      ✓ should handle odd number of leaves
+    generateProof
+      ✓ should generate proof for existing leaf
+      ✓ should throw error for non-existing leaf (4 ms)
+    verifyProof
+      ✓ should verify correct proof
+      ✓ should reject incorrect proof
+    getLeaves
+      ✓ should return all leaves (1 ms)
+    getTree
+      ✓ should return tree structure
+    verifyTree
+      ✓ should verify tree consistency
+    configuration
+      ✓ should use custom configuration
+
+PASS src/__tests__/DataHasher.test.ts
+  DataHasher
+    hash
+      ✓ should hash a string using default algorithm
+      ✓ should hash a buffer
+      ✓ should use specified algorithm (1 ms)
+      ✓ should produce consistent hashes
+      ✓ should produce different hashes for different data
+    verify
+      ✓ should verify correct hash
+      ✓ should reject incorrect hash
+    hashMultiple
+      ✓ should hash multiple data items
+    doubleHash
+      ✓ should perform double hashing
+    getAvailableAlgorithms
+      ✓ should return available algorithms
+    getHashLength
+      ✓ should return correct hash lengths
+
+Test Suites: 5 passed, 5 total
+Tests:       64 passed, 64 total
+Snapshots:   0 total
+Time:        0.752 s, estimated 1 s
+Ran all test suites.
