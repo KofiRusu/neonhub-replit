@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+[ -n "$SKIP_HUSKY" ] && exit 0
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run verify script before push

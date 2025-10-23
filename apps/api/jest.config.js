@@ -20,6 +20,7 @@ const config = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
+  setupFiles: ['<rootDir>/jest.setup.ts'],
   collectCoverage: true,
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
   coverageThreshold: {
