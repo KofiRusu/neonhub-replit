@@ -1,0 +1,107 @@
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'release/*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v3.2.0)'
+        required: true
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Verify prerequisites
+        run: |
+          node --version
+          npm --version
+          pnpm --version
+          xcode-select --print-path
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run linting
+        run: pnpm lint
+      - name: Run type check
+        run: pnpm type-check
+      - name: Run tests
+        run: pnpm test
+
+  build:
+    name: Build Artifacts
+    needs: validate
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build API
+        run: cd apps/api && pnpm build
+      - name: Build Web
+        run: cd apps/web && pnpm build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            apps/api/dist
+            apps/web/.next
+
+  create-release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Release Notes
+            See [RELEASE_NOTES.md](./release/RELEASE_NOTES_v${{ github.ref_name }}.md) for details.
+            
+            ## Deployment
+            - API: Deploy to production
+            - Web: Deploy to Vercel
+          draft: false
+          prerelease: false
+
+  deploy:
+    name: Deploy to Production
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy API to production
+        run: |
+          echo "Deploying API..."
+          # Add deployment commands here
+      - name: Deploy Web to Vercel
+        run: |
+          echo "Deploying Web to Vercel..."
+          # Add Vercel deployment commands here
