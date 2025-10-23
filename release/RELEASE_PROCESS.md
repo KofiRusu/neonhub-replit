@@ -12,7 +12,7 @@ This document outlines the standardized release process for NeonHub, ensuring co
 ## Pre-Release Checklist
 
 ### 1. Code Quality
-- [ ] All tests passing (>= 95% coverage)
+- [ ] All tests passing with >= 95% coverage requirement
 - [ ] ESLint/TypeScript validation: 0 errors, 0 warnings
 - [ ] Code review approved by 2+ maintainers
 - [ ] No security vulnerabilities (npm audit clean)
@@ -44,8 +44,9 @@ git checkout -b release/v{VERSION}
 
 ### Step 2: Update Version Numbers
 ```bash
-# Update package.json versions
-pnpm version {VERSION}
+# Update package.json versions WITHOUT auto-creating git tag
+# (we'll create the tag manually in Step 6)
+pnpm version {VERSION} --no-git-tag-version
 
 # Update release notes
 cp docs/RELEASE_NOTES_TEMPLATE.md release/RELEASE_NOTES_v{VERSION}.md
@@ -57,12 +58,16 @@ cp docs/RELEASE_NOTES_TEMPLATE.md release/RELEASE_NOTES_v{VERSION}.md
 # Prerequisites check (portable for all environments)
 export NODE_ENV=production
 
-# Install and test
+# Install and test WITH coverage reporting
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm type-check
-pnpm test
-pnpm audit  # Security check
+pnpm test -- --coverage  # MUST include --coverage to generate coverage data
+
+# Verify coverage meets 95% threshold
+# Look for output: "Lines : X% (must be >= 95%)"
+# If below 95%, coverage gate will block deployment
+pnpm audit --prod  # FAIL if vulnerabilities found (no bypassing)
 ```
 
 ### Step 4: Create Release Commit
@@ -195,3 +200,16 @@ Estimated: 10-15 minutes
 - **Release Manager**: @kofirusu
 - **Slack Channel**: #releases
 - **On-Call**: Check PagerDuty
+
+## Production Readiness: Coverage & Security
+
+**Coverage Requirement**: >= 95% (enforced)
+- Local validation: `pnpm test -- --coverage`
+- CI/CD validation: `.github/workflows/release.yml` enforces 95% minimum
+- Non-negotiable: Release will not proceed if coverage < 95%
+
+**Security Requirement**: 0 critical/high vulnerabilities
+- Local validation: `pnpm audit --prod`
+- CI/CD validation: `.github/workflows/release.yml` enforces strict security audit
+- Non-negotiable: Any vulnerability blocks the release
+- Note: Use `pnpm audit --fix` to remediate before release
