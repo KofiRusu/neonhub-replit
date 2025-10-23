@@ -53,7 +53,7 @@
 
 ### Phase 1️⃣: Local Development
 ```bash
-cd /Users/kofirusu/Desktop/NeonHub
+# From repo root
 pnpm install
 pnpm dev  # Starts API + Web in dev mode
 ```
