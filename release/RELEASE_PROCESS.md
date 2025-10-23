@@ -4,8 +4,9 @@
 This document outlines the standardized release process for NeonHub, ensuring consistency, quality, and traceability across all deployments.
 
 ## Release Versioning
-- **Format**: `v{MAJOR}.{MINOR}.{PATCH}-{CHANNEL}` (e.g., `v3.2.0-stable`)
-- **Channels**: `alpha`, `beta`, `rc` (release candidate), `stable`
+- **Format**: `v{MAJOR}.{MINOR}.{PATCH}` for final releases (e.g., `v3.2.0`)
+- **Pre-release Format**: `v{MAJOR}.{MINOR}.{PATCH}-{CHANNEL}` (e.g., `v3.2.0-alpha.1`, `v3.2.0-beta.2`, `v3.2.0-rc.1`)
+- **Channels**: `alpha`, `beta`, `rc` (release candidate) — NOT for stable releases
 - **Semver**: Follows [Semantic Versioning 2.0.0](https://semver.org/)
 
 ## Pre-Release Checklist
@@ -48,19 +49,20 @@ pnpm version {VERSION}
 
 # Update release notes
 cp docs/RELEASE_NOTES_TEMPLATE.md release/RELEASE_NOTES_v{VERSION}.md
+# Then edit the template with specific details
 ```
 
 ### Step 3: Run Full Test Suite
 ```bash
-# Prerequisites check
-export PATH="/Users/kofirusu/.npm-global/bin:$PATH"
-source .env
+# Prerequisites check (portable for all environments)
+export NODE_ENV=production
 
 # Install and test
-pnpm install
+pnpm install --frozen-lockfile
 pnpm lint
 pnpm type-check
 pnpm test
+pnpm audit  # Security check
 ```
 
 ### Step 4: Create Release Commit
