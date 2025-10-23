@@ -1,1 +1,29 @@
-npm test
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Escape hatch for emergencies
+if [ -n "$SKIP_HUSKY" ]; then
+  echo "SKIP_HUSKY set - skipping pre-commit checks"
+  exit 0
+fi
+
+pnpm_cmd="pnpm"
+if ! command -v pnpm >/dev/null 2>&1; then
+  pnpm_cmd="npx --yes pnpm"
+fi
+
+echo "Running pre-commit lint..."
+if ! $pnpm_cmd -w run lint:strict; then
+  echo "Lint failed - aborting commit"
+  exit 1
+fi
+
+if [ -z "$SKIP_TESTS" ]; then
+  echo "Running quick tests..."
+  if ! $pnpm_cmd -w run test:quick; then
+    echo "Quick tests failed - aborting commit"
+    exit 1
+  fi
+else
+  echo "SKIP_TESTS set - skipping tests in pre-commit"
+fi

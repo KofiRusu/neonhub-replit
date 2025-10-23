@@ -34,37 +34,40 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Enable Corepack
+      run: corepack enable
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
 
     - name: Generate Prisma client
-      run: npm run prisma:generate
+      run: pnpm -w run prisma:generate --workspace apps/api
 
-    - name: Type check
-      run: npm run typecheck
-      continue-on-error: true # Allow TypeScript errors (build still works)
+    - name: Typecheck
+      run: pnpm -w run typecheck --workspace apps/web
 
-    - name: Lint
-      run: npm run lint
-      continue-on-error: true # Allow lint warnings (build still works)
+    - name: Lint (strict)
+      run: pnpm -w run lint:strict --workspace apps/web
 
     - name: Build API
-      run: cd apps/api && npm run build
+      run: pnpm -w run build --workspace apps/api
 
     - name: Build Web
-      run: cd apps/web && npm run build
+      run: pnpm -w run build --workspace apps/web
       env:
+        NEXT_USE_WEBPACK: "1"
         NEXT_PUBLIC_SITE_URL: https://test.example.com
         NEXT_PUBLIC_API_URL: https://api-test.example.com
         NEXTAUTH_URL: https://test.example.com
         NEXTAUTH_SECRET: test-secret-for-ci-builds-only
         NODE_ENV: production
 
-    - name: Run tests (if any)
-      run: npm test
-      continue-on-error: true # Don't fail CI if no tests exist
+    - name: Test (full, single worker)
+      run: pnpm -w run test --workspaces --if-present
+      env:
+        CI: "true"
 
   smoke-test:
     runs-on: ubuntu-latest
