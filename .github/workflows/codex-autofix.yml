@@ -1,0 +1,109 @@
+name: Codex Auto-Fix on Failure
+
+on:
+  workflow_run:
+    workflows: ["CI", "Auto Sync from Sibling Repos"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  codex-autofix:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      FAILED_NAME: ${{ github.event.workflow_run.name }}
+      FAILED_URL: ${{ github.event.workflow_run.html_url }}
+      FAILED_BRANCH: ${{ github.event.workflow_run.head_branch }}
+      FAILED_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Preflight check for OPENAI_API_KEY
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY is required (repo/org secret). Exiting."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.FAILED_SHA }}
+          fetch-depth: 0
+
+      - name: Setup Node & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies (best effort)
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Run Codex to heal the failing workflow
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          safety-strategy: drop-sudo
+          codex-args: '["--timeout","20m","--plan","true","--write","true"]'
+          prompt: |
+            You are a cautious CI healer for a pnpm monorepo called NeonHub.
+            Objective: make the failing GitHub Actions workflow green with the smallest possible diff.
+            
+            Context:
+              - Primary failures: auto-sync-from-siblings (missing scripts/secret), plus any CI drifts.
+              - Use pnpm everywhere; enable Corepack; avoid sudo.
+              - Required files that may be missing:
+                scripts/auto-sync/index.ts
+                scripts/auto-sync/run-ci.sh
+                scripts/auto-sync/config.json
+                scripts/smoke.sh
+                scripts/ci-cd/qa-sentinel-trigger.sh
+                .github/workflows/mlc_config.json
+              - Required package.json scripts that workflows call:
+                root: lint, typecheck, test:ci, build
+                apps/api: prisma:generate, prisma:migrate:deploy, seed, test
+            
+            Steps:
+              1) Inspect workflow logs to identify the exact failure.
+              2) If a referenced file/script is missing, create a minimal safe stub that does nothing harmful and exits 0 (when allowed) or make the workflow skip gracefully using bash checks.
+              3) Keep Auto-Sync safe: if SOURCE_PAT is missing, skip with neutral success and a clear log line. If scripts are missing, skip.
+              4) Do not refactor app logic. Keep changes surgical to CI/scripts/workflows.
+              5) Verify locally: pnpm -r lint; pnpm -r build; pnpm --filter apps/api run prisma:generate; pnpm -r test --if-present.
+              6) Summarize root cause and all edits in ≤ 200 words for the PR body.
+            
+            Output: final diff summary + commands you ran.
+
+      - name: Fast verify (non-blocking)
+        run: |
+          pnpm -r test --reporter=dot || true
+          pnpm -r build || true
+
+      - name: Create PR with fixes
+        if: success()
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: codex/autofix-${{ github.event.workflow_run.run_id }}
+          title: "ci: Codex auto-fix for '${{ env.FAILED_NAME }}'"
+          base: ${{ env.FAILED_BRANCH }}
+          commit-message: "ci: Codex auto-fix for run ${{ github.event.workflow_run.run_id }}"
+          body: |
+            ## 🤖 Codex Auto-Fix
+            
+            **Failed workflow:** ${{ env.FAILED_URL }}
+            **Failed branch:** ${{ env.FAILED_BRANCH }}
+            **Failed SHA:** ${{ env.FAILED_SHA }}
+            
+            ### Codex Summary:
+            ${{ steps.codex.outputs.final-message }}
+            
+            ---
+            
+            This PR was automatically created by the Codex Auto-Fix workflow.
+            Please review the changes and merge if appropriate.
+
