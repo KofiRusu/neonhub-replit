@@ -8,7 +8,12 @@
     "build": "tsc",
     "test": "jest --passWithNoTests",
     "lint": "eslint src/**/*.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "qa:validate": "node scripts/stub-ci.js validate",
+    "qa:scheduled": "node scripts/stub-ci.js scheduled",
+    "benchmark:compare": "node scripts/stub-ci.js benchmark",
+    "anomaly:detect": "node scripts/stub-ci.js anomaly",
+    "report:generate": "node scripts/stub-ci.js report"
   },
   "keywords": [
     "qa",

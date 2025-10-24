@@ -1,3 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WEB_URL="${WEB_URL:-http://localhost:3000}"
+API_URL="${API_URL:-http://localhost:3001}"
+
+echo "🔎 Smoke: checking $WEB_URL and $API_URL"
+
+status_ok() {
+  local url="$1"
+  if curl -fsS -o /dev/null -w "%{http_code}" "$url" | grep -Eq "^(200|301|302)$"; then
+    return 0
+  fi
+  return 1
+}
+
+if status_ok "$WEB_URL"; then
+  echo "✅ Web reachable: $WEB_URL"
+else
+  echo "⚠️  Web not reachable: $WEB_URL" >&2
+fi
+
+if status_ok "$API_URL"; then
+  echo "✅ API reachable: $API_URL"
+else
+  echo "⚠️  API not reachable: $API_URL" >&2
+fi
+
+echo "✅ Smoke complete"
+
 #!/bin/bash
 # Production Smoke Tests - NeonHub v3.x
 

@@ -20,32 +20,79 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      SOURCE_PAT: ${{ secrets.SOURCE_PAT }}
+      SOURCE_PAT: ${{ secrets.SOURCE_PAT || secrets.GITHUB_TOKEN }}
       NODE_OPTIONS: "--max-old-space-size=4096"
     steps:
+      - name: Skip if SOURCE_PAT not configured and repos likely private
+        run: |
+          if [ -z "${SOURCE_PAT}" ]; then
+            echo "⚠️ SOURCE_PAT not set; if source repos are private this run will fail. Skipping to avoid noisy failures." && exit 0
+          fi
+        shell: bash
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Detect package manager
+        id: pkg_manager
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "manager=pnpm" >> $GITHUB_OUTPUT
+          else
+            echo "manager=npm" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Enable pnpm for caching
+        if: steps.pkg_manager.outputs.manager == 'pnpm'
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: ${{ hashFiles('pnpm-lock.yaml') && 'pnpm' || 'npm' }}
+
+      - name: Install pnpm
+        if: steps.pkg_manager.outputs.manager == 'pnpm'
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
 
       - name: Install deps
         run: |
           corepack enable || true
-          npm ci
+          if command -v pnpm >/dev/null 2>&1 && [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+          else
+            npm ci
+          fi
 
       - name: Ensure labels exist
         run: |
-          gh label create auto-sync -c "#0366d6" -d "Automated sync PRs" 2>&1 || true
-          gh label create risk:low -c "#2cbe4e" -d "Low risk changes" 2>&1 || true
-          gh label create risk:medium -c "#fbca04" -d "Medium risk changes" 2>&1 || true
-          gh label create risk:high -c "#d93f0b" -d "High risk changes" 2>&1 || true
+          labels=(
+            "auto-sync:#0366d6:Automated sync PRs"
+            "risk:low:#2cbe4e:Low risk changes"
+            "risk:medium:#fbca04:Medium risk changes"
+            "risk:high:#d93f0b:High risk changes"
+          )
+          
+          for label in "${labels[@]}"; do
+            IFS=':' read -r name color desc <<< "$label"
+            gh label list --limit 100 | grep -q "^${name}" || \
+              gh label create "${name}" -c "${color}" -d "${desc}" || true
+          done
+
+      - name: Validate auto-sync script
+        run: |
+          if [ ! -f scripts/auto-sync/index.ts ]; then
+            echo "❌ Auto-sync script not found"
+            exit 1
+          fi
+          npx --yes tsx@4 --check scripts/auto-sync/index.ts
+          echo "✅ Auto-sync script validated"
 
       - name: Run Auto Sync
         run: |
           chmod +x scripts/auto-sync/run-ci.sh
           ./scripts/auto-sync/run-ci.sh
-

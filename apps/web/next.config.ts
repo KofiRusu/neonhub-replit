@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 // Import env validation - will validate on startup
 import "./src/config/env";
@@ -77,6 +78,11 @@ const nextConfig: NextConfig = {
   
   // Webpack optimizations
   webpack: (config, { isServer }) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "src"),
+    };
+
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
