@@ -6,9 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_DATABASE_URL")
+  extensions = [vector(schema: "public")]
 }
 
 enum AgentKind {
@@ -175,6 +176,8 @@ model Organization {
   Feedback          Feedback[]
   TeamMember        TeamMember[]
   ConnectorAuth     ConnectorAuth[]
+
+  @@map("organizations")
 }
 
 model OrganizationRole {
@@ -191,6 +194,7 @@ model OrganizationRole {
   memberships     OrganizationMembership[]
 
   @@unique([organizationId, slug])
+  @@map("organization_roles")
 }
 
 model OrganizationPermission {
@@ -204,6 +208,7 @@ model OrganizationPermission {
   rolePermissions RolePermission[]
 
   @@unique([organizationId, key])
+  @@map("organization_permissions")
 }
 
 model RolePermission {
@@ -214,6 +219,7 @@ model RolePermission {
   permission OrganizationPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
+  @@map("role_permissions")
 }
 
 model OrganizationMembership {
@@ -232,14 +238,15 @@ model OrganizationMembership {
   role         OrganizationRole? @relation(fields: [roleId], references: [id], onDelete: SetNull)
 
   @@unique([organizationId, userId])
+  @@map("organization_members")
 }
 
 model ApiKey {
   id             String    @id @default(cuid())
   organizationId String
-  userId         String
+  createdById    String
   name           String
-  keyHash        String
+  tokenHash      String
   scopes         String[]  @default([])
   lastUsedAt     DateTime?
   expiresAt      DateTime?
@@ -247,10 +254,11 @@ model ApiKey {
   createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator      User         @relation("ApiKeyCreator", fields: [userId], references: [id], onDelete: Cascade)
+  creator      User         @relation("ApiKeyCreator", fields: [createdById], references: [id], onDelete: Cascade)
 
-  @@unique([organizationId, keyHash])
-  @@unique([userId, keyHash])
+  @@unique([organizationId, tokenHash])
+  @@unique([createdById, tokenHash])
+  @@map("api_keys")
 }
 
 model EmbeddingSpace {
@@ -269,6 +277,9 @@ model EmbeddingSpace {
   datasets     Dataset[]
   chunks       Chunk[]
   Document     Document[]
+
+  @@unique([organizationId, name])
+  @@map("embedding_spaces")
 }
 
 model Brand {
@@ -288,21 +299,24 @@ model Brand {
   assets       BrandAsset[]
 
   @@unique([organizationId, slug])
+  @@map("brands")
 }
 
 model BrandVoice {
-  id               String                @id @default(cuid())
+  id               String                 @id @default(cuid())
   brandId          String
   embeddingSpaceId String
-  promptTemplate   String                @db.Text
+  promptTemplate   String                 @db.Text
   styleRulesJson   Json
-  embedding        Unsupported("vector")
+  embedding        Unsupported("vector")?
   metrics          Json?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   brand          Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
   embeddingSpace EmbeddingSpace @relation(fields: [embeddingSpaceId], references: [id], onDelete: Cascade)
+
+  @@map("brand_voices")
 }
 
 model BrandAsset {
@@ -315,6 +329,8 @@ model BrandAsset {
   createdAt DateTime @default(now())
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_assets")
 }
 
 model Agent {
@@ -337,6 +353,7 @@ model Agent {
   tools        Tool[]
 
   @@unique([organizationId, slug])
+  @@map("agents")
 }
 
 model AgentCapability {
@@ -347,6 +364,8 @@ model AgentCapability {
   createdAt DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_capabilities")
 }
 
 model AgentConfig {
@@ -360,6 +379,7 @@ model AgentConfig {
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, key])
+  @@map("agent_configs")
 }
 
 model AgentRun {
@@ -381,6 +401,7 @@ model AgentRun {
   runMetrics     AgentRunMetric[]
 
   @@index([agentId, startedAt])
+  @@map("agent_runs")
 }
 
 model AgentRunMetric {
@@ -391,6 +412,8 @@ model AgentRunMetric {
   metadata   Json?
 
   agentRun AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+
+  @@map("agent_run_metrics")
 }
 
 model Tool {
@@ -409,6 +432,7 @@ model Tool {
   agentId      String?
 
   @@unique([organizationId, slug])
+  @@map("tools")
 }
 
 model ToolExecution {
@@ -424,6 +448,8 @@ model ToolExecution {
 
   tool     Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
   agentRun AgentRun? @relation(fields: [agentRunId], references: [id], onDelete: SetNull)
+
+  @@map("tool_executions")
 }
 
 model Conversation {
@@ -442,23 +468,25 @@ model Conversation {
   messages     Message[]
 
   @@index([organizationId, createdAt])
+  @@map("conversations")
 }
 
 model Message {
-  id             String                @id @default(cuid())
+  id             String                 @id @default(cuid())
   conversationId String
   authorId       String?
   role           MessageRole
   contentJson    Json
-  embedding      Unsupported("vector")
+  embedding      Unsupported("vector")?
   metadata       Json?
-  createdAt      DateTime              @default(now())
+  createdAt      DateTime               @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   author       User?        @relation("MessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([conversationId, createdAt])
   @@index([role, createdAt])
+  @@map("messages")
 }
 
 model Dataset {
@@ -481,6 +509,7 @@ model Dataset {
   AgentRun       AgentRun[]
 
   @@unique([organizationId, slug])
+  @@map("datasets")
 }
 
 model Document {
@@ -501,18 +530,20 @@ model Document {
   owner          User            @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   embeddingSpace EmbeddingSpace? @relation(fields: [embeddingSpaceId], references: [id], onDelete: SetNull)
   chunks         Chunk[]
+
+  @@map("documents")
 }
 
 model Chunk {
-  id               String                @id @default(cuid())
+  id               String                 @id @default(cuid())
   datasetId        String
   documentId       String
   embeddingSpaceId String
   idx              Int
-  text             String                @db.Text
-  embedding        Unsupported("vector")
+  text             String                 @db.Text
+  embedding        Unsupported("vector")?
   metadata         Json?
-  createdAt        DateTime              @default(now())
+  createdAt        DateTime               @default(now())
 
   dataset        Dataset        @relation(fields: [datasetId], references: [id], onDelete: Cascade)
   document       Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
@@ -520,6 +551,7 @@ model Chunk {
 
   @@unique([datasetId, idx])
   @@index([embeddingSpaceId])
+  @@map("chunks")
 }
 
 model ModelVersion {
@@ -534,6 +566,8 @@ model ModelVersion {
   organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   trainingJobs TrainingJob[]
   endpoints    InferenceEndpoint[]
+
+  @@map("model_versions")
 }
 
 model TrainingJob {
@@ -546,6 +580,8 @@ model TrainingJob {
   completedAt    DateTime?
 
   modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@map("training_jobs")
 }
 
 model InferenceEndpoint {
@@ -562,6 +598,7 @@ model InferenceEndpoint {
   modelVersion ModelVersion? @relation(fields: [modelVersionId], references: [id], onDelete: SetNull)
 
   @@unique([organizationId, slug])
+  @@map("inference_endpoints")
 }
 
 model Content {
@@ -579,6 +616,8 @@ model Content {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   author       User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@map("content")
 }
 
 model Campaign {
@@ -602,6 +641,7 @@ model Campaign {
   abTests        ABTest[]
 
   @@index([organizationId, status])
+  @@map("campaigns")
 }
 
 model CampaignMetric {
@@ -610,11 +650,12 @@ model CampaignMetric {
   kind       String
   value      Float?
   payload    Json?
-  ts         DateTime @default(now())
+  timestamp  DateTime @default(now())
 
   campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
-  @@index([campaignId, kind, ts])
+  @@index([campaignId, kind, timestamp])
+  @@map("campaign_metrics")
 }
 
 model EmailSequence {

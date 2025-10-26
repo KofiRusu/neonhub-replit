@@ -60,6 +60,15 @@ function resolveBinary(command) {
           // fall through to throw original error
         }
       }
+      if (command === "tsx") {
+        const apiTsx = resolve(repoRoot, "apps/api/node_modules/tsx/dist/cli.mjs");
+        try {
+          accessSync(apiTsx, constants.R_OK);
+          return apiTsx;
+        } catch {
+          // ignore
+        }
+      }
       throw error;
     }
   } catch (error) {

@@ -4,13 +4,13 @@ services:
     container_name: neonhub-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: neonhub
+      POSTGRES_PASSWORD: neonhub
       POSTGRES_DB: neonhub
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U neonhub"]
       interval: 10s
       timeout: 5s
       retries: 5
