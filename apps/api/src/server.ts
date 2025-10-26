@@ -25,13 +25,29 @@ import ecoMetricsRouter from "./routes/eco-metrics.js";
 import orchestrationRouter from "./routes/orchestration.js";
 import { stripeWebhookRouter } from "./routes/stripe-webhook.js";
 import billingRouter from "./routes/billing.js";
+import documentsRouter from "./routes/documents.js";
+import tasksRouter from "./routes/tasks.js";
+import feedbackRouter from "./routes/feedback.js";
+import messagesRouter from "./routes/messages.js";
+import { teamRouter } from "./routes/team.js";
+import { trendsRouter } from "./routes/trends.js";
 import { AppError } from "./lib/errors.js";
+import { registerConnectors } from "./connectors/index.js";
+import { syncRegisteredConnectors } from "./services/connector.service.js";
+import connectorsRouter from "./routes/connectors.js";
 import cookieParser from "cookie-parser";
 
 // Environment is validated on import
 
 // Initialize Sentry (no-op if DSN not configured)
 initSentry();
+
+// Register connectors and sync metadata in background
+registerConnectors()
+  .then(syncRegisteredConnectors)
+  .catch(error => {
+    logger.error({ error }, "Failed to register connectors");
+  });
 
 // Create Express app
 const app = express();
@@ -83,6 +99,15 @@ app.use('/api/data-trust', requireAuth, adminIPGuard, auditMiddleware('data-trus
 app.use('/api/eco-metrics', requireAuth, adminIPGuard, auditMiddleware('eco-metrics'), ecoMetricsRouter);
 app.use('/api/orchestration', requireAuth, adminIPGuard, auditMiddleware('orchestration'), orchestrationRouter);
 app.use('/api', requireAuth, billingRouter); // Billing routes with auth
+
+// Phase 4 Beta routes
+app.use('/api/documents', requireAuth, auditMiddleware('document'), documentsRouter);
+app.use('/api/tasks', requireAuth, auditMiddleware('task'), tasksRouter);
+app.use('/api/feedback', requireAuth, auditMiddleware('feedback'), feedbackRouter);
+app.use('/api/messages', requireAuth, auditMiddleware('message'), messagesRouter);
+app.use('/api/team', requireAuth, auditMiddleware('team'), teamRouter);
+app.use('/api/trends', requireAuth, trendsRouter);
+app.use('/api/connectors', requireAuth, auditMiddleware('connector'), connectorsRouter);
 
 // 404 handler
 app.use((_req, res) => {

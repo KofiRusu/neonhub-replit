@@ -1,18 +1,43 @@
-import Stripe from 'stripe';
-import { prisma } from '../../db/prisma.js';
-import { logger } from '../../lib/logger.js';
+import { URLSearchParams } from "url"
+import { prisma } from "../../db/prisma.js"
+import { logger } from "../../lib/logger.js"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-09-30.clover',
-  typescript: true,
-});
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || ""
 
-// Plan configurations
+if (!STRIPE_SECRET_KEY) {
+  logger.warn("STRIPE_SECRET_KEY is not configured – billing API will operate in sandbox mode")
+}
+
+async function stripeRequest<T>(path: string, params: Record<string, string>, method: "POST" | "GET" = "POST") {
+  if (!STRIPE_SECRET_KEY) {
+    throw new Error("Stripe secret key not configured")
+  }
+
+  const url = `https://api.stripe.com/v1/${path}`
+  const body = new URLSearchParams(params)
+
+  const response = await fetch(method === "GET" ? `${url}?${body.toString()}` : url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: method === "GET" ? undefined : body.toString(),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw new Error(`Stripe API error ${response.status}: ${text}`)
+  }
+
+  return (await response.json()) as T
+}
+
 export const PLANS = {
   free: {
-    name: 'Free',
-    priceId: process.env.STRIPE_PRICE_FREE || '',
-    productId: process.env.STRIPE_PRODUCT_FREE || '',
+    name: "Free",
+    priceId: process.env.STRIPE_PRICE_FREE || "",
+    productId: process.env.STRIPE_PRODUCT_FREE || "",
     limits: {
       campaigns: 5,
       emails: 1000,
@@ -21,9 +46,9 @@ export const PLANS = {
     },
   },
   pro: {
-    name: 'Pro',
-    priceId: process.env.STRIPE_PRICE_PRO || '',
-    productId: process.env.STRIPE_PRODUCT_PRO || '',
+    name: "Pro",
+    priceId: process.env.STRIPE_PRICE_PRO || "",
+    productId: process.env.STRIPE_PRODUCT_PRO || "",
     limits: {
       campaigns: 50,
       emails: 50000,
@@ -32,9 +57,9 @@ export const PLANS = {
     },
   },
   enterprise: {
-    name: 'Enterprise',
-    priceId: process.env.STRIPE_PRICE_ENTERPRISE || '',
-    productId: process.env.STRIPE_PRODUCT_ENTERPRISE || '',
+    name: "Enterprise",
+    priceId: process.env.STRIPE_PRICE_ENTERPRISE || "",
+    productId: process.env.STRIPE_PRODUCT_ENTERPRISE || "",
     limits: {
       campaigns: 999999,
       emails: 999999,
@@ -42,109 +67,86 @@ export const PLANS = {
       agentCalls: 999999,
     },
   },
-} as const;
+} as const
 
 export class BillingService {
-  // Create or get Stripe customer
   async getOrCreateCustomer(userId: string, email: string): Promise<string> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { stripeCustomerId: true },
-    });
-
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { stripeCustomerId: true } })
     if (user?.stripeCustomerId) {
-      return user.stripeCustomerId;
+      return user.stripeCustomerId
     }
 
-    const customer = await stripe.customers.create({
+    const customer = await stripeRequest<{ id: string }>("customers", {
       email,
-      metadata: { userId },
-    });
+      "metadata[userId]": userId,
+    })
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: { stripeCustomerId: customer.id },
-    });
-
-    logger.info({ customerId: customer.id, userId }, 'Stripe customer created');
-
-    return customer.id;
+    await prisma.user.update({ where: { id: userId }, data: { stripeCustomerId: customer.id } })
+    logger.info({ customerId: customer.id, userId }, "Stripe customer created")
+    return customer.id
   }
 
-  // Create checkout session for subscription
   async createCheckoutSession(params: {
-    userId: string;
-    email: string;
-    plan: keyof typeof PLANS;
-    successUrl: string;
-    cancelUrl: string;
+    userId: string
+    email: string
+    plan: keyof typeof PLANS
+    successUrl: string
+    cancelUrl: string
   }): Promise<{ url: string }> {
-    const customerId = await this.getOrCreateCustomer(params.userId, params.email);
-    const planConfig = PLANS[params.plan];
+    const customerId = await this.getOrCreateCustomer(params.userId, params.email)
+    const planConfig = PLANS[params.plan]
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: planConfig.priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
+    if (!planConfig.priceId) {
+      throw new Error(`Price ID not configured for plan ${params.plan}`)
+    }
+
+    const session = await stripeRequest<{ url: string | null }>("checkout/sessions", {
+      mode: "subscription",
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
-      metadata: {
-        userId: params.userId,
-        plan: params.plan,
-      },
-    });
+      customer: customerId,
+      "line_items[0][price]": planConfig.priceId,
+      "line_items[0][quantity]": "1",
+      "metadata[userId]": params.userId,
+      "metadata[plan]": params.plan,
+    })
 
-    logger.info({ sessionId: session.id, plan: params.plan }, 'Checkout session created');
-
-    return { url: session.url! };
-  }
-
-  // Create portal session for managing subscription
-  async createPortalSession(userId: string, returnUrl: string): Promise<{ url: string }> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { stripeCustomerId: true },
-    });
-
-    if (!user?.stripeCustomerId) {
-      throw new Error('No Stripe customer found');
+    if (!session.url) {
+      throw new Error("Stripe checkout session did not include URL")
     }
 
-    const session = await stripe.billingPortal.sessions.create({
-      customer: user.stripeCustomerId,
-      return_url: returnUrl,
-    });
-
-    logger.info({ sessionId: session.id, userId }, 'Portal session created');
-
-    return { url: session.url };
+    logger.info({ plan: params.plan, userId: params.userId }, "Stripe checkout session created")
+    return { url: session.url }
   }
 
-  // Check usage limits
+  async createPortalSession(userId: string, returnUrl: string): Promise<{ url: string }> {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { stripeCustomerId: true } })
+    if (!user?.stripeCustomerId) {
+      throw new Error("No Stripe customer found")
+    }
+
+    const session = await stripeRequest<{ url: string }>("billing_portal/sessions", {
+      customer: user.stripeCustomerId,
+      return_url: returnUrl,
+    })
+
+    return { url: session.url }
+  }
+
   async checkLimit(
     userId: string,
-    resourceType: 'campaign' | 'email' | 'social_post' | 'agent_call'
+    resourceType: "campaign" | "email" | "social_post" | "agent_call"
   ): Promise<{ allowed: boolean; limit: number; used: number }> {
-    const subscription = await prisma.subscription.findUnique({
-      where: { userId },
-    });
-
+    const subscription = await prisma.subscription.findUnique({ where: { userId } })
     if (!subscription) {
-      // No subscription = free tier limits
-      const limits = PLANS.free.limits;
+      const limits = PLANS.free.limits
       const limitMap = {
         campaign: limits.campaigns,
         email: limits.emails,
         social_post: limits.socialPosts,
         agent_call: limits.agentCalls,
-      };
-      return { allowed: false, limit: limitMap[resourceType], used: 0 };
+      }
+      return { allowed: false, limit: limitMap[resourceType], used: 0 }
     }
 
     const usedMap = {
@@ -152,169 +154,60 @@ export class BillingService {
       email: subscription.emailsSent,
       social_post: subscription.socialPosts,
       agent_call: subscription.agentCalls,
-    };
+    }
 
     const limitMap = {
       campaign: subscription.campaignLimit,
       email: subscription.emailLimit,
       social_post: subscription.socialLimit,
       agent_call: subscription.agentCallLimit,
-    };
-
-    const used = usedMap[resourceType];
-    const limit = limitMap[resourceType];
-
-    return {
-      allowed: used < limit,
-      limit,
-      used,
-    };
-  }
-
-  // Track usage
-  async trackUsage(params: {
-    userId: string;
-    resourceType: 'campaign' | 'email' | 'social_post' | 'agent_call';
-    resourceId?: string;
-    quantity?: number;
-  }): Promise<void> {
-    const subscription = await prisma.subscription.findUnique({
-      where: { userId: params.userId },
-    });
-
-    if (!subscription) {
-      logger.warn({ userId: params.userId }, 'Tracking usage for user without subscription');
-      return;
     }
 
-    // Create usage record
+    return {
+      allowed: usedMap[resourceType] < limitMap[resourceType],
+      limit: limitMap[resourceType],
+      used: usedMap[resourceType],
+    }
+  }
+
+  async trackUsage(params: {
+    userId: string
+    resourceType: "campaign" | "email" | "social_post" | "agent_call"
+    resourceId?: string
+    quantity?: number
+  }): Promise<void> {
+    const subscription = await prisma.subscription.findUnique({ where: { userId: params.userId } })
+    if (!subscription) {
+      logger.warn({ userId: params.userId }, "Tracking usage for user without subscription")
+      return
+    }
+
     await prisma.usageRecord.create({
       data: {
         subscriptionId: subscription.id,
         resourceType: params.resourceType,
         resourceId: params.resourceId,
-        quantity: params.quantity || 1,
+        quantity: params.quantity ?? 1,
         timestamp: new Date(),
       },
-    });
+    })
 
-    // Update subscription counters
-    const updateMap = {
-      campaign: { campaignsUsed: { increment: params.quantity || 1 } },
-      email: { emailsSent: { increment: params.quantity || 1 } },
-      social_post: { socialPosts: { increment: params.quantity || 1 } },
-      agent_call: { agentCalls: { increment: params.quantity || 1 } },
-    };
-
-    await prisma.subscription.update({
-      where: { id: subscription.id },
-      data: updateMap[params.resourceType],
-    });
-
-    logger.info(
-      { userId: params.userId, resourceType: params.resourceType, quantity: params.quantity || 1 },
-      'Usage tracked'
-    );
-  }
-
-  // Get subscription details
-  async getSubscription(userId: string) {
-    return prisma.subscription.findUnique({
-      where: { userId },
-      include: {
-        invoices: {
-          orderBy: { createdAt: 'desc' },
-          take: 10,
-        },
-      },
-    });
-  }
-
-  // Cancel subscription
-  async cancelSubscription(userId: string, cancelAtPeriodEnd: boolean = true): Promise<void> {
-    const subscription = await prisma.subscription.findUnique({
-      where: { userId },
-    });
-
-    if (!subscription) {
-      throw new Error('No subscription found');
-    }
-
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-      cancel_at_period_end: cancelAtPeriodEnd,
-    });
+    const fieldMap = {
+      campaign: "campaignsUsed",
+      email: "emailsSent",
+      social_post: "socialPosts",
+      agent_call: "agentCalls",
+    } as const
 
     await prisma.subscription.update({
       where: { id: subscription.id },
       data: {
-        cancelAtPeriodEnd,
-        canceledAt: cancelAtPeriodEnd ? new Date() : null,
+        [fieldMap[params.resourceType]]: {
+          increment: params.quantity ?? 1,
+        },
       },
-    });
-
-    logger.info({ userId, cancelAtPeriodEnd }, 'Subscription cancellation updated');
-  }
-
-  // Verify webhook signature
-  constructWebhookEvent(payload: string | Buffer, signature: string): Stripe.Event {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    if (!webhookSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET not configured');
-    }
-
-    return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    })
   }
 }
 
-export const billingService = new BillingService();
-export { stripe };
-
-// Helper functions for backward compatibility with old billing.ts
-export function isStripeLive(): boolean {
-  return !!(
-    process.env.STRIPE_SECRET_KEY &&
-    process.env.STRIPE_WEBHOOK_SECRET &&
-    process.env.STRIPE_SECRET_KEY.startsWith('sk_live_')
-  );
-}
-
-export async function createCheckoutSession(params: {
-  priceId: string;
-  successUrl: string;
-  cancelUrl: string;
-  userId: string;
-  userEmail: string;
-}): Promise<{ url: string }> {
-  const customerId = await billingService.getOrCreateCustomer(params.userId, params.userEmail);
-
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price: params.priceId,
-        quantity: 1,
-      },
-    ],
-    mode: 'subscription',
-    success_url: params.successUrl,
-    cancel_url: params.cancelUrl,
-    metadata: {
-      userId: params.userId,
-    },
-  });
-
-  return { url: session.url! };
-}
-
-export async function createPortalSession(params: {
-  customerId: string;
-  returnUrl: string;
-}): Promise<{ url: string }> {
-  const session = await stripe.billingPortal.sessions.create({
-    customer: params.customerId,
-    return_url: params.returnUrl,
-  });
-
-  return { url: session.url };
-}
+export const billingService = new BillingService()

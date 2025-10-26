@@ -3,44 +3,44 @@
  * Full implementation requires @neonhub/eco-optimizer module
  */
 
-import { logger } from '../../lib/logger.js';
+import { logger } from "../../lib/logger.js";
 
 export async function getCurrentEnergyMetrics(): Promise<{
   totalEnergy: number;
   energyByProvider: Record<string, number>;
   timestamp: Date;
 }> {
-  logger.info('Energy metrics requested (stubbed)');
+  logger.info("Energy metrics requested (stubbed)");
   return {
     totalEnergy: 0,
     energyByProvider: {},
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 }
 
-export async function calculateCarbonFootprint(resources: any[]): Promise<{
+export async function calculateCarbonFootprint(resources: unknown[]): Promise<{
   totalCarbon: number;
   carbonByProvider: Record<string, number>;
   recommendations: string[];
 }> {
-  logger.info('Carbon footprint calculation requested (stubbed)');
+  logger.info({ resourcesCount: resources.length }, "Carbon footprint calculation requested (stubbed)");
   return {
     totalCarbon: 0,
     carbonByProvider: {},
-    recommendations: []
+    recommendations: [],
   };
 }
 
-export async function optimizeResources(resources: any[]): Promise<{
+export async function optimizeResources(resources: unknown[]): Promise<{
   optimized: boolean;
   savings: { energy: number; cost: number; carbon: number };
   recommendations: any[];
 }> {
-  logger.info('Resource optimization requested (stubbed)');
+  logger.info({ resourcesCount: resources.length }, "Resource optimization requested (stubbed)");
   return {
     optimized: false,
     savings: { energy: 0, cost: 0, carbon: 0 },
-    recommendations: []
+    recommendations: [],
   };
 }
 
@@ -50,12 +50,12 @@ export async function analyzeEfficiency(timeRange: { start: Date; end: Date }): 
   inefficiencies: any[];
   recommendations: any[];
 }> {
-  logger.info({ timeRange }, 'Efficiency analysis requested (stubbed)');
+  logger.info({ timeRange }, "Efficiency analysis requested (stubbed)");
   return {
     overallScore: 0,
     metrics: {},
     inefficiencies: [],
-    recommendations: []
+    recommendations: [],
   };
 }
 
@@ -64,11 +64,11 @@ export async function getGreenAIRecommendations(model: any): Promise<{
   recommendations: any[];
   estimatedSavings: { energy: number; carbon: number; cost: number };
 }> {
-  logger.info({ model }, 'Green AI recommendations requested (stubbed)');
+  logger.info({ model }, "Green AI recommendations requested (stubbed)");
   return {
     score: 0,
     recommendations: [],
-    estimatedSavings: { energy: 0, carbon: 0, cost: 0 }
+    estimatedSavings: { energy: 0, carbon: 0, cost: 0 },
   };
 }
 
@@ -79,13 +79,13 @@ export async function generateSustainabilityReport(timeRange: { start: Date; end
   achievements: any[];
   recommendations: any[];
 }> {
-  logger.info({ timeRange }, 'Sustainability report requested (stubbed)');
+  logger.info({ timeRange }, "Sustainability report requested (stubbed)");
   return {
     period: timeRange,
     summary: {},
     metrics: {},
     achievements: [],
-    recommendations: []
+    recommendations: [],
   };
 }
 
@@ -94,11 +94,11 @@ export async function trackEnergyUsage(resource: any): Promise<{
   carbonKg: number;
   cost: number;
 }> {
-  logger.info({ resource }, 'Energy usage tracking requested (stubbed)');
+  logger.info({ resource }, "Energy usage tracking requested (stubbed)");
   return {
     energyKWh: 0,
     carbonKg: 0,
-    cost: 0
+    cost: 0,
   };
 }
 
@@ -109,6 +109,6 @@ export function getSystemStatus() {
     resourceOptimizer: true,
     efficiencyAnalyzer: true,
     greenAIAdvisor: true,
-    sustainabilityReporter: true
+    sustainabilityReporter: true,
   };
 }

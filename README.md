@@ -493,6 +493,7 @@ The pipeline runs automatically every hour and creates PRs with detailed diagnos
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+6. Review the repository guidelines in [AGENTS.md](./AGENTS.md) to confirm coding standards, test coverage expectations, and PR requirements.
 
 ---
 

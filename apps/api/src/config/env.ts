@@ -26,6 +26,9 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().positive().default(3001),
   
+  // Beta Program
+  BETA_ENABLED: z.coerce.boolean().default(false),
+  
   // Optional - Monitoring
   SENTRY_DSN: z.string().url().optional(),
   
@@ -33,6 +36,12 @@ const envSchema = z.object({
   TWILIO_ACCOUNT_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(), 
   TWILIO_PHONE_NUMBER: z.string().optional(),
+  
+  // Social APIs (for trends service)
+  TWITTER_BEARER_TOKEN: z.string().optional(),
+  REDDIT_CLIENT_ID: z.string().optional(),
+  REDDIT_CLIENT_SECRET: z.string().optional(),
+  REDDIT_USER_AGENT: z.string().default('NeonHub/3.2'),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -29,7 +29,15 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
   }
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
-    return (await res.json()) as T;
+    const json = (await res.json()) as unknown;
+    if (json && typeof json === "object" && "ok" in (json as Record<string, unknown>)) {
+      const result = json as { ok: boolean; data?: unknown; error?: string };
+      if (result.ok) {
+        return result.data as T;
+      }
+      throw new Error(result.error || "Request failed");
+    }
+    return json as T;
   }
   // Caller is responsible for correct T if not JSON
   return (await res.text()) as T;

@@ -92,7 +92,7 @@ test.describe('Billing & Subscriptions', () => {
     }
   });
 
-  test.skip('should block campaign creation at limit', async ({ page, context }) => {
+  test.skip('should block campaign creation at limit', async ({ page, context: _context }) => {
     // This test requires setting up a user at their limit
     // Skip unless test data is available
     

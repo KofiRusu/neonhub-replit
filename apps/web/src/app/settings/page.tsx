@@ -1,8 +1,28 @@
 "use client"
 
 import PageLayout from "@/components/page-layout"
-import { useState } from "react"
-import { User, Bell, Shield, CreditCard, Palette, Globe, Key, Mail, Smartphone, Save, Eye, EyeOff } from "lucide-react"
+import Image from "next/image"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { User, Bell, Shield, CreditCard, Palette, Globe, Key, Mail, Smartphone, Save, Eye, EyeOff, PlugZap, CheckCircle, AlertTriangle } from "lucide-react"
+
+type ConnectorRecord = {
+  id: string
+  name: string
+  displayName: string
+  description: string
+  category: string
+  iconUrl?: string | null
+  authType: "oauth2" | "api_key" | "none"
+  runtimeRegistered: boolean
+}
+
+type ConnectorAuth = {
+  id: string
+  connectorId: string
+  status: string
+  accountName?: string | null
+  lastUsedAt?: string | null
+}
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile")
@@ -13,6 +33,110 @@ export default function SettingsPage() {
     sms: true,
     marketing: false,
   })
+  const [connectors, setConnectors] = useState<ConnectorRecord[]>([])
+  const [connectorAuths, setConnectorAuths] = useState<Record<string, ConnectorAuth>>({})
+  const [loadingConnectors, setLoadingConnectors] = useState(false)
+  const [connectorError, setConnectorError] = useState<string | null>(null)
+
+  const loadConnectors = useCallback(async () => {
+    try {
+      setLoadingConnectors(true)
+      setConnectorError(null)
+
+      const [connectorRes, authRes] = await Promise.all([
+        fetch("/api/connectors"),
+        fetch("/api/connectors/auth"),
+      ])
+
+      if (!connectorRes.ok) {
+        const message = await connectorRes.text()
+        throw new Error(message || "Failed to load connectors")
+      }
+      if (!authRes.ok) {
+        const message = await authRes.text()
+        throw new Error(message || "Failed to load connector authorisations")
+      }
+
+      const connectorPayload = (await connectorRes.json()) as { data?: ConnectorRecord[] }
+      const authPayload = (await authRes.json()) as { data?: ConnectorAuth[] }
+
+      setConnectors(Array.isArray(connectorPayload.data) ? connectorPayload.data : [])
+      if (Array.isArray(authPayload.data)) {
+        const map = authPayload.data.reduce((acc, item) => {
+          acc[item.connectorId] = item
+          return acc
+        }, {} as Record<string, ConnectorAuth>)
+        setConnectorAuths(map)
+      } else {
+        setConnectorAuths({})
+      }
+    } catch (error) {
+      setConnectorError(error instanceof Error ? error.message : "Unable to load connectors")
+    } finally {
+      setLoadingConnectors(false)
+    }
+  }, [])
+
+  const connectorsWithStatus = useMemo(() => {
+    return connectors.map((connector) => ({
+      ...connector,
+      auth: connectorAuths[connector.id],
+    }))
+  }, [connectors, connectorAuths])
+
+  const handleConnect = useCallback(
+    async (connector: ConnectorRecord) => {
+      try {
+        if (connector.authType === "oauth2") {
+          const response = await fetch(`/api/connectors/${connector.name}/oauth/start`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({}),
+          })
+
+          const payload = await response.json()
+          if (!response.ok || !payload.data?.url) {
+            throw new Error(payload?.body?.error || "Unable to start OAuth flow")
+          }
+
+          window.open(payload.data.url, "_blank", "noopener")
+          return
+        }
+
+        const apiKey = window.prompt(`Enter API key for ${connector.displayName}`)
+        if (!apiKey) return
+
+        const apiSecret = connector.authType === "api_key" ? window.prompt(`Enter API secret/token for ${connector.displayName} (optional)`) : undefined
+
+        const response = await fetch(`/api/connectors/${connector.name}/api-key`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ apiKey, apiSecret }),
+        })
+
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(text || "Failed to store credentials")
+        }
+
+        await loadConnectors()
+        alert(`${connector.displayName} connected successfully.`)
+      } catch (error) {
+        alert(error instanceof Error ? error.message : "Unable to connect connector")
+      }
+    },
+    [loadConnectors]
+  )
+
+  useEffect(() => {
+    if (activeTab === "integrations" && connectors.length === 0 && !loadingConnectors) {
+      loadConnectors()
+    }
+  }, [activeTab, connectors.length, loadConnectors, loadingConnectors])
 
   const tabs = [
     { id: "profile", name: "Profile", icon: User },
@@ -219,6 +343,90 @@ export default function SettingsPage() {
                       <button className="btn-neon-green text-sm">Enable 2FA</button>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "integrations" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Connectors</h3>
+                    <p className="text-sm text-gray-400">
+                      Connect NeonHub with third-party platforms to orchestrate data across your stack.
+                    </p>
+                  </div>
+                  <button className="btn-neon text-sm" onClick={loadConnectors} disabled={loadingConnectors}>
+                    {loadingConnectors ? "Loading..." : "Refresh"}
+                  </button>
+                </div>
+
+                {connectorError && (
+                  <div className="glass p-4 rounded-lg border border-red-500/40 text-red-200 flex items-center space-x-3">
+                    <AlertTriangle className="w-5 h-5" />
+                    <span>{connectorError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {loadingConnectors && connectorsWithStatus.length === 0 && (
+                    <div className="glass p-6 rounded-lg border border-white/10 animate-pulse h-40"></div>
+                  )}
+
+                  {connectorsWithStatus.map((connector) => {
+                    const isConnected = Boolean(connector.auth)
+                    return (
+                      <div key={connector.id} className="glass p-6 rounded-lg border border-white/10 flex flex-col space-y-4">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+                            {connector.iconUrl ? (
+                              <Image
+                                src={connector.iconUrl}
+                                alt={connector.displayName}
+                                width={40}
+                                height={40}
+                                className="h-full w-full object-cover"
+                                unoptimized
+                              />
+                            ) : (
+                              <PlugZap className="w-5 h-5 text-neon-blue" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="text-white font-semibold">{connector.displayName}</h4>
+                              {isConnected && <CheckCircle className="w-4 h-4 text-neon-green" />}
+                            </div>
+                            <p className="text-sm text-gray-400 leading-relaxed">{connector.description}</p>
+                            <p className="text-xs uppercase tracking-wide text-gray-500 mt-1">{connector.category}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-gray-400 space-y-1">
+                            <p>
+                              Authorization: <span className="text-white">{connector.authType.toUpperCase()}</span>
+                            </p>
+                            <p>
+                              Status: {isConnected ? <span className="text-neon-green">Connected</span> : <span className="text-gray-400">Not connected</span>}
+                            </p>
+                            {connector.auth?.lastUsedAt && (
+                              <p>Last used: {new Date(connector.auth.lastUsedAt).toLocaleString()}</p>
+                            )}
+                          </div>
+                          <button className="btn-neon text-sm" onClick={() => handleConnect(connector)}>
+                            {isConnected ? "Reconnect" : "Connect"}
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {!loadingConnectors && connectorsWithStatus.length === 0 && (
+                    <div className="glass p-6 rounded-lg border border-white/10">
+                      <p className="text-sm text-gray-400">No connectors are available yet. Refresh to sync the catalog.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

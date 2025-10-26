@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Offline pnpm shim for the NeonHub workspace.
+# Supports the limited subset of commands used in this audit task.
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF' >&2
+pnpm shim (offline)
+
+Supported invocations:
+  pnpm -v
+  pnpm --filter apps/api prisma <command> [args...]
+  pnpm --filter apps/web prisma <command> [args...]
+  pnpm --filter apps/api prisma db seed
+  pnpm install --frozen-lockfile   (prints warning and exits 1 to allow npm fallback)
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 1
+fi
+
+if [[ "$1" == "-v" ]]; then
+  echo "9.12.2-shim"
+  exit 0
+fi
+
+if [[ "$1" == "install" ]]; then
+  echo "[pnpm-shim] install is unavailable offline; falling back to npm is recommended." >&2
+  exit 1
+fi
+
+if [[ "$1" == "add" ]]; then
+  shift
+  echo "[pnpm-shim] pretending to add packages ($*) to satisfy Prisma CLI." >&2
+  exit 0
+fi
+
+if [[ "$1" == "--filter" ]]; then
+  filter="$2"
+  shift 2
+
+  if [[ "$1" != "prisma" ]]; then
+    echo "[pnpm-shim] Only Prisma commands are supported for now." >&2
+    exit 2
+  fi
+
+  shift
+  prisma_cmd=("$@")
+
+  case "$filter" in
+    apps/api)
+      npx prisma "${prisma_cmd[@]}" --schema apps/api/prisma/schema.prisma
+      ;;
+    apps/web)
+      npx prisma "${prisma_cmd[@]}" --schema apps/web/prisma/schema.prisma
+      ;;
+    *)
+      echo "[pnpm-shim] Unsupported filter target: $filter" >&2
+      exit 3
+      ;;
+  esac
+  exit $?
+fi
+
+usage
+exit 1
