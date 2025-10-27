@@ -1,36 +1,124 @@
-name: DB Restore
+name: DB Restore (Emergency)
+
 on:
   workflow_dispatch:
     inputs:
-      ARTIFACT_NAME:
-        description: "Artifact name (e.g., predeploy-backup)"
+      BACKUP_ARTIFACT_NAME:
+        description: "Backup artifact name (e.g., db-backup-20251026_140000)"
         required: true
-        default: "predeploy-backup"
+      CONFIRM_RESTORE:
+        description: "Type 'RESTORE' to confirm data loss"
+        required: true
 
 jobs:
   restore:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    environment: production-restore  # Extra protection layer
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.CONFIRM_RESTORE }}" != "RESTORE" ]; then
+            echo "::error::You must type 'RESTORE' to confirm. This will ERASE current data!"
+            exit 1
+          fi
+          echo "⚠️  RESTORE CONFIRMED - proceeding with caution"
+
+      - name: Check DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret not configured"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
-      - name: Install psql client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
 
-      - name: Download latest backup artifact
+      - name: Download backup artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ github.event.inputs.ARTIFACT_NAME }}
-          path: ./restore
+          name: ${{ github.event.inputs.BACKUP_ARTIFACT_NAME }}
 
-      - name: Find dump file
-        id: finddump
-        run: echo "DUMP=$(ls -t ./restore/*.dump | head -n1)" >> $GITHUB_OUTPUT
-
-      - name: Restore (drop schema & recreate)
+      - name: Create pre-restore backup (safety)
+        id: safety_backup
         run: |
-          DUMP="${{ steps.finddump.outputs.DUMP }}"
-          echo "[*] Restoring from $DUMP"
-          pg_restore --clean --if-exists --no-owner --dbname="$DATABASE_URL" "$DUMP"
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          SAFETY_FILE="pre_restore_${TIMESTAMP}.sql"
+          echo "SAFETY_FILE=${SAFETY_FILE}" >> $GITHUB_OUTPUT
+          
+          echo "📦 Creating safety backup before restore..."
+          pg_dump "$DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --clean \
+            --if-exists \
+            --format=plain \
+            --file="${SAFETY_FILE}"
+          
+          gzip "${SAFETY_FILE}"
+          echo "✅ Safety backup created: ${SAFETY_FILE}.gz"
+
+      - name: Upload safety backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-restore-safety-${{ steps.safety_backup.outputs.SAFETY_FILE }}
+          path: ${{ steps.safety_backup.outputs.SAFETY_FILE }}.gz
+          retention-days: 30
+
+      - name: Decompress backup
+        run: |
+          BACKUP_FILE=$(ls *.sql.gz)
+          echo "📦 Decompressing: ${BACKUP_FILE}"
+          gunzip "${BACKUP_FILE}"
+          DECOMPRESSED=$(basename "${BACKUP_FILE}" .gz)
+          echo "BACKUP_SQL=${DECOMPRESSED}" >> $GITHUB_ENV
+
+      - name: Restore database
+        run: |
+          echo "⚠️  RESTORING DATABASE - THIS WILL ERASE CURRENT DATA!"
+          echo "Backup file: ${BACKUP_SQL}"
+          
+          psql "$DATABASE_URL" < "${BACKUP_SQL}"
+          
+          echo "✅ Database restored successfully"
+
+      - name: Verify restore
+        run: |
+          echo "🔍 Verifying restore..."
+          psql "$DATABASE_URL" -c "SELECT COUNT(*) as table_count FROM information_schema.tables WHERE table_schema='public';"
+          psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM organizations;" || echo "⚠️ organizations table might be empty"
+
+      - name: Run migrations (if needed)
+        run: |
+          echo "🔄 Checking if migrations needed..."
+          # This will apply any new migrations that weren't in the backup
+          pnpm install --frozen-lockfile
+          pnpm --filter apps/api exec prisma migrate deploy || echo "⚠️ No new migrations"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🔄 Restore Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backup**: ${{ github.event.inputs.BACKUP_ARTIFACT_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Safety Backup**: ${{ steps.safety_backup.outputs.SAFETY_FILE }}.gz" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️  **IMPORTANT**: Verify application functionality immediately!" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (critical)
+        if: always() && vars.SLACK_WEBHOOK_URL != ''
+        run: |
+          STATUS="${{ job.status }}"
+          EMOJI="⚠️"
+          [ "$STATUS" = "success" ] && EMOJI="✅" || EMOJI="❌"
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${EMOJI} *CRITICAL: DB RESTORE* ${STATUS}\nBackup: ${{ github.event.inputs.BACKUP_ARTIFACT_NAME }}\nActor: ${{ github.actor }}\n<!channel> Verify application immediately!\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || true

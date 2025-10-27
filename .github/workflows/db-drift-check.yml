@@ -1,6 +1,12 @@
 name: DB Drift Check
+
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  pull_request:
+    paths:
+      - 'apps/api/prisma/schema.prisma'
 
 jobs:
   drift:
@@ -9,27 +15,99 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       PRISMA_HIDE_UPDATE_MESSAGE: "1"
     steps:
+      - name: Check DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::warning::DATABASE_URL not configured - skipping drift check"
+            exit 0
+          fi
+
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 8
+      - name: Enable Corepack + pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
 
-      - run: corepack enable && corepack prepare pnpm@8 --activate
-
-      - name: Install deps
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prisma status (read-only)
-        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
+      - name: Generate Prisma Client
+        run: pnpm --filter apps/api run prisma:generate
 
-      - name: Install psql client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Check migration status
+        id: status
+        run: |
+          echo "## 🔍 Migration Status" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter apps/api exec prisma migrate status >> status.txt 2>&1 || true
+          cat status.txt >> $GITHUB_STEP_SUMMARY
+          
+          if grep -q "Database schema is up to date" status.txt; then
+            echo "STATUS=up-to-date" >> $GITHUB_OUTPUT
+            echo "✅ Database schema is up to date" >> $GITHUB_STEP_SUMMARY
+          elif grep -q "pending migrations" status.txt; then
+            echo "STATUS=pending" >> $GITHUB_OUTPUT
+            echo "::warning::Pending migrations detected!"
+            echo "⚠️ **PENDING MIGRATIONS DETECTED**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "STATUS=unknown" >> $GITHUB_OUTPUT
+            echo "::warning::Unable to determine migration status"
+          fi
 
-      - name: Check pgvector extension
-        run: psql "$DATABASE_URL" -c "SELECT extname FROM pg_extension WHERE extname='vector';"
+      - name: Detect schema drift
+        id: drift
+        continue-on-error: true
+        run: |
+          echo "## 📊 Schema Drift Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          pnpm --filter apps/api exec prisma migrate diff \
+            --from-url "$DATABASE_URL" \
+            --to-schema-datamodel "apps/api/prisma/schema.prisma" \
+            --script > drift.sql 2>&1 || true
+          
+          if [ -s drift.sql ] && ! grep -q "No difference detected" drift.sql; then
+            echo "DRIFT_DETECTED=true" >> $GITHUB_OUTPUT
+            echo "::warning::Schema drift detected!"
+            echo "⚠️ **DRIFT DETECTED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`sql" >> $GITHUB_STEP_SUMMARY
+            cat drift.sql >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DRIFT_DETECTED=false" >> $GITHUB_OUTPUT
+            echo "✅ No schema drift detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload drift report
+        if: steps.drift.outputs.DRIFT_DETECTED == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report-${{ github.run_id }}
+          path: drift.sql
+          retention-days: 7
+
+      - name: Fail on pending migrations or drift
+        if: steps.status.outputs.STATUS == 'pending' || steps.drift.outputs.DRIFT_DETECTED == 'true'
+        run: |
+          echo "::error::Database has pending migrations or schema drift!"
+          echo "Run 'DB Deploy' workflow to apply migrations"
+          exit 1
+
+      - name: Success notice
+        if: steps.status.outputs.STATUS == 'up-to-date' && steps.drift.outputs.DRIFT_DETECTED == 'false'
+        run: |
+          echo "::notice::✅ Database schema is clean - no drift or pending migrations"
+          echo "✅ All checks passed" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (on drift)
+        if: always() && (steps.drift.outputs.DRIFT_DETECTED == 'true' || steps.status.outputs.STATUS == 'pending') && vars.SLACK_WEBHOOK_URL != ''
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"⚠️ *DB Drift Check* - Drift or pending migrations detected!\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || true

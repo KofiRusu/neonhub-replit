@@ -1,0 +1,62 @@
+name: DB Migrate Diff (dry-run)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/api/prisma/schema.prisma'
+      - 'apps/api/prisma/migrations/**'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      PRISMA_HIDE_UPDATE_MESSAGE: "1"
+    steps:
+      - name: Check DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret not configured"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack + pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter apps/api run prisma:generate
+
+      - name: Show SQL diff (no apply)
+        id: diff
+        run: |
+          echo "## 📊 Database Migration Diff" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`sql" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter apps/api exec prisma migrate diff \
+            --from-url "$DATABASE_URL" \
+            --to-schema-datamodel "apps/api/prisma/schema.prisma" \
+            --script | tee -a $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check Migration Status
+        run: |
+          echo "## 🔍 Current Migration Status" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter apps/api exec prisma migrate status >> $GITHUB_STEP_SUMMARY 2>&1 || true
+
+      - name: Success Notice
+        run: echo "::notice::✅ Dry-run diff complete - review STEP SUMMARY for changes"
+

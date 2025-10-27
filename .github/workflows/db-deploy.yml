@@ -9,6 +9,7 @@ on:
 
 jobs:
   db-deploy:
+    environment: production  # Requires manual approval in Settings → Environments
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -52,9 +53,28 @@ jobs:
       - name: Apply migrations (deploy)
         run: pnpm -F apps/api prisma migrate deploy
 
-      - name: Seed database (optional)
+      - name: Seed database (optional, staging only)
         if: ${{ github.event.inputs.RUN_SEED == 'true' }}
-        run: pnpm -F apps/api prisma db seed
+        run: |
+          # Safety: Only seed if explicitly requested
+          echo "⚠️  Seeding requested - USE CAUTION in production!"
+          pnpm -F apps/api prisma db seed
+        continue-on-error: false
 
       - name: Status
         run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
+
+      - name: Log migration telemetry
+        if: always()
+        run: |
+          echo "Migration telemetry: workflow=${{ github.workflow }}, status=${{ job.status }}, sha=${{ github.sha }}, actor=${{ github.actor }}, timestamp=$(date -Is)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (optional)
+        if: always() && vars.SLACK_WEBHOOK_URL != ''
+        run: |
+          STATUS="${{ job.status }}"
+          EMOJI="✅"
+          [ "$STATUS" != "success" ] && EMOJI="❌"
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${EMOJI} *${{ github.workflow }}* finished with *${STATUS}* on *${{ github.ref_name }}*\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nActor: ${{ github.actor }}\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || echo "Slack notification failed (webhook not configured)"
