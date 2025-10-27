@@ -1,0 +1,36 @@
+name: DB Restore
+on:
+  workflow_dispatch:
+    inputs:
+      ARTIFACT_NAME:
+        description: "Artifact name (e.g., predeploy-backup)"
+        required: true
+        default: "predeploy-backup"
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Download latest backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.inputs.ARTIFACT_NAME }}
+          path: ./restore
+
+      - name: Find dump file
+        id: finddump
+        run: echo "DUMP=$(ls -t ./restore/*.dump | head -n1)" >> $GITHUB_OUTPUT
+
+      - name: Restore (drop schema & recreate)
+        run: |
+          DUMP="${{ steps.finddump.outputs.DUMP }}"
+          echo "[*] Restoring from $DUMP"
+          pg_restore --clean --if-exists --no-owner --dbname="$DATABASE_URL" "$DUMP"
