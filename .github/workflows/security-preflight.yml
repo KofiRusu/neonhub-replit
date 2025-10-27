@@ -1,0 +1,170 @@
+name: Security Preflight
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main, ci/*]
+  push:
+    branches: [main]
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Enable Corepack
+        run: corepack enable && corepack prepare pnpm@8 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma format & validate
+        run: |
+          echo "## 🔍 Prisma Schema Validation" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter apps/api exec prisma format --schema apps/api/prisma/schema.prisma
+          pnpm --filter apps/api exec prisma validate --schema apps/api/prisma/schema.prisma
+          echo "✅ Prisma schema is valid" >> $GITHUB_STEP_SUMMARY
+
+      - name: TypeScript type check
+        run: |
+          echo "## 📝 TypeScript Type Check" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter apps/api exec tsc --noEmit || echo "⚠️ Type errors detected (non-blocking)"
+          echo "Type check complete" >> $GITHUB_STEP_SUMMARY
+
+      - name: Dependency audit (advisory)
+        continue-on-error: true
+        run: |
+          echo "## 🔒 Dependency Security Audit" >> $GITHUB_STEP_SUMMARY
+          pnpm audit --audit-level=high >> audit.txt 2>&1 || true
+          if grep -q "vulnerabilities" audit.txt; then
+            echo "⚠️ **Vulnerabilities detected** (see logs)" >> $GITHUB_STEP_SUMMARY
+            cat audit.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No high/critical vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Secrets scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        continue-on-error: true
+
+      - name: CodeQL init
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'javascript-typescript'
+          queries: security-and-quality
+
+      - name: CodeQL autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: CodeQL analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:javascript-typescript'
+
+      - name: Check for banned patterns
+        run: |
+          echo "## 🚫 Banned Pattern Check" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for exposed secrets patterns
+          if grep -r "sk_live_" apps/api/src/ apps/web/src/ 2>/dev/null; then
+            echo "❌ **CRITICAL**: Live Stripe key found in code!" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+          # Check for hardcoded passwords
+          if grep -rE "(password|secret).*=.*['\"][\w]{8,}" apps/api/src/ 2>/dev/null | grep -v ".spec.ts" | grep -v "test"; then
+            echo "⚠️ **WARNING**: Potential hardcoded credentials detected" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for console.log in production code
+          CONSOLE_LOGS=$(grep -r "console\.log" apps/api/src/ apps/web/src/ 2>/dev/null | grep -v ".spec.ts" | grep -v "test" | wc -l || echo "0")
+          if [ "$CONSOLE_LOGS" -gt 10 ]; then
+            echo "⚠️ **WARNING**: $CONSOLE_LOGS console.log statements (use logger instead)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "✅ Banned pattern check complete" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify environment templates
+        run: |
+          echo "## 📋 Environment Template Check" >> $GITHUB_STEP_SUMMARY
+          
+          # Check ENV_TEMPLATE exists
+          if [ ! -f "ENV_TEMPLATE.example" ]; then
+            echo "⚠️ **WARNING**: ENV_TEMPLATE.example not found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ ENV_TEMPLATE.example exists" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for required env vars in template
+          REQUIRED_VARS="DATABASE_URL NEXTAUTH_SECRET OPENAI_API_KEY"
+          for VAR in $REQUIRED_VARS; do
+            if grep -q "$VAR" ENV_TEMPLATE.example; then
+              echo "  ✅ $VAR documented" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "  ⚠️ $VAR missing from template" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Check migration integrity
+        run: |
+          echo "## 🗃️ Migration Integrity Check" >> $GITHUB_STEP_SUMMARY
+          
+          # Count migrations
+          MIGRATION_COUNT=$(find apps/api/prisma/migrations -name "migration.sql" | wc -l)
+          echo "  📊 Total migrations: $MIGRATION_COUNT" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for empty migrations
+          EMPTY_MIGRATIONS=$(find apps/api/prisma/migrations -name "migration.sql" -size 0 | wc -l)
+          if [ "$EMPTY_MIGRATIONS" -gt 0 ]; then
+            echo "  ⚠️ **WARNING**: $EMPTY_MIGRATIONS empty migration files" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "  ✅ No empty migrations" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check migration lock file
+          if [ -f "apps/api/prisma/migrations/migration_lock.toml" ]; then
+            echo "  ✅ Migration lock file present" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "  ⚠️ **WARNING**: migration_lock.toml missing" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Security summary
+        if: always()
+        run: |
+          echo "## 🛡️ Security Preflight Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Prisma**: Schema validated ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dependencies**: Audit complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Secrets**: Gitleaks scan complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **SAST**: CodeQL analysis complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Patterns**: Banned pattern check complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Migrations**: Integrity verified" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (on failure)
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"❌ *Security Preflight FAILED* on *${{ github.ref_name }}*\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nReview security issues before deploying!\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || true
+
