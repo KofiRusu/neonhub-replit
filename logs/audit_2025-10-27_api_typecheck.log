@@ -1,0 +1,23 @@
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+error TS2318: Cannot find global type 'Boolean'.
+error TS2318: Cannot find global type 'Function'.
+error TS2318: Cannot find global type 'IArguments'.
+error TS2318: Cannot find global type 'Number'.
+error TS2318: Cannot find global type 'Object'.
+error TS2318: Cannot find global type 'RegExp'.
+error TS6053: File '/Users/kofirusu/Desktop/NeonHub/node_modules/typescript/lib/lib.dom.d.ts' not found.
+  The file is in the program because:
+    Library 'lib.dom.d.ts' specified in compilerOptions
+error TS6053: File '/Users/kofirusu/Desktop/NeonHub/node_modules/typescript/lib/lib.es2022.d.ts' not found.
+  The file is in the program because:
+    Library 'lib.es2022.d.ts' specified in compilerOptions
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
