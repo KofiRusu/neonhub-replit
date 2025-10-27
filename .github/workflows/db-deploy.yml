@@ -21,11 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install pnpm FIRST before Node setup
+      # Install pnpm FIRST before Node setup (reads version from package.json)
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node
         uses: actions/setup-node@v4
