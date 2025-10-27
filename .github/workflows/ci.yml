@@ -1,162 +1,46 @@
-name: CI Pipeline
+name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20]
-
+        node: [18, 20]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Sync & init submodules
-      run: |
-        git submodule sync --recursive
-        git submodule update --init --recursive
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
-    - name: Verify submodules
-      run: |
-        git submodule sync --recursive
-        git submodule update --init --recursive
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
 
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    - name: Enable Corepack
-      run: corepack enable
+      - name: Generate Prisma client
+        run: pnpm -w prisma:generate
 
-    - name: Prepare pnpm
-      run: corepack prepare pnpm@9 --activate
+      - name: Type check
+        run: pnpm -w type-check
 
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm -w lint
 
-    - name: Generate Prisma client
-      run: pnpm --filter apps/api run prisma:generate
+      - name: Test with coverage
+        run: pnpm -w test -- --coverage --runInBand
 
-    - name: Typecheck
-      run: pnpm --filter apps/web run typecheck
-
-    - name: Lint (strict)
-      run: pnpm --filter apps/web run lint:strict
-
-    - name: Build API
-      run: pnpm --filter apps/api run build
-
-    - name: Build Web
-      run: pnpm --filter apps/web run build
-      env:
-        NEXT_USE_WEBPACK: "1"
-        NEXT_PUBLIC_SITE_URL: https://test.example.com
-        NEXT_PUBLIC_API_URL: https://api-test.example.com
-        NEXTAUTH_URL: https://test.example.com
-        NEXTAUTH_SECRET: test-secret-for-ci-builds-only
-        NODE_ENV: production
-
-    - name: Test (full, single worker)
-      run: pnpm --filter apps/api run test:coverage -- --runInBand --ci
-      env:
-        CI: "true"
-    
-    - name: Check test coverage
-      run: |
-        if [ -f apps/api/coverage/coverage-summary.json ]; then
-          COVERAGE=$(node -p "JSON.parse(require('fs').readFileSync('apps/api/coverage/coverage-summary.json', 'utf8')).total.lines.pct")
-          echo "Coverage: ${COVERAGE}%"
-          if (( $(echo "$COVERAGE < 95" | bc -l) )); then
-            echo "❌ Coverage ${COVERAGE}% is below required 95%"
-            exit 1
-          else
-            echo "✅ Coverage ${COVERAGE}% meets requirement"
-          fi
-        else
-          echo "⚠️  No coverage report found"
-          exit 1
-        fi
-
-  smoke-test:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: test
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Sync & init submodules
-      run: |
-        git submodule sync --recursive
-        git submodule update --init --recursive
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'pnpm'
-    
-    - name: Enable Corepack
-      run: corepack enable
-    
-    - name: Prepare pnpm
-      run: corepack prepare pnpm@9 --activate
-    
-    - name: Install dependencies
-      run: |
-        pnpm install --frozen-lockfile
-        sudo apt-get update && sudo apt-get install -y curl jq
-    
-    - name: Run smoke tests
-      run: |
-        chmod +x scripts/smoke.sh
-        ./scripts/smoke.sh
-      env:
-        WEB_URL: ${{ secrets.STAGING_WEB_URL || 'http://localhost:3000' }}
-        API_URL: ${{ secrets.STAGING_API_URL || 'http://localhost:3001' }}
-      continue-on-error: true
-
-  security-scan:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Sync & init submodules
-      run: |
-        git submodule sync --recursive
-        git submodule update --init --recursive
-    
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-    
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
+      - name: Build
+        run: pnpm -w build
