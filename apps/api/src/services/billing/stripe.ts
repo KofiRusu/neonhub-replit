@@ -4,6 +4,16 @@ import { logger } from "../../lib/logger.js"
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || ""
 
+const resolveEnv = (candidates: string[]): string => {
+  for (const key of candidates) {
+    const value = process.env[key]
+    if (value && value.length > 0) {
+      return value
+    }
+  }
+  return ""
+}
+
 if (!STRIPE_SECRET_KEY) {
   logger.warn("STRIPE_SECRET_KEY is not configured – billing API will operate in sandbox mode")
 }
@@ -16,14 +26,20 @@ async function stripeRequest<T>(path: string, params: Record<string, string>, me
   const url = `https://api.stripe.com/v1/${path}`
   const body = new URLSearchParams(params)
 
-  const response = await fetch(method === "GET" ? `${url}?${body.toString()}` : url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: method === "GET" ? undefined : body.toString(),
-  })
+  let response: Response
+  try {
+    response = await fetch(method === "GET" ? `${url}?${body.toString()}` : url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: method === "GET" ? undefined : body.toString(),
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown fetch error"
+    throw new Error(`Failed to reach Stripe API (${path}): ${message}`)
+  }
 
   if (!response.ok) {
     const text = await response.text()
@@ -33,11 +49,23 @@ async function stripeRequest<T>(path: string, params: Record<string, string>, me
   return (await response.json()) as T
 }
 
+const PLAN_PRICE_KEYS = {
+  starter: ["STRIPE_PRICE_ID_STARTER", "STRIPE_PRICE_STARTER", "STRIPE_PRICE_FREE"],
+  pro: ["STRIPE_PRICE_ID_PRO", "STRIPE_PRICE_PRO"],
+  enterprise: ["STRIPE_PRICE_ID_ENTERPRISE", "STRIPE_PRICE_ENTERPRISE"],
+} as const
+
+const PLAN_PRODUCT_KEYS = {
+  starter: ["STRIPE_PRODUCT_STARTER", "STRIPE_PRODUCT_FREE"],
+  pro: ["STRIPE_PRODUCT_PRO"],
+  enterprise: ["STRIPE_PRODUCT_ENTERPRISE"],
+} as const
+
 export const PLANS = {
-  free: {
-    name: "Free",
-    priceId: process.env.STRIPE_PRICE_FREE || "",
-    productId: process.env.STRIPE_PRODUCT_FREE || "",
+  starter: {
+    name: "Starter",
+    priceId: resolveEnv(PLAN_PRICE_KEYS.starter),
+    productId: resolveEnv(PLAN_PRODUCT_KEYS.starter),
     limits: {
       campaigns: 5,
       emails: 1000,
@@ -47,8 +75,8 @@ export const PLANS = {
   },
   pro: {
     name: "Pro",
-    priceId: process.env.STRIPE_PRICE_PRO || "",
-    productId: process.env.STRIPE_PRODUCT_PRO || "",
+    priceId: resolveEnv(PLAN_PRICE_KEYS.pro),
+    productId: resolveEnv(PLAN_PRODUCT_KEYS.pro),
     limits: {
       campaigns: 50,
       emails: 50000,
@@ -58,8 +86,8 @@ export const PLANS = {
   },
   enterprise: {
     name: "Enterprise",
-    priceId: process.env.STRIPE_PRICE_ENTERPRISE || "",
-    productId: process.env.STRIPE_PRODUCT_ENTERPRISE || "",
+    priceId: resolveEnv(PLAN_PRICE_KEYS.enterprise),
+    productId: resolveEnv(PLAN_PRODUCT_KEYS.enterprise),
     limits: {
       campaigns: 999999,
       emails: 999999,
@@ -68,6 +96,27 @@ export const PLANS = {
     },
   },
 } as const
+
+const findPlanByPriceId = (priceId: string | undefined) => {
+  if (!priceId) return undefined
+  return (Object.entries(PLANS) as Array<[keyof typeof PLANS, (typeof PLANS)[keyof typeof PLANS]]>).find(
+    ([, config]) => config.priceId === priceId,
+  )?.[0]
+}
+
+const logMissingPlanConfig = () => {
+  const missingPlans = Object.entries(PLANS)
+    .filter(([, config]) => !config.priceId || !config.productId)
+    .map(([key]) => key)
+  if (missingPlans.length > 0) {
+    logger.warn(
+      { missingPlans },
+      "Stripe plan configuration incomplete – checkout sessions will fail for these plans",
+    )
+  }
+}
+
+logMissingPlanConfig()
 
 export class BillingService {
   async getOrCreateCustomer(userId: string, email: string): Promise<string> {
@@ -89,15 +138,18 @@ export class BillingService {
   async createCheckoutSession(params: {
     userId: string
     email: string
-    plan: keyof typeof PLANS
+    plan?: keyof typeof PLANS
+    priceId?: string
     successUrl: string
     cancelUrl: string
   }): Promise<{ url: string }> {
     const customerId = await this.getOrCreateCustomer(params.userId, params.email)
-    const planConfig = PLANS[params.plan]
+    const planKey = params.plan ?? findPlanByPriceId(params.priceId)
+    const planConfig = planKey ? PLANS[planKey] : undefined
+    const priceId = params.priceId ?? planConfig?.priceId
 
-    if (!planConfig.priceId) {
-      throw new Error(`Price ID not configured for plan ${params.plan}`)
+    if (!priceId) {
+      throw new Error(`Price ID not configured for plan ${params.plan ?? "custom"}`)
     }
 
     const session = await stripeRequest<{ url: string | null }>("checkout/sessions", {
@@ -105,17 +157,17 @@ export class BillingService {
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
       customer: customerId,
-      "line_items[0][price]": planConfig.priceId,
+      "line_items[0][price]": priceId,
       "line_items[0][quantity]": "1",
       "metadata[userId]": params.userId,
-      "metadata[plan]": params.plan,
+      ...(planKey ? { "metadata[plan]": planKey } : {}),
     })
 
     if (!session.url) {
       throw new Error("Stripe checkout session did not include URL")
     }
 
-    logger.info({ plan: params.plan, userId: params.userId }, "Stripe checkout session created")
+    logger.info({ plan: planKey ?? "custom", priceId, userId: params.userId }, "Stripe checkout session created")
     return { url: session.url }
   }
 
@@ -139,7 +191,7 @@ export class BillingService {
   ): Promise<{ allowed: boolean; limit: number; used: number }> {
     const subscription = await prisma.subscription.findUnique({ where: { userId } })
     if (!subscription) {
-      const limits = PLANS.free.limits
+      const limits = PLANS.starter.limits
       const limitMap = {
         campaign: limits.campaigns,
         email: limits.emails,

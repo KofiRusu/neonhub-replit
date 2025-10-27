@@ -90,6 +90,14 @@ export default function BillingPage() {
 
   const isLoading = planLoading || usageLoading
 
+  const planSlugByLabel: Record<string, "starter" | "pro" | "enterprise"> = {
+    Starter: "starter",
+    Professional: "pro",
+    Enterprise: "enterprise",
+  }
+
+  const resolvePriceId = (id: string | undefined) => id && id.length > 0 ? id : undefined
+
   const handleUpgrade = (planName: string) => {
     if (!isStripeLive) {
       alert("Stripe is not configured. Set NEXT_PUBLIC_STRIPE_LIVE=true and configure Stripe keys to enable live billing.")
@@ -98,9 +106,18 @@ export default function BillingPage() {
 
     // TODO: Map plan names to Stripe price IDs from env
     const priceIds: Record<string, string> = {
-      Starter: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || "",
-      Professional: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || "",
-      Enterprise: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE || "",
+      Starter:
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER) ||
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER) ||
+        "",
+      Professional:
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO) ||
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO) ||
+        "",
+      Enterprise:
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE) ||
+        resolvePriceId(process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE) ||
+        "",
     }
 
     const priceId = priceIds[planName]
@@ -109,8 +126,11 @@ export default function BillingPage() {
       return
     }
 
+    const plan = planSlugByLabel[planName]
+
     checkoutMutation.mutate({
       priceId,
+      plan,
       successUrl: `${window.location.origin}/billing?success=true`,
       cancelUrl: `${window.location.origin}/billing?canceled=true`,
     })

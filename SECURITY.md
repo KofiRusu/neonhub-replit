@@ -73,6 +73,15 @@ We release security updates for the following versions:
 6. **Audit Dependencies:** Run `npm audit` regularly
 7. **Code Review:** All code must be reviewed before merging
 
+## Encryption Keys & HTTPS
+
+- **Key Generation:** Generate `ENCRYPTION_KEY` with `openssl rand -hex 32` (64 hex chars) and store it in GitHub/Vercel secrets. Never reuse across environments.
+- **Rotation Cadence:** Rotate `ENCRYPTION_KEY`, `NEXTAUTH_SECRET`, and `JWT_SECRET` quarterly or immediately after suspected compromise.
+- **Storage:** Keep all secrets in managed secret stores (GitHub Actions, Vercel, or HashiCorp Vault). Do not persist them in `.env` files checked into source control.
+- **TLS Enforcement:** Enforce HTTPS with automatic redirects and preload HSTS (`Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`).
+- **Certificate Hygiene:** Use trusted certificates (Let’s Encrypt or AWS ACM) and monitor expiration with alerts at least 14 days prior.
+- **Verification:** After deploys, run `curl -Iv https://your-domain.com` to confirm certificate chain and HSTS headers.
+
 ## Known Security Features
 
 ### Authentication & Authorization
@@ -174,4 +183,3 @@ For security-related questions or concerns:
 **Version:** 3.2.0
 
 Thank you for helping keep NeonHub and our users safe!
-

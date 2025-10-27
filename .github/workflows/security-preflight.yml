@@ -22,17 +22,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            pnpm-workspace.yaml
 
-      - name: Install pnpm
+      - name: Setup pnpm & install dependencies
         uses: pnpm/action-setup@v4
         with:
           version: 8
-
-      - name: Enable Corepack
-        run: corepack enable && corepack prepare pnpm@8 --activate
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          run_install: true
+          args: --frozen-lockfile
 
       - name: Prisma format & validate
         run: |
@@ -167,4 +166,3 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"❌ *Security Preflight FAILED* on *${{ github.ref_name }}*\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nReview security issues before deploying!\"}" \
             ${{ secrets.SLACK_WEBHOOK_URL }} || true
-

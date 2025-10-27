@@ -83,7 +83,7 @@ export function useIsStripeLive(): boolean {
 export function useCheckout(): UseMutationResult<
   { url: string },
   Error,
-  { priceId: string; successUrl: string; cancelUrl: string }
+  { priceId: string; plan?: "starter" | "pro" | "enterprise"; successUrl: string; cancelUrl: string }
 > {
   return useMutation({
     mutationFn: createCheckoutSession,
@@ -110,4 +110,3 @@ export function useBillingPortal(): UseMutationResult<{ url: string }, Error, { 
     },
   })
 }
-

@@ -54,13 +54,14 @@ DATABASE_URL=postgresql://[user]:[pass]@[host]:5432/neonhub?sslmode=require
 JWT_SECRET=[generate-with-openssl-rand-base64-32]
 JWT_EXPIRES_IN=7d
 NEXTAUTH_URL=https://neonhubecosystem.com
+ENCRYPTION_KEY=[generate-with-openssl-rand-hex-32]
 
 # CORS (Production Domains)
-CORS_ORIGIN=https://neonhubecosystem.com,https://neonhub.vercel.app,https://*.vercel.app
+CORS_ORIGINS=https://neonhubecosystem.com,https://neonhub.vercel.app,https://*.vercel.app
 
 # AI Services (Required for content generation)
 OPENAI_API_KEY=sk-[your-openai-api-key]
-AI_MODEL=gpt-4-turbo-preview
+OPENAI_MODEL=gpt-4o-mini
 AI_MAX_TOKENS=4000
 AI_TEMPERATURE=0.7
 
@@ -78,6 +79,14 @@ RESEND_API_KEY=re_[your-resend-api-key]
 # Application URLs
 APP_BASE_URL=https://neonhubecosystem.com
 API_BASE_URL=https://api.neonhubecosystem.com
+NEXT_PUBLIC_SITE_URL=https://neonhubecosystem.com
+NEXT_PUBLIC_API_URL=https://api.neonhubecosystem.com
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_[your-publishable-key]
+NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER=price_[starter-price-id]
+NEXT_PUBLIC_STRIPE_PRICE_ID_PRO=price_[pro-price-id]
+NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE=price_[enterprise-price-id]
+NEXT_PUBLIC_STRIPE_LIVE=true
+NEXT_PUBLIC_BILLING_SANDBOX=false
 
 # Rate Limiting (Production Settings)
 RATE_LIMIT_WINDOW_MS=60000
@@ -91,6 +100,13 @@ LOG_LEVEL=info
 ENABLE_AGENTS=true
 ENABLE_WEBSOCKETS=true
 ENABLE_EMAIL_NOTIFICATIONS=true
+
+# Open Banking (Optional Connector)
+OPEN_BANKING_PROVIDER=truelayer
+OPEN_BANKING_CLIENT_ID=...
+OPEN_BANKING_CLIENT_SECRET=...
+OPEN_BANKING_API_URL=https://api.truelayer.com
+OPEN_BANKING_REDIRECT_URI=https://neonhubecosystem.com/banking/oauth/callback
 ```
 
 ---
@@ -163,4 +179,3 @@ After setting all variables:
 
 **Last Updated:** October 3, 2025  
 **Version:** 1.0.0-production
-

@@ -54,6 +54,22 @@ Some databases need two URLs. If yours does:
 
 ---
 
+### Bonus: Add the Other Production Secrets 🔒
+
+Repeat the same process for each of these so GitHub Actions can run end-to-end:
+
+| Name | Why it matters |
+| --- | --- |
+| `NEXTAUTH_SECRET` | Required by NextAuth to sign cookies/tokens |
+| `STRIPE_SECRET_KEY` | Needed for live billing + Stripe webhooks |
+| `STRIPE_WEBHOOK_SECRET` | Validates events coming from Stripe |
+| `OPENAI_API_KEY` | Powers the AI agents/content features |
+| `RESEND_API_KEY` | Sends invite emails & notifications |
+
+> Tip: Keep a checklist in your password manager so you know which secrets are live in GitHub **and** Vercel.
+
+---
+
 ## Step 5: Run the Magic Workflow ✨
 
 1. Click the **Actions** tab at the top
@@ -112,4 +128,3 @@ Take a screenshot of:
 3. Your workflow run page
 
 Send them to me and I'll tell you the exact fix!
-

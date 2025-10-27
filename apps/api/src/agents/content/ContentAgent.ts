@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { generateText } from "../../ai/openai.js";
 import { prisma } from "../../db/prisma.js";
 import { agentJobManager } from "../base/AgentJobManager.js";
@@ -10,6 +11,10 @@ export interface GenerateDraftInput {
   audience?: string;
   notes?: string;
   createdById?: string;
+  brandId?: string;
+  brandVoiceId?: string;
+  campaignGoal?: "awareness" | "engagement" | "conversion" | "retention";
+  callToAction?: string;
 }
 
 export interface GenerateDraftOutput {
@@ -24,6 +29,116 @@ export interface GenerateDraftOutput {
  */
 export class ContentAgent {
   private readonly agentName = "content";
+
+  private async resolveOrganizationId(userId?: string | null): Promise<string | undefined> {
+    if (!userId) {
+      return undefined;
+    }
+
+    const membership = await prisma.organizationMembership.findFirst({
+      where: { userId },
+      select: { organizationId: true },
+    });
+
+    return membership?.organizationId ?? undefined;
+  }
+
+  private toRecord(value: Prisma.JsonValue | null | undefined): Record<string, unknown> {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      return {};
+    }
+    return { ...value } as Record<string, unknown>;
+  }
+
+  private formatStyleRules(value: Prisma.JsonValue | null | undefined): string {
+    if (!value) {
+      return "";
+    }
+    if (Array.isArray(value)) {
+      return value.map(rule => `- ${String(rule)}`).join("\n");
+    }
+    if (typeof value === "object") {
+      return Object.entries(value as Record<string, unknown>)
+        .map(([key, v]) => {
+          if (Array.isArray(v)) {
+            return `- ${key}: ${(v as unknown[]).map(item => String(item)).join(", ")}`;
+          }
+          return `- ${key}: ${String(v)}`;
+        })
+        .join("\n");
+    }
+    return `- ${String(value)}`;
+  }
+
+  private formatMetadata(value: Prisma.JsonValue | null | undefined): string {
+    const record = this.toRecord(value);
+    if (Object.keys(record).length === 0) {
+      return "";
+    }
+    return Object.entries(record)
+      .map(([key, raw]) => {
+        if (Array.isArray(raw)) {
+          return `- ${key}: ${(raw as unknown[]).map(item => String(item)).join(", ")}`;
+        }
+        if (typeof raw === "object" && raw) {
+          return `- ${key}: ${JSON.stringify(raw)}`;
+        }
+        return `- ${key}: ${String(raw)}`;
+      })
+      .join("\n");
+  }
+
+  private async resolveBrandContext(input: GenerateDraftInput) {
+    if (!input.brandVoiceId && !input.brandId) {
+      return null;
+    }
+
+    const brandVoice = input.brandVoiceId
+      ? await prisma.brandVoice.findUnique({
+          where: { id: input.brandVoiceId },
+          select: {
+            id: true,
+            promptTemplate: true,
+            styleRulesJson: true,
+            brand: {
+              select: {
+                id: true,
+                name: true,
+                slogan: true,
+                metadata: true,
+              },
+            },
+          },
+        })
+      : null;
+
+    const brand = brandVoice?.brand
+      ? brandVoice.brand
+      : input.brandId
+      ? await prisma.brand.findUnique({
+          where: { id: input.brandId },
+          select: {
+            id: true,
+            name: true,
+            slogan: true,
+            metadata: true,
+          },
+        })
+      : null;
+
+    if (!brand) {
+      return null;
+    }
+
+    return {
+      brandId: brand.id,
+      brandName: brand.name,
+      slogan: brand.slogan ?? undefined,
+      promptTemplate: brandVoice?.promptTemplate,
+      styleGuide: this.formatStyleRules(brandVoice?.styleRulesJson),
+      metadataSummary: this.formatMetadata(brand.metadata),
+    } as const;
+  }
 
   /**
    * Generate a content draft using AI
@@ -47,8 +162,13 @@ export class ContentAgent {
       // Mark job as running
       await agentJobManager.startJob(jobId);
 
+      const [brandContext, organizationId] = await Promise.all([
+        this.resolveBrandContext(input),
+        this.resolveOrganizationId(input.createdById),
+      ]);
+
       // Build prompt for AI
-      const prompt = this.buildPrompt(input);
+      const prompt = this.buildPrompt(input, brandContext);
       
       logger.info({ jobId, topic: input.topic }, "Generating content with AI");
 
@@ -57,7 +177,7 @@ export class ContentAgent {
         prompt,
         temperature: input.tone === "casual" ? 0.8 : 0.7,
         maxTokens: 1500,
-        systemPrompt: this.getSystemPrompt(input.tone),
+        systemPrompt: this.getSystemPrompt(input.tone, brandContext, input.campaignGoal),
       });
 
       // Parse and structure the content
@@ -73,6 +193,7 @@ export class ContentAgent {
           audience: input.audience,
           status: "generated",
           createdById: input.createdById,
+          ...(organizationId ? { organizationId } : {}),
         },
       });
 
@@ -87,6 +208,9 @@ export class ContentAgent {
           wordCount: content.body.split(/\s+/).length,
           preview: content.body.substring(0, 200) + "...",
           mock: result.mock,
+          brandId: brandContext?.brandId,
+          campaignGoal: input.campaignGoal ?? "awareness",
+          callToAction: input.callToAction,
         },
         {
           duration,
@@ -128,44 +252,91 @@ export class ContentAgent {
   /**
    * Build AI prompt from input
    */
-  private buildPrompt(input: GenerateDraftInput): string {
-    let prompt = `Create engaging marketing content about: ${input.topic}\n\n`;
-    
+  private buildPrompt(input: GenerateDraftInput, brand: Awaited<ReturnType<typeof this.resolveBrandContext>>): string {
+    const goal = input.campaignGoal ?? "awareness";
+    const headline = brand?.brandName
+      ? `Develop ${goal} content for ${brand.brandName}.`
+      : `Develop ${goal} marketing content.`;
+
+    const segments: string[] = [headline, `Topic: ${input.topic}`];
+
+    if (brand?.slogan) {
+      segments.push(`Brand Promise: ${brand.slogan}`);
+    }
+
     if (input.audience) {
-      prompt += `Target Audience: ${input.audience}\n`;
+      segments.push(`Target Audience: ${input.audience}`);
     }
-    
-    prompt += `Tone: ${input.tone}\n`;
-    
+
+    segments.push(`Tone: ${input.tone}`);
+
+    if (input.callToAction) {
+      segments.push(`Primary Call To Action: ${input.callToAction}`);
+    }
+
     if (input.notes) {
-      prompt += `Additional Notes: ${input.notes}\n`;
+      segments.push(`Notes from requester: ${input.notes}`);
     }
 
-    prompt += `\nPlease create a well-structured piece of content that includes:
-1. An engaging title
-2. A compelling introduction
-3. 3-5 key points or sections
-4. A strong call-to-action
+    if (brand?.styleGuide) {
+      segments.push(`Brand Voice Guardrails:\n${brand.styleGuide}`);
+    }
 
-Format the content in Markdown. Make it actionable and valuable for the target audience.`;
+    if (brand?.promptTemplate) {
+      segments.push(`Messaging Pillars:\n${brand.promptTemplate}`);
+    }
 
-    return prompt;
+    if (brand?.metadataSummary) {
+      segments.push(`Additional Brand Context:\n${brand.metadataSummary}`);
+    }
+
+    segments.push(`\nCreate a well-structured Markdown draft that includes:
+1. An attention-grabbing title
+2. A compelling introduction tied to the campaign goal (${goal})
+3. 3-5 thematic sections with clear transitions
+4. A closing paragraph that reinforces the value proposition
+5. A call-to-action matching the provided CTA or recommend one if missing
+
+Each section should include actionable insights, relevant data points when possible, and maintain factual accuracy. Avoid generic fluff.`);
+
+    return segments.join("\n");
   }
 
   /**
    * Get system prompt based on tone
    */
-  private getSystemPrompt(tone: string): string {
-    const basePrompt = "You are an expert marketing content writer.";
-    
+  private getSystemPrompt(
+    tone: string,
+    brand: Awaited<ReturnType<typeof this.resolveBrandContext>>,
+    goal?: GenerateDraftInput["campaignGoal"],
+  ): string {
     const tonePrompts = {
-      professional: " Write in a professional, authoritative tone suitable for business audiences.",
-      casual: " Write in a casual, conversational tone that feels friendly and approachable.",
-      friendly: " Write in a warm, friendly tone that builds connection with readers.",
-      authoritative: " Write in an authoritative, expert tone that establishes credibility.",
-    };
+      professional: "Maintain an informed, executive-friendly tone.",
+      casual: "Keep the writing approachable with light conversational touches.",
+      friendly: "Write warmly and emphasize relationship-building language.",
+      authoritative: "Project expertise with confident, data-backed statements.",
+    } as const;
 
-    return basePrompt + (tonePrompts[tone as keyof typeof tonePrompts] || "");
+    const lines: string[] = [];
+    lines.push(
+      brand?.brandName
+        ? `You are the lead marketing copywriter for ${brand.brandName}, responsible for producing on-brand assets that drive ${goal ?? "awareness"}.`
+        : `You are an expert marketing content writer focused on producing ${goal ?? "awareness"} assets.`,
+    );
+
+    if (brand?.slogan) {
+      lines.push(`Keep messaging consistent with the brand promise: "${brand.slogan}".`);
+    }
+
+    if (tone in tonePrompts) {
+      lines.push(tonePrompts[tone as keyof typeof tonePrompts]);
+    }
+
+    lines.push(
+      "Ensure the copy is specific, factually accurate, and avoids hallucinated product claims. Provide helpful subheadings and keyword-rich phrasing without sacrificing readability.",
+    );
+
+    return lines.join(" ");
   }
 
   /**
@@ -183,6 +354,14 @@ Format the content in Markdown. Make it actionable and valuable for the target a
     if (!body.includes("#") && !body.includes("\n\n")) {
       // Add some basic structure if AI didn't provide it
       body = `## Overview\n\n${body}`;
+    }
+
+    if (input.callToAction) {
+      const callToAction = input.callToAction.trim();
+      const hasCta = body.toLowerCase().includes(callToAction.toLowerCase());
+      if (!hasCta) {
+        body = `${body}\n\n**Call to Action:** ${callToAction}`;
+      }
     }
 
     return { title, body };

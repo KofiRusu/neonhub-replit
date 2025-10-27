@@ -153,15 +153,23 @@ export function isStripeLive(): boolean {
  */
 export async function createCheckoutSession(params: {
   priceId: string
+  plan?: "starter" | "pro" | "enterprise"
   successUrl: string
   cancelUrl: string
 }): Promise<{ url: string }> {
+  const payload = {
+    priceId: params.priceId,
+    plan: params.plan,
+    successUrl: params.successUrl,
+    cancelUrl: params.cancelUrl,
+  }
+
   const response = await fetch(`${API_URL}/billing/checkout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(params),
+    body: JSON.stringify(payload),
   })
 
   if (!response.ok) {
@@ -258,4 +266,3 @@ const mockInvoices: Invoice[] = [
     pdfUrl: "#",
   },
 ]
-

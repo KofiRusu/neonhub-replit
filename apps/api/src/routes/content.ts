@@ -6,7 +6,7 @@ import { logger } from "../lib/logger.js";
 import { contentAgent } from "../agents/content/ContentAgent.js";
 import { getAuthenticatedUserId } from "../lib/requestUser.js";
 
-export const contentRouter = Router();
+export const contentRouter: Router = Router();
 
 // Generate content using ContentAgent
 contentRouter.post("/content/generate", async (req, res, next) => {
@@ -18,7 +18,7 @@ contentRouter.post("/content/generate", async (req, res, next) => {
       throw new ValidationError(result.error.errors[0].message);
     }
 
-    const { topic, tone, audience, notes } = result.data;
+    const { topic, tone, audience, notes, brandId, brandVoiceId, campaignGoal, callToAction } = result.data;
 
     // Use real ContentAgent to generate content
     const output = await contentAgent.generateDraft({
@@ -26,6 +26,10 @@ contentRouter.post("/content/generate", async (req, res, next) => {
       tone: tone as any,
       audience,
       notes,
+      brandId,
+      brandVoiceId,
+      campaignGoal,
+      callToAction,
       createdById: userId,
     });
 

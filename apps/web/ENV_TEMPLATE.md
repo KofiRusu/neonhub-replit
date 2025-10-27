@@ -8,6 +8,12 @@ Create `.env.local` with these variables:
 # ==============================================
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXT_PUBLIC_API_URL="http://localhost:3001"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER="price_..."
+NEXT_PUBLIC_STRIPE_PRICE_ID_PRO="price_..."
+NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE="price_..."
+NEXT_PUBLIC_STRIPE_LIVE=false
+NEXT_PUBLIC_BILLING_SANDBOX=true
 
 # ==============================================
 # NextAuth.js
@@ -20,7 +26,7 @@ DEMO_LOGIN_NAME="NeonHub Demo"
 DEMO_LOGIN_USER_ID="demo-user"
 
 # ==============================================
-# Sentry (Optional - for error tracking)
+# Observability (Optional - for error tracking)
 # ==============================================
 SENTRY_DSN="https://your-sentry-dsn@sentry.io/project-id"
 SENTRY_AUTH_TOKEN="your-sentry-auth-token"
@@ -37,9 +43,12 @@ NEXT_PUBLIC_ENABLE_REAL_TIME=true
 
 1. **NEXT_PUBLIC_SITE_URL** - Your production domain (e.g., `https://neonhubecosystem.com`)
 2. **NEXT_PUBLIC_API_URL** - Your backend API URL (e.g., `https://api.neonhubecosystem.com`)
-3. **NEXTAUTH_URL** - Same as NEXT_PUBLIC_SITE_URL
-4. **NEXTAUTH_SECRET** - Generate with: `openssl rand -base64 32`
-5. **Sentry** - Add your production Sentry DSN for error tracking
+3. **NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY** - Production publishable key from Stripe Dashboard
+4. **NEXT_PUBLIC_STRIPE_PRICE_ID_\*** - Price IDs for Starter/Pro/Enterprise plans
+5. **NEXT_PUBLIC_STRIPE_LIVE** - Set to `true` once live keys are configured
+6. **NEXTAUTH_URL** - Same as NEXT_PUBLIC_SITE_URL
+7. **NEXTAUTH_SECRET** - Generate with: `openssl rand -base64 32`
+8. **Sentry** - Add your production Sentry DSN for error tracking
 
 ## Generate Secrets:
 

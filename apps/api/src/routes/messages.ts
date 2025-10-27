@@ -5,7 +5,7 @@ import * as messagingService from '../services/messaging.service.js';
 import type { CreateMessageInput } from '../services/messaging.service.js';
 import { ok, fail } from '../lib/http.js';
 
-export const messagesRouter = Router();
+export const messagesRouter: Router = Router();
 
 // Validation schemas
 const sendMessageSchema = z.object({
@@ -15,6 +15,7 @@ const sendMessageSchema = z.object({
   threadId: z.string().optional(),
   replyToId: z.string().optional(),
   attachments: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 

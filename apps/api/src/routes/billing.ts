@@ -6,24 +6,40 @@ import { billingService, PLANS } from "../services/billing/stripe.js"
 import { prisma } from "../db/prisma.js"
 import { ValidationError } from "../lib/errors.js"
 
-export const billingRouter = Router()
+export const billingRouter: Router = Router()
 
-const checkoutSchema = z.object({
-  plan: z.enum(["free", "pro", "enterprise"]),
-  successUrl: z.string().url("Invalid success URL"),
-  cancelUrl: z.string().url("Invalid cancel URL"),
-})
+const planOptions = ["starter", "pro", "enterprise", "free"] as const
+
+const checkoutSchema = z
+  .object({
+    plan: z.enum(planOptions).optional(),
+    priceId: z.string().min(1, "Invalid price ID").optional(),
+    successUrl: z.string().url("Invalid success URL"),
+    cancelUrl: z.string().url("Invalid cancel URL"),
+  })
+  .refine(
+    (payload) => Boolean(payload.plan) || Boolean(payload.priceId),
+    { message: "Provide either plan or priceId", path: ["plan"] },
+  )
 
 const portalSchema = z.object({
   returnUrl: z.string().url("Invalid return URL"),
 })
+
+type PlanOption = (typeof planOptions)[number]
+
+const normalizePlan = (plan: PlanOption | null | undefined): keyof typeof PLANS | undefined => {
+  if (!plan) return undefined
+  if (plan === "free") return "starter"
+  return plan as keyof typeof PLANS
+}
 
 billingRouter.get("/billing/plan", async (req, res) => {
   try {
     const user = getAuthenticatedUser(req)
     const subscription = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
-    const planKey = (subscription?.plan as keyof typeof PLANS) ?? "free"
+    const planKey = normalizePlan(subscription?.plan as PlanOption) ?? "starter"
     const planConfig = PLANS[planKey]
 
     return res.json(ok({
@@ -32,7 +48,8 @@ billingRouter.get("/billing/plan", async (req, res) => {
       priceId: planConfig.priceId,
       productId: planConfig.productId,
       limits: planConfig.limits,
-      status: subscription?.status ?? (planKey === "free" ? "active" : "inactive"),
+      status: subscription?.status ?? (planKey === "starter" ? "active" : "inactive"),
+      // keep backwards-compatible status until subscriptions table is migrated
       currentPeriod: subscription
         ? {
             start: subscription.currentPeriodStart.toISOString(),
@@ -53,7 +70,7 @@ billingRouter.get("/billing/usage", async (req, res) => {
     const subscription = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
     if (!subscription) {
-      const limits = PLANS.free.limits
+      const limits = PLANS.starter.limits
       return res.json(
         ok({
           campaigns: { used: 0, total: limits.campaigns },
@@ -116,6 +133,7 @@ billingRouter.post("/billing/checkout", async (req, res) => {
   try {
     const user = getAuthenticatedUser(req)
     const payload = checkoutSchema.parse(req.body)
+    const planKey = normalizePlan(payload.plan)
 
     if (!user.email) {
       throw new ValidationError("User email is required for checkout")
@@ -124,7 +142,8 @@ billingRouter.post("/billing/checkout", async (req, res) => {
     const session = await billingService.createCheckoutSession({
       userId: user.id,
       email: user.email,
-      plan: payload.plan,
+      plan: planKey,
+      priceId: payload.priceId,
       successUrl: payload.successUrl,
       cancelUrl: payload.cancelUrl,
     })

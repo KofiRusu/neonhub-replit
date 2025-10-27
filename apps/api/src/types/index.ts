@@ -17,6 +17,12 @@ export const GenerateContentRequestSchema = z.object({
   tone: z.enum(["professional", "casual", "friendly", "authoritative"]).default("professional"),
   audience: z.string().optional(),
   notes: z.string().optional(),
+  brandId: z.string().uuid("brandId must be a valid UUID").optional(),
+  brandVoiceId: z.string().uuid("brandVoiceId must be a valid UUID").optional(),
+  campaignGoal: z
+    .enum(["awareness", "engagement", "conversion", "retention"])
+    .default("awareness"),
+  callToAction: z.string().min(1).optional(),
 });
 
 export type GenerateContentRequest = z.infer<typeof GenerateContentRequestSchema>;

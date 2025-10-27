@@ -1,22 +1,46 @@
-# Web App Environment Variables
-# Copy to .env.local
+# NeonHub Web App Environment Variables
+# Copy to .env.local (Next.js)
 
-# API
+# -----------------------------------------------------------------------------
+# Core URLs
+# -----------------------------------------------------------------------------
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_API_URL=http://localhost:3001
 
-# Auth
-NEXTAUTH_SECRET=replace_me_with_random_32_char_string
+# -----------------------------------------------------------------------------
+# Auth (NextAuth Demo Defaults)
+# -----------------------------------------------------------------------------
 NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=replace_me_with_random_32_char_string
 DEMO_LOGIN_EMAIL=demo@neonhub.ai
 DEMO_LOGIN_PASSWORD=demo-access
 DEMO_LOGIN_NAME="NeonHub Demo"
 DEMO_LOGIN_USER_ID=demo-user
 
-# Site
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# Stripe (Public Key)
+# -----------------------------------------------------------------------------
+# Billing (Stripe)
+# -----------------------------------------------------------------------------
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_PRO=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE=price_...
+NEXT_PUBLIC_STRIPE_LIVE=false
+NEXT_PUBLIC_BILLING_SANDBOX=true
 
-# Prisma (for client generation)
+# -----------------------------------------------------------------------------
+# Feature Flags (Optional)
+# -----------------------------------------------------------------------------
+NEXT_PUBLIC_ENABLE_ANALYTICS=true
+NEXT_PUBLIC_ENABLE_REAL_TIME=true
+
+# -----------------------------------------------------------------------------
+# Observability (Optional)
+# -----------------------------------------------------------------------------
+NEXT_PUBLIC_SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+SENTRY_AUTH_TOKEN=your-sentry-auth-token
+
+# -----------------------------------------------------------------------------
+# Prisma (optional for local client generation)
+# -----------------------------------------------------------------------------
 DATABASE_URL=postgresql://user:pass@localhost:5432/neonhub?schema=public

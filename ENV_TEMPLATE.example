@@ -1,33 +1,75 @@
-# NeonHub v3.0 Environment Variables Template
-# Copy this file to .env and fill in the values
+#
+# NeonHub v3.x Environment Variables Template
+# Copy this file to `.env` (API / shared) and fill in the values before running the app.
+#
 
-# Database
+# -----------------------------------------------------------------------------
+# Core Platform
+# -----------------------------------------------------------------------------
+NODE_ENV=development
+PORT=3001
 DATABASE_URL=postgresql://user:pass@localhost:5432/neonhub?schema=public
+DIRECT_DATABASE_URL=postgresql://user:pass@localhost:5432/neonhub?schema=public
+CORS_ORIGINS=http://localhost:3000
+BETA_ENABLED=false
 
-# Auth and API URLs
+# -----------------------------------------------------------------------------
+# Authentication / URLs
+# -----------------------------------------------------------------------------
 NEXTAUTH_SECRET=replace_me_with_random_32_char_string
 NEXTAUTH_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_API_URL=http://localhost:3001
 
-# OpenAI
+# -----------------------------------------------------------------------------
+# Secrets & Encryption
+# -----------------------------------------------------------------------------
+JWT_SECRET=replace_me_with_random_32_char_string
+ENCRYPTION_KEY=replace_me_with_64_hex_characters # openssl rand -hex 32
+
+# -----------------------------------------------------------------------------
+# AI Providers
+# -----------------------------------------------------------------------------
 OPENAI_API_KEY=sk-proj-...
+OPENAI_MODEL=gpt-4o-mini
 
+# -----------------------------------------------------------------------------
 # Billing (Stripe)
+# -----------------------------------------------------------------------------
 STRIPE_SECRET_KEY=sk_test_...
-STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRODUCT_FREE=prod_...
+STRIPE_PRODUCT_PRO=prod_...
+STRIPE_PRODUCT_ENTERPRISE=prod_...
+STRIPE_PRICE_ID_STARTER=price_...
+STRIPE_PRICE_ID_PRO=price_...
+STRIPE_PRICE_ID_ENTERPRISE=price_...
 
-# Email Services
+# Public web keys (used by Next.js)
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_PRO=price_...
+NEXT_PUBLIC_STRIPE_PRICE_ID_ENTERPRISE=price_...
+NEXT_PUBLIC_STRIPE_LIVE=false
+NEXT_PUBLIC_BILLING_SANDBOX=true
+
+# -----------------------------------------------------------------------------
+# Email & Notifications
+# -----------------------------------------------------------------------------
 RESEND_API_KEY=re_...
 SENDGRID_API_KEY=SG...
 
-# SMS/Communication
+# -----------------------------------------------------------------------------
+# SMS / Communication
+# -----------------------------------------------------------------------------
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_PHONE_NUMBER=+1...
 
-# Social Media APIs (for TrendAgent)
+# -----------------------------------------------------------------------------
+# Social + Trend Integrations
+# -----------------------------------------------------------------------------
 TWITTER_API_KEY=...
 TWITTER_API_SECRET=...
 TWITTER_BEARER_TOKEN=...
@@ -35,9 +77,16 @@ REDDIT_CLIENT_ID=...
 REDDIT_CLIENT_SECRET=...
 REDDIT_USER_AGENT=NeonHub/3.0
 
-# Monitoring
+# -----------------------------------------------------------------------------
+# Monitoring / Observability
+# -----------------------------------------------------------------------------
 SENTRY_DSN=https://...
 
-# Node Environment
-NODE_ENV=development
-
+# -----------------------------------------------------------------------------
+# Optional: Open Banking / FinTech Integrations
+# -----------------------------------------------------------------------------
+OPEN_BANKING_PROVIDER=sandbox
+OPEN_BANKING_CLIENT_ID=...
+OPEN_BANKING_CLIENT_SECRET=...
+OPEN_BANKING_API_URL=https://api.sandbox-openbanking.example.com
+OPEN_BANKING_REDIRECT_URI=http://localhost:3000/banking/oauth/callback
