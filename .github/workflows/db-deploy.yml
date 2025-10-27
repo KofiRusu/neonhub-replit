@@ -1,50 +1,60 @@
 name: DB Deploy
-
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+    inputs:
+      RUN_SEED:
+        description: "Run seed after migrate"
+        required: true
+        default: "true"
 
 jobs:
-  deploy:
+  db-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
+      CI: "true"
+      PRISMA_HIDE_UPDATE_MESSAGE: "1"
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Enable Corepack + pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
-          pnpm -v
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+          cache: "pnpm"
+
+      # Ensure pnpm is the real binary (not a shim)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Enable Corepack (defense-in-depth)
+        run: corepack enable && corepack prepare pnpm@8 --activate
+
+      - name: Print tool versions
+        run: |
+          node -v
+          pnpm -v
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile || npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Prisma Generate
-        run: pnpm --filter apps/api run prisma:generate || npx prisma generate
-        working-directory: .
+      - name: Generate Prisma Client
+        run: pnpm -F apps/api prisma generate
 
-      - name: Migrate Deploy
-        run: pnpm --filter apps/api run prisma:migrate:deploy || npx prisma migrate deploy
-        working-directory: apps/api
+      - name: Verify DB connectivity
+        run: pnpm -F apps/api prisma validate
 
-      - name: Seed DB
-        run: pnpm --filter apps/api run seed || echo "⚠️ No seed script configured"
-        working-directory: apps/api
-        continue-on-error: true
+      - name: Apply migrations (deploy)
+        run: pnpm -F apps/api prisma migrate deploy
 
-      - name: Health Check
-        run: |
-          echo "✅ DB migration & seed operations complete"
-          echo "Migration status: Ready for verification"
+      - name: Seed database (optional)
+        if: ${{ github.event.inputs.RUN_SEED == 'true' }}
+        run: pnpm -F apps/api prisma db seed
 
-      - name: Success Notice
-        run: echo "::notice::✅ Database deployment workflow completed successfully"
+      - name: Status
+        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
