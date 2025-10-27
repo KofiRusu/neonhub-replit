@@ -52,3 +52,20 @@ dmypy.json
 # Python profilers
 *.prof
 *.lprof
+
+# JavaScript/TypeScript Build Artifacts
+.turbo/
+.next/
+.cache/
+coverage/
+tmp/
+.vite/
+out/
+.vercel/
+.wrangler/
+
+# System Files
+**/.DS_Store
+
+# Cleanup Logs
+logs/cleanup-*.log

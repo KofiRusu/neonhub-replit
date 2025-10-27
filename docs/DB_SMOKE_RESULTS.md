@@ -1,8 +1,9 @@
-# Database Smoke Test Results
+# Database Smoke Test Results — Post Omni-Channel Enhancement
 
-**Test Date:** 2025-10-26  
+**Test Date:** 2025-10-26 23:28 UTC  
 **Environment:** Local Development (macOS darwin-arm64)  
-**Status:** ✅ ALL CHECKS PASSING  
+**Status:** ✅ ALL CHECKS PASSING (31 tables with data, 17 empty, 0 failed)  
+**Enhancement:** Omni-channel connector infrastructure complete
 
 ---
 
@@ -13,11 +14,13 @@
 | Node.js | ✅ v20.17.0 | Required version met |
 | npm | ✅ 10.8.3 | Package manager ready |
 | Prisma | ✅ 6.18.0 | ORM installed and functional |
-| Schema | ✅ Valid | 20+ models validated |
+| Schema | ✅ Valid | 48 models validated |
 | Toolchain | ✅ Ready | All dependencies installed |
 | Docker Support | ✅ Available | pgvector image ready |
 | GitHub Actions | ✅ Configured | Workflow created and ready |
 | Local Script | ✅ Executable | One-command deploy ready |
+| **Connectors** | **✅ 15 platforms** | **Omni-channel catalog seeded** |
+| **ConnectorKind Enum** | **✅ Active** | **15 platform types enforced** |
 
 ---
 
@@ -308,9 +311,89 @@ grep ".env" .gitignore
 
 ---
 
+## Automated Smoke Test Results
+
+### Script: `scripts/db-smoke.mjs`
+
+```
+📊 NeonHub Database Smoke Test
+================================================================================
+
+Timestamp: 2025-10-26T23:28:19.302Z
+Database: localhost:5433/neonhub
+
+✅ organization                        2
+✅ user                                2
+✅ organizationMembership              2
+✅ organizationRole                    2
+✅ organizationPermission              2
+✅ rolePermission                      2
+✅ apiKey                              1
+✅ brand                               2
+✅ brandVoice                          2
+✅ brandAsset                          1
+✅ embeddingSpace                      2
+✅ agent                               2
+✅ agentCapability                     4
+✅ agentConfig                         1
+✅ agentRun                            1
+✅ agentRunMetric                      1
+✅ tool                                4
+✅ toolExecution                       1
+✅ conversation                        2
+✅ message                             3
+✅ dataset                             2
+✅ document                            2
+✅ chunk                               4
+⚪ modelVersion                        0 (empty)
+⚪ trainingJob                         0 (empty)
+⚪ inferenceEndpoint                   0 (empty)
+✅ content                             1
+✅ campaign                            2
+✅ campaignMetric                      2
+⚪ emailSequence                       0 (empty)
+⚪ socialPost                          0 (empty)
+⚪ aBTest                              0 (empty)
+✅ contentDraft                        2
+✅ agentJob                            2
+✅ metricEvent                         3
+✅ connector                          15 ⭐ NEW
+✅ connectorAuth                       2 ⭐ NEW
+⚪ triggerConfig                       0 (empty)
+⚪ actionConfig                        0 (empty)
+⚪ credential                          0 (empty)
+⚪ userSettings                        0 (empty)
+⚪ subscription                        0 (empty)
+⚪ invoice                             0 (empty)
+⚪ usageRecord                         0 (empty)
+⚪ auditLog                            0 (empty)
+⚪ task                                0 (empty)
+⚪ feedback                            0 (empty)
+⚪ teamMember                          0 (empty)
+
+================================================================================
+Summary:
+  Total tables:    48
+  ✅ Success:      31
+  ⚪ Empty:        17
+  ❌ Failed:       0
+
+✅ Smoke test passed!
+```
+
+### Key Findings
+- **31 tables with data** (64.6% coverage)
+- **17 empty tables** (optional/future features)
+- **0 failed tables** (100% schema integrity)
+- **15 connectors seeded** ⭐ NEW — Email, SMS, WhatsApp, Reddit, Instagram, Facebook, X, YouTube, TikTok, Google Ads, Shopify, Stripe, Slack, Discord, LinkedIn
+- **2 connector auths** ⭐ NEW — Demo auth for email and Slack
+- **4 tools** (including 3 new omni-channel tools: send-email, post-social, send-sms)
+
+---
+
 ## Model & Table Coverage
 
-### Database Models (20+ Total)
+### Database Models (48 Total)
 | Model | Status | Relations |
 |-------|--------|-----------|
 | User | ✅ | 10+ relations |

@@ -1,8 +1,14 @@
 # GitHub Actions: Database Deployment Workflow
 
+**Last Updated:** 2025-10-26 (Post Omni-Channel Enhancement)  
+**Enhancement:** ConnectorKind enum + 15 platform connectors
+
 ## Overview
 
 The `DB Deploy` workflow (``.github/workflows/db-deploy.yml`) automatically runs Prisma migrations and seeds your database on every push to `main` or on manual trigger.
+
+**Latest Migration:** `20251026_add_connector_kind_enum` (15 platform types)  
+**Latest Seed:** Enhanced with omni-channel connector catalog
 
 **Triggers:**
 - ✅ Manual run via GitHub Actions UI
@@ -152,8 +158,61 @@ To temporarily disable automatic deployments:
 
 ---
 
+## Omni-Channel Deployment Details
+
+### What Gets Deployed
+
+When this workflow runs, it will:
+
+1. **Apply 6 migrations** (including latest `20251026_add_connector_kind_enum`)
+2. **Seed 15 platform connectors:**
+   - EMAIL (Email / SMTP)
+   - SMS (SMS / Twilio)
+   - WHATSAPP (WhatsApp Business)
+   - REDDIT (Reddit)
+   - INSTAGRAM (Instagram)
+   - FACEBOOK (Facebook Pages)
+   - X (X / Twitter)
+   - YOUTUBE (YouTube)
+   - TIKTOK (TikTok)
+   - GOOGLE_ADS (Google Ads)
+   - SHOPIFY (Shopify)
+   - STRIPE (Stripe)
+   - SLACK (Slack)
+   - DISCORD (Discord)
+   - LINKEDIN (LinkedIn)
+
+3. **Create 2 demo connector auths** (for email and Slack)
+4. **Add 3 omni-channel tools** (send-email, post-social, send-sms)
+5. **Set up vector embeddings** (1536 dimensions, IVFFLAT indexes)
+
+### Post-Deployment Verification
+
+After the workflow completes, verify deployment with:
+
+```bash
+# SSH into your server or use Neon SQL Editor
+psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM connectors;"
+# Expected: 15
+
+psql "$DATABASE_URL" -c "SELECT unnest(enum_range(NULL::\"ConnectorKind\"));"
+# Expected: 15 enum values
+
+psql "$DATABASE_URL" -c "SELECT slug FROM tools WHERE slug IN ('send-email', 'post-social', 'send-sms');"
+# Expected: 3 tools
+```
+
+Or use the automated smoke test script:
+```bash
+node scripts/db-smoke.mjs
+# Expected: ✅ Smoke test passed!
+```
+
+---
+
 ## Next Steps
 
 - Run the workflow manually from Actions tab
 - Monitor logs for successful migration
+- Verify connector catalog with SQL queries above
 - For local CLI, see [LOCAL_DB_DEPLOY.md](./LOCAL_DB_DEPLOY.md)

@@ -69,6 +69,24 @@ enum CampaignStatus {
   archived
 }
 
+enum ConnectorKind {
+  EMAIL
+  SMS
+  WHATSAPP
+  REDDIT
+  INSTAGRAM
+  FACEBOOK
+  X
+  YOUTUBE
+  TIKTOK
+  GOOGLE_ADS
+  SHOPIFY
+  STRIPE
+  SLACK
+  DISCORD
+  LINKEDIN
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -979,22 +997,22 @@ model TeamMember {
 }
 
 model Connector {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String        @id @default(cuid())
+  name        String        @unique
   displayName String
-  description String   @db.Text
-  category    String
+  description String        @db.Text
+  category    ConnectorKind
   iconUrl     String?
   websiteUrl  String?
   authType    String
   authConfig  Json
-  isEnabled   Boolean  @default(true)
-  isVerified  Boolean  @default(false)
+  isEnabled   Boolean       @default(true)
+  isVerified  Boolean       @default(false)
   triggers    Json
   actions     Json
   metadata    Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   connectorAuths ConnectorAuth[]
 

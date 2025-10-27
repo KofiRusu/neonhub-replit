@@ -342,6 +342,302 @@ async function main() {
       skipDuplicates: true,
     });
 
+    // Omni-Channel Connector Catalog
+    const connectorDefinitions = [
+      {
+        name: "email",
+        displayName: "Email / SMTP",
+        category: "EMAIL",
+        description:
+          "Send transactional and marketing emails via SMTP, SendGrid, or AWS SES.",
+        authType: "smtp",
+        iconUrl: "https://cdn.neonhub.ai/connectors/email.svg",
+        websiteUrl: "https://www.ietf.org/rfc/rfc5321.txt",
+        triggers: { incoming_email: { webhook: true } },
+        actions: { send_email: { to: "string", subject: "string", body: "html" } },
+        authConfig: { fields: ["host", "port", "username", "password"] },
+      },
+      {
+        name: "sms",
+        displayName: "SMS / Twilio",
+        category: "SMS",
+        description: "Send SMS messages via Twilio or other SMS gateways.",
+        authType: "api_key",
+        iconUrl: "https://cdn.neonhub.ai/connectors/twilio.svg",
+        websiteUrl: "https://www.twilio.com",
+        triggers: { incoming_sms: { webhook: true } },
+        actions: { send_sms: { to: "phone", body: "string" } },
+        authConfig: { fields: ["account_sid", "auth_token"] },
+      },
+      {
+        name: "whatsapp",
+        displayName: "WhatsApp Business",
+        category: "WHATSAPP",
+        description: "Send WhatsApp messages via WhatsApp Business API.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/whatsapp.svg",
+        websiteUrl: "https://business.whatsapp.com",
+        triggers: { incoming_message: { webhook: true } },
+        actions: { send_message: { to: "phone", body: "string" } },
+        authConfig: { oauth_url: "https://graph.facebook.com/oauth" },
+      },
+      {
+        name: "reddit",
+        displayName: "Reddit",
+        category: "REDDIT",
+        description: "Post to subreddits and monitor mentions via Reddit API.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/reddit.svg",
+        websiteUrl: "https://www.reddit.com",
+        triggers: { new_mention: { poll: 300 } },
+        actions: { post_submission: { subreddit: "string", title: "string", text: "markdown" } },
+        authConfig: { oauth_url: "https://www.reddit.com/api/v1/authorize" },
+      },
+      {
+        name: "instagram",
+        displayName: "Instagram",
+        category: "INSTAGRAM",
+        description: "Post photos, stories, and reels via Instagram Graph API.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/instagram.svg",
+        websiteUrl: "https://www.instagram.com",
+        triggers: { new_comment: { webhook: true } },
+        actions: { post_photo: { image_url: "url", caption: "string" } },
+        authConfig: { oauth_url: "https://api.instagram.com/oauth/authorize" },
+      },
+      {
+        name: "facebook",
+        displayName: "Facebook Pages",
+        category: "FACEBOOK",
+        description: "Post to Facebook Pages and monitor engagement.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/facebook.svg",
+        websiteUrl: "https://www.facebook.com",
+        triggers: { new_post_comment: { webhook: true } },
+        actions: { post_to_page: { page_id: "string", message: "string" } },
+        authConfig: { oauth_url: "https://www.facebook.com/v18.0/dialog/oauth" },
+      },
+      {
+        name: "x",
+        displayName: "X (Twitter)",
+        category: "X",
+        description: "Post tweets, replies, and DMs via X API v2.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/x.svg",
+        websiteUrl: "https://x.com",
+        triggers: { new_mention: { webhook: true } },
+        actions: { post_tweet: { text: "string", media_ids: "array" } },
+        authConfig: { oauth_url: "https://api.x.com/oauth2/authorize" },
+      },
+      {
+        name: "youtube",
+        displayName: "YouTube",
+        category: "YOUTUBE",
+        description: "Upload videos and manage YouTube channel content.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/youtube.svg",
+        websiteUrl: "https://www.youtube.com",
+        triggers: { new_comment: { webhook: false, poll: 600 } },
+        actions: { upload_video: { title: "string", file_url: "url", description: "string" } },
+        authConfig: { oauth_url: "https://accounts.google.com/o/oauth2/v2/auth" },
+      },
+      {
+        name: "tiktok",
+        displayName: "TikTok",
+        category: "TIKTOK",
+        description: "Upload TikTok videos and track analytics.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/tiktok.svg",
+        websiteUrl: "https://www.tiktok.com",
+        triggers: { new_follower: { poll: 3600 } },
+        actions: { upload_video: { video_url: "url", caption: "string" } },
+        authConfig: { oauth_url: "https://www.tiktok.com/auth/authorize" },
+      },
+      {
+        name: "google-ads",
+        displayName: "Google Ads",
+        category: "GOOGLE_ADS",
+        description: "Manage Google Ads campaigns and fetch performance metrics.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/google-ads.svg",
+        websiteUrl: "https://ads.google.com",
+        triggers: { campaign_status_change: { poll: 1800 } },
+        actions: { create_campaign: { name: "string", budget: "number" } },
+        authConfig: { oauth_url: "https://accounts.google.com/o/oauth2/v2/auth" },
+      },
+      {
+        name: "shopify",
+        displayName: "Shopify",
+        category: "SHOPIFY",
+        description: "Sync Shopify orders, products, and customer data.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/shopify.svg",
+        websiteUrl: "https://www.shopify.com",
+        triggers: { new_order: { webhook: true } },
+        actions: { create_product: { title: "string", price: "number", inventory: "number" } },
+        authConfig: { oauth_url: "https://{shop}.myshopify.com/admin/oauth/authorize" },
+      },
+      {
+        name: "stripe",
+        displayName: "Stripe",
+        category: "STRIPE",
+        description: "Process payments and manage subscriptions via Stripe API.",
+        authType: "api_key",
+        iconUrl: "https://cdn.neonhub.ai/connectors/stripe.svg",
+        websiteUrl: "https://stripe.com",
+        triggers: { payment_succeeded: { webhook: true } },
+        actions: {
+          create_payment_intent: { amount: "number", currency: "string", customer: "string" },
+        },
+        authConfig: { fields: ["secret_key"] },
+      },
+      {
+        name: "slack",
+        displayName: "Slack",
+        category: "SLACK",
+        description: "Send notifications and manage Slack channels.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/slack.svg",
+        websiteUrl: "https://slack.com",
+        triggers: { new_message: { webhook: true } },
+        actions: { send_message: { channel: "string", text: "string" } },
+        authConfig: { oauth_url: "https://slack.com/oauth/v2/authorize" },
+      },
+      {
+        name: "discord",
+        displayName: "Discord",
+        category: "DISCORD",
+        description: "Manage Discord servers and send messages to channels.",
+        authType: "api_key",
+        iconUrl: "https://cdn.neonhub.ai/connectors/discord.svg",
+        websiteUrl: "https://discord.com",
+        triggers: { new_message: { webhook: true } },
+        actions: { send_message: { channel_id: "string", content: "string" } },
+        authConfig: { fields: ["bot_token"] },
+      },
+      {
+        name: "linkedin",
+        displayName: "LinkedIn",
+        category: "LINKEDIN",
+        description: "Post professional updates and articles to LinkedIn.",
+        authType: "oauth2",
+        iconUrl: "https://cdn.neonhub.ai/connectors/linkedin.svg",
+        websiteUrl: "https://www.linkedin.com",
+        triggers: { new_connection: { poll: 3600 } },
+        actions: { post_update: { text: "string", visibility: "PUBLIC" } },
+        authConfig: { oauth_url: "https://www.linkedin.com/oauth/v2/authorization" },
+      },
+    ];
+
+    const connectors = [];
+    for (const def of connectorDefinitions) {
+      const connector = await tx.connector.upsert({
+        where: { name: def.name },
+        update: {},
+        create: { ...def, isEnabled: true, isVerified: false, metadata: { demo: true } },
+      });
+      connectors.push(connector);
+    }
+
+    // Sample ConnectorAuth for demo user
+    const emailConnector = connectors.find((c) => c.name === "email");
+    const slackConnector = connectors.find((c) => c.name === "slack");
+
+    if (emailConnector) {
+      await tx.connectorAuth.upsert({
+        where: { id: "conn-auth-email-demo" },
+        update: {},
+        create: {
+          id: "conn-auth-email-demo",
+          userId: founder.id,
+          connectorId: emailConnector.id,
+          organizationId: organization.id,
+          accountName: "demo@neonhub.ai",
+          status: "demo",
+          metadata: { note: "Seed fixture - not functional" },
+        },
+      });
+    }
+
+    if (slackConnector) {
+      await tx.connectorAuth.upsert({
+        where: { id: "conn-auth-slack-demo" },
+        update: {},
+        create: {
+          id: "conn-auth-slack-demo",
+          userId: founder.id,
+          connectorId: slackConnector.id,
+          organizationId: organization.id,
+          accountName: "neonhub-workspace",
+          status: "demo",
+          metadata: { note: "Seed fixture - not functional" },
+        },
+      });
+    }
+
+    // Tool definitions for omni-channel operations
+    await tx.tool.upsert({
+      where: {
+        organizationId_slug: {
+          organizationId: organization.id,
+          slug: "send-email",
+        },
+      },
+      update: {},
+      create: {
+        organizationId: organization.id,
+        agentId: agent.id,
+        name: "Send Email",
+        slug: "send-email",
+        description: "Send an email via configured SMTP connector",
+        inputSchema: { to: "string", subject: "string", body: "html", from: "string?" },
+        outputSchema: { messageId: "string", status: "string", timestamp: "datetime" },
+      },
+    });
+
+    await tx.tool.upsert({
+      where: {
+        organizationId_slug: {
+          organizationId: organization.id,
+          slug: "post-social",
+        },
+      },
+      update: {},
+      create: {
+        organizationId: organization.id,
+        agentId: agent.id,
+        name: "Post to Social Media",
+        slug: "post-social",
+        description: "Post content to social media platforms (X, LinkedIn, Facebook, Instagram)",
+        inputSchema: {
+          platform: "enum",
+          content: "string",
+          media_urls: "array?",
+          schedule_time: "datetime?",
+        },
+        outputSchema: { post_id: "string", platform: "string", url: "string", status: "string" },
+      },
+    });
+
+    await tx.tool.upsert({
+      where: {
+        organizationId_slug: {
+          organizationId: organization.id,
+          slug: "send-sms",
+        },
+      },
+      update: {},
+      create: {
+        organizationId: organization.id,
+        agentId: agent.id,
+        name: "Send SMS",
+        slug: "send-sms",
+        description: "Send SMS message via Twilio or configured SMS gateway",
+        inputSchema: { to: "phone", body: "string", from: "phone?" },
+        outputSchema: { sid: "string", status: "string", price: "number?" },
+      },
+    });
+
     return {
       founder,
       organization,
@@ -354,6 +650,7 @@ async function main() {
       dataset,
       document,
       campaign,
+      connectors,
     };
   });
 
