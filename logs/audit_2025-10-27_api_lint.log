@@ -1,0 +1,32 @@
+
+> @neonhub/backend-v3.2@3.2.0 lint
+> node ../../scripts/run-cli.mjs eslint src --ext .ts
+
+node:internal/modules/cjs/loader:1228
+  throw err;
+  ^
+
+Error: Cannot find module '../package.json'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/node_modules/eslint/bin/eslint.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at process.onFatalError (/Users/kofirusu/Desktop/NeonHub/node_modules/eslint/bin/eslint.js:120:22)
+    at process.emit (node:events:519:28)
+    at process._fatalException (node:internal/process/execution:188:25) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/kofirusu/Desktop/NeonHub/node_modules/eslint/bin/eslint.js'
+  ]
+}
+
+Node.js v20.17.0
+npm error Lifecycle script `lint` failed with error:
+npm error code 7
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs eslint src --ext .ts

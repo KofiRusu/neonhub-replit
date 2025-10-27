@@ -15,7 +15,7 @@ const config = {
     ]
   },
   transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
-  passWithNoTests: true,
+  passWithNoTests: false,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
@@ -25,10 +25,10 @@ const config = {
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 75,
-      lines: 80,
-      statements: 80
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95
     }
   }
 };

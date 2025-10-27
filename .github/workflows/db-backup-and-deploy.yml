@@ -1,0 +1,64 @@
+name: DB Backup and Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      RUN_SEED:
+        description: "Run seed after migrate"
+        required: true
+        default: "false"
+
+jobs:
+  backup_deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
+      PRISMA_HIDE_UPDATE_MESSAGE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - run: corepack enable && corepack prepare pnpm@8 --activate
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Pre-deploy backup (pg_dump)
+        run: |
+          TS="$(date +%Y%m%d-%H%M%S)"
+          pg_dump "$DATABASE_URL" --no-owner --format=custom -f "db-backup-${TS}.dump"
+          echo "BACKUP_FILE=db-backup-${TS}.dump" >> $GITHUB_ENV
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: predeploy-backup
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 7
+
+      - name: Generate Prisma Client
+        run: pnpm -F apps/api prisma generate
+
+      - name: Validate
+        run: pnpm -F apps/api prisma validate
+
+      - name: Migrate deploy
+        run: pnpm -F apps/api prisma migrate deploy
+
+      - name: Seed (optional)
+        if: ${{ github.event.inputs.RUN_SEED == 'true' }}
+        run: pnpm -F apps/api prisma db seed
+
+      - name: Status
+        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma

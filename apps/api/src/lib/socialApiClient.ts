@@ -3,9 +3,9 @@
  * Fetches trending data from Twitter/Reddit APIs
  */
 
-import axios from 'axios';
+import { Buffer } from "node:buffer";
 
-interface TrendData {
+export interface TrendData {
   keyword: string;
   volume: number;
   sentiment: number;
@@ -34,21 +34,31 @@ export class SocialApiClient {
     }
 
     try {
-      const response = await axios.get('https://api.twitter.com/2/tweets/search/recent', {
+      const url = new URL('https://api.twitter.com/2/tweets/search/recent');
+      url.searchParams.set('query', 'trending -is:retweet');
+      url.searchParams.set('max_results', '50');
+      url.searchParams.set('tweet.fields', 'public_metrics,created_at');
+
+      const response = await fetch(url.toString(), {
         headers: {
-          'Authorization': `Bearer ${this.twitterBearerToken}`,
-        },
-        params: {
-          query: 'trending -is:retweet',
-          max_results: 50,
-          'tweet.fields': 'public_metrics,created_at',
+          Authorization: `Bearer ${this.twitterBearerToken}`,
+          'Content-Type': 'application/json',
         },
       });
 
-      return response.data.data.map((tweet: any) => ({
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Twitter API error:', response.status, text);
+        return this.getMockTwitterData();
+      }
+
+      const payload = await response.json();
+      if (!payload.data) return this.getMockTwitterData();
+
+      return payload.data.map((tweet: any) => ({
         keyword: tweet.text.split(' ').slice(0, 3).join(' '),
         volume: tweet.public_metrics.like_count + tweet.public_metrics.retweet_count,
-        sentiment: 0.5, // Neutral by default
+        sentiment: 0.5,
         platform: 'twitter' as const,
         timestamp: new Date(tweet.created_at),
       }));
@@ -69,29 +79,42 @@ export class SocialApiClient {
 
     try {
       const auth = Buffer.from(`${this.redditClientId}:${this.redditClientSecret}`).toString('base64');
-      const tokenResponse = await axios.post(
-        'https://www.reddit.com/api/v1/access_token',
-        'grant_type=client_credentials',
-        {
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-      const response = await axios.get(`https://oauth.reddit.com/r/${subreddit}/hot`, {
+      const tokenResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'User-Agent': process.env.REDDIT_USER_AGENT || 'NeonHub/3.0',
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        params: {
-          limit: 50,
+        body: 'grant_type=client_credentials',
+      });
+
+      if (!tokenResponse.ok) {
+        const text = await tokenResponse.text();
+        console.error('Reddit token error:', text);
+        return this.getMockRedditData();
+      }
+
+      const tokenPayload = await tokenResponse.json();
+      const accessToken = tokenPayload.access_token;
+
+      const url = new URL(`https://oauth.reddit.com/r/${subreddit}/hot`);
+      url.searchParams.set('limit', '50');
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'User-Agent': process.env.REDDIT_USER_AGENT || 'NeonHub/3.0',
         },
       });
 
-      return response.data.data.children.map((post: any) => ({
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Reddit API error:', text);
+        return this.getMockRedditData();
+      }
+
+      const payload = await response.json();
+      return payload.data.children.map((post: any) => ({
         keyword: post.data.title,
         volume: post.data.ups + post.data.num_comments,
         sentiment: post.data.upvote_ratio,
@@ -135,4 +158,3 @@ export class SocialApiClient {
 }
 
 export const socialApiClient = new SocialApiClient();
-

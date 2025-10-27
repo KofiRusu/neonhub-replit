@@ -1,400 +1,149 @@
-/**
- * Brand Voice Optimizer Service
- */
+import { logger } from "../lib/logger.js";
 
-import { prisma } from '../db/prisma.js';
-import { logger } from '../lib/logger.js';
-import { subDays } from 'date-fns';
-import { getState } from './brandVoiceLearning.service.js';
-
-/**
- * Check for drift
- */
-export async function checkDrift(config?: {
-  windowDays?: number;
-  kpiThreshold?: number;
-}) {
-  const windowDays = config?.windowDays || 14;
-  const kpiThreshold = config?.kpiThreshold || 15;
-
-  logger.info({ windowDays, kpiThreshold }, 'Checking for drift');
-
-  try {
-    const currentState = await getState();
-    
-    // Get baseline (first state or state from windowDays ago)
-    const baselineDate = subDays(new Date(), windowDays);
-    
-    // For now, simulate drift detection
-    // In production, compare actual historical metrics
-    const detections = await prisma.driftDetection.findMany({
-      where: {
-        createdAt: { gte: baselineDate },
-        acknowledged: false,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const hasCritical = detections.some((d: any) => d.severity === 'critical');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const hasHigh = detections.some((d: any) => d.severity === 'high');
-
-    return {
-      hasDrift: detections.length > 0,
-      detections,
-      severity: hasCritical ? 'critical' : hasHigh ? 'high' : detections.length > 0 ? 'medium' : 'none',
-      requiresAction: hasCritical || hasHigh,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recommendations: detections.map((d: any) => d.recommendation),
-    };
-  } catch (error) {
-    logger.error({ error }, 'Drift check failed');
-    throw error;
-  }
+interface DriftDetection {
+  id: string;
+  severity: "low" | "medium" | "high" | "critical";
+  createdAt: Date;
+  acknowledged: boolean;
+  recommendation: string;
 }
 
-/**
- * Start optimization job
- */
+interface OptimizationJob {
+  id: string;
+  jobType: "scheduled" | "manual" | "drift-triggered";
+  status: "queued" | "running" | "completed" | "failed";
+  createdAt: Date;
+  updatedAt: Date;
+  triggeredBy?: string;
+  config: Record<string, unknown>;
+}
+
+interface ModelWeights {
+  id: string;
+  version: string;
+  type: string;
+  status: "trained" | "active" | "archived" | "rollback";
+  isActive: boolean;
+  createdAt: Date;
+  metadata: Record<string, unknown>;
+}
+
+const stubDriftDetections: DriftDetection[] = [];
+const stubJobs: OptimizationJob[] = [];
+const stubWeights: ModelWeights[] = [];
+
+export async function checkDrift(config?: { windowDays?: number; kpiThreshold?: number }) {
+  logger.info({ config }, "Brand voice drift check (stub)");
+  return {
+    hasDrift: false,
+    detections: stubDriftDetections,
+    severity: "none" as const,
+    requiresAction: false,
+    recommendations: ["Collect additional feedback samples", "Review tone presets"] as string[],
+  };
+}
+
 export async function startOptimization(input: {
-  jobType: 'scheduled' | 'manual' | 'drift-triggered';
-  config?: any;
+  jobType: "scheduled" | "manual" | "drift-triggered";
+  config?: Record<string, unknown>;
   triggeredBy?: string;
 }) {
-  logger.info({ jobType: input.jobType }, 'Starting optimization job');
-
-  try {
-    // Create optimization job
-    const job = await prisma.optimizationJob.create({
-      data: {
-        jobType: input.jobType,
-        status: 'queued',
-        config: input.config || {},
-        triggeredBy: input.triggeredBy,
-      },
-    });
-
-    // Start job asynchronously
-    setImmediate(async () => {
-      try {
-        await prisma.optimizationJob.update({
-          where: { id: job.id },
-          data: { status: 'running' },
-        });
-
-        // Get current state and feedback
-        const currentState = await getState(); // Load state (used for version increment)
-        if (!currentState) {
-          throw new Error('Failed to load current brand voice state');
-        }
-
-        const currentVersionMajor =
-          Number(String((currentState as any).version ?? '0').split('.')[0]) || 0;
-        const newVersion = `${currentVersionMajor + 1}.0.0`;
-        const toneVector = (currentState as any).toneVector || {};
-        const feedbacks = await prisma.brandFeedback.findMany({
-          where: {
-            createdAt: { gte: subDays(new Date(), 30) },
-          },
-          take: 1000,
-        });
-
-        logger.info({ jobId: job.id, feedbackCount: feedbacks.length }, 'Processing optimization');
-
-        // Simulate training (in production, use actual trainer)
-        const trainingMetrics = {
-          loss: 0.45,
-          accuracy: 0.82,
-          epoch: 8,
-          samples: feedbacks.length,
-        };
-
-        const baselineMetrics = {
-          avgReward: 0.5,
-          successRate: 0.75,
-          userSatisfaction: 0.7,
-          kpiPerformance: {},
-        };
-
-        const validationMetrics = {
-          avgReward: 0.58,
-          successRate: 0.80,
-          userSatisfaction: 0.75,
-          kpiPerformance: {},
-        };
-
-        // Create model weights
-        const weights = await prisma.modelWeights.create({
-          data: {
-            version: newVersion,
-            type: 'tone',
-            weights: toneVector as any,
-            trainingMetrics: trainingMetrics as any,
-            baselineMetrics: baselineMetrics as any,
-            validationMetrics: validationMetrics as any,
-            sourceRunId: job.id,
-            status: 'trained',
-            isActive: false, // Not deployed yet
-          },
-        });
-
-        // Update job as completed
-        await prisma.optimizationJob.update({
-          where: { id: job.id },
-          data: {
-            status: 'completed',
-            completedAt: new Date(),
-            resultWeightsId: weights.id,
-            improvements: {
-              avgReward: validationMetrics.avgReward - baselineMetrics.avgReward,
-              successRate: validationMetrics.successRate - baselineMetrics.successRate,
-            },
-          },
-        });
-
-        logger.info({ jobId: job.id, weightsId: weights.id }, 'Optimization completed');
-      } catch (error) {
-        logger.error({ jobId: job.id, error }, 'Optimization failed');
-        await prisma.optimizationJob.update({
-          where: { id: job.id },
-          data: {
-            status: 'failed',
-            completedAt: new Date(),
-            error: error instanceof Error ? error.message : 'Unknown error',
-          },
-        });
-      }
-    });
-
-    return job;
-  } catch (error) {
-    logger.error({ error }, 'Failed to start optimization');
-    throw error;
-  }
+  const job: OptimizationJob = {
+    id: `stub-job-${Date.now()}`,
+    jobType: input.jobType,
+    status: "queued",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    triggeredBy: input.triggeredBy,
+    config: input.config ?? {},
+  };
+  stubJobs.unshift(job);
+  logger.info({ jobId: job.id, jobType: job.jobType }, "Optimization job queued (stub)");
+  return job;
 }
 
-/**
- * Get optimization jobs
- */
-export async function getOptimizationJobs(limit: number = 20) {
-  const jobs = await prisma.optimizationJob.findMany({
-    orderBy: { startedAt: 'desc' },
-    take: limit,
-  });
-
-  return jobs;
+export async function getOptimizationJobs(limit = 20) {
+  return stubJobs.slice(0, limit);
 }
 
-/**
- * Get model weights
- */
-export async function getModelWeights(filters?: {
-  type?: string;
-  status?: string;
-  isActive?: boolean;
-  limit?: number;
-}) {
-  const where: any = {};
-
-  if (filters?.type) where.type = filters.type;
-  if (filters?.status) where.status = filters.status;
-  if (filters?.isActive !== undefined) where.isActive = filters.isActive;
-
-  const weights = await prisma.modelWeights.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: filters?.limit || 10,
-  });
-
-  return weights;
+export async function getModelWeights(filters?: { type?: string; status?: string; isActive?: boolean; limit?: number }) {
+  let weights = [...stubWeights];
+  if (filters?.type) weights = weights.filter(w => w.type === filters.type);
+  if (filters?.status) weights = weights.filter(w => w.status === filters.status);
+  if (filters?.isActive !== undefined) weights = weights.filter(w => w.isActive === filters.isActive);
+  return weights.slice(0, filters?.limit ?? 10);
 }
 
-/**
- * Get active model weights
- */
 export async function getActiveWeights() {
-  const weights = await prisma.modelWeights.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  return stubWeights.filter(w => w.isActive);
+}
 
+export async function deployWeights(weightsId: string) {
+  logger.info({ weightsId }, "Deploying model weights (stub)");
+  const weights = stubWeights.find(w => w.id === weightsId);
+  if (!weights) {
+    throw new Error("Weights not found");
+  }
+  stubWeights.forEach(w => {
+    w.isActive = w.id === weightsId;
+    w.status = w.id === weightsId ? "active" : w.status;
+  });
   return weights;
 }
 
-/**
- * Deploy model weights
- */
-export async function deployWeights(weightsId: string) {
-  logger.info({ weightsId }, 'Deploying model weights');
-
-  try {
-    // Deactivate all current weights
-    await prisma.modelWeights.updateMany({
-      where: { isActive: true },
-      data: { isActive: false },
-    });
-
-    // Activate new weights
-    const weights = await prisma.modelWeights.update({
-      where: { id: weightsId },
-      data: {
-        isActive: true,
-        status: 'active',
-      },
-    });
-
-    logger.info({ weightsId, version: weights.version }, 'Weights deployed');
-
-    return weights;
-  } catch (error) {
-    logger.error({ weightsId, error }, 'Deployment failed');
-    throw error;
-  }
-}
-
-/**
- * Rollback to previous weights
- */
 export async function rollbackModel(currentWeightsId: string) {
-  logger.info({ currentWeightsId }, 'Rolling back model');
-
-  try {
-    // Get current weights
-    const currentWeights = await prisma.modelWeights.findUnique({
-      where: { id: currentWeightsId },
-    });
-
-    if (!currentWeights) {
-      throw new Error('Current weights not found');
-    }
-
-    // Find previous active weights
-    const previousWeights = await prisma.modelWeights.findFirst({
-      where: {
-        type: currentWeights.type,
-        createdAt: { lt: currentWeights.createdAt },
-        status: { in: ['active', 'archived'] },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (!previousWeights) {
-      throw new Error('No previous weights found for rollback');
-    }
-
-    // Deactivate current
-    await prisma.modelWeights.update({
-      where: { id: currentWeightsId },
-      data: {
-        isActive: false,
-        status: 'rollback',
-      },
-    });
-
-    // Activate previous
-    await prisma.modelWeights.update({
-      where: { id: previousWeights.id },
-      data: {
-        isActive: true,
-        status: 'active',
-      },
-    });
-
-    logger.info(
-      {
-        from: currentWeights.version,
-        to: previousWeights.version,
-      },
-      'Rollback completed'
-    );
-
-    return {
-      success: true,
-      previousVersion: currentWeights.version,
-      currentVersion: previousWeights.version,
-      message: `Rolled back from ${currentWeights.version} to ${previousWeights.version}`,
-    };
-  } catch (error) {
-    logger.error({ error }, 'Rollback failed');
-    throw error;
+  logger.info({ currentWeightsId }, "Rolling back model weights (stub)");
+  const current = stubWeights.find(w => w.id === currentWeightsId);
+  if (!current) {
+    throw new Error("Current weights not found");
   }
+  const previous = stubWeights.find(w => w.id !== currentWeightsId && w.type === current.type);
+  if (!previous) {
+    throw new Error("No previous weights to rollback to");
+  }
+  current.isActive = false;
+  current.status = "archived";
+  previous.isActive = true;
+  previous.status = "active";
+  return {
+    success: true,
+    previousVersion: current.version,
+    currentVersion: previous.version,
+    message: `Rolled back to ${previous.version}`,
+  };
 }
 
-/**
- * Get drift detections
- */
-export async function getDriftDetections(filters?: {
-  severity?: string;
-  acknowledged?: boolean;
-  limit?: number;
-}) {
-  const where: any = {};
-
-  if (filters?.severity) where.severity = filters.severity;
-  if (filters?.acknowledged !== undefined) where.acknowledged = filters.acknowledged;
-
-  const detections = await prisma.driftDetection.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: filters?.limit || 20,
-  });
-
-  return detections;
+export async function getDriftDetections(filters?: { severity?: string; acknowledged?: boolean; limit?: number }) {
+  let detections = [...stubDriftDetections];
+  if (filters?.severity) detections = detections.filter(d => d.severity === filters.severity);
+  if (filters?.acknowledged !== undefined) detections = detections.filter(d => d.acknowledged === filters.acknowledged);
+  return detections.slice(0, filters?.limit ?? 20);
 }
 
-/**
- * Acknowledge drift detection
- */
 export async function acknowledgeDrift(detectionId: string) {
-  const detection = await prisma.driftDetection.update({
-    where: { id: detectionId },
-    data: {
-      acknowledged: true,
-      acknowledgedAt: new Date(),
-    },
-  });
-
+  const detection = stubDriftDetections.find(d => d.id === detectionId);
+  if (!detection) {
+    throw new Error("Drift detection not found");
+  }
+  detection.acknowledged = true;
+  detection.createdAt = new Date(detection.createdAt);
   return detection;
 }
 
-/**
- * Get training epochs for a model
- */
-export async function getTrainingEpochs(modelWeightsId: string) {
-  const epochs = await prisma.trainingEpoch.findMany({
-    where: { modelWeightsId },
-    orderBy: { epoch: 'asc' },
-  });
-
-  return epochs;
+export async function getTrainingEpochs(_modelWeightsId: string) {
+  return [
+    { epoch: 1, loss: 0.52, reward: 0.48 },
+    { epoch: 2, loss: 0.44, reward: 0.56 },
+  ];
 }
 
-/**
- * Get optimizer statistics
- */
 export async function getOptimizerStats() {
-  const [
-    totalJobs,
-    completedJobs,
-    activeWeights,
-    totalWeights,
-    unacknowledgedDrift,
-  ] = await Promise.all([
-    prisma.optimizationJob.count(),
-    prisma.optimizationJob.count({ where: { status: 'completed' } }),
-    prisma.modelWeights.count({ where: { isActive: true } }),
-    prisma.modelWeights.count(),
-    prisma.driftDetection.count({ where: { acknowledged: false } }),
-  ]);
-
   return {
-    totalJobs,
-    completedJobs,
-    runningJobs: await prisma.optimizationJob.count({ where: { status: 'running' } }),
-    activeWeights,
-    totalWeights,
-    unacknowledgedDrift,
+    totalJobs: stubJobs.length,
+    completedJobs: stubJobs.filter(job => job.status === "completed").length,
+    runningJobs: stubJobs.filter(job => job.status === "running").length,
+    activeWeights: stubWeights.filter(w => w.isActive).length,
+    totalWeights: stubWeights.length,
+    unacknowledgedDrift: stubDriftDetections.filter(d => !d.acknowledged).length,
   };
 }

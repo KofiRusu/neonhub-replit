@@ -1,0 +1,80 @@
+name: DB Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      RUN_SEED:
+        description: "Run seed after migrate"
+        required: true
+        default: "true"
+
+jobs:
+  db-deploy:
+    environment: production  # Requires manual approval in Settings → Environments
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: "true"
+      PRISMA_HIDE_UPDATE_MESSAGE: "1"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      # Ensure pnpm is the real binary (not a shim)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Enable Corepack (defense-in-depth)
+        run: corepack enable && corepack prepare pnpm@8 --activate
+
+      - name: Print tool versions
+        run: |
+          node -v
+          pnpm -v
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm -F apps/api prisma generate
+
+      - name: Verify DB connectivity
+        run: pnpm -F apps/api prisma validate
+
+      - name: Apply migrations (deploy)
+        run: pnpm -F apps/api prisma migrate deploy
+
+      - name: Seed database (optional, staging only)
+        if: ${{ github.event.inputs.RUN_SEED == 'true' }}
+        run: |
+          # Safety: Only seed if explicitly requested
+          echo "⚠️  Seeding requested - USE CAUTION in production!"
+          pnpm -F apps/api prisma db seed
+        continue-on-error: false
+
+      - name: Status
+        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
+
+      - name: Log migration telemetry
+        if: always()
+        run: |
+          echo "Migration telemetry: workflow=${{ github.workflow }}, status=${{ job.status }}, sha=${{ github.sha }}, actor=${{ github.actor }}, timestamp=$(date -Is)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Slack (optional)
+        if: always() && vars.SLACK_WEBHOOK_URL != ''
+        run: |
+          STATUS="${{ job.status }}"
+          EMOJI="✅"
+          [ "$STATUS" != "success" ] && EMOJI="❌"
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${EMOJI} *${{ github.workflow }}* finished with *${STATUS}* on *${{ github.ref_name }}*\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nActor: ${{ github.actor }}\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || echo "Slack notification failed (webhook not configured)"

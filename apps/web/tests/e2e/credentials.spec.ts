@@ -71,7 +71,7 @@ test.describe('Credential Management', () => {
     }
   });
 
-  test.skip('should display connected credential status', async ({ page, context }) => {
+  test.skip('should display connected credential status', async ({ page, context: _context }) => {
     // This requires actual OAuth flow completion
     // Skip unless integration test environment is set up
     

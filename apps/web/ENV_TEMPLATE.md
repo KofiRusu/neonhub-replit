@@ -14,6 +14,10 @@ NEXT_PUBLIC_API_URL="http://localhost:3001"
 # ==============================================
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+DEMO_LOGIN_EMAIL="demo@neonhub.ai"
+DEMO_LOGIN_PASSWORD="demo-access"
+DEMO_LOGIN_NAME="NeonHub Demo"
+DEMO_LOGIN_USER_ID="demo-user"
 
 # ==============================================
 # Sentry (Optional - for error tracking)
@@ -43,4 +47,3 @@ NEXT_PUBLIC_ENABLE_REAL_TIME=true
 # Generate NEXTAUTH_SECRET
 openssl rand -base64 32
 ```
-

@@ -1,232 +1,160 @@
-import { Router } from "express";
-import { z } from "zod";
-import { ok, fail } from "../lib/http";
-import { getAuthenticatedUser } from "../lib/requestUser.js";
-import { ValidationError } from "../lib/errors";
-import {
-  isStripeLive,
-  createCheckoutSession,
-  createPortalSession,
-} from "../services/billing/stripe.js";
+import { Router } from "express"
+import { z } from "zod"
+import { ok, fail } from "../lib/http"
+import { getAuthenticatedUser } from "../lib/requestUser.js"
+import { billingService, PLANS } from "../services/billing/stripe.js"
+import { prisma } from "../db/prisma.js"
+import { ValidationError } from "../lib/errors.js"
 
-export const billingRouter = Router();
+export const billingRouter = Router()
 
-// Validation schemas
-const CheckoutSchema = z.object({
-  priceId: z.string().min(1, "Price ID is required"),
+const checkoutSchema = z.object({
+  plan: z.enum(["free", "pro", "enterprise"]),
   successUrl: z.string().url("Invalid success URL"),
   cancelUrl: z.string().url("Invalid cancel URL"),
-});
+})
 
-const PortalSchema = z.object({
+const portalSchema = z.object({
   returnUrl: z.string().url("Invalid return URL"),
-});
+})
 
-// Mock billing data (until Stripe integration)
-const mockPlan = {
-  name: "Professional",
-  price: 99,
-  interval: "month",
-  features: [
-    "20 AI Agents",
-    "100,000 API calls/mo",
-    "50 GB Storage",
-    "Advanced analytics",
-    "Priority support",
-    "20 team members",
-    "Custom integrations",
-    "White-label options",
-  ],
-  current: true,
-};
-
-const mockUsage = {
-  apiCalls: { used: 43291, total: 100000 },
-  storage: { used: 18.5, total: 50 },
-  teamSeats: { used: 6, total: 20 },
-  emailSends: { used: 8420, total: 50000 },
-};
-
-const mockInvoices = [
-  {
-    id: "INV-2024-001",
-    date: "2024-01-01",
-    amount: 99.0,
-    status: "paid",
-    pdfUrl: "#",
-  },
-  {
-    id: "INV-2023-012",
-    date: "2023-12-01",
-    amount: 99.0,
-    status: "paid",
-    pdfUrl: "#",
-  },
-  {
-    id: "INV-2023-011",
-    date: "2023-11-01",
-    amount: 99.0,
-    status: "paid",
-    pdfUrl: "#",
-  },
-  {
-    id: "INV-2023-010",
-    date: "2023-10-01",
-    amount: 99.0,
-    status: "paid",
-    pdfUrl: "#",
-  },
-  {
-    id: "INV-2023-009",
-    date: "2023-09-01",
-    amount: 99.0,
-    status: "paid",
-    pdfUrl: "#",
-  },
-];
-
-// GET /billing/plan
 billingRouter.get("/billing/plan", async (req, res) => {
   try {
-    // Return plan with live flag
-    const plan = {
-      ...mockPlan,
-      live: isStripeLive(),
-    };
-    
-    // TODO: If Stripe configured, fetch real subscription
-    // const customerId = req.user?.stripeCustomerId;
-    // if (customerId && isStripeLive()) {
-    //   const subscription = await getSubscription(customerId);
-    //   if (subscription) {
-    //     plan = transformSubscriptionToPlan(subscription);
-    //   }
-    // }
-    
-    return res.json(ok(plan));
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Server error";
-    return res.status(500).json(fail(message).body);
-  }
-});
+    const user = getAuthenticatedUser(req)
+    const subscription = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
-// GET /billing/usage
+    const planKey = (subscription?.plan as keyof typeof PLANS) ?? "free"
+    const planConfig = PLANS[planKey]
+
+    return res.json(ok({
+      plan: planKey,
+      displayName: planConfig.name,
+      priceId: planConfig.priceId,
+      productId: planConfig.productId,
+      limits: planConfig.limits,
+      status: subscription?.status ?? (planKey === "free" ? "active" : "inactive"),
+      currentPeriod: subscription
+        ? {
+            start: subscription.currentPeriodStart.toISOString(),
+            end: subscription.currentPeriodEnd.toISOString(),
+          }
+        : null,
+      cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
+    }))
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to fetch billing plan"
+    return res.status(500).json(fail(message).body)
+  }
+})
+
 billingRouter.get("/billing/usage", async (req, res) => {
   try {
-    // TODO: Calculate real usage from:
-    // - API call counts from metrics
-    // - Storage from file uploads
-    // - Team seats from user table
-    // - Email sends from email service
-    
-    return res.json(ok(mockUsage));
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Server error";
-    return res.status(500).json(fail(message).body);
-  }
-});
+    const user = getAuthenticatedUser(req)
+    const subscription = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
-// GET /billing/invoices
+    if (!subscription) {
+      const limits = PLANS.free.limits
+      return res.json(
+        ok({
+          campaigns: { used: 0, total: limits.campaigns },
+          emails: { used: 0, total: limits.emails },
+          socialPosts: { used: 0, total: limits.socialPosts },
+          agentCalls: { used: 0, total: limits.agentCalls },
+        })
+      )
+    }
+
+    return res.json(
+      ok({
+        campaigns: { used: subscription.campaignsUsed, total: subscription.campaignLimit },
+        emails: { used: subscription.emailsSent, total: subscription.emailLimit },
+        socialPosts: { used: subscription.socialPosts, total: subscription.socialLimit },
+        agentCalls: { used: subscription.agentCalls, total: subscription.agentCallLimit },
+      })
+    )
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to fetch usage"
+    return res.status(500).json(fail(message).body)
+  }
+})
+
 billingRouter.get("/billing/invoices", async (req, res) => {
   try {
-    // If Stripe configured, fetch real invoices
-    if (isStripeLive()) {
-      // TODO: Get customer ID from authenticated user
-      // const customerId = req.user?.stripeCustomerId;
-      // if (customerId) {
-      //   const stripeInvoices = await listInvoices(customerId);
-      //   const invoices = stripeInvoices.map(inv => ({
-      //     id: inv.id,
-      //     date: new Date(inv.created * 1000).toISOString().split('T')[0],
-      //     amount: inv.amount_paid / 100,
-      //     status: inv.status,
-      //     pdfUrl: inv.invoice_pdf || '#',
-      //   }));
-      //   return res.json(ok(invoices));
-      // }
+    const user = getAuthenticatedUser(req)
+    const subscription = await prisma.subscription.findUnique({ where: { userId: user.id }, select: { id: true } })
+    if (!subscription) {
+      return res.json(ok([]))
     }
-    
-    return res.json(ok(mockInvoices));
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Server error";
-    return res.status(500).json(fail(message).body);
-  }
-});
 
-// POST /billing/checkout - Create Stripe checkout session
+    const invoices = await prisma.invoice.findMany({
+      where: { subscriptionId: subscription.id },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    })
+
+    return res.json(
+      ok(
+        invoices.map((invoice) => ({
+          id: invoice.id,
+          stripeInvoiceId: invoice.stripeInvoiceId,
+          amount: invoice.amountDue / 100,
+          currency: invoice.currency,
+          status: invoice.status,
+          invoiceUrl: invoice.hostedInvoiceUrl,
+          invoicePdf: invoice.invoicePdf,
+          createdAt: invoice.createdAt.toISOString(),
+        }))
+      )
+    )
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to fetch invoices"
+    return res.status(500).json(fail(message).body)
+  }
+})
+
 billingRouter.post("/billing/checkout", async (req, res) => {
   try {
-    if (!isStripeLive()) {
-      throw new ValidationError("Stripe not configured - billing is in sandbox mode");
+    const user = getAuthenticatedUser(req)
+    const payload = checkoutSchema.parse(req.body)
+
+    if (!user.email) {
+      throw new ValidationError("User email is required for checkout")
     }
 
-    const result = CheckoutSchema.safeParse(req.body);
-    if (!result.success) {
-      throw new ValidationError(result.error.errors[0].message);
+    const session = await billingService.createCheckoutSession({
+      userId: user.id,
+      email: user.email,
+      plan: payload.plan,
+      successUrl: payload.successUrl,
+      cancelUrl: payload.cancelUrl,
+    })
+
+    return res.json(ok(session))
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0].message).body)
     }
-
-    const { priceId, successUrl, cancelUrl } = result.data;
-
-    const user = getAuthenticatedUser(req);
-    const userId = user.id;
-    const userEmail = user.email;
-
-    if (!userEmail) {
-      throw new ValidationError("User email is required for checkout");
+    if (error instanceof ValidationError) {
+      return res.status(error.statusCode).json(fail(error.message, error.statusCode).body)
     }
-
-    const session = await createCheckoutSession({
-      priceId,
-      successUrl,
-      cancelUrl,
-      userId,
-      userEmail,
-    });
-
-    return res.json(ok({ url: session.url }));
-  } catch (e: unknown) {
-    if (e instanceof ValidationError) {
-      return res.status(400).json(fail(e.message).body);
-    }
-    const message = e instanceof Error ? e.message : "Server error";
-    return res.status(500).json(fail(message).body);
+    const message = error instanceof Error ? error.message : "Failed to create checkout session"
+    return res.status(500).json(fail(message).body)
   }
-});
+})
 
-// POST /billing/portal - Create billing portal session
 billingRouter.post("/billing/portal", async (req, res) => {
   try {
-    if (!isStripeLive()) {
-      throw new ValidationError("Stripe not configured - billing is in sandbox mode");
+    const user = getAuthenticatedUser(req)
+    const payload = portalSchema.parse(req.body)
+    const session = await billingService.createPortalSession(user.id, payload.returnUrl)
+    return res.json(ok(session))
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0].message).body)
     }
-
-    const result = PortalSchema.safeParse(req.body);
-    if (!result.success) {
-      throw new ValidationError(result.error.errors[0].message);
-    }
-
-    const { returnUrl } = result.data;
-
-    const { stripeCustomerId } = getAuthenticatedUser(req);
-
-    if (!stripeCustomerId) {
-      throw new ValidationError("No Stripe customer found for this user");
-    }
-
-    const session = await createPortalSession({
-      customerId: stripeCustomerId,
-      returnUrl,
-    });
-
-    return res.json(ok({ url: session.url }));
-  } catch (e: unknown) {
-    if (e instanceof ValidationError) {
-      return res.status(400).json(fail(e.message).body);
-    }
-    const message = e instanceof Error ? e.message : "Server error";
-    return res.status(500).json(fail(message).body);
+    const message = error instanceof Error ? error.message : "Failed to create billing portal session"
+    return res.status(500).json(fail(message).body)
   }
-});
+})
 
-export default billingRouter;
-
+export default billingRouter

@@ -1,0 +1,529 @@
+{
+  "generatedAt": "2025-10-27T13:12:38.419488+01:00",
+  "totals": {
+    "passed": 4,
+    "warning": 30,
+    "failed": 21
+  },
+  "sections": [
+    {
+      "name": "Core Infrastructure",
+      "items": [
+        {
+          "id": "infra.build",
+          "status": "fail",
+          "notes": "API build misses TypeScript lib stubs; web build cannot locate Next.js binary.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_build.log:35 \u2014 TS6053 missing lib.es2022.d.ts",
+            "logs/audit_2025-10-27_web_build.log:27 \u2014 Error: Cannot find module 'next/dist/bin/next'"
+          ]
+        },
+        {
+          "id": "infra.lint",
+          "status": "fail",
+          "notes": "ESLint binary not reachable from run-cli shim for both API and web packages.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_lint.log:19 \u2014 MODULE_NOT_FOUND for eslint/bin/eslint.js",
+            "logs/audit_2025-10-27_web_lint.log:19 \u2014 MODULE_NOT_FOUND for eslint/bin/eslint.js"
+          ]
+        },
+        {
+          "id": "infra.typecheck",
+          "status": "fail",
+          "notes": "TypeScript standard library d.ts bundles absent from node_modules across API and web.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_typecheck.log:11 \u2014 TS6053 missing lib.dom.d.ts / lib.es2022.d.ts",
+            "logs/audit_2025-10-27_web_typecheck.log:11 \u2014 TS6053 missing lib.dom/iterable/esnext d.ts"
+          ]
+        },
+        {
+          "id": "infra.docker",
+          "status": "fail",
+          "notes": "Compose file still points at historical ./backend and Neon-v2.4.0/ui contexts that do not exist in this monorepo.",
+          "evidence": [
+            "docker-compose.yml:24 \u2014 backend build context set to ./backend",
+            "docker-compose.yml:45 \u2014 ui build context set to ./Neon-v2.4.0/ui"
+          ]
+        },
+        {
+          "id": "infra.ci",
+          "status": "warning",
+          "notes": "Workflow definitions exist but depend on pnpm commands that currently fail locally due to missing toolchain binaries.",
+          "evidence": [
+            ".github/workflows/ci.yml:21-42 \u2014 pipeline expects pnpm build/type-check/tests",
+            "logs/audit_2025-10-27_api_build.log:35 \u2014 local parity failure replicates the same toolchain gap"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DB & Data",
+      "items": [
+        {
+          "id": "db.schema",
+          "status": "pass",
+          "notes": "Schema covers agents, RAG, telemetry, and declares pgvector extension.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma:1-40 \u2014 datasource enables vector extension",
+            "apps/api/prisma/schema.prisma:569-633 \u2014 Chunk/ModelVersion/TrainingJob definitions"
+          ]
+        },
+        {
+          "id": "db.migrate",
+          "status": "warning",
+          "notes": "Running migrate status fails before reaching the database because the Prisma CLI binary cannot execute without the missing TypeScript stdlib files.",
+          "evidence": [
+            "logs/audit_2025-10-27_prisma_status.log:3-12 \u2014 prisma build/index.js aborts before reporting status"
+          ]
+        },
+        {
+          "id": "db.pgvector",
+          "status": "warning",
+          "notes": "Schema and health check query vector extension, but no runtime verification was possible because the API build is broken.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma:14-22 \u2014 datasource extensions include vector",
+            "apps/api/src/routes/health.ts:49-70 \u2014 health check queries pg_extension for 'vector'"
+          ]
+        },
+        {
+          "id": "db.seeds",
+          "status": "warning",
+          "notes": "Seed script provisions org/agents/connectors but has not been executed in this environment; relies on Prisma client availability and DB connectivity.",
+          "evidence": [
+            "apps/api/prisma/seed.ts:1-210 \u2014 creates org, roles, embedding space, connectors"
+          ]
+        },
+        {
+          "id": "db.indexes",
+          "status": "warning",
+          "notes": "Several @@index declarations exist yet high-traffic tables like Conversation/AgentRun lack dedicated latency indexes; requires review once migrations can run.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma:387-520 \u2014 limited @@index coverage on agent tables"
+          ]
+        },
+        {
+          "id": "db.backups",
+          "status": "warning",
+          "notes": "Playbooks capture process but no automation evidence captured during audit; requires validation once database connectivity is restored.",
+          "evidence": [
+            "docs/DB_BACKUP_RESTORE.md:1-32 \u2014 documented procedure without execution logs"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Agents",
+      "items": [
+        {
+          "id": "ai.trpc",
+          "status": "fail",
+          "notes": "UI hook still stubs tRPC client and falls back to REST placeholders; no generated procedures.",
+          "evidence": [
+            "apps/web/src/hooks/useCopilotRouter.ts:8-24 \u2014 comment notes tRPC client missing"
+          ]
+        },
+        {
+          "id": "ai.latency",
+          "status": "warning",
+          "notes": "No latency measurements collected because orchestrator could not be exercised while builds are broken.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_build.log:35 \u2014 blocking build failure prevented smoke runs"
+          ]
+        },
+        {
+          "id": "ai.telemetry",
+          "status": "fail",
+          "notes": "Orchestrator registry only stores agents in memory; no writes to AgentRun/AgentRunMetric tables.",
+          "evidence": [
+            "apps/api/src/services/orchestration/index.ts:5-48 \u2014 orchestrator uses in-memory registry with no persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Frontend & Chat",
+      "items": [
+        {
+          "id": "ui.websocket",
+          "status": "warning",
+          "notes": "Socket.IO wiring exists for migration/deployment rooms, but we did not validate live traffic due to backend build failures.",
+          "evidence": [
+            "apps/api/src/ws/index.ts:4-90 \u2014 socket channel subscriptions",
+            "apps/web/src/hooks/useMigrationStatus.ts:24-166 \u2014 client hook for websocket"
+          ]
+        },
+        {
+          "id": "ui.typing",
+          "status": "fail",
+          "notes": "BrandVoice Copilot chat renders messages without any typing state or live feedback.",
+          "evidence": [
+            "apps/web/src/components/brand-voice/BrandVoiceCopilot.tsx:33-120 \u2014 no typing indicator state"
+          ]
+        },
+        {
+          "id": "ui.aria",
+          "status": "warning",
+          "notes": "Navigation includes aria-current but most interactive components lack keyboard affordances; requires audit post build fix.",
+          "evidence": [
+            "apps/web/src/components/navigation.tsx:62-86 \u2014 limited aria usage"
+          ]
+        },
+        {
+          "id": "ui.theme",
+          "status": "fail",
+          "notes": "ThemeProvider stores mode but AppShell exposes no toggle control for users.",
+          "evidence": [
+            "apps/web/src/components/AppShell.tsx:7-47 \u2014 header lacks theme controls",
+            "apps/web/src/components/theme-provider.tsx:20-58 \u2014 client context without UI"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Email & CRM",
+      "items": [
+        {
+          "id": "email.smtp",
+          "status": "warning",
+          "notes": "Team invites rely on Resend and fall back to mock mode when RESEND_API_KEY is absent; no direct SMTP transport configured in runtime.",
+          "evidence": [
+            "apps/api/src/services/team/invite.ts:9-72 \u2014 warns when RESEND_API_KEY missing and uses mock"
+          ]
+        },
+        {
+          "id": "email.templates",
+          "status": "warning",
+          "notes": "Templates are embedded strings with no build step or linting; requires templating integration for multi-variant campaigns.",
+          "evidence": [
+            "apps/api/src/services/team/invite.ts:80-131 \u2014 HTML string literal template"
+          ]
+        },
+        {
+          "id": "email.ab",
+          "status": "warning",
+          "notes": "EmailAgent persists A/B test records but instrumentation can't be validated until Prisma client issues resolved.",
+          "evidence": [
+            "apps/api/src/agents/EmailAgent.ts:232-315 \u2014 runABTest implementation writing prisma.aBTest"
+          ]
+        },
+        {
+          "id": "email.metrics",
+          "status": "warning",
+          "notes": "Metrics endpoint exists but no live events were produced during audit due to API not running.",
+          "evidence": [
+            "apps/api/src/routes/metrics.ts:1-88 \u2014 event tracking route"
+          ]
+        },
+        {
+          "id": "email.crm",
+          "status": "warning",
+          "notes": "HubSpot connector implements OAuth actions yet depends on encrypted credentials and API connectivity that can't be exercised without the platform booting.",
+          "evidence": [
+            "apps/api/src/connectors/services/HubSpotConnector.ts:1-108 \u2014 create/search contact actions"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SEO & Analytics",
+      "items": [
+        {
+          "id": "seo.outputs",
+          "status": "warning",
+          "notes": "SEOAgent returns stubbed recommendations; requires integration with real audits.",
+          "evidence": [
+            "apps/api/src/agents/SEOAgent.ts:20-63 \u2014 mock data for optimization & keywords"
+          ]
+        },
+        {
+          "id": "seo.keyword_index",
+          "status": "fail",
+          "notes": "No keyword tables or services found in schema or codebase.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma \u2014 no keyword model present (rg 'keyword' returns none)"
+          ]
+        },
+        {
+          "id": "seo.sitemap",
+          "status": "fail",
+          "notes": "robots.txt references production sitemap URL but repo lacks sitemap generation in public assets.",
+          "evidence": [
+            "apps/web/public/robots.txt:1-18 \u2014 sitemap points to external URL",
+            "apps/web/public \u2014 no sitemap.xml asset present"
+          ]
+        },
+        {
+          "id": "seo.gsc",
+          "status": "fail",
+          "notes": "No runtime integration; documentation explicitly calls out missing GSC support.",
+          "evidence": [
+            "reports/seo-agent-validation-report.md:534 \u2014 notes lack of Google Search Console"
+          ]
+        },
+        {
+          "id": "seo.lighthouse",
+          "status": "warning",
+          "notes": "Unable to execute Lighthouse suite because Next.js build currently fails.",
+          "evidence": [
+            "logs/audit_2025-10-27_web_build.log:27 \u2014 Next.js binary missing"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Neural Memory",
+      "items": [
+        {
+          "id": "memory.flow",
+          "status": "warning",
+          "notes": "Learning service routes events into predictive engine but cannot be verified without running API.",
+          "evidence": [
+            "apps/api/src/services/learning/index.ts:1-37 \u2014 learnFrom delegates to predictive engine"
+          ]
+        },
+        {
+          "id": "memory.rag_latency",
+          "status": "warning",
+          "notes": "No latency sampling collected; dependent on restoring agent execution.",
+          "evidence": [
+            "apps/api/src/services/orchestration/router.ts:23-93 \u2014 execution pipeline awaiting agent handlers"
+          ]
+        },
+        {
+          "id": "memory.training_link",
+          "status": "fail",
+          "notes": "Schema defines relationships but application layer never writes TrainingJob records.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma:599-633 \u2014 TrainingJob model exists",
+            "(rg) apps/api/src \u2014 no references to TrainingJob"
+          ]
+        },
+        {
+          "id": "memory.auto_eval",
+          "status": "fail",
+          "notes": "No automated evaluation or scoring routines surfaced during code search.",
+          "evidence": [
+            "Repository search \u2014 no auto-eval or evaluation pipeline implementations present"
+          ]
+        },
+        {
+          "id": "memory.notion_export",
+          "status": "warning",
+          "notes": "Notion connector supports page creation and triggers, yet integration with memory sync is not wired.",
+          "evidence": [
+            "apps/api/src/connectors/services/NotionConnector.ts:41-118 \u2014 connector capabilities"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Security & Governance",
+      "items": [
+        {
+          "id": "sec.rbac",
+          "status": "warning",
+          "notes": "Schema models org roles but middleware primarily gates via IP allowlists; role checks absent on most routes.",
+          "evidence": [
+            "apps/api/prisma/schema.prisma:121-208 \u2014 OrganizationRole definitions",
+            "apps/api/src/server.ts:65-110 \u2014 admin routes rely on adminIPGuard but not role checks"
+          ]
+        },
+        {
+          "id": "sec.audit",
+          "status": "pass",
+          "notes": "Audit middleware captures successful operations with user/IP metadata.",
+          "evidence": [
+            "apps/api/src/middleware/auditLog.ts:1-39 \u2014 audit() invoked on response",
+            "apps/api/src/lib/audit.ts:1-39 \u2014 writes to prisma.auditLog"
+          ]
+        },
+        {
+          "id": "sec.apikey",
+          "status": "fail",
+          "notes": "Encryption helper throws unless ENCRYPTION_KEY is provided; reversible encryption instead of hashing.",
+          "evidence": [
+            "apps/api/src/lib/encryption.ts:5-33 \u2014 hard requirement on ENCRYPTION_KEY and AES-256-GCM"
+          ]
+        },
+        {
+          "id": "sec.cors_rate",
+          "status": "pass",
+          "notes": "Strict origin matching and dual-scope rate limiting active by default.",
+          "evidence": [
+            "apps/api/src/middleware/cors.ts:1-84 \u2014 strictCORS implementation",
+            "apps/api/src/middleware/rateLimit.ts:1-84 \u2014 IP/user scoped throttling"
+          ]
+        },
+        {
+          "id": "sec.error_boundaries",
+          "status": "warning",
+          "notes": "API wraps errors with AppError but frontend boundary is basic; should add user guidance and telemetry once app builds.",
+          "evidence": [
+            "apps/api/src/server.ts:86-126 \u2014 central error handler",
+            "apps/web/src/components/error-boundary.tsx:1-12 \u2014 minimal fallback"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Automation & CI",
+      "items": [
+        {
+          "id": "ci.green",
+          "status": "fail",
+          "notes": "Local build/test parity fails; same issues would break required CI jobs.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_build.log:35 \u2014 build failure mirrors CI",
+            "logs/audit_2025-10-27_api_test.log:6 \u2014 tests fail without typescript module"
+          ]
+        },
+        {
+          "id": "ci.slack",
+          "status": "fail",
+          "notes": "No Slack notifications in active workflows; only referenced in historical documentation.",
+          "evidence": [
+            "scripts/ci-cd \u2014 contains automated-testing, qa trigger, rollback guard only (no Slack script)",
+            "reports/WORKFLOW_STATUS_DASHBOARD.md:400 \u2014 Slack action referenced as documentation"
+          ]
+        },
+        {
+          "id": "ci.semver",
+          "status": "pass",
+          "notes": "Release workflow responds to v* tags with validation/build/release steps.",
+          "evidence": [
+            ".github/workflows/release.yml:1-120 \u2014 tag-driven release pipeline"
+          ]
+        },
+        {
+          "id": "ci.nightly",
+          "status": "warning",
+          "notes": "QA Sentinel workflow scheduled but runs stub CLI that generates placeholder reports.",
+          "evidence": [
+            ".github/workflows/qa-sentinel.yml:23-118 \u2014 cron schedule with benchmark job",
+            "core/qa-sentinel/scripts/stub-ci.js:4-48 \u2014 stub implementation"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Deploy & Monitoring",
+      "items": [
+        {
+          "id": "deploy.targets",
+          "status": "warning",
+          "notes": "Deployment descriptors exist, yet no live verification executed during audit.",
+          "evidence": [
+            "render.yaml:1-24 \u2014 Render service config",
+            "vercel.json:1-20 \u2014 Next.js deploy settings"
+          ]
+        },
+        {
+          "id": "deploy.health",
+          "status": "warning",
+          "notes": "Health route includes database/vector/agent checks but endpoint was not reachable without successful build.",
+          "evidence": [
+            "apps/api/src/routes/health.ts:1-92 \u2014 detailed health checks"
+          ]
+        },
+        {
+          "id": "deploy.db_metrics",
+          "status": "warning",
+          "notes": "Metrics endpoint ready to broadcast but blocked by API startup failures.",
+          "evidence": [
+            "apps/api/src/routes/metrics.ts:1-124 \u2014 REST analytics"
+          ]
+        },
+        {
+          "id": "deploy.logs_tracing",
+          "status": "warning",
+          "notes": "Sentry integration optional and disabled without DSN; no Logtail integration found.",
+          "evidence": [
+            "apps/api/src/obs/sentry.ts:5-27 \u2014 initialization short-circuits without DSN"
+          ]
+        },
+        {
+          "id": "deploy.sentry_logtail",
+          "status": "warning",
+          "notes": "Only Sentry stub present; Logtail pipelines absent.",
+          "evidence": [
+            "apps/api/src/obs/sentry.ts:5-27 \u2014 Sentry only"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Docs & Tests",
+      "items": [
+        {
+          "id": "docs.readme",
+          "status": "warning",
+          "notes": "README still highlights v3.0 production state; needs refresh once audit artifacts added.",
+          "evidence": [
+            "README.md:1-32 \u2014 references v3.0 deployment"
+          ]
+        },
+        {
+          "id": "tests.unit",
+          "status": "fail",
+          "notes": "API test suite fails immediately because ts-jest cannot load TypeScript module.",
+          "evidence": [
+            "logs/audit_2025-10-27_api_test.log:6 \u2014 Cannot find module 'typescript'"
+          ]
+        },
+        {
+          "id": "tests.e2e",
+          "status": "fail",
+          "notes": "Web workspace has no configured tests; command exits after echo.",
+          "evidence": [
+            "logs/audit_2025-10-27_web_test.log:3 \u2014 'No tests configured'"
+          ]
+        },
+        {
+          "id": "tests.benchmarks",
+          "status": "warning",
+          "notes": "QA Sentinel benchmark job generates stub reports only.",
+          "evidence": [
+            "core/qa-sentinel/scripts/stub-ci.js:4-48 \u2014 stubbed benchmark handler"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enhancements",
+      "items": [
+        {
+          "id": "enhancements.stripe",
+          "status": "warning",
+          "notes": "Billing service integrates Stripe APIs but short-circuits without STRIPE_SECRET_KEY configured.",
+          "evidence": [
+            "apps/api/src/services/billing/stripe.ts:1-108 \u2014 warns when STRIPE_SECRET_KEY missing"
+          ]
+        },
+        {
+          "id": "enhancements.oauth_vault",
+          "status": "fail",
+          "notes": "Credential encryption helper throws early without ENCRYPTION_KEY; prevents API from booting in audit environment.",
+          "evidence": [
+            "apps/api/src/lib/encryption.ts:5-20 \u2014 throws if ENCRYPTION_KEY absent"
+          ]
+        },
+        {
+          "id": "enhancements.geo",
+          "status": "fail",
+          "notes": "No geospatial components or map integrations present in web routes.",
+          "evidence": [
+            "apps/web/src/app \u2014 no geo or map modules detected (rg 'mapbox'/'leaflet' returned none)"
+          ]
+        },
+        {
+          "id": "enhancements.performance_copilot",
+          "status": "fail",
+          "notes": "No Performance Copilot UI or API endpoints found; feature absent in current codebase.",
+          "evidence": [
+            "Repository search \u2014 no 'Performance Copilot' implementations"
+          ]
+        }
+      ]
+    }
+  ]
+}

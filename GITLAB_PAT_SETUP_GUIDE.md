@@ -40,7 +40,7 @@
 
 ### Option A: Via GitLab Web UI
 
-1. **Navigate to:** https://gitlab.com/projects/new
+1. **Navigate to:** https://gitlab.com/NeonHub3A/neonhub
 2. **Configure:**
    ```
    Project name: NeonHub

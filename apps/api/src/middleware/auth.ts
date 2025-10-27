@@ -14,6 +14,7 @@ export interface AuthRequest extends Request {
     updatedAt: Date;
     image?: string | null;
     emailVerified: Date | null;
+    isBetaUser: boolean;
   };
 }
 
@@ -48,6 +49,7 @@ export async function requireAuth(
               emailVerified: true,
               createdAt: true,
               updatedAt: true,
+              isBetaUser: true,
               stripeCustomerId: true,
             },
           },
@@ -67,6 +69,7 @@ export async function requireAuth(
         updatedAt: session.user.updatedAt,
         image: session.user.image,
         emailVerified: session.user.emailVerified,
+        isBetaUser: session.user.isBetaUser ?? false,
       };
     }
     
@@ -84,6 +87,7 @@ export async function requireAuth(
               emailVerified: true,
               createdAt: true,
               updatedAt: true,
+              isBetaUser: true,
               stripeCustomerId: true,
             },
           },
@@ -103,6 +107,7 @@ export async function requireAuth(
         updatedAt: session.user.updatedAt,
         image: session.user.image,
         emailVerified: session.user.emailVerified,
+        isBetaUser: session.user.isBetaUser ?? false,
       };
     }
     

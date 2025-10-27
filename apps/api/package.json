@@ -8,22 +8,31 @@
     "npm": ">=10.0.0"
   },
   "packageManager": "npm@10.8.2",
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
+  },
   "scripts": {
-    "prisma:generate": "prisma generate",
-    "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "build": "npm run prisma:generate && tsc -p .",
+    "prisma:generate": "node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs",
+    "prisma:deploy": "node ../../scripts/run-cli.mjs prisma migrate deploy",
+    "prisma:seed": "node ../../scripts/run-cli.mjs prisma db seed",
+    "prisma:migrate:deploy": "node ../../scripts/run-cli.mjs prisma migrate deploy",
+    "prisma:migrate": "node ../../scripts/run-cli.mjs prisma migrate dev",
+    "prisma:studio": "node ../../scripts/run-cli.mjs prisma studio",
+    "prisma:validate": "node ../../scripts/run-cli.mjs prisma validate",
+    "prisma:status": "node ../../scripts/run-cli.mjs prisma migrate status --schema apps/api/prisma/schema.prisma",
+    "db:drift-check": "npm run prisma:validate && npm run prisma:status",
+    "build": "npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .",
     "start": "node dist/src/server.js",
-    "dev": "tsx watch src/server.ts",
-    "test": "NODE_ENV=test jest",
-    "test:watch": "NODE_ENV=test jest --watch",
-    "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
+    "dev": "node ../../scripts/run-cli.mjs tsx watch src/server.ts",
+    "test": "NODE_ENV=test node ../../scripts/run-cli.mjs jest",
+    "test:coverage": "NODE_ENV=test node ../../scripts/run-cli.mjs jest --coverage --coverageDirectory=coverage",
+    "test:watch": "NODE_ENV=test node ../../scripts/run-cli.mjs jest --watch",
+    "lint": "node ../../scripts/run-cli.mjs eslint src --ext .ts",
+    "typecheck": "node ../../scripts/run-cli.mjs tsc --noEmit",
+    "format": "node ../../scripts/run-cli.mjs prettier --write \"src/**/*.ts\"",
+    "format:check": "node ../../scripts/run-cli.mjs prettier --check \"src/**/*.ts\"",
     "verify": "npm run lint && npm run typecheck && npm run test",
-    "seed": "tsx prisma/seed.ts",
+    "seed": "node ../../scripts/run-cli.mjs tsx prisma/seed.ts",
     "prepare": "npm run prisma:generate"
   },
   "dependencies": {
@@ -32,9 +41,8 @@
     "@prisma/client": "^5.22.0",
     "@sentry/node": "^10.17.0",
     "@sentry/profiling-node": "^10.17.0",
-    "@tensorflow/tfjs-node": "4.16.0",
+    "@tensorflow/tfjs": "^4.16.0",
     "@types/redis": "^4.0.10",
-    "axios": "^1.7.7",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -51,7 +59,6 @@
     "resend": "^6.1.2",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.1",
-    "stripe": "^19.0.0",
     "twilio": "^5.3.3",
     "uuid": "^13.0.0",
     "zod": "^3.24.1"
@@ -72,6 +79,7 @@
     "prisma": "^5.22.0",
     "ts-jest": "^29.2.5",
     "tsx": "^4.16.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   }
 }

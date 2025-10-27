@@ -5,6 +5,7 @@ import { ok, fail } from "../lib/http";
 import { ValidationError } from "../lib/errors";
 import { sendInviteEmail, isEmailServiceConfigured } from "../services/team/invite.js";
 import { logger } from "../lib/logger.js";
+import * as teamService from "../services/team.service.js";
 
 export const teamRouter = Router();
 
@@ -24,84 +25,99 @@ const InviteMemberSchema = z.object({
   message: z.string().optional(),
 });
 
-// Mock team data (until database integration)
-const mockMembers = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "sarah@company.com",
-    avatar: "/placeholder-user.jpg",
-    role: "Owner",
-    department: "Leadership",
-    status: "online",
-    joinedAt: "2023-01-15",
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    email: "michael@company.com",
-    avatar: "/placeholder-user.jpg",
-    role: "Admin",
-    department: "Engineering",
-    status: "online",
-    joinedAt: "2023-02-20",
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    email: "emily@company.com",
-    avatar: "/placeholder-user.jpg",
-    role: "Member",
-    department: "Marketing",
-    status: "away",
-    joinedAt: "2023-03-10",
-  },
-  {
-    id: "4",
-    name: "David Kim",
-    email: "david@company.com",
-    avatar: "/placeholder-user.jpg",
-    role: "Member",
-    department: "Sales",
-    status: "offline",
-    joinedAt: "2023-04-05",
-  },
-];
-
-const mockInvitations = [
-  {
-    id: "1",
-    email: "newuser@company.com",
-    role: "Member",
-    invitedBy: "Sarah Johnson",
-    sentAt: "2024-01-10",
-    expiresAt: "2024-01-17",
-  },
-];
-
-// GET /team/members
+// GET /team/members - List all team members
 teamRouter.get("/team/members", async (req, res) => {
   try {
-    // TODO: Replace with actual database query
-    // const members = await prisma.user.findMany({ where: { teamId: req.user.teamId } });
+    const { role, status } = req.query;
+    const filters: any = {};
     
-    return res.json(ok(mockMembers));
+    if (role && typeof role === 'string') {
+      filters.role = role;
+    }
+    
+    if (status && typeof status === 'string') {
+      filters.status = status;
+    }
+    
+    const members = await teamService.getTeamMembers(filters);
+    return res.json(ok(members));
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return res.status(500).json(fail(message).body);
   }
 });
 
-// GET /team/invitations
-teamRouter.get("/team/invitations", async (req, res) => {
+// GET /team/stats - Get team statistics
+teamRouter.get("/team/stats", async (req, res) => {
   try {
-    // TODO: Replace with actual database query
-    // const invitations = await prisma.invitation.findMany({ where: { status: 'pending' } });
-    
-    return res.json(ok(mockInvitations));
+    const stats = await teamService.getTeamStats();
+    return res.json(ok(stats));
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     return res.status(500).json(fail(message).body);
+  }
+});
+
+// GET /team/members/:id - Get specific team member
+teamRouter.get("/team/members/:id", async (req, res) => {
+  try {
+    const member = await teamService.getTeamMemberById(req.params.id);
+    return res.json(ok(member));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// PUT /team/members/:id - Update team member
+teamRouter.put("/team/members/:id", async (req, res) => {
+  try {
+    const { role, department, status } = req.body;
+    const member = await teamService.updateTeamMember(req.params.id, {
+      role,
+      department,
+      status,
+    });
+    return res.json(ok(member));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// DELETE /team/members/:id - Remove team member
+teamRouter.delete("/team/members/:id", async (req, res) => {
+  try {
+    const result = await teamService.removeTeamMember(req.params.id);
+    return res.json(ok(result));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') || message.includes('Cannot remove') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// GET /team/invitations - Get pending invitations
+teamRouter.get("/team/invitations", async (req, res) => {
+  try {
+    // Get pending invitations from tokens map
+    const invitations = Array.from(inviteTokens.entries())
+      .filter(([_, invite]) => !invite.used && invite.expiresAt > new Date())
+      .map(([token, invite]) => ({
+        id: token,
+        email: invite.email,
+        role: invite.role,
+        invitedBy: "Current User", // TODO: Track who sent invite
+        sentAt: invite.createdAt.toISOString().split('T')[0],
+        expiresAt: invite.expiresAt.toISOString().split('T')[0],
+      }));
+    
+    return res.json(ok(invitations));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message));
   }
 });
 
@@ -291,4 +307,3 @@ teamRouter.get("/team/accept", async (req, res) => {
 });
 
 export default teamRouter;
-

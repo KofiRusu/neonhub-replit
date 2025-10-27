@@ -1,0 +1,61 @@
+# NeonHub Code Owners
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @KofiRusu
+
+# Backend API - All TypeScript files in apps/api
+/apps/api/**/*.ts @KofiRusu
+/apps/api/prisma/ @KofiRusu
+/apps/api/src/routes/ @KofiRusu
+/apps/api/src/services/ @KofiRusu
+
+# Frontend Web - All React/Next.js files in apps/web
+/apps/web/**/*.tsx @KofiRusu
+/apps/web/**/*.ts @KofiRusu
+/apps/web/src/app/ @KofiRusu
+/apps/web/src/components/ @KofiRusu
+
+# Core Packages - Shared libraries
+/core/ @KofiRusu
+/modules/ @KofiRusu
+/packages/ @KofiRusu
+
+# CI/CD and DevOps - Workflows, Docker, deployment
+/.github/workflows/ @KofiRusu
+/scripts/ @KofiRusu
+/docker-compose.yml @KofiRusu
+/Dockerfile @KofiRusu
+/apps/api/Dockerfile @KofiRusu
+/apps/web/Dockerfile @KofiRusu
+
+# Database - Prisma schema and migrations
+/apps/api/prisma/schema.prisma @KofiRusu
+/apps/api/prisma/migrations/ @KofiRusu
+/apps/api/prisma/seed.ts @KofiRusu
+
+# Configuration Files - Environment, build, and package management
+/.env.example @KofiRusu
+/apps/api/.env.example @KofiRusu
+/apps/web/.env.example @KofiRusu
+/package.json @KofiRusu
+/pnpm-workspace.yaml @KofiRusu
+/tsconfig.json @KofiRusu
+
+# Documentation - All markdown files
+/*.md @KofiRusu
+/docs/**/*.md @KofiRusu
+/README.md @KofiRusu
+
+# Security - Security policies and configurations
+/SECURITY.md @KofiRusu
+/.github/SECURITY.md @KofiRusu
+/security/ @KofiRusu
+
+# Testing - Test configuration and test files
+/apps/api/jest.config.js @KofiRusu
+/apps/web/playwright.config.ts @KofiRusu
+/**/__tests__/**/*.ts @KofiRusu
+/**/*.test.ts @KofiRusu
+/**/*.spec.ts @KofiRusu
+

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: neonhub-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: neonhub
+      POSTGRES_PASSWORD: neonhub
+      POSTGRES_DB: neonhub
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neonhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - neonhub_pgdata:/var/lib/postgresql/data
+
+volumes:
+  neonhub_pgdata:

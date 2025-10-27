@@ -1,16 +1,28 @@
-/* v0 theme tokens */
+/* NeonHub design tokens shared across the app */
 :root {
   --radius: 0.625rem;
   --space-gray: #0e0f1a;
+  --space-gray-soft: #131424;
   --neon-blue: #00ffff;
+  --neon-blue-soft: rgba(0, 255, 255, 0.12);
   --neon-purple: #7a5fff;
+  --neon-purple-soft: rgba(122, 95, 255, 0.16);
   --neon-pink: #ff1493;
+  --neon-pink-soft: rgba(255, 20, 147, 0.16);
   --neon-green: #39ff14;
+  --neon-green-soft: rgba(57, 255, 20, 0.12);
+  --surface-blur: blur(18px);
+  --border-glow: rgba(148, 163, 255, 0.18);
+  --brand-gradient: linear-gradient(135deg, #00ffff 0%, #7a5fff 50%, #ff1493 100%);
 }
 
 .neon-surface {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
+  background: rgba(19, 20, 36, 0.78);
+  border: 1px solid var(--border-glow);
+  backdrop-filter: var(--surface-blur);
+  box-shadow: 0 16px 42px rgba(2, 6, 23, 0.45);
 }
 
+.neon-ring {
+  box-shadow: 0 0 0 1px var(--neon-blue-soft), 0 10px 30px rgba(0, 255, 255, 0.14);
+}

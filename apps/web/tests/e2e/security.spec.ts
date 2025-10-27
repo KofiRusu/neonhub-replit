@@ -84,7 +84,7 @@ test.describe('Rate Limiting', () => {
 
 test.describe('Open Redirect Protection', () => {
   test('should sanitize unsafe redirect parameters', async ({ page }) => {
-    const response = await page.goto('/?redirect=https://evil.com');
+    await page.goto('/?redirect=https://evil.com');
     // Should either remove redirect param or stay on safe URL
     expect(page.url()).not.toContain('evil.com');
   });

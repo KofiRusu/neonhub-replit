@@ -3,6 +3,10 @@
 [![CI](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml/badge.svg)](https://github.com/KofiRusu/Neonhub-v3.0/actions/workflows/ci.yml)
 [![Production Status](https://img.shields.io/badge/production-v3.0-green)](https://neonhubecosystem.com)
 [![Test Coverage](https://img.shields.io/badge/tests-32%2F32%20passing-success)](./apps/api/src/__tests__)
+[![System Audit](https://img.shields.io/badge/system%20audit-2025--10--27-%23ff6f61)](docs/AUDIT_REPORT_2025-10-27.md)
+[![Checklist](https://img.shields.io/badge/checklist-xlsx-blue)](docs/CHECKLIST_STATUS_2025-10-27.xlsx)
+[![Remediation Plan](https://img.shields.io/badge/remediation-plan-orange)](docs/REMEDIATION_PLAN_2025-10-27.md)
+[![Roadmap](https://img.shields.io/badge/roadmap-gantt-purple)](docs/ROADMAP_GANTT_2025-10-27.md)
 
 **NeonHub** is an AI-powered marketing automation platform built with Next.js 15, Express, Prisma, and OpenAI. This is a monorepo containing both the API backend and web frontend.
 
@@ -493,6 +497,7 @@ The pipeline runs automatically every hour and creates PRs with detailed diagnos
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+6. Review the repository guidelines in [AGENTS.md](./AGENTS.md) to confirm coding standards, test coverage expectations, and PR requirements.
 
 ---
 

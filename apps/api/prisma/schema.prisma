@@ -1,13 +1,90 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// NeonHub Prisma schema aligned with Postgres + pgvector
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_DATABASE_URL")
+  extensions = [vector(schema: "public")]
+}
+
+enum AgentKind {
+  COPILOT
+  WORKFLOW
+  ANALYST
+}
+
+enum AgentStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum MessageRole {
+  system
+  user
+  assistant
+  tool
+}
+
+enum ConversationKind {
+  support
+  campaign
+  planning
+  ad_hoc
+}
+
+enum DatasetKind {
+  documents
+  faq
+  analytics
+}
+
+enum TrainStatus {
+  queued
+  running
+  completed
+  failed
+  cancelled
+}
+
+enum ContentKind {
+  article
+  email
+  social_script
+  ad_copy
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  active
+  paused
+  completed
+  archived
+}
+
+enum ConnectorKind {
+  EMAIL
+  SMS
+  WHATSAPP
+  REDDIT
+  INSTAGRAM
+  FACEBOOK
+  X
+  YOUTUBE
+  TIKTOK
+  GOOGLE_ADS
+  SHOPIFY
+  STRIPE
+  SLACK
+  DISCORD
+  LINKEDIN
 }
 
 model User {
@@ -19,16 +96,29 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  contentDrafts ContentDraft[]
-  agentJobs     AgentJob[]
-  campaigns     Campaign[]
-  credentials   Credential[]
-  settings      UserSettings?
-  subscription  Subscription?
-  auditLogs     AuditLog[]
-  stripeCustomerId String?  @unique
+  accounts               Account[]
+  sessions               Session[]
+  contentDrafts          ContentDraft[]
+  agentJobs              AgentJob[]
+  credentials            Credential[]
+  settings               UserSettings?
+  subscription           Subscription?
+  auditLogs              AuditLog[]
+  organizationMembership OrganizationMembership[]
+  apiKeys                ApiKey[]                 @relation("ApiKeyCreator")
+  conversations          Conversation[]           @relation("ConversationCreator")
+  messages               Message[]                @relation("MessageAuthor")
+  documents              Document[]               @relation("DocumentOwner")
+  tasksCreated           Task[]                   @relation("TaskCreator")
+  tasksAssigned          Task[]                   @relation("TaskAssignee")
+  feedback               Feedback[]
+  connectorAuths         ConnectorAuth[]
+  teamMemberships        TeamMember[]
+  campaigns              Campaign[]
+
+  stripeCustomerId String?   @unique
+  isBetaUser       Boolean   @default(false)
+  Content          Content[]
 
   @@map("users")
 }
@@ -72,37 +162,608 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model ContentDraft {
-  id          String   @id @default(cuid())
-  title       String
-  topic       String
-  body        String   @db.Text
-  tone        String   @default("professional")
-  audience    String?
-  status      String   @default("draft") // draft, generated, published
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Organization {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  plan      String   @default("starter")
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([createdById])
-  @@index([status])
+  members           OrganizationMembership[]
+  roles             OrganizationRole[]
+  permissions       OrganizationPermission[]
+  apiKeys           ApiKey[]
+  brands            Brand[]
+  embeddingSpaces   EmbeddingSpace[]
+  agents            Agent[]
+  datasets          Dataset[]
+  modelVersions     ModelVersion[]
+  campaigns         Campaign[]
+  conversations     Conversation[]
+  contentItems      Content[]
+  auditLogs         AuditLog[]
+  AgentRun          AgentRun[]
+  Tool              Tool[]
+  Document          Document[]
+  InferenceEndpoint InferenceEndpoint[]
+  ContentDraft      ContentDraft[]
+  AgentJob          AgentJob[]
+  Task              Task[]
+  Feedback          Feedback[]
+  TeamMember        TeamMember[]
+  ConnectorAuth     ConnectorAuth[]
+
+  @@map("organizations")
+}
+
+model OrganizationRole {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization    Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+  memberships     OrganizationMembership[]
+
+  @@unique([organizationId, slug])
+  @@map("organization_roles")
+}
+
+model OrganizationPermission {
+  id             String   @id @default(cuid())
+  organizationId String
+  key            String
+  description    String?
+  createdAt      DateTime @default(now())
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+
+  @@unique([organizationId, key])
+  @@map("organization_permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       OrganizationRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission OrganizationPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model OrganizationMembership {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  roleId         String?
+  status         String   @default("active")
+  invitedById    String?
+  joinedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         OrganizationRole? @relation(fields: [roleId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model ApiKey {
+  id             String    @id @default(cuid())
+  organizationId String
+  createdById    String
+  name           String
+  tokenHash      String
+  scopes         String[]  @default([])
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User         @relation("ApiKeyCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, tokenHash])
+  @@unique([createdById, tokenHash])
+  @@map("api_keys")
+}
+
+model EmbeddingSpace {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  provider       String
+  model          String
+  dimension      Int
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brandVoices  BrandVoice[]
+  datasets     Dataset[]
+  chunks       Chunk[]
+  Document     Document[]
+
+  @@unique([organizationId, name])
+  @@map("embedding_spaces")
+}
+
+model Brand {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  mainColor      String?
+  slogan         String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brandVoices  BrandVoice[]
+  assets       BrandAsset[]
+
+  @@unique([organizationId, slug])
+  @@map("brands")
+}
+
+model BrandVoice {
+  id               String                 @id @default(cuid())
+  brandId          String
+  embeddingSpaceId String
+  promptTemplate   String                 @db.Text
+  styleRulesJson   Json
+  embedding        Unsupported("vector")?
+  metrics          Json?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  brand          Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  embeddingSpace EmbeddingSpace @relation(fields: [embeddingSpaceId], references: [id], onDelete: Cascade)
+
+  @@map("brand_voices")
+}
+
+model BrandAsset {
+  id        String   @id @default(cuid())
+  brandId   String
+  kind      String
+  name      String
+  url       String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@map("brand_assets")
+}
+
+model Agent {
+  id             String      @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  kind           AgentKind
+  status         AgentStatus @default(ACTIVE)
+  description    String?
+  version        String?
+  config         Json?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  capabilities AgentCapability[]
+  configs      AgentConfig[]
+  runs         AgentRun[]
+  tools        Tool[]
+
+  @@unique([organizationId, slug])
+  @@map("agents")
+}
+
+model AgentCapability {
+  id        String   @id @default(cuid())
+  agentId   String
+  name      String
+  config    Json?
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_capabilities")
+}
+
+model AgentConfig {
+  id        String   @id @default(cuid())
+  agentId   String
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, key])
+  @@map("agent_configs")
+}
+
+model AgentRun {
+  id             String    @id @default(cuid())
+  agentId        String
+  organizationId String
+  datasetId      String?
+  status         String    @default("queued")
+  input          Json
+  output         Json?
+  metrics        Json?
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  agent          Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  dataset        Dataset?         @relation(fields: [datasetId], references: [id], onDelete: SetNull)
+  toolExecutions ToolExecution[]
+  runMetrics     AgentRunMetric[]
+
+  @@index([agentId, startedAt])
+  @@map("agent_runs")
+}
+
+model AgentRunMetric {
+  id         String @id @default(cuid())
+  agentRunId String
+  name       String
+  value      Float?
+  metadata   Json?
+
+  agentRun AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+
+  @@map("agent_run_metrics")
+}
+
+model Tool {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  inputSchema    Json?
+  outputSchema   Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executions   ToolExecution[]
+  Agent        Agent?          @relation(fields: [agentId], references: [id])
+  agentId      String?
+
+  @@unique([organizationId, slug])
+  @@map("tools")
+}
+
+model ToolExecution {
+  id          String    @id @default(cuid())
+  toolId      String
+  agentRunId  String?
+  status      String    @default("queued")
+  input       Json?
+  output      Json?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  metadata    Json?
+
+  tool     Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  agentRun AgentRun? @relation(fields: [agentRunId], references: [id], onDelete: SetNull)
+
+  @@map("tool_executions")
+}
+
+model Conversation {
+  id             String           @id @default(cuid())
+  organizationId String
+  kind           ConversationKind @default(support)
+  status         String           @default("active")
+  title          String?
+  createdById    String?
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation("ConversationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  messages     Message[]
+
+  @@index([organizationId, createdAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String                 @id @default(cuid())
+  conversationId String
+  authorId       String?
+  role           MessageRole
+  contentJson    Json
+  embedding      Unsupported("vector")?
+  metadata       Json?
+  createdAt      DateTime               @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  author       User?        @relation("MessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt])
+  @@index([role, createdAt])
+  @@map("messages")
+}
+
+model Dataset {
+  id               String      @id @default(cuid())
+  organizationId   String
+  embeddingSpaceId String?
+  name             String
+  slug             String
+  kind             DatasetKind
+  description      String?
+  source           String?
+  metadata         Json?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  embeddingSpace EmbeddingSpace? @relation(fields: [embeddingSpaceId], references: [id], onDelete: SetNull)
+  documents      Document[]
+  chunks         Chunk[]
+  AgentRun       AgentRun[]
+
+  @@unique([organizationId, slug])
+  @@map("datasets")
+}
+
+model Document {
+  id               String   @id @default(cuid())
+  datasetId        String?
+  organizationId   String
+  ownerId          String
+  embeddingSpaceId String?
+  title            String
+  content          String   @db.Text
+  status           String   @default("draft")
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  dataset        Dataset?        @relation(fields: [datasetId], references: [id], onDelete: SetNull)
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner          User            @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  embeddingSpace EmbeddingSpace? @relation(fields: [embeddingSpaceId], references: [id], onDelete: SetNull)
+  chunks         Chunk[]
+
+  @@map("documents")
+}
+
+model Chunk {
+  id               String                 @id @default(cuid())
+  datasetId        String
+  documentId       String
+  embeddingSpaceId String
+  idx              Int
+  text             String                 @db.Text
+  embedding        Unsupported("vector")?
+  metadata         Json?
+  createdAt        DateTime               @default(now())
+
+  dataset        Dataset        @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  document       Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  embeddingSpace EmbeddingSpace @relation(fields: [embeddingSpaceId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, idx])
+  @@index([embeddingSpaceId])
+  @@map("chunks")
+}
+
+model ModelVersion {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  provider       String
+  version        String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  trainingJobs TrainingJob[]
+  endpoints    InferenceEndpoint[]
+
+  @@map("model_versions")
+}
+
+model TrainingJob {
+  id             String      @id @default(cuid())
+  modelVersionId String
+  status         TrainStatus @default(queued)
+  config         Json
+  metrics        Json?
+  startedAt      DateTime    @default(now())
+  completedAt    DateTime?
+
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@map("training_jobs")
+}
+
+model InferenceEndpoint {
+  id             String   @id @default(cuid())
+  organizationId String
+  modelVersionId String?
+  name           String
+  slug           String
+  status         String   @default("draft")
+  config         Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  modelVersion ModelVersion? @relation(fields: [modelVersionId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, slug])
+  @@map("inference_endpoints")
+}
+
+model Content {
+  id             String      @id @default(cuid())
+  organizationId String
+  authorId       String?
+  kind           ContentKind
+  status         String      @default("draft")
+  title          String?
+  body           String?     @db.Text
+  metadata       Json?
+  publishedAt    DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author       User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@map("content")
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  organizationId String
+  ownerId        String
+  name           String
+  status         CampaignStatus @default(draft)
+  type           String
+  config         Json?
+  schedule       Json?
+  budget         Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner          User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  metrics        CampaignMetric[]
+  emailSequences EmailSequence[]
+  socialPosts    SocialPost[]
+  abTests        ABTest[]
+
+  @@index([organizationId, status])
+  @@map("campaigns")
+}
+
+model CampaignMetric {
+  id         String   @id @default(cuid())
+  campaignId String
+  kind       String
+  value      Float?
+  payload    Json?
+  timestamp  DateTime @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, kind, timestamp])
+  @@map("campaign_metrics")
+}
+
+model EmailSequence {
+  id           String    @id @default(cuid())
+  campaignId   String
+  subject      String
+  body         String    @db.Text
+  variant      String?
+  scheduledFor DateTime?
+  sentAt       DateTime?
+  metrics      Json?
+  createdAt    DateTime  @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, scheduledFor])
+  @@map("email_sequences")
+}
+
+model SocialPost {
+  id           String    @id @default(cuid())
+  campaignId   String
+  platform     String
+  content      String    @db.Text
+  mediaUrls    Json?
+  variant      String?
+  scheduledFor DateTime?
+  publishedAt  DateTime?
+  externalId   String?
+  metrics      Json?
+  createdAt    DateTime  @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, platform, scheduledFor])
+  @@map("social_posts")
+}
+
+model ABTest {
+  id          String    @id @default(cuid())
+  campaignId  String
+  name        String
+  variants    Json
+  winner      String?
+  metrics     Json
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("ab_tests")
+}
+
+model ContentDraft {
+  id             String   @id @default(cuid())
+  organizationId String?
+  title          String
+  topic          String
+  body           String   @db.Text
+  tone           String   @default("professional")
+  audience       String?
+  status         String   @default("draft")
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  createdBy    User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([createdById, status])
   @@index([createdAt])
   @@map("content_drafts")
 }
 
 model AgentJob {
-  id          String   @id @default(cuid())
-  agent       String // content, seo, email, social, support, trend
-  input       Json
-  output      Json?
-  status      String   @default("queued") // queued, running, success, error
-  error       String?  @db.Text
-  metrics     Json? // { duration: number, tokens: number, etc }
-  createdById String?
-  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String?
+  agent          String
+  input          Json
+  output         Json?
+  status         String   @default("queued")
+  error          String?  @db.Text
+  metrics        Json?
+  createdById    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  createdBy    User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
   @@index([agent])
   @@index([status])
@@ -112,8 +773,8 @@ model AgentJob {
 
 model MetricEvent {
   id        String   @id @default(cuid())
-  type      String // page_view, click, conversion, agent_run, etc
-  meta      Json // flexible metadata
+  type      String
+  meta      Json
   createdAt DateTime @default(now())
 
   @@index([type])
@@ -121,222 +782,105 @@ model MetricEvent {
   @@map("metric_events")
 }
 
-model Campaign {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name        String
-  type        String   // 'email', 'social', 'multi-channel'
-  status      String   // 'draft', 'scheduled', 'active', 'paused', 'completed'
-  
-  config      Json     // Campaign-specific configuration
-  schedule    Json?    // Scheduling configuration
-  budget      Json?    // { total: 1000, spent: 250, currency: 'usd', alerts: [50, 75, 90] }
-  
-  emailSequences  EmailSequence[]
-  socialPosts     SocialPost[]
-  abTests         ABTest[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([userId, status])
-  @@map("campaigns")
-}
-
-model EmailSequence {
-  id          String   @id @default(cuid())
-  campaignId  String
-  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  
-  subject     String
-  body        String   @db.Text
-  variant     String?  // For A/B testing
-  
-  scheduledFor DateTime?
-  sentAt      DateTime?
-  
-  metrics     Json?    // opens, clicks, conversions
-  
-  createdAt   DateTime @default(now())
-  
-  @@index([campaignId, scheduledFor])
-  @@map("email_sequences")
-}
-
-model SocialPost {
-  id          String   @id @default(cuid())
-  campaignId  String
-  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  
-  platform    String   // 'twitter', 'linkedin', 'facebook', 'instagram'
-  content     String   @db.Text
-  mediaUrls   Json?
-  variant     String?  // For A/B testing
-  
-  scheduledFor DateTime?
-  publishedAt DateTime?
-  externalId  String?  // Platform post ID
-  
-  metrics     Json?    // likes, shares, comments, impressions
-  
-  createdAt   DateTime @default(now())
-  
-  @@index([campaignId, platform, scheduledFor])
-  @@map("social_posts")
-}
-
-model ABTest {
-  id          String   @id @default(cuid())
-  campaignId  String
-  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  
-  name        String
-  variants    Json     // Variant configurations
-  winner      String?  // Winning variant ID
-  
-  metrics     Json     // Performance metrics per variant
-  
-  startedAt   DateTime @default(now())
-  completedAt DateTime?
-  
-  @@index([campaignId])
-  @@map("ab_tests")
-}
-
-
 model Credential {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  provider    String   // 'twitter', 'linkedin', 'facebook', 'sendgrid', 'stripe', etc.
-  accountId   String?  // External account ID
-  
-  // Encrypted fields - NEVER store plaintext
-  accessToken      String?  @db.Text
-  refreshToken     String?  @db.Text
-  accessSecret     String?  @db.Text // For OAuth 1.0a (Twitter)
-  
-  scope       String?  // OAuth scopes granted
-  tokenType   String?  // 'Bearer', 'OAuth', etc.
-  
-  expiresAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // For tracking token usage
-  lastUsedAt  DateTime?
-  status      String   @default("active") // 'active', 'expired', 'revoked'
-  
+  id           String    @id @default(cuid())
+  userId       String
+  provider     String
+  accountId    String?
+  accessToken  String?   @db.Text
+  refreshToken String?   @db.Text
+  accessSecret String?   @db.Text
+  scope        String?
+  tokenType    String?
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastUsedAt   DateTime?
+  status       String    @default("active")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, provider, accountId])
   @@index([userId, provider])
   @@map("credentials")
 }
 
 model UserSettings {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Brand & Voice
-  brandVoice  Json?    // Brand personality, tone, style
-  
-  // Notifications
-  emailNotifications     Boolean @default(true)
-  pushNotifications      Boolean @default(false)
-  notificationFrequency  String  @default("realtime") // 'realtime', 'daily', 'weekly'
-  
-  // Regional
-  timezone    String   @default("UTC")
-  locale      String   @default("en-US")
-  dateFormat  String   @default("MM/DD/YYYY")
-  
-  // Privacy
-  dataRetention    Int     @default(90) // days
-  allowAnalytics   Boolean @default(true)
-  allowPersonalization Boolean @default(true)
-  
-  // API & Integration
-  apiRateLimit     Int     @default(1000) // requests per hour
-  webhookUrl       String?
-  webhookSecret    String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  brandVoice            Json?
+  emailNotifications    Boolean  @default(true)
+  pushNotifications     Boolean  @default(false)
+  notificationFrequency String   @default("realtime")
+  timezone              String   @default("UTC")
+  locale                String   @default("en-US")
+  dateFormat            String   @default("MM/DD/YYYY")
+  dataRetention         Int      @default(90)
+  allowAnalytics        Boolean  @default(true)
+  allowPersonalization  Boolean  @default(true)
+  apiRateLimit          Int      @default(1000)
+  webhookUrl            String?
+  webhookSecret         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("user_settings")
 }
 
-
 model Subscription {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  stripeCustomerId       String   @unique
-  stripeSubscriptionId   String   @unique
-  stripePriceId          String
-  stripeProductId        String
-  
-  plan              String   // 'free', 'pro', 'enterprise'
-  status            String   // 'active', 'canceled', 'past_due', 'trialing'
-  
-  currentPeriodStart    DateTime
-  currentPeriodEnd      DateTime
-  cancelAtPeriodEnd     Boolean  @default(false)
-  canceledAt            DateTime?
-  
-  // Usage tracking
-  campaignsUsed    Int      @default(0)
-  emailsSent       Int      @default(0)
-  socialPosts      Int      @default(0)
-  agentCalls       Int      @default(0)
-  
-  // Limits based on plan
-  campaignLimit    Int      @default(5)   // Free: 5, Pro: 50, Enterprise: unlimited
-  emailLimit       Int      @default(1000) // Free: 1K, Pro: 50K, Enterprise: unlimited
-  socialLimit      Int      @default(100)  // Free: 100, Pro: 5K, Enterprise: unlimited
-  agentCallLimit   Int      @default(100)  // Free: 100, Pro: 5K, Enterprise: unlimited
-  
-  trialEndsAt      DateTime?
-  metadata         Json?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
-  invoices         Invoice[]
-  usageRecords     UsageRecord[]
-  
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String    @unique
+  stripePriceId        String
+  stripeProductId      String
+  plan                 String
+  status               String
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean   @default(false)
+  canceledAt           DateTime?
+  campaignsUsed        Int       @default(0)
+  emailsSent           Int       @default(0)
+  socialPosts          Int       @default(0)
+  agentCalls           Int       @default(0)
+  campaignLimit        Int       @default(5)
+  emailLimit           Int       @default(1000)
+  socialLimit          Int       @default(100)
+  agentCallLimit       Int       @default(100)
+  trialEndsAt          DateTime?
+  metadata             Json?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
+  usageRecords UsageRecord[]
+
   @@map("subscriptions")
 }
 
 model Invoice {
-  id                    String   @id @default(cuid())
+  id                    String    @id @default(cuid())
   subscriptionId        String
-  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  
-  stripeInvoiceId       String   @unique
+  stripeInvoiceId       String    @unique
   stripePaymentIntentId String?
-  
-  amountDue        Int      // in cents
-  amountPaid       Int      @default(0)
-  currency         String   @default("usd")
-  
-  status           String   // 'draft', 'open', 'paid', 'void', 'uncollectible'
-  
-  invoicePdf       String?
-  hostedInvoiceUrl String?
-  
-  dueDate          DateTime?
-  paidAt           DateTime?
-  
-  metadata         Json?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
+  amountDue             Int
+  amountPaid            Int       @default(0)
+  currency              String    @default("usd")
+  status                String
+  invoicePdf            String?
+  hostedInvoiceUrl      String?
+  dueDate               DateTime?
+  paidAt                DateTime?
+  metadata              Json?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
   @@index([subscriptionId, status])
   @@map("invoices")
 }
@@ -344,36 +888,203 @@ model Invoice {
 model UsageRecord {
   id             String   @id @default(cuid())
   subscriptionId String
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  
-  resourceType   String   // 'campaign', 'email', 'social_post', 'agent_call'
-  resourceId     String?  // ID of campaign, email, etc.
-  
+  resourceType   String
+  resourceId     String?
   quantity       Int      @default(1)
-  cost           Int?     // in cents, if applicable
-  
+  cost           Int?
   timestamp      DateTime @default(now())
-  
   metadata       Json?
-  
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
   @@index([subscriptionId, resourceType, timestamp])
   @@map("usage_records")
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  ip        String?
-  action    String   // 'create_campaign', 'delete_credential', 'update_settings', etc.
-  resource  String?  // Resource ID or type
-  metadata  Json?    // Additional context
-  
-  @@index([createdAt])
+  id             String   @id @default(cuid())
+  organizationId String?
+  userId         String?
+  actorType      String?
+  action         String
+  resourceId     String?
+  resourceType   String?
+  requestHash    String?
+  metadata       Json?
+  ip             String?
+  createdAt      DateTime @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
   @@index([userId, createdAt])
   @@index([action])
   @@map("audit_logs")
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  organizationId String?
+  title          String
+  description    String?   @db.Text
+  status         String    @default("todo")
+  priority       String    @default("medium")
+  createdById    String
+  assigneeId     String?
+  dueDate        DateTime?
+  completedAt    DateTime?
+  tags           String[]
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  createdBy    User          @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignee     User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([createdById, status])
+  @@index([assigneeId, status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+model Feedback {
+  id             String    @id @default(cuid())
+  organizationId String?
+  type           String
+  category       String?
+  title          String
+  description    String    @db.Text
+  rating         Int?
+  status         String    @default("open")
+  userId         String
+  metadata       Json?
+  response       String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  resolvedAt     DateTime?
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([type, status])
+  @@index([createdAt])
+  @@map("feedback")
+}
+
+model TeamMember {
+  id             String    @id @default(cuid())
+  organizationId String?
+  userId         String
+  role           String    @default("Member")
+  department     String?
+  status         String    @default("active")
+  invitedBy      String?
+  invitedAt      DateTime?
+  joinedAt       DateTime  @default(now())
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([role, status])
+  @@map("team_members")
+}
+
+model Connector {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  displayName String
+  description String        @db.Text
+  category    ConnectorKind
+  iconUrl     String?
+  websiteUrl  String?
+  authType    String
+  authConfig  Json
+  isEnabled   Boolean       @default(true)
+  isVerified  Boolean       @default(false)
+  triggers    Json
+  actions     Json
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  connectorAuths ConnectorAuth[]
+
+  @@map("connectors")
+}
+
+model ConnectorAuth {
+  id             String    @id @default(cuid())
+  userId         String
+  connectorId    String
+  organizationId String?
+  accountId      String?
+  accountName    String?
+  accessToken    String?   @db.Text
+  refreshToken   String?   @db.Text
+  apiKey         String?   @db.Text
+  apiSecret      String?   @db.Text
+  scope          String?
+  tokenType      String?
+  expiresAt      DateTime?
+  status         String    @default("active")
+  lastUsedAt     DateTime?
+  lastError      String?   @db.Text
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connector      Connector       @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+  organization   Organization?   @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  triggerConfigs TriggerConfig[]
+  actionConfigs  ActionConfig[]
+
+  @@unique([userId, connectorId, accountId])
+  @@index([userId, connectorId])
+  @@map("connector_auths")
+}
+
+model TriggerConfig {
+  id              String    @id @default(cuid())
+  connectorAuthId String
+  name            String
+  triggerType     String
+  config          Json
+  isActive        Boolean   @default(true)
+  lastTriggeredAt DateTime?
+  triggerCount    Int       @default(0)
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  connectorAuth ConnectorAuth @relation(fields: [connectorAuthId], references: [id], onDelete: Cascade)
+
+  @@index([connectorAuthId, isActive])
+  @@map("trigger_configs")
+}
+
+model ActionConfig {
+  id              String    @id @default(cuid())
+  connectorAuthId String
+  name            String
+  actionType      String
+  config          Json
+  isActive        Boolean   @default(true)
+  lastExecutedAt  DateTime?
+  executionCount  Int       @default(0)
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  connectorAuth ConnectorAuth @relation(fields: [connectorAuthId], references: [id], onDelete: Cascade)
+
+  @@index([connectorAuthId, isActive])
+  @@map("action_configs")
 }
