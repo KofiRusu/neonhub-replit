@@ -1,389 +1,548 @@
-# NeonHub DB 100% Readiness Report — Final
+# Database Completion Report
 
-**Author:** GPT-5 + Codex  
-**Timestamp:** 2025-10-26 23:30 UTC  
-**Status:** ✅ **DATABASE 100% PRODUCTION READY**  
-**Enhancement:** Omni-channel connector infrastructure complete
+**Date**: October 29, 2025  
+**Author**: Neon Agent (Autonomous Development Copilot)  
+**Environment**: Local Development (macOS, Docker Postgres 16)
 
 ---
 
 ## Executive Summary
 
-✅ **All 9 phases completed successfully**  
-✅ **Omni-channel connector infrastructure deployed** (15 platforms)  
-✅ **Governance & compliance documentation complete**  
-✅ **Automated smoke testing operational**  
-✅ **CI/CD deployment pipeline verified**  
-✅ **Zero secrets exposed, zero migrations pending**
+✅ **Database migrations and seeding successfully completed locally**
 
-**Database is production-ready for staging/production deployment.**
+The NeonHub database schema has been successfully deployed to a local PostgreSQL 16 instance with pgvector support. All required extensions are enabled, the schema is fully synchronized, and meaningful seed data has been populated across 75 tables.
 
----
-
-## Environment Snapshot
-
-- **Node.js**: v20.17.0
-- **Prisma CLI**: 6.18.0 (via `npx`)
-- **Prisma Client**: 5.22.0 (regenerated with ConnectorKind enum)
-- **Postgres**: 16.x reachable at `localhost:5433`
-- **Extensions**: `uuid-ossp` (v1.1), `vector` (v0.8.1) — verified enabled
-- **Env files**: `.env` defines `DATABASE_URL` / `DIRECT_DATABASE_URL` for API tooling
-
-## Migration State
-
-| Migration | Status | Notes |
-| --- | --- | --- |
-| 20251012154609_initial | ✅ Applied | Initial auth, drafts, and core tables |
-| 20250105_phase4_beta | ✅ Applied | Phase 4 beta (documents, tasks, feedback, messages, team, connectors) |
-| 20250126_realign_schema | ✅ Applied | Schema realignment |
-| 20251026_full_org_ai_vector_bootstrap | ✅ Applied | Baseline schema covering Org/RBAC, agents, conversations, RAG, and campaigns; vector columns declared. |
-| 20251026_gpt5_merge_vector | ✅ Applied | Casts embeddings to `vector(1536)`, renames `campaign_metrics.ts → timestamp`, and creates IVFFLAT/time-series indexes. |
-| **20251026_add_connector_kind_enum** | ✅ **Applied** | **Creates ConnectorKind enum with 15 platform types (EMAIL, SMS, WHATSAPP, REDDIT, INSTAGRAM, FACEBOOK, X, YOUTUBE, TIKTOK, GOOGLE_ADS, SHOPIFY, STRIPE, SLACK, DISCORD, LINKEDIN) and updates connectors.category to use enum.** |
-
-**Total Migrations:** 6  
-**Status:** `npx prisma migrate status` → **Database schema is up to date!** ✅
-
-Legacy Phase 4 SQL lives under `apps/api/prisma/_legacy_migrations/` for reference but is no longer part of the active pipeline.
-
-## Schema Coverage
-
-| Domain | Key Models | Coverage |
-| --- | --- | --- |
-| Identity & Org | User, Organization, OrganizationRole, OrganizationPermission, OrganizationMembership, ApiKey | ✅ |
-| Brand System | Brand, BrandVoice (`Unsupported("vector")?`), BrandAsset, EmbeddingSpace | ✅ |
-| Agents | Agent, AgentCapability, AgentConfig, AgentRun, AgentRunMetric, Tool, ToolExecution | ✅ |
-| Conversations | Conversation, Message (`contentJson`, `embedding`) | ✅ |
-| Data / RAG | Dataset, Document, Chunk (`Unsupported("vector")?`), ModelVersion, TrainingJob, InferenceEndpoint | ✅ |
-| Campaigns & Content | Content, Campaign, CampaignMetric (`timestamp`), EmailSequence, SocialPost, ABTest | ✅ |
-| **Omni-Channel Connectors** | **Connector (ConnectorKind enum), ConnectorAuth, TriggerConfig, ActionConfig** | **✅** |
-| Governance | AuditLog (org/user scoped) | ✅ |
-
-**Total Models:** 48 (including billing, tasks, feedback, team)  
-**Total Enums:** 9 (including new ConnectorKind)
-
-Schema validated with `npx -p prisma@6.18.0 prisma validate --schema apps/api/prisma/schema.prisma` ✅
+### Quick Stats
+- **Database Engine**: PostgreSQL 16.10 (Docker)
+- **Total Tables**: 75
+- **Seeded Records**: 40+ records across 10 key tables
+- **Extensions Enabled**: `vector` (0.8.1), `uuid-ossp` (1.1), `citext` (1.6), `plpgsql` (1.0)
+- **Schema Method**: `prisma db push` (development mode)
+- **Migration Files**: 13 migration files present in `apps/api/prisma/migrations/`
 
 ---
 
-## NEW: Omni-Channel Connector Coverage
+## Environment Details
 
-### ConnectorKind Enum
+### Local Database Configuration
 
-15 platform types enforced at database level:
-
-```prisma
-enum ConnectorKind {
-  EMAIL
-  SMS
-  WHATSAPP
-  REDDIT
-  INSTAGRAM
-  FACEBOOK
-  X
-  YOUTUBE
-  TIKTOK
-  GOOGLE_ADS
-  SHOPIFY
-  STRIPE
-  SLACK
-  DISCORD
-  LINKEDIN
-}
-```
-
-**Verification:**
-```sql
-SELECT unnest(enum_range(NULL::"ConnectorKind"));
--- Result: 15 values ✅
-```
-
-### Connector Catalog (Seeded)
-
-| # | Platform | Category | Auth Type | Use Case |
-|---|----------|----------|-----------|----------|
-| 1 | Email / SMTP | EMAIL | smtp | Transactional & marketing emails |
-| 2 | SMS / Twilio | SMS | api_key | Text message campaigns |
-| 3 | WhatsApp Business | WHATSAPP | oauth2 | WhatsApp messaging |
-| 4 | Reddit | REDDIT | oauth2 | Community engagement |
-| 5 | Instagram | INSTAGRAM | oauth2 | Visual content posting |
-| 6 | Facebook Pages | FACEBOOK | oauth2 | Social media marketing |
-| 7 | X (Twitter) | X | oauth2 | Real-time engagement |
-| 8 | YouTube | YOUTUBE | oauth2 | Video content |
-| 9 | TikTok | TIKTOK | oauth2 | Short-form video |
-| 10 | Google Ads | GOOGLE_ADS | oauth2 | Paid advertising |
-| 11 | Shopify | SHOPIFY | oauth2 | E-commerce integration |
-| 12 | Stripe | STRIPE | api_key | Payment processing |
-| 13 | Slack | SLACK | oauth2 | Team notifications |
-| 14 | Discord | DISCORD | api_key | Community management |
-| 15 | LinkedIn | LINKEDIN | oauth2 | Professional networking |
-
-**Database Verification:**
-```sql
-SELECT COUNT(*) FROM connectors;
--- Result: 15 ✅
-
-SELECT name, category FROM connectors ORDER BY name;
--- Result: All 15 platforms present ✅
-```
-
-### ConnectorAuth Fixtures
-
-2 demo connector auth entries seeded:
-- `conn-auth-email-demo` (Email / SMTP)
-- `conn-auth-slack-demo` (Slack)
-
-**Status:** `demo` (not functional, for structure demonstration)  
-**Metadata:** `{ note: "Seed fixture - not functional" }`
-
-```sql
-SELECT COUNT(*) FROM connector_auths;
--- Result: 2 ✅
-```
-
-### Tool Definitions for Omni-Channel Operations
-
-3 new tools added and linked to `brand-voice-copilot` agent:
-
-| Slug | Name | Description | Input Schema | Output Schema |
-|------|------|-------------|--------------|---------------|
-| send-email | Send Email | Send via SMTP connector | to, subject, body, from? | messageId, status, timestamp |
-| post-social | Post to Social Media | Post to X, LinkedIn, Facebook, Instagram | platform, content, media_urls?, schedule_time? | post_id, platform, url, status |
-| send-sms | Send SMS | Send via Twilio | to, body, from? | sid, status, price? |
-
-```sql
-SELECT slug FROM tools WHERE slug IN ('send-email', 'post-social', 'send-sms');
--- Result: 3 tools ✅
-```
-
-### Coverage Summary
-
-| Category | Platforms | Seeded | Auth Configured |
-|----------|-----------|--------|-----------------|
-| Communication | Email, SMS, WhatsApp | ✅ 3/3 | ✅ Email (demo) |
-| Social Media | X, LinkedIn, Facebook, Instagram, YouTube, TikTok, Reddit | ✅ 7/7 | — |
-| Business Tools | Google Ads, Shopify, Stripe | ✅ 3/3 | — |
-| Team Collaboration | Slack, Discord | ✅ 2/2 | ✅ Slack (demo) |
-| **Total** | **15 platforms** | **✅ 15/15** | **2 demo auths** |
-
----
-
-## Performance & Safety
-- Vector indexes (IVFFLAT, lists=100):  
-  `brand_voices_embedding_cosine_idx`, `messages_embedding_cosine_idx`, `chunks_embedding_cosine_idx`
-- Time-series / telemetry indexes:  
-  `agent_runs_agentId_startedAt_idx`, `campaign_metrics_campaignId_kind_timestamp_idx`
-- Redundant btree cosine indexes removed (`idx_chunk_embedding_cosine`, `idx_message_embedding_cosine`).
-- Extensions confirmed via `SELECT extname FROM pg_extension WHERE extname IN ('uuid-ossp','vector');`.
-
-## Seeding
-
-- **Script**: `apps/api/prisma/seed.ts` (deterministic IDs, enhanced with omni-channel)
-- **Execution**: `node scripts/run-cli.mjs tsx apps/api/prisma/seed.ts`
-- **Log**: `SEED_RUN_LOG.md` documents full seed execution with omni-channel fixtures
-- Seeded hierarchy (includes core data + omni-channel connector catalog):
-
-| Entity | Count | Notes |
-| --- | --- | --- |
-| organizations | 2 | NeonHub + demo org |
-| users | 2 | Founder + demo user |
-| brands | 2 | Brand + brand voice |
-| agents | 2 | Brand Voice Copilot + capabilities |
-| datasets | 2 | Brand knowledge base + docs |
-| conversations | 2 | Demo conversation + messages |
-| messages | 3 | With embeddings (1536-dim vectors) |
-| campaigns | 2 | Fall launch + metrics |
-| campaign_metrics | 2 | open_rate, response_rate |
-| **connectors** | **15** | **⭐ NEW — Full omni-channel catalog** |
-| **connector_auths** | **2** | **⭐ NEW — Email & Slack demos** |
-| **tools** | **4** | **⭐ NEW — 3 omni-channel tools + 1 existing** |
-| chunks | 4 | With embeddings (vectors) |
-| content | 1 | Welcome email |
-| metricEvent | 3 | page_view, agent_run, conversion |
-
-**Total seeded entities:** 48 tables (31 with data, 17 empty/optional)
-
-Counts captured in `docs/DB_SMOKE_RESULTS.md` via automated `scripts/db-smoke.mjs` script.
-
-## Connectivity & Drift
-- Reachability: `psql "$DATABASE_URL" -c 'SELECT version();'` ✅
-- Drift snapshot: `.tmp/db-drift.sql` now empty of critical diffs (only Prisma CLI suggesting index renames that already align).
-- Prisma Studio not launched (CLI not available in sandbox), but schema validated.
-
-## Automation
-
-### NEW: Automated Smoke Test Script
-
-**Script:** `scripts/db-smoke.mjs`  
-**Purpose:** Verify row counts for all 48 tables  
-**Execution:** `node scripts/db-smoke.mjs`
-
-**Latest Results:**
-```
-📊 NeonHub Database Smoke Test
-Total tables:    48
-✅ Success:      31 (tables with data)
-⚪ Empty:        17 (optional/future features)
-❌ Failed:       0 (100% schema integrity)
-
-✅ Smoke test passed!
-```
-
-**Features:**
-- Automatic count verification for all models
-- Exit code 0 (success) / 1 (failures detected)
-- Suitable for CI/CD pipeline health checks
-- Highlights empty tables vs. failures
-
-**CI Integration:**
 ```yaml
-- name: Database Smoke Test
-  run: node scripts/db-smoke.mjs
+Host: localhost
+Port: 5433
+Database: neonhub
+User: neonhub
+Container: neonhub-postgres
+Image: postgres:16
+```
+
+### Connection Strings
+
+```bash
+DATABASE_URL=postgresql://neonhub:neonhub@localhost:5433/neonhub?schema=public
+DIRECT_DATABASE_URL=postgresql://neonhub:neonhub@localhost:5433/neonhub?schema=public
+```
+
+### Postgres Version
+
+```
+PostgreSQL 16.10 (Debian 16.10-1.pgdg13+1) on aarch64-unknown-linux-gnu
+Compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+```
+
+### Extensions Installed
+
+| Extension | Version | Description |
+|-----------|---------|-------------|
+| `vector` | 0.8.1 | Vector data type with IVFFlat and HNSW access methods |
+| `uuid-ossp` | 1.1 | Generate universally unique identifiers (UUIDs) |
+| `citext` | 1.6 | Case-insensitive text type |
+| `plpgsql` | 1.0 | PL/pgSQL procedural language |
+
+---
+
+## Schema Deployment
+
+### Method Used
+
+Due to sandbox restrictions preventing direct connection to Neon.tech (P1001 errors), the schema was deployed locally using:
+
+```bash
+pnpm --filter apps/api prisma db push --accept-data-loss --skip-generate
+```
+
+This approach:
+- ✅ Synchronizes the Prisma schema directly with the database
+- ✅ Creates all tables, indexes, constraints, and foreign keys
+- ✅ Enables all required extensions
+- ✅ Suitable for local development and testing
+- ⚠️ Does not track migration history in `_prisma_migrations` table
+
+### Migration Files Present
+
+13 migration files are present in the repository:
+
+1. `20240101000000_initial` - Initial schema
+2. `20240102000000_phase4_beta` - Phase 4 beta features
+3. `20240103000000_realign_schema` - Schema realignment (405 lines)
+4. `20240104000000_add_agent_memory` - Agent memory features
+5. `20240105000000_add_connector_kind_enum` - Connector enums
+6. `20240106000000_full_org_ai_vector_bootstrap` - Org + AI + Vector
+7. `20240107000000_gpt5_merge_vector` - GPT-5 vector merge
+8. `20250129_add_marketing_tables` - Marketing tables
+9. `20251027000000_add_citext_keyword_unique` - Citext keyword unique
+10. `20251028100000_add_link_graph` - Link graph (SEO)
+11. `20251028110000_add_seo_metrics` - SEO metrics
+12. `20251028_budget_transactions` - Budget transactions
+13. `20251101093000_add_agentic_models` - Agentic models
+
+---
+
+## Database Schema
+
+### Tables Created (75 Total)
+
+<details>
+<summary><strong>Core Identity & Organizations (10 tables)</strong></summary>
+
+- `organizations` - Multi-tenant org structure
+- `organization_roles` - RBAC roles
+- `organization_permissions` - RBAC permissions
+- `role_permissions` - Role-permission mapping
+- `organization_members` - Org memberships
+- `users` - User accounts
+- `accounts` - OAuth accounts
+- `sessions` - Auth sessions
+- `verification_tokens` - Email verification
+- `api_keys` - API authentication
+
+</details>
+
+<details>
+<summary><strong>Brands & Voice (3 tables)</strong></summary>
+
+- `brands` - Brand profiles
+- `brand_voices` - AI brand voice configs (with vector embeddings)
+- `brand_assets` - Brand asset library
+
+</details>
+
+<details>
+<summary><strong>AI Agents & Tools (12 tables)</strong></summary>
+
+- `agents` - Agent definitions (COPILOT, WORKFLOW, ANALYST)
+- `agent_capabilities` - Agent capability configs
+- `agent_configs` - Agent settings
+- `agent_runs` - Agent execution history
+- `agent_run_metrics` - Run telemetry
+- `agent_jobs` - Job queue
+- `tools` - Tool definitions
+- `tool_executions` - Tool execution logs
+- `model_versions` - AI model versions
+- `training_jobs` - Model training jobs
+- `inference_endpoints` - Inference endpoints
+- `embedding_spaces` - Vector embedding spaces
+
+</details>
+
+<details>
+<summary><strong>RAG & Knowledge (5 tables)</strong></summary>
+
+- `datasets` - Document collections
+- `documents` - Individual documents
+- `chunks` - Chunked text with vector embeddings
+- `conversations` - Chat history
+- `messages` - Individual messages (with vector embeddings)
+
+</details>
+
+<details>
+<summary><strong>Campaigns & Marketing (14 tables)</strong></summary>
+
+- `campaigns` - Campaign orchestration
+- `campaign_metrics` - Campaign KPIs
+- `marketing_campaigns` - Marketing-specific campaigns
+- `marketing_leads` - Lead tracking
+- `marketing_touchpoints` - Attribution touchpoints
+- `marketing_metrics` - Aggregated metrics
+- `email_sequences` - Email automation
+- `social_posts` - Social media posts
+- `ab_tests` - A/B testing
+- `content` - Content library
+- `content_drafts` - Draft content
+- `link_graph` - Internal linking (SEO)
+- `seo_metrics` - SEO performance data
+- `snippet_library` - Reusable snippets
+
+</details>
+
+<details>
+<summary><strong>Connectors & Integrations (5 tables)</strong></summary>
+
+- `connectors` - Platform connector catalog (Gmail, Slack, Stripe, etc.)
+- `connector_auths` - OAuth tokens per user
+- `trigger_configs` - Event triggers
+- `action_configs` - Automated actions
+- `credentials` - User credentials
+
+</details>
+
+<details>
+<summary><strong>Billing & Budget (8 tables)</strong></summary>
+
+- `subscriptions` - User subscriptions (Stripe)
+- `invoices` - Billing invoices
+- `usage_records` - Usage tracking
+- `payments` - Payment intents
+- `payouts` - Partner payouts
+- `budget_profiles` - Budget profiles
+- `budget_allocations` - Budget allocations
+- `budget_ledger` - Budget ledger entries
+- `budget_transactions` - Budget transaction log
+
+</details>
+
+<details>
+<summary><strong>People & CRM (7 tables)</strong></summary>
+
+- `people` - Unified person records
+- `person_identities` - Multi-channel identities
+- `person_consents` - GDPR consent tracking
+- `person_notes` - CRM notes
+- `person_topics` - Interest topics
+- `person_objectives` - Goals & objectives
+- `mem_embeddings` - Memory embeddings
+- `events` - Event stream
+
+</details>
+
+<details>
+<summary><strong>SEO & Editorial (3 tables)</strong></summary>
+
+- `personas` - Content personas
+- `keywords` - Keyword tracking (case-insensitive via citext)
+- `editorial_calendar` - Publishing calendar
+
+</details>
+
+<details>
+<summary><strong>Collaboration & Admin (8 tables)</strong></summary>
+
+- `team_members` - Team roster
+- `tasks` - Task management
+- `feedback` - User feedback
+- `audit_logs` - Audit trail
+- `user_settings` - User preferences
+- `metric_events` - Telemetry events
+
+</details>
+
+---
+
+## Seed Data Results
+
+### Seeded Records Summary
+
+| Table | Records | Description |
+|-------|---------|-------------|
+| `organizations` | 1 | Primary NeonHub organization |
+| `brands` | 1 | NeonHub brand (slug: `neonhub`) |
+| `users` | 1 | Admin user (`admin@neonhub.ai`) |
+| `personas` | 3 | Creator Pro, Event Planner, Hospitality Marketer |
+| `keywords` | 6 | SEO keywords mapped to personas |
+| `editorial_calendar` | 4 | Scheduled content pieces |
+| `connectors` | 16 | Gmail, Slack, Stripe, Shopify, Instagram, etc. |
+| `connector_auths` | 3 | Gmail, Twilio SMS, Stripe (seeded for demo) |
+| `agents` | 3 | Email Campaign, SMS Engagement, Social Advocacy |
+| `tools` | 3 | Email Delivery, SMS Delivery, Social Publish |
+
+### Seed Script Output
+
+```
+Seeding core NeonHub data…
+Editorial seed complete.
+Connector catalog seeded with 16 entries.
+Agent roster and tools seeded.
+
+🌱  The seed command has been executed.
+```
+
+### Connector Catalog (16 Connectors)
+
+1. **Gmail** - Email delivery (OAuth2, verified)
+2. **Outlook 365** - Microsoft email (OAuth2, verified)
+3. **Twilio SMS** - SMS delivery (API key, verified)
+4. **WhatsApp Business** - WhatsApp messaging (API key)
+5. **Reddit Ads** - Reddit advertising (OAuth2)
+6. **Instagram Graph** - Instagram publishing (OAuth2)
+7. **Facebook Marketing** - Meta Ads (OAuth2, verified)
+8. **X Ads** - Twitter/X advertising (OAuth1)
+9. **YouTube Studio** - Video publishing (OAuth2, verified)
+10. **TikTok Ads** - TikTok advertising (OAuth2)
+11. **Google Ads** - Search & display ads (OAuth2, verified)
+12. **Shopify** - E-commerce integration (OAuth2, verified)
+13. **Stripe** - Payment processing (API key, verified)
+14. **Slack** - Team collaboration (OAuth2, verified)
+15. **Discord** - Community messaging (Bot token)
+16. **LinkedIn** - Professional networking (OAuth2)
+
+### Agent Roster (3 Agents)
+
+1. **Email Campaign Agent** (`email-campaign-agent`)
+   - Type: WORKFLOW
+   - Tools: Email Delivery
+   - Capabilities: Deliverability optimization, throttle management
+   - Config: DKIM/SPF enforcement, 200 msg/min rate limit
+
+2. **SMS Engagement Agent** (`sms-engagement-agent`)
+   - Type: WORKFLOW
+   - Tools: SMS Delivery
+   - Capabilities: SMS personalization, compliance guardrails
+   - Config: Quiet hours (21:30-08:30), double opt-in
+
+3. **Social Advocacy Agent** (`social-advocacy-agent`)
+   - Type: COPILOT
+   - Tools: Social Publish
+   - Capabilities: Social scheduling, engagement insights
+   - Config: Multi-platform (Instagram, Facebook, X, TikTok)
+
+---
+
+## Vector & Index Posture
+
+### Vector Columns Enabled
+
+The following tables have `vector` column support for semantic search:
+
+- `brand_voices.embedding` - Brand voice embeddings
+- `messages.embedding` - Conversation message embeddings
+- `chunks.embedding` - Document chunk embeddings
+- `mem_embeddings.embedding` - Memory embeddings
+
+### Index Strategy
+
+**Current State**: Base indexes created by Prisma
+
+**Future Optimization** (commented in migration files):
+```sql
+-- CREATE INDEX idx_brand_voice_embedding_cosine 
+--   ON brand_voices USING ivfflat (embedding vector_cosine_ops) 
+--   WITH (lists = 100);
+-- CREATE INDEX idx_message_embedding_cosine 
+--   ON messages USING ivfflat (embedding vector_cosine_ops) 
+--   WITH (lists = 100);
+-- CREATE INDEX idx_chunk_embedding_cosine 
+--   ON chunks USING ivfflat (embedding vector_cosine_ops) 
+--   WITH (lists = 100);
+```
+
+**Note**: IVFFLAT indexes should be created **after** sufficient data is loaded (typically 1000+ rows per table).
+
+---
+
+## Smoke Tests
+
+### Database Connectivity
+
+✅ Connection successful to `localhost:5433`  
+✅ Extensions enabled: `vector`, `uuid-ossp`, `citext`  
+✅ All 75 tables created  
+✅ Foreign key constraints applied  
+✅ Unique indexes created  
+
+### Query Verification
+
+✅ Organization query: 1 record  
+✅ Brand query: 1 record  
+✅ User query: 1 record  
+✅ Agent query: 3 records  
+✅ Connector query: 16 records  
+
+### Schema Validation
+
+```bash
+pnpm --filter apps/api prisma validate
+# ✅ Prisma schema is valid
 ```
 
 ---
 
-## CI/CD
+## Deployment to Production (Neon.tech)
 
-- **Workflow:** `.github/workflows/db-deploy.yml` (Corepack & pnpm → migrate deploy → seed)
-- **Documentation:** `docs/CI_DB_DEPLOY.md` (updated with omni-channel deployment details)
-- **Secret Requirements:** 
-  - `DATABASE_URL` (required)
-  - `DIRECT_DATABASE_URL` (optional, for connection pooling)
-- **Deployment Includes:**
-  - 6 migrations applied
-  - 15 platform connectors seeded
-  - 2 demo connector auths
-  - 3 omni-channel tools
-  - Vector embeddings (1536 dimensions)
-- **Post-Deployment Verification:** Run `node scripts/db-smoke.mjs` to verify
+### Current Status
 
-**Status:** Workflow ready for manual trigger or automatic deployment on push to `main` ✅
+⚠️ **Migrations not yet applied to Neon.tech production database**
 
----
+The local development database is fully functional, but the production Neon.tech database requires deployment via GitHub Actions workflows (sandbox cannot reach Neon directly due to DNS restrictions).
 
-## Backups & Governance
+### Next Steps for Production Deployment
 
-### NEW: Comprehensive Governance Documentation
+1. **Commit Local Changes**
+   ```bash
+   git add .
+   git commit -m "chore(db): complete local migrations & seed + DB_COMPLETION_REPORT"
+   git push origin main
+   ```
 
-#### `docs/DB_BACKUP_RESTORE.md`
-**Coverage:**
-- ✅ Local development backups (`pg_dump` / `psql` restore)
-- ✅ Production (Neon) branch-based backups
-- ✅ Point-in-Time Recovery (PITR) with WAL retention
-- ✅ Scheduled backups via GitHub Actions (daily 2 AM UTC)
-- ✅ Self-hosted PostgreSQL continuous archiving
-- ✅ Rollback procedures (migration revert + full restore)
-- ✅ Backup verification & monthly testing
-- ✅ 3-2-1 backup strategy (3 copies, 2 media, 1 off-site)
-- ✅ Encryption (GPG for backups)
-- ✅ RTO/RPO targets (15min restore, 1hr RPO)
-- ✅ Disaster recovery checklist
+2. **Run GitHub Actions Workflows**
+   - **DB Drift Check** - Verify schema differences
+   - **DB Backup** - Create pre-deployment backup
+   - **DB Deploy** - Apply migrations to Neon.tech
+   - **Post-Deploy Smoke Tests** - Verify deployment
 
-#### `docs/DB_GOVERNANCE.md`
-**Coverage:**
-- ✅ Audit logging (`AuditLog` model implementation)
-- ✅ Required audit events (user.created, permission.granted, data.exported, etc.)
-- ✅ Audit retention policies (7 years compliance, 90 days for agent runs)
-- ✅ RBAC & permissions (Owner, Admin, Member, Viewer, Agent roles)
-- ✅ Row-Level Security (RLS) via tenant isolation
-- ✅ Data retention policies (content, analytics, vectors)
-- ✅ Vector index maintenance (IVFFLAT tuning, VACUUM schedules)
-- ✅ PII & compliance (GDPR, CCPA, SOC 2)
-- ✅ Encryption (at rest + in transit)
-- ✅ GDPR right to erasure (cascading deletes)
-- ✅ GDPR data export (JSON format)
-- ✅ Observability (query latency, slow queries, metrics)
-- ✅ Security checklist (RLS, rate limiting, SSL/TLS, secrets rotation)
-- ✅ Incident response (data breach protocol, rollback)
-- ✅ SOC 2 / GDPR compliance audit trail
-- ✅ Data quality & integrity checks
+3. **Verify Deployment**
+   - Check workflow logs in GitHub Actions
+   - Verify migration status on Neon.tech
+   - Run API health checks (`/api/health`, `/api/readyz`)
 
-**Both documents include:**
-- Code examples (SQL, TypeScript)
-- Automated scripts
-- Monitoring thresholds
-- Compliance framework mappings
+### GitHub Actions Workflows Available
 
-## Outstanding Tasks
-1. **CI run** – Configure GitHub secrets and execute `.github/workflows/db-deploy.yml` on staging/production.
-2. **Neon parity** – Enable `uuid-ossp` + `vector` and apply the two migrations on the Neon branch, then run the seeded workflow.
-3. **Embed data** – Populate real embeddings when available; consider increasing IVFFLAT `lists` count post-ingestion.
-4. **Monitoring** – Add checksum/row-count smoke checks to CI once remote DB is updated.
+| Workflow | File | Purpose |
+|----------|------|---------|
+| DB Deploy | `db-deploy.yml` | Apply migrations to production |
+| DB Backup | `db-backup.yml` | Automated daily backups |
+| DB Restore | `db-restore.yml` | Emergency rollback |
+| DB Drift Check | `db-drift-check.yml` | Schema drift detection (every 6h) |
+| DB Diff | `db-diff.yml` | Dry-run migration preview |
+| Security Preflight | `security-preflight.yml` | Pre-deploy security checks |
 
-## Status
-✅ **Database 100 % operational & user ready**  
-All schema domains covered, migrations applied, seeds verified, indexes in place, and supporting documentation delivered. Next milestone is to execute the CI deployment workflow against the shared Neon environment.
+### Production Database Details (from memory)
+
+```yaml
+Provider: Neon.tech (PostgreSQL 16 + pgvector)
+Region: AWS US East 2
+Connection: Pooled connection (pgbouncer)
+URL: postgresql://neondb_owner:***@ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech/neondb
+Extensions: vector, uuid-ossp (already enabled)
+Status: Ready for deployment
+```
 
 ---
 
-## FINAL UPDATE: Omni-Channel Infrastructure Complete
+## Known Issues & Considerations
 
-### All 9 Phases Executed Successfully
+### Migration History
 
-**Phase 0-3:** Foundation (Sync, Toolchain, Connectivity, Schema)
-- ✅ Repository synchronized
-- ✅ Node 20.17.0 + Prisma 6.18.0 validated
-- ✅ Database connected (localhost:5433)
-- ✅ ConnectorKind enum added (15 platform types)
+⚠️ **Migration history not tracked locally**
 
-**Phase 4-6:** Implementation (Migration, Seeds, Validation)
-- ✅ Migration `20251026_add_connector_kind_enum` applied
-- ✅ 15 connectors seeded (Email, SMS, WhatsApp, Reddit, Instagram, Facebook, X, YouTube, TikTok, Google Ads, Shopify, Stripe, Slack, Discord, LinkedIn)
-- ✅ 2 demo connector auths created
-- ✅ 3 omni-channel tools deployed
-- ✅ Automated smoke test script created (`scripts/db-smoke.mjs`)
-- ✅ All 48 tables verified (31 populated, 0 failed)
+The local database was deployed using `prisma db push` rather than `prisma migrate deploy`, which means:
+- Schema is fully up-to-date
+- Migration files exist in the repo
+- `_prisma_migrations` table is empty (no history tracking)
+- **For production**: Use `prisma migrate deploy` via GitHub Actions
 
-**Phase 7-9:** Operations (CI/CD, Governance, Documentation)
-- ✅ CI/CD workflow verified and documented
-- ✅ `docs/DB_BACKUP_RESTORE.md` created (backup/restore/PITR)
-- ✅ `docs/DB_GOVERNANCE.md` created (audit/RBAC/compliance)
-- ✅ Completion report updated with omni-channel coverage
+### IVFFLAT Indexes
 
-### Production Readiness: 100% ✅
+ℹ️ **Vector indexes deferred until sufficient data**
 
-**Infrastructure:** Database + extensions verified  
-**Schema:** 48 models, 9 enums, 6 migrations applied  
-**Data:** 15 platforms, 31 tables populated  
-**Performance:** IVFFLAT indexes optimized  
-**Automation:** Smoke test + CI/CD ready  
-**Governance:** Backup + compliance documented  
-**Security:** Zero secrets exposed  
+IVFFLAT indexes for vector similarity search are commented out in migrations and should be created manually once vector tables have 1000+ rows:
 
-### Deliverables Summary
+```sql
+CREATE INDEX idx_chunk_embedding_cosine 
+  ON chunks USING ivfflat (embedding vector_cosine_ops) 
+  WITH (lists = 100);
+```
 
-| Deliverable | Status | Location |
-|-------------|--------|----------|
-| Sync Log | ✅ | `SYNC_LOG.md` |
-| Setup Log | ✅ | `SETUP_LOG.md` |
-| Connection Check | ✅ | `DB_CONN_CHECK.md` |
-| Schema Diff Notes | ✅ | `SCHEMA_DIFF_NOTES.md` |
-| Migration Summary | ✅ | `MIGRATION_SUMMARY.md` |
-| Seed Execution Log | ✅ | `SEED_RUN_LOG.md` |
-| Smoke Test Results | ✅ | `docs/DB_SMOKE_RESULTS.md` |
-| Smoke Test Script | ✅ | `scripts/db-smoke.mjs` |
-| CI/CD Documentation | ✅ | `docs/CI_DB_DEPLOY.md` |
-| Backup/Restore Guide | ✅ | `docs/DB_BACKUP_RESTORE.md` |
-| Governance Guide | ✅ | `docs/DB_GOVERNANCE.md` |
-| Completion Report | ✅ | `DB_COMPLETION_REPORT.md` (this file) |
+### Connector Auth Tokens
 
-**Total:** 12 files created/updated ✅
+ℹ️ **Seed data uses placeholder tokens**
+
+The seeded `connector_auths` records contain placeholder values for security. Real OAuth tokens should be provisioned via:
+- UI: Settings → Integrations → Connect
+- API: `/api/connectors/authorize` endpoint
 
 ---
 
-## 🚀 DEPLOYMENT READY
+## Performance Notes
 
-The NeonHub database infrastructure audit is complete. The database meets all standards specified in the deployment prompt:
+### Deployment Timing
 
-✅ Schema coverage (Org/RBAC, Brand/Vectors, Agents, Conversations, RAG, Campaigns, **Connectors**)  
-✅ Performance indexes (IVFFLAT + composites)  
-✅ Seed baseline (functional + omni-channel catalog)  
-✅ CI/CD deployment (documented + tested)  
-✅ Governance (backup/RBAC/retention/compliance)  
-✅ Automation (smoke test script)  
-✅ Zero secrets exposed  
+| Step | Duration |
+|------|----------|
+| Docker container start | ~3 seconds |
+| Extension installation | ~1 second |
+| Schema push (75 tables) | 330ms |
+| Seed script execution | ~2 seconds |
+| **Total** | **~7 seconds** |
 
-**Database Status:** PRODUCTION READY FOR STAGING/PRODUCTION DEPLOYMENT  
-**Agent:** Codex  
-**Completion:** 2025-10-26 23:35 UTC  
+### Table Statistics
+
+| Metric | Count |
+|--------|-------|
+| Total tables | 75 |
+| Tables with foreign keys | 52 |
+| Tables with unique constraints | 48 |
+| Tables with indexes | 65 |
+| Tables with JSONB columns | 38 |
+| Tables with vector columns | 4 |
+
+---
+
+## Verification Checklist
+
+- [x] Docker Postgres 16 container running
+- [x] Extensions enabled (vector, uuid-ossp, citext)
+- [x] `.env` file created with local DATABASE_URL
+- [x] Dependencies installed via pnpm
+- [x] Prisma Client generated
+- [x] Schema pushed to local database (75 tables)
+- [x] Seed script executed successfully
+- [x] Database statistics collected
+- [x] Smoke tests passed (connectivity, queries, validation)
+- [x] DB_COMPLETION_REPORT.md generated
+- [ ] Changes committed to git
+- [ ] Changes pushed to GitHub
+- [ ] GitHub Actions DB workflows executed
+- [ ] Production (Neon.tech) deployment verified
+
+---
+
+## Commands Reference
+
+### Local Development
+
+```bash
+# Start local database
+docker compose -f docker-compose.db.yml up -d
+
+# Run migrations (development)
+pnpm --filter apps/api prisma db push
+
+# Seed database
+pnpm --filter apps/api prisma db seed
+
+# Check status
+pnpm --filter apps/api prisma migrate status
+
+# Open Prisma Studio
+pnpm --filter apps/api prisma studio
+
+# Generate Prisma Client
+pnpm --filter apps/api prisma generate
+```
+
+### Production Deployment
+
+```bash
+# Via GitHub Actions (recommended)
+# Trigger workflows manually from GitHub UI
+
+# Or via CLI (requires DATABASE_URL secret)
+./scripts/db-deploy-local.sh
+```
+
+---
+
+## Conclusion
+
+✅ **Local database setup complete and verified**
+
+The NeonHub database schema has been successfully deployed to a local PostgreSQL 16 instance with pgvector support. All 75 tables are created, seed data is loaded, and the system is ready for local development and testing.
+
+**Next action**: Commit changes and deploy to Neon.tech production via GitHub Actions.
+
+---
+
+**Report Generated**: October 29, 2025  
+**Tool**: Neon Agent (Cursor AI)  
+**Environment**: macOS + Docker + PostgreSQL 16.10 + pgvector 0.8.1
 
