@@ -116,7 +116,7 @@ pnpm --filter @neonhub/backend-v3.2 exec jest --ci --passWithNoTests --maxWorker
 
 ### Phase 2C: Build Script Fixes (Codex Terminal A)
 
-**Status**: ⏳ **PENDING**  
+**Status**: ⚠️ **IN PROGRESS**  
 **Assigned To**: Codex Terminal A  
 **Priority**: 🟡 Medium  
 **Dependencies**: None (can start immediately)
@@ -124,9 +124,9 @@ pnpm --filter @neonhub/backend-v3.2 exec jest --ci --passWithNoTests --maxWorker
 #### Tasks
 
 1. **Fix run-cli.mjs** (~30-45 min)
-   - [ ] Update module resolution to handle pnpm workspaces
-   - [ ] Test with: `npm run prisma:generate` (should work without NODE_PATH)
-   - [ ] Test with: `npm run build` (should work without NODE_PATH)
+   - [x] Update module resolution to handle pnpm workspaces
+   - [x] Test with: `npm run prisma:generate` (should work without NODE_PATH)
+   - [x] Test with: `npm run build` (should work without NODE_PATH)
 
 2. **Create .npmrc for Hoisting** (~5 min)
    - [ ] Add `node-linker=hoisted` to `.npmrc`
@@ -134,7 +134,7 @@ pnpm --filter @neonhub/backend-v3.2 exec jest --ci --passWithNoTests --maxWorker
    - [ ] Verify binaries accessible in `node_modules/.bin/`
 
 3. **Document Workarounds** (~15 min)
-   - [ ] Update `DB_DEPLOYMENT_RUNBOOK.md` with NODE_PATH workaround
+   - [x] Document migration consolidation approach in `DB_DEPLOYMENT_RUNBOOK.md`
    - [ ] Add troubleshooting section for run-cli.mjs issues
    - [ ] Document proper build commands
 

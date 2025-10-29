@@ -6,7 +6,7 @@
  */
 
 import { spawn } from "node:child_process";
-import { mkdirSync, accessSync, constants } from "node:fs";
+import { mkdirSync, accessSync, constants, existsSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -39,6 +39,48 @@ const BIN_MAP = {
   prettier: "prettier/bin-prettier.js",
 };
 
+function getPackageName(modulePath) {
+  const segments = modulePath.split("/");
+  if (segments[0]?.startsWith("@") && segments.length >= 2) {
+    return `${segments[0]}/${segments[1]}`;
+  }
+  return segments[0];
+}
+
+function resolveFromPnpm(basePath, modulePath, packageName) {
+  const pnpmDir = resolve(basePath, ".pnpm");
+  if (!existsSync(pnpmDir)) {
+    return null;
+  }
+
+  const pnpmPrefix = packageName.replace(/\//g, "+");
+  let entries;
+  try {
+    entries = readdirSync(pnpmDir);
+  } catch {
+    return null;
+  }
+
+  for (const entry of entries) {
+    if (!entry.startsWith(`${pnpmPrefix}@`)) {
+      continue;
+    }
+    const candidateNodeModules = resolve(pnpmDir, entry, "node_modules");
+    const packageSegments = packageName.split("/");
+    const packageRoot = resolve(candidateNodeModules, ...packageSegments);
+    if (!existsSync(packageRoot)) {
+      continue;
+    }
+    try {
+      return require.resolve(modulePath, { paths: [candidateNodeModules] });
+    } catch {
+      // Keep iterating to find another candidate
+    }
+  }
+
+  return null;
+}
+
 function resolveBinary(command) {
   const modulePath = BIN_MAP[command];
   if (!modulePath) {
@@ -47,36 +89,60 @@ function resolveBinary(command) {
     );
   }
 
-  try {
-    try {
-      return require.resolve(modulePath, { paths: [__dirname] });
-    } catch (error) {
-      const manual = MANUAL_BIN[command];
-      if (manual) {
-        try {
-          accessSync(manual, constants.X_OK | constants.R_OK);
-          return manual;
-        } catch {
-          // fall through to throw original error
-        }
-      }
-      if (command === "tsx") {
-        const apiTsx = resolve(repoRoot, "apps/api/node_modules/tsx/dist/cli.mjs");
-        try {
-          accessSync(apiTsx, constants.R_OK);
-          return apiTsx;
-        } catch {
-          // ignore
-        }
-      }
-      throw error;
+  const packageName = getPackageName(modulePath);
+  const candidateDirs = [
+    resolve(process.cwd(), "node_modules"),
+    resolve(repoRoot, "node_modules"),
+    resolve(repoRoot, "apps/api/node_modules"),
+    resolve(repoRoot, "apps/web/node_modules"),
+  ];
+
+  const searchPaths = [];
+  for (const dir of candidateDirs) {
+    if (dir && existsSync(dir) && !searchPaths.includes(dir)) {
+      searchPaths.push(dir);
     }
-  } catch (error) {
-    throw new Error(
-      `Unable to resolve binary for "${command}" (module "${modulePath}"). Did you install dependencies?`,
-      { cause: error },
-    );
   }
+
+  let lastError;
+
+  for (const basePath of searchPaths) {
+    try {
+      return require.resolve(modulePath, { paths: [basePath] });
+    } catch (error) {
+      lastError = error;
+      const fromPnpm = resolveFromPnpm(basePath, modulePath, packageName);
+      if (fromPnpm) {
+        return fromPnpm;
+      }
+    }
+  }
+
+  const manual = MANUAL_BIN[command];
+  if (manual) {
+    try {
+      accessSync(manual, constants.X_OK | constants.R_OK);
+      return manual;
+    } catch (error) {
+      lastError ??= error;
+    }
+  }
+
+  if (command === "tsx") {
+    const apiTsx = resolve(repoRoot, "apps/api/node_modules/tsx/dist/cli.mjs");
+    try {
+      accessSync(apiTsx, constants.R_OK);
+      return apiTsx;
+    } catch (error) {
+      lastError ??= error;
+    }
+  }
+
+  const message = `Unable to resolve binary for "${command}" (module "${modulePath}"). Did you install dependencies?`;
+  if (lastError) {
+    throw new Error(message, { cause: lastError });
+  }
+  throw new Error(message);
 }
 
 function main() {

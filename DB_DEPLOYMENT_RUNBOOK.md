@@ -623,6 +623,32 @@ pnpm --filter apps/api exec prisma generate
 
 ---
 
+## Handling Existing Schema (Migration Consolidation)
+
+### Background
+
+Migration history contained draft entries that blocked `prisma migrate deploy`. We restored alignment by pushing the schema and manually marking migrations as applied so Prisma and the database agreed on state.
+
+### When to Use
+
+- Migration files are inconsistent or partially applied
+- The live schema already matches the desired model
+- You need a fast, low-risk deployment path without rewriting migrations
+
+### Steps
+
+1. Deploy schema: `npx prisma db push`
+2. Mark migrations as applied (see `docs/MIGRATION_STRATEGY.md`)
+3. Verify status: `npx prisma migrate status`
+4. Re-enable required extensions: `vector`, `uuid-ossp`, `citext`
+
+### Verification
+
+Run: `./scripts/verify-migrations.sh`  
+Expected: All checks pass ✅
+
+---
+
 ## Support
 
 **Slack**: `#infrastructure` or `#ops-alerts`  
