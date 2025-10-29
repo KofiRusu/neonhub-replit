@@ -1,0 +1,555 @@
+// ============================================================================
+// SEO DATA MODELS
+// ============================================================================
+// Comprehensive Prisma schema for SEO features including:
+// - Pages with vector embeddings (pgvector)
+// - Keywords with metrics and intent
+// - Rankings tracking
+// - Backlinks monitoring
+// - Recommendations and learning
+// - A/B testing for meta tags
+// - Content audits
+// 
+// Author: Cursor Agent (Neon Autonomous Development Agent)
+// Date: 2025-10-27
+// 
+// NOTE: This schema should be merged into the main apps/api/prisma/schema.prisma
+// ============================================================================
+
+// ============================================================================
+// SEO PAGES
+// ============================================================================
+
+model SEOPage {
+  id          String   @id @default(uuid())
+  url         String   @unique
+  title       String
+  description String?
+  keyword     String   // Primary target keyword
+  
+  // Content
+  content     String   @db.Text
+  wordCount   Int      @default(0)
+  
+  // Vector embedding for semantic search (pgvector)
+  // Requires: CREATE EXTENSION vector;
+  embedding   Unsupported("vector(1536)")? // OpenAI ada-002 embeddings
+  
+  // SEO Metrics
+  h1Count     Int      @default(0)
+  h2Count     Int      @default(0)
+  h3Count     Int      @default(0)
+  internalLinks Int    @default(0)
+  externalLinks Int    @default(0)
+  images      Int      @default(0)
+  imagesWithAlt Int    @default(0)
+  
+  // Quality Scores
+  readabilityScore  Float @default(0) // Flesch Reading Ease
+  keywordDensity    Float @default(0)
+  contentScore      Int   @default(0) // Overall quality (0-100)
+  eeatScore         Int   @default(0) // E-E-A-T score (0-100)
+  
+  // Metadata
+  published   Boolean  @default(true)
+  lastCrawled DateTime?
+  lastUpdated DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  keywords    KeywordMapping[]
+  rankings    SEORanking[]
+  audits      ContentAudit[]
+  abTests     SEOABTest[]
+  incomingLinks InternalLink[] @relation("LinkTarget")
+  outgoingLinks InternalLink[] @relation("LinkSource")
+  
+  @@index([keyword])
+  @@index([published])
+  @@index([contentScore])
+  @@map("seo_pages")
+}
+
+// ============================================================================
+// KEYWORDS
+// ============================================================================
+
+model Keyword {
+  id          String   @id @default(uuid())
+  keyword     String   @unique
+  
+  // Metrics
+  searchVolume     Int      @default(0)
+  competition      String   // 'low', 'medium', 'high'
+  competitionScore Int      @default(0) // 0-100
+  difficulty       Int      @default(0) // 0-100
+  cpc              Float?   // Cost per click
+  
+  // Intent
+  intent           String   // 'informational', 'navigational', 'commercial', 'transactional'
+  intentConfidence Float    @default(0) // 0-1
+  
+  // Trend
+  trend            String   @default("stable") // 'rising', 'stable', 'declining'
+  growthRate       Float    @default(0) // Percentage
+  
+  // LSI Keywords (related terms)
+  lsiKeywords      String[] // Array of related keywords
+  
+  // Metadata
+  lastChecked      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  pages           KeywordMapping[]
+  rankings        SEORanking[]
+  
+  @@index([intent])
+  @@index([searchVolume])
+  @@index([difficulty])
+  @@map("keywords")
+}
+
+// ============================================================================
+// KEYWORD TO PAGE MAPPING
+// ============================================================================
+
+model KeywordMapping {
+  id          String   @id @default(uuid())
+  
+  pageId      String
+  page        SEOPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  keywordId   String
+  keyword     Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  
+  isPrimary   Boolean  @default(false) // Is this the primary keyword for the page?
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([pageId, keywordId])
+  @@index([pageId])
+  @@index([keywordId])
+  @@map("keyword_mappings")
+}
+
+// ============================================================================
+// RANKINGS
+// ============================================================================
+
+model SEORanking {
+  id          String   @id @default(uuid())
+  
+  pageId      String
+  page        SEOPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  keywordId   String
+  keyword     Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  
+  // Ranking Data
+  position    Int      // 1-100 (Google search position)
+  url         String   // URL that's ranking
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  ctr         Float    @default(0) // Click-through rate
+  
+  // Metadata
+  checkedAt   DateTime @default(now())
+  source      String   @default("manual") // 'gsc', 'semrush', 'ahrefs', 'manual'
+  
+  @@unique([pageId, keywordId, checkedAt])
+  @@index([pageId, checkedAt])
+  @@index([keywordId, checkedAt])
+  @@index([position])
+  @@map("seo_rankings")
+}
+
+// ============================================================================
+// BACKLINKS
+// ============================================================================
+
+model Backlink {
+  id               String   @id @default(uuid())
+  
+  // Source (linking page)
+  sourceUrl        String
+  sourceDomain     String
+  sourceDomainAuthority Int  @default(0) // 0-100
+  sourcePageAuthority   Int  @default(0) // 0-100
+  
+  // Target (our page)
+  targetUrl        String
+  
+  // Link Details
+  anchorText       String
+  isDoFollow       Boolean  @default(true)
+  isInternal       Boolean  @default(false)
+  
+  // Status
+  status           String   @default("active") // 'active', 'lost', 'broken'
+  firstSeen        DateTime @default(now())
+  lastSeen         DateTime @default(now())
+  
+  // Metadata
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([targetUrl])
+  @@index([sourceDomain])
+  @@index([status])
+  @@index([firstSeen])
+  @@map("backlinks")
+}
+
+// ============================================================================
+// INTERNAL LINKS
+// ============================================================================
+
+model InternalLink {
+  id          String   @id @default(uuid())
+  
+  sourceId    String
+  source      SEOPage  @relation("LinkSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  
+  targetId    String
+  target      SEOPage  @relation("LinkTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  
+  anchorText  String
+  position    Int      @default(0) // Paragraph number in source content
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  
+  @@unique([sourceId, targetId, anchorText])
+  @@index([sourceId])
+  @@index([targetId])
+  @@map("internal_links")
+}
+
+// ============================================================================
+// CONTENT AUDITS
+// ============================================================================
+
+model ContentAudit {
+  id          String   @id @default(uuid())
+  
+  pageId      String
+  page        SEOPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  // Audit Results
+  score       Int      @default(0) // Overall score (0-100)
+  
+  // Readability
+  fleschReadingEase    Float @default(0)
+  fleschKincaidGrade   Float @default(0)
+  averageSentenceLength Float @default(0)
+  
+  // Keywords
+  keywordDensity       Float @default(0)
+  keywordFrequency     Int   @default(0)
+  keywordProminence    Float @default(0)
+  
+  // Structure
+  hasH1                Boolean @default(false)
+  hasMultipleH1        Boolean @default(false)
+  hasLogicalHierarchy  Boolean @default(false)
+  
+  // E-E-A-T
+  hasAuthorBio         Boolean @default(false)
+  hasCitations         Boolean @default(false)
+  hasUpdatedDate       Boolean @default(false)
+  hasExpertQuotes      Boolean @default(false)
+  
+  // Recommendations
+  recommendations      Json    // Array of recommendation objects
+  
+  // Metadata
+  auditedAt            DateTime @default(now())
+  auditedBy            String?  // User ID or 'system'
+  
+  @@index([pageId, auditedAt])
+  @@index([score])
+  @@map("content_audits")
+}
+
+// ============================================================================
+// SEO RECOMMENDATIONS
+// ============================================================================
+
+model SEORecommendation {
+  id          String   @id @default(uuid())
+  
+  // Recommendation Details
+  type        String   // 'trending_keywords', 'content_refresh', 'competitive_gap', etc.
+  priority    String   // 'critical', 'high', 'medium', 'low'
+  category    String   // 'technical', 'content', 'keywords', 'links', 'performance', 'competitive'
+  
+  title       String
+  description String   @db.Text
+  
+  // Impact & Effort
+  impact      String   // 'high', 'medium', 'low'
+  effort      String   // 'easy', 'medium', 'hard'
+  estimatedImpact String? // e.g., "+15% organic traffic"
+  
+  // Action Steps
+  actionSteps Json     // Array of action step strings
+  resources   Json?    // Array of resource URLs/docs
+  
+  // Status
+  status      String   @default("pending") // 'pending', 'in_progress', 'completed', 'cancelled'
+  assignedTo  String?  // User ID
+  deadline    DateTime?
+  
+  // Implementation Tracking
+  implemented Boolean  @default(false)
+  implementedAt DateTime?
+  
+  // Effectiveness Tracking (Learning System)
+  impactMetric String?  // 'traffic', 'rankings', 'conversions'
+  beforeValue  Float?
+  afterValue   Float?
+  actualImpact Float?   // Percentage change
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([type])
+  @@index([priority])
+  @@index([status])
+  @@index([createdAt])
+  @@map("seo_recommendations")
+}
+
+// ============================================================================
+// A/B TESTS (Meta Tags)
+// ============================================================================
+
+model SEOABTest {
+  id          String   @id @default(uuid())
+  
+  pageId      String
+  page        SEOPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  // Test Details
+  element     String   // 'title', 'description', 'headers', 'content'
+  status      String   @default("active") // 'active', 'completed', 'cancelled'
+  
+  // Test Variants
+  variants    Json     // Array of variant objects with text and metrics
+  
+  // Winner
+  winnerId    String?
+  winnerText  String?
+  
+  // Statistical Significance
+  isSignificant Boolean @default(false)
+  confidence    Float   @default(0) // 0-1
+  
+  // Dates
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  duration    Int      @default(14) // Days
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([pageId])
+  @@index([status])
+  @@map("seo_ab_tests")
+}
+
+// ============================================================================
+// PERFORMANCE ALERTS
+// ============================================================================
+
+model SEOAlert {
+  id          String   @id @default(uuid())
+  
+  // Alert Type
+  type        String   // 'traffic_drop', 'ranking_drop', 'crawl_error', 'performance_regression'
+  severity    String   // 'critical', 'warning', 'info'
+  
+  // Affected Resource
+  affectedUrl String?
+  
+  // Metrics
+  metric      String   // 'organic_traffic', 'ranking_position', 'core_web_vitals', etc.
+  current     Float
+  previous    Float
+  change      Float    // Percentage
+  
+  // Status
+  status      String   @default("open") // 'open', 'acknowledged', 'resolved', 'ignored'
+  resolvedAt  DateTime?
+  
+  // Recommendation
+  recommendation String @db.Text
+  
+  // Metadata
+  detectedAt  DateTime @default(now())
+  metadata    Json?    // Additional context
+  
+  @@index([type])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+  @@map("seo_alerts")
+}
+
+// ============================================================================
+// COMPETITOR TRACKING
+// ============================================================================
+
+model Competitor {
+  id          String   @id @default(uuid())
+  
+  name        String
+  url         String   @unique
+  domain      String
+  
+  // Status
+  isActive    Boolean  @default(true)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  rankings    CompetitorRanking[]
+  
+  @@map("competitors")
+}
+
+model CompetitorRanking {
+  id          String   @id @default(uuid())
+  
+  competitorId String
+  competitor  Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  
+  keyword     String
+  position    Int
+  url         String
+  
+  checkedAt   DateTime @default(now())
+  
+  @@index([competitorId, checkedAt])
+  @@index([keyword])
+  @@map("competitor_rankings")
+}
+
+// ============================================================================
+// INDEXES FOR VECTOR SIMILARITY SEARCH
+// ============================================================================
+
+// Create these indexes manually after migration:
+//
+// -- IVFFLAT index for fast cosine similarity search
+// CREATE INDEX IF NOT EXISTS seo_pages_embedding_cosine_idx 
+//   ON seo_pages 
+//   USING ivfflat (embedding vector_cosine_ops) 
+//   WITH (lists = 100);
+//
+// -- For exact nearest neighbor search (slower but more accurate)
+// CREATE INDEX IF NOT EXISTS seo_pages_embedding_l2_idx 
+//   ON seo_pages 
+//   USING ivfflat (embedding vector_l2_ops) 
+//   WITH (lists = 100);
+
+// ============================================================================
+// USAGE NOTES
+// ============================================================================
+
+// 1. Vector Embeddings:
+//    - Requires pgvector extension: CREATE EXTENSION vector;
+//    - Generate embeddings with OpenAI text-embedding-ada-002 (1536 dimensions)
+//    - Use cosine similarity for semantic search: 1 - (embedding <=> query_embedding)
+//
+// 2. Keyword Research:
+//    - Store keywords with metrics from Google Keyword Planner API
+//    - Track search volume, competition, difficulty
+//    - Classify intent (informational, navigational, commercial, transactional)
+//
+// 3. Rankings:
+//    - Track daily rankings for target keywords
+//    - Calculate CTR from Google Search Console data
+//    - Monitor ranking changes over time
+//
+// 4. Backlinks:
+//    - Monitor backlinks from Ahrefs/Moz API
+//    - Track domain authority and anchor text
+//    - Identify lost/broken links
+//
+// 5. Recommendations:
+//    - Generate AI-powered recommendations weekly
+//    - Track implementation and effectiveness
+//    - Learn from outcomes to improve future recommendations
+//
+// 6. A/B Testing:
+//    - Test title/description variations
+//    - Track clicks and impressions per variant
+//    - Determine statistical significance
+//
+// 7. Internal Linking:
+//    - Use vector similarity to find related pages
+//    - Generate contextual anchor text with AI
+//    - Build topic clusters (pillar + supporting pages)
+
+// ============================================================================
+// EXAMPLE QUERIES
+// ============================================================================
+
+// Find related pages using vector similarity:
+// SELECT 
+//   url, 
+//   title, 
+//   1 - (embedding <=> $1::vector) as similarity
+// FROM seo_pages
+// WHERE 1 - (embedding <=> $1::vector) > 0.7
+// ORDER BY embedding <=> $1::vector
+// LIMIT 10;
+
+// Get ranking history for a keyword:
+// SELECT 
+//   position, 
+//   clicks, 
+//   impressions, 
+//   ctr, 
+//   checkedAt
+// FROM seo_rankings
+// WHERE keywordId = $1
+// ORDER BY checkedAt DESC
+// LIMIT 30;
+
+// Find top-performing pages:
+// SELECT 
+//   p.url,
+//   p.title,
+//   AVG(r.position) as avg_position,
+//   SUM(r.clicks) as total_clicks,
+//   SUM(r.impressions) as total_impressions,
+//   AVG(r.ctr) as avg_ctr
+// FROM seo_pages p
+// JOIN seo_rankings r ON r.pageId = p.id
+// WHERE r.checkedAt > NOW() - INTERVAL '30 days'
+// GROUP BY p.id
+// ORDER BY total_clicks DESC
+// LIMIT 20;
+
+// Identify content that needs refreshing:
+// SELECT 
+//   p.url,
+//   p.title,
+//   p.lastUpdated,
+//   AVG(r.position) as avg_position,
+//   SUM(r.clicks) as total_clicks
+// FROM seo_pages p
+// LEFT JOIN seo_rankings r ON r.pageId = p.id AND r.checkedAt > NOW() - INTERVAL '30 days'
+// WHERE p.lastUpdated < NOW() - INTERVAL '12 months'
+// GROUP BY p.id
+// HAVING AVG(r.position) > 10 OR SUM(r.clicks) < 100
+// ORDER BY p.lastUpdated ASC;
+

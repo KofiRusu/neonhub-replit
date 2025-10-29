@@ -1,0 +1,26 @@
+→ pnpm --filter apps/api prisma db seed
+Environment variables loaded from .env
+Running seed command `tsx prisma/seed.ts` ...
+node:net:1882
+      const error = new UVExceptionWithHostPort(rval, 'listen', address, port);
+                    ^
+
+Error: listen EPERM: operation not permitted /var/folders/cv/blq4f6fs61g_zv__z9px4n040000gn/T/tsx-501/13489.pipe
+    at Server.setupListenHandle [as _listen2] (node:net:1882:21)
+    at listenInCluster (node:net:1961:12)
+    at Server.listen (node:net:2080:5)
+    at file:///Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/cli.mjs:53:31537
+    at new Promise (<anonymous>)
+    at createIpcServer (file:///Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/cli.mjs:53:31515)
+    at async file:///Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/tsx@4.20.6/node_modules/tsx/dist/cli.mjs:55:459 {
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '/var/folders/cv/blq4f6fs61g_zv__z9px4n040000gn/T/tsx-501/13489.pipe',
+  port: -1
+}
+
+Node.js v20.17.0
+
+An error occurred while running the seed command:
+Error: Command failed with exit code 1: tsx prisma/seed.ts

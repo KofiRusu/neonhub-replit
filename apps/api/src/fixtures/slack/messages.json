@@ -1,0 +1,12 @@
+[
+  {
+    "ts": "1710000000.0001",
+    "text": "Welcome to the NeonHub test workspace!",
+    "user": "U12345"
+  },
+  {
+    "ts": "1710000000.0002",
+    "text": "Agent orchestration smoke check complete.",
+    "user": "U67890"
+  }
+]

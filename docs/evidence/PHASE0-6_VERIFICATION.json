@@ -1,0 +1,56 @@
+{
+  "phases": {
+    "0": {
+      "status": "blocked",
+      "issues": [
+        "pnpm install --frozen-lockfile fails with ENOTFOUND registry.npmjs.org (logs/verification/phase0-dependencies.log)",
+        "Typecheck/lint/test/build cannot run without node_modules (logs/verification/phase0-baseline.log)"
+      ]
+    },
+    "1": {
+      "status": "blocked",
+      "issues": [
+        "SDK build requires tsup binary (logs/verification/phase1-sdk-build.log)",
+        "SDK tests require jest binary (logs/verification/phase1-sdk-tests.log)"
+      ]
+    },
+    "2": {
+      "status": "failed",
+      "issues": [
+        "tRPC router exists but not mounted in server (logs/verification/phase2-trpc-structure.log)",
+        "API typecheck surfaces syntax errors in apps/api/src/agents/EmailAgent.ts (logs/verification/phase2-typecheck.log)"
+      ]
+    },
+    "3": {
+      "status": "blocked",
+      "issues": [
+        "Next.js build requires prisma/next binaries (logs/verification/phase3-ui-build.log)",
+        "UI components listed in logs/verification/phase3-components-list.txt"
+      ]
+    },
+    "4": {
+      "status": "partial",
+      "issues": [
+        "Budgeting services and tests present (logs/verification/phase4-budget-structure.log)",
+        "Jest invocation fails before running budget suite (logs/verification/phase4-budget-tests.log)"
+      ]
+    },
+    "5": {
+      "status": "failed",
+      "issues": [
+        "Stripe webhook remains stubbed without signature verification (logs/verification/phase5-stripe-structure.log)",
+        "No evidence of ledger writes (docs/evidence/ledger-reconcile.json)"
+      ]
+    },
+    "6": {
+      "status": "partial",
+      "issues": [
+        "Subscription and team models exist (logs/verification/phase6-team-structure.log)",
+        "Team routes lack requireAuth middleware (logs/verification/phase6-rbac-check.log)"
+      ]
+    }
+  },
+  "security": {
+    "audit": "pnpm audit blocked by offline registry (logs/verification/security-audit.log)"
+  }
+}

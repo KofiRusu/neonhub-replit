@@ -21,14 +21,14 @@ import {
   listCampaignsQuerySchema,
 } from "../schemas/campaign.js";
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /api/campaigns - Create a new campaign
  */
 router.post("/", async (req, res, next) => {
   try {
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = createCampaignSchema.parse(req.body);
     
@@ -36,7 +36,7 @@ router.post("/", async (req, res, next) => {
       name: body.name,
       type: body.type,
       config: body.config,
-      userId,
+      ownerId,
     });
 
     res.status(201).json({
@@ -56,11 +56,11 @@ router.post("/", async (req, res, next) => {
  */
 router.get("/", async (req, res, next) => {
   try {
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const query = listCampaignsQuerySchema.parse(req.query);
     
-    const campaigns = await campaignAgent.listCampaigns(userId, {
+    const campaigns = await campaignAgent.listCampaigns(ownerId, {
       status: query.status,
       type: query.type,
     });
@@ -86,14 +86,14 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const campaign = await campaignAgent.getCampaign(id);
     
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -112,7 +112,7 @@ router.get("/:id", async (req, res, next) => {
 router.put("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     updateCampaignSchema.parse(req.body);
     
@@ -121,7 +121,7 @@ router.put("/:id", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -145,14 +145,14 @@ router.put("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     // Check campaign exists and user owns it
     const campaign = await campaignAgent.getCampaign(id);
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -173,7 +173,7 @@ router.delete("/:id", async (req, res, next) => {
 router.post("/:id/schedule", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = scheduleCampaignSchema.parse(req.body);
     
@@ -182,7 +182,7 @@ router.post("/:id/schedule", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -202,7 +202,7 @@ router.post("/:id/schedule", async (req, res, next) => {
           scheduledFor: new Date(post.scheduledFor),
         })),
       },
-      userId,
+      requestedById: ownerId,
     });
 
     res.json({
@@ -223,7 +223,7 @@ router.post("/:id/schedule", async (req, res, next) => {
 router.post("/:id/ab-test", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = runABTestSchema.parse(req.body);
     
@@ -232,11 +232,11 @@ router.post("/:id/ab-test", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
-    const result = await campaignAgent.runABTest(id, body.variants, userId);
+    const result = await campaignAgent.runABTest(id, body.variants, ownerId);
 
     res.json({
       success: true,
@@ -256,7 +256,7 @@ router.post("/:id/ab-test", async (req, res, next) => {
 router.get("/:id/analytics", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     getCampaignMetricsQuerySchema.parse(req.query);
     
@@ -265,7 +265,7 @@ router.get("/:id/analytics", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -289,7 +289,7 @@ router.get("/:id/analytics", async (req, res, next) => {
 router.post("/:id/optimize", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = optimizeCampaignSchema.parse(req.body);
     
@@ -298,14 +298,14 @@ router.post("/:id/optimize", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
     const result = await campaignAgent.optimizeCampaign({
       campaignId: id,
       optimizationGoals: body.optimizationGoals,
-      userId,
+      requestedById: ownerId,
     });
 
     res.json({
@@ -326,7 +326,7 @@ router.post("/:id/optimize", async (req, res, next) => {
 router.post("/:id/email/sequence", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = generateEmailSequenceSchema.parse(req.body);
     
@@ -335,7 +335,7 @@ router.post("/:id/email/sequence", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -344,7 +344,7 @@ router.post("/:id/email/sequence", async (req, res, next) => {
       audience: body.audience,
       numEmails: body.numEmails,
       tone: body.tone,
-      createdById: userId,
+      createdById: ownerId,
     });
 
     res.json({
@@ -364,14 +364,14 @@ router.post("/:id/email/sequence", async (req, res, next) => {
  */
 router.post("/email/optimize-subject", async (req, res, next) => {
   try {
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = optimizeSubjectLineSchema.parse(req.body);
     
     const result = await emailAgent.optimizeSubjectLine({
       originalSubject: body.originalSubject as string,
       context: body.context,
-      createdById: userId,
+      createdById: ownerId,
     });
 
     res.json({
@@ -391,7 +391,7 @@ router.post("/email/optimize-subject", async (req, res, next) => {
  */
 router.post("/social/generate", async (req, res, next) => {
   try {
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = generateSocialPostSchema.parse(req.body);
     
@@ -400,7 +400,7 @@ router.post("/social/generate", async (req, res, next) => {
       platform: body.platform as SocialPlatform,
       tone: body.tone,
       includeHashtags: body.includeHashtags,
-      createdById: userId,
+      createdById: ownerId,
     });
 
     res.json({
@@ -420,14 +420,14 @@ router.post("/social/generate", async (req, res, next) => {
  */
 router.post("/social/optimize", async (req, res, next) => {
   try {
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = optimizeForPlatformSchema.parse(req.body);
     
     const result = await socialAgent.optimizeForPlatform({
       content: body.content as string,
       platform: body.platform as SocialPlatform,
-      createdById: userId,
+      createdById: ownerId,
     });
 
     res.json({
@@ -448,7 +448,7 @@ router.post("/social/optimize", async (req, res, next) => {
 router.post("/:id/social/schedule", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const body = schedulePostSchema.parse(req.body);
     
@@ -457,7 +457,7 @@ router.post("/:id/social/schedule", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 
@@ -467,7 +467,7 @@ router.post("/:id/social/schedule", async (req, res, next) => {
       content: body.content,
       mediaUrls: body.mediaUrls,
       scheduledFor: new Date(body.scheduledFor),
-      createdById: userId,
+      createdById: ownerId,
     });
 
     res.json({
@@ -488,7 +488,7 @@ router.post("/:id/social/schedule", async (req, res, next) => {
 router.patch("/:id/status", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = getAuthenticatedUserId(req);
+    const ownerId = getAuthenticatedUserId(req);
     
     const { status } = req.body;
     
@@ -501,7 +501,7 @@ router.patch("/:id/status", async (req, res, next) => {
     if (!campaign) {
       return next(new AppError("Campaign not found", 404, "NOT_FOUND"));
     }
-    if (campaign.userId !== userId) {
+    if (campaign.ownerId !== ownerId) {
       return next(new AppError("Unauthorized", 403, "FORBIDDEN"));
     }
 

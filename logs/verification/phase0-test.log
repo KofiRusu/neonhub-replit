@@ -1,0 +1,31 @@
+
+> neonhub@3.2.0 test /Users/kofirusu/Desktop/NeonHub
+> npm run test --workspace apps/api -- --runInBand --ci --passWithNoTests "--runInBand"
+
+
+> @neonhub/backend-v3.2@3.2.0 test
+> NODE_ENV=test node ../../scripts/run-cli.mjs jest --runInBand --ci --passWithNoTests --runInBand
+
+Unable to resolve binary for "jest" (module "jest/bin/jest.js"). Did you install dependencies?
+Error: Cannot find module 'jest/bin/jest.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c NODE_ENV=test node ../../scripts/run-cli.mjs jest --runInBand --ci --passWithNoTests --runInBand
+ ELIFECYCLE  Test failed. See above for more details.

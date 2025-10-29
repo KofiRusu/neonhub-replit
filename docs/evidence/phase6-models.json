@@ -1,0 +1,7 @@
+{
+  "subscription_model_present": true,
+  "team_member_model_present": true,
+  "rbac_guard_usage": "team routes do not apply requireAuth (see logs/verification/phase6-rbac-check.log)",
+  "invite_persistence": "in-memory Map in apps/api/src/routes/team.ts:21",
+  "status": "partial"
+}

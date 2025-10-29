@@ -2,14 +2,22 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import SessionProvider from "./SessionProvider";
+import { setTransport } from "@neonhub/sdk/client";
+import { mockTransport } from "@/mocks/nhTransport";
+import { createTRPCClient, trpc } from "@/lib/trpc";
+
+if (process.env.NEXT_PUBLIC_NH_USE_MOCKS !== "false") {
+  setTransport(mockTransport);
+}
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [client] = React.useState(() => new QueryClient());
+  const [trpcClient] = React.useState(() => createTRPCClient());
   return (
     <SessionProvider>
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      <QueryClientProvider client={client}>
+        <trpc.Provider client={trpcClient} queryClient={client}>{children}</trpc.Provider>
+      </QueryClientProvider>
     </SessionProvider>
   );
 }
-
-

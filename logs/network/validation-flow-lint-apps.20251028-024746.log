@@ -1,0 +1,223 @@
+=== Linting apps/api ===
+
+> @neonhub/backend-v3.2@3.2.0 lint /Users/kofirusu/Desktop/NeonHub/apps/api
+> node ../../scripts/run-cli.mjs eslint src --ext .ts
+
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/CampaignAgent.ts
+  158:93  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  178:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  283:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  339:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  433:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/EmailAgent.ts
+  291:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  305:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/InsightAgent.ts
+  70:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/SocialAgent.ts
+  310:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  311:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  326:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  342:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/base/AgentJobManager.ts
+   9:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  91:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/connectors/base/types.ts
+  49:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/connectors/execution/RetryManager.ts
+  23:5  warning  Unused eslint-disable directive (no problems were reported from 'no-constant-condition')
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/connectors/services/NotionConnector.ts
+   67:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/integration-server.ts
+   30:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info, debug  no-console
+  100:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info, debug  no-console
+  101:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info, debug  no-console
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/audit.ts
+  14:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/errors.ts
+   4:12  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  21:15  warning  Type string trivially inferred from a string literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  28:15  warning  Type string trivially inferred from a string literal, remove type annotation  @typescript-eslint/no-inferrable-types
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/leadScraper.ts
+  38:38  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/logger.ts
+  10:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  83:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/socialApiClient.ts
+   30:28  warning  Type string trivially inferred from a string literal, remove type annotation  @typescript-eslint/no-inferrable-types
+   58:39  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+   74:27  warning  Type string trivially inferred from a string literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  117:47  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/middleware/auditLog.ts
+  16:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/agents.ts
+   22:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   32:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   48:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   74:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/connectors.ts
+  83:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/content.ts
+  26:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/data-trust.ts
+  205:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/documents.ts
+  47:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/feedback.ts
+  48:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/governance.ts
+  140:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/messages.ts
+  41:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/metrics.ts
+  146:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/seo/content.ts
+  229:29  error  'personaId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/tasks.ts
+  62:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/routes/team.ts
+  32:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/credentials.service.ts
+  64:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/data-trust/index.ts
+  47:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/drift-detector.ts
+  173:38  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  224:39  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  238:32  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/eco-optimizer/index.ts
+  37:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  92:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/feedback.service.ts
+   57:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/orchestration/router.ts
+  16:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/predictive-engine.ts
+  18:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/predictive-engine/index.ts
+  18:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/seo/internal-linking.service.ts
+  371:5  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/seo/keyword-research.service.ts
+  177:47  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  526:5   warning  Type string trivially inferred from a string literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  538:80  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+  542:82  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/seo/meta-generation.service.ts
+  145:5  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  242:5  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+  301:5  warning  Type number trivially inferred from a number literal, remove type annotation  @typescript-eslint/no-inferrable-types
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/seo/recommendations.service.ts
+  608:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/settings.service.ts
+    5:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/services/tasks.service.ts
+   67:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/types/auth.ts
+  27:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/types/governance.ts
+   68:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  222:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  230:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  335:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  349:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  358:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  359:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/kofirusu/Desktop/NeonHub/apps/api/src/ws/index.ts
+   74:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 123 problems (1 error, 122 warnings)
+  0 errors and 15 warnings potentially fixable with the `--fix` option.
+
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 lint: `node ../../scripts/run-cli.mjs eslint src --ext .ts`
+Exit status 1

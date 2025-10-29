@@ -1,0 +1,4 @@
+{
+  "status": "blocked",
+  "reason": "Stripe webhook handler is a stub without signature verification or idempotency. Verification halted; see logs/verification/phase5-stripe-structure.log."
+}

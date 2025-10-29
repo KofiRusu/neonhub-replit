@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events';
-import * as winston from 'winston';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { AuditAction, AuditResult, GovernanceError } from '../types/index.js';
 export class AuditLogger extends EventEmitter {
     constructor(options = {}) {
@@ -8,30 +7,9 @@ export class AuditLogger extends EventEmitter {
         this.auditEntries = [];
         this.maxEntries = options.maxEntries || 10000;
         this.retentionDays = options.retentionDays || 90;
-        // Configure Winston logger
-        this.logger = winston.createLogger({
-            level: options.logLevel || 'info',
-            format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.json()),
-            defaultMeta: { service: 'ai-governance' },
-            transports: [
-                // Write all logs with importance level of `error` or less to `error.log`
-                new winston.transports.File({
-                    filename: options.logFile || 'logs/ai-governance-error.log',
-                    level: 'error'
-                }),
-                // Write all logs with importance level of `info` or less to `combined.log`
-                new winston.transports.File({
-                    filename: options.logFile?.replace('.log', '-combined.log') || 'logs/ai-governance-combined.log'
-                })
-            ]
+        this.logger = new SimpleLogger({
+            level: options.logLevel || 'info'
         });
-        // If we're not in production then log to the `console` with the format:
-        // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-        if (process.env.NODE_ENV !== 'production') {
-            this.logger.add(new winston.transports.Console({
-                format: winston.format.combine(winston.format.colorize(), winston.format.simple())
-            }));
-        }
         // Start cleanup interval
         this.startCleanupInterval();
     }
@@ -41,7 +19,7 @@ export class AuditLogger extends EventEmitter {
     async log(entry) {
         try {
             const auditEntry = {
-                id: uuidv4(),
+                id: randomUUID(),
                 timestamp: new Date(),
                 ...entry
             };
@@ -243,10 +221,64 @@ export class AuditLogger extends EventEmitter {
      * Close the logger
      */
     async close() {
-        await new Promise((resolve) => {
-            this.logger.on('finish', resolve);
-            this.logger.end();
-        });
+        await this.logger.close();
+    }
+}
+const LOG_LEVEL_ORDER = {
+    debug: 10,
+    info: 20,
+    warn: 30,
+    error: 40
+};
+class SimpleLogger {
+    constructor(options = {}) {
+        const level = options.level?.toLowerCase() || 'info';
+        this.minLevel = LOG_LEVEL_ORDER[level] ?? LOG_LEVEL_ORDER.info;
+    }
+    info(message, meta) {
+        this.log('info', message, meta);
+    }
+    warn(message, meta) {
+        this.log('warn', message, meta);
+    }
+    error(message, meta) {
+        this.log('error', message, meta);
+    }
+    debug(message, meta) {
+        this.log('debug', message, meta);
+    }
+    on(_event, _listener) {
+        return this;
+    }
+    end() {
+        // no-op for console logger
+    }
+    async close() {
+        return Promise.resolve();
+    }
+    log(level, message, meta) {
+        if (LOG_LEVEL_ORDER[level] < this.minLevel) {
+            return;
+        }
+        const payload = {
+            level,
+            message,
+            timestamp: new Date().toISOString(),
+            ...(meta ? { meta } : {})
+        };
+        switch (level) {
+            case 'error':
+                console.error(payload);
+                break;
+            case 'warn':
+                console.warn(payload);
+                break;
+            case 'debug':
+                console.debug(payload);
+                break;
+            default:
+                console.info(payload);
+        }
     }
 }
 //# sourceMappingURL=AuditLogger.js.map

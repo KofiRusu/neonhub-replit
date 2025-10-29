@@ -1,0 +1,6 @@
+=== Step 3: TypeScript Type Check ===
+Scope: 18 of 19 workspace projects
+apps/api typecheck$ node ../../scripts/run-cli.mjs tsc --noEmit
+apps/web typecheck$ node ../../scripts/run-cli.mjs tsc --noEmit
+apps/web typecheck: Done
+apps/api typecheck: Done

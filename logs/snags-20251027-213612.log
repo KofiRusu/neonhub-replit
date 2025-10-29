@@ -1,0 +1,17 @@
+→ pnpm --filter apps/api prisma migrate deploy
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+
+7 migrations found in prisma/migrations
+
+Applying migration `20240101000000_initial`
+Applying migration `20240102000000_phase4_beta`
+Applying migration `20240103000000_realign_schema`
+Error: ERROR: current transaction is aborted, commands ignored until end of transaction block
+   0: schema_core::commands::apply_migrations::Applying migration
+           with migration_name="20240103000000_realign_schema"
+             at schema-engine/core/src/commands/apply_migrations.rs:91
+   1: schema_core::state::ApplyMigrations
+             at schema-engine/core/src/state.rs:226
+

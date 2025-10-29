@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { requireAuth, type AuthRequest } from '../middleware/auth.js';
 import { prisma } from '../db/prisma.js';
 
-const router = Router();
+const router: Router = Router();
 
 // Get current user (protected)
 router.get('/auth/me', requireAuth, async (req: AuthRequest, res) => {

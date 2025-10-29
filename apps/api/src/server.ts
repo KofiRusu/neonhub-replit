@@ -1,4 +1,5 @@
 import express from "express";
+import type { Express } from "express";
 import { createServer } from "http";
 import { env } from "./config/env.js";
 import { logger } from "./lib/logger.js";
@@ -16,6 +17,7 @@ import { metricsRouter } from "./routes/metrics.js";
 import { authRouter } from "./routes/auth.js";
 import { jobsRouter } from "./routes/jobs.js";
 import { campaignRouter } from "./routes/campaign.js";
+import { marketingRouter } from "./routes/marketing.js";
 import credentialsRouter from "./routes/credentials.js";
 import settingsRouter from "./routes/settings.js";
 import predictiveRouter from "./routes/predictive.js";
@@ -31,11 +33,23 @@ import feedbackRouter from "./routes/feedback.js";
 import messagesRouter from "./routes/messages.js";
 import { teamRouter } from "./routes/team.js";
 import { trendsRouter } from "./routes/trends.js";
+import personasRouter from "./routes/personas.js";
+import keywordsRouter from "./routes/keywords.js";
+import editorialCalendarRouter from "./routes/editorial-calendar.js";
+import seoRouter from "./routes/seo/index.js";
+import { sdkHandshakeRouter } from "./routes/sdk-handshake.js";
 import { AppError } from "./lib/errors.js";
 import { registerConnectors } from "./connectors/index.js";
 import { syncRegisteredConnectors } from "./services/connector.service.js";
 import connectorsRouter from "./routes/connectors.js";
 import cookieParser from "cookie-parser";
+import brandVoiceRouter from "./routes/brand-voice.js";
+import personRouter from "./routes/person.js";
+import smsRouter from "./routes/sms.js";
+import socialRouter from "./routes/social.js";
+import budgetRouter from "./routes/budget.js";
+import { sitemapsRouter } from "./routes/sitemaps.js";
+import { startSeoAnalyticsJob } from "./jobs/seo-analytics.job.js";
 
 // Environment is validated on import
 
@@ -49,8 +63,10 @@ registerConnectors()
     logger.error({ error }, "Failed to register connectors");
   });
 
+startSeoAnalyticsJob();
+
 // Create Express app
-const app = express();
+const app: Express = express();
 const httpServer = createServer(app);
 
 // Initialize WebSocket
@@ -85,12 +101,15 @@ app.use((req, _res, next) => {
 // Public routes (no auth required)
 app.use(healthRouter);
 app.use(authRateLimit, authRouter); // Stricter rate limit on auth endpoints
+app.use(sdkHandshakeRouter);
+app.use("/api", sitemapsRouter);
 
 // Protected routes (auth required + audit logging)
 app.use(requireAuth, contentRouter);
 app.use(requireAuth, metricsRouter);
 app.use(requireAuth, jobsRouter);
 app.use('/api/campaigns', requireAuth, auditMiddleware('campaign'), campaignRouter);
+app.use('/api/marketing', requireAuth, auditMiddleware('marketing'), marketingRouter);
 app.use('/api/credentials', requireAuth, auditMiddleware('credential'), credentialsRouter);
 app.use('/api/settings', requireAuth, adminIPGuard, auditMiddleware('settings'), settingsRouter);
 app.use('/api/predictive', requireAuth, predictiveRouter);
@@ -108,6 +127,15 @@ app.use('/api/messages', requireAuth, auditMiddleware('message'), messagesRouter
 app.use('/api/team', requireAuth, auditMiddleware('team'), teamRouter);
 app.use('/api/trends', requireAuth, trendsRouter);
 app.use('/api/connectors', requireAuth, auditMiddleware('connector'), connectorsRouter);
+app.use('/api/personas', requireAuth, auditMiddleware('persona'), personasRouter);
+app.use('/api/keywords', requireAuth, auditMiddleware('keyword'), keywordsRouter);
+app.use('/api/editorial-calendar', requireAuth, auditMiddleware('editorial-calendar'), editorialCalendarRouter);
+app.use('/api/seo', requireAuth, auditMiddleware('seo'), seoRouter);
+app.use('/api/brand-voice', requireAuth, brandVoiceRouter);
+app.use('/api/person', requireAuth, personRouter);
+app.use('/api/budget', requireAuth, budgetRouter);
+app.use('/api/sms', smsRouter);
+app.use('/api/social', socialRouter);
 
 // 404 handler
 app.use((_req, res) => {

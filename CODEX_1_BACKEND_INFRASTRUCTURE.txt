@@ -1,0 +1,541 @@
+═══════════════════════════════════════════════════════════════════════
+CODEX 1: BACKEND INFRASTRUCTURE & API COMPLETION
+Terminal A - Backend/Database/Testing Focus
+═══════════════════════════════════════════════════════════════════════
+
+ROLE: Backend Engineering Agent
+WORKSPACE: /Users/kofirusu/Desktop/NeonHub
+FOCUS: Phases 6D-6F (Internal Linking, Sitemap, Analytics), Testing, Security
+COORDINATION: Work independently on backend; signal readiness for Codex 2 integration
+
+───────────────────────────────────────────────────────────────────────
+CURRENT STATE (Do Not Modify)
+───────────────────────────────────────────────────────────────────────
+
+✅ Complete:
+  - Database: 73 models, 11 migrations, 16 connectors
+  - Phase 6A: SEO Agent (keyword discovery, intent, difficulty)
+  - Phase 6B: Brand Voice KB (RAG, embeddings, IVFFLAT)
+  - Phase 6C: Content Generator (articles, meta tags, schema)
+  - Prisma client generated (v5.22.0)
+  - TypeScript errors fixed (26/26)
+  - Phase 6B tests passing (18/18)
+
+⏳ Your Responsibilities:
+  - Phase 6D: Internal Linking Engine
+  - Phase 6E: Sitemap & Robots Generator
+  - Phase 6F: Analytics Loop (Google Search Console)
+  - Testing & validation (lint, coverage, security)
+  - Database optimization (IVFFLAT tuning)
+
+🚫 Do NOT Touch (Codex 2's Domain):
+  - Frontend files (apps/web/src/components/*, apps/web/src/app/*)
+  - Phase 6G: TrendAgent (Codex 2 handles)
+  - Phase 6H: Geo Performance UI (Codex 2 handles)
+  - Phase 6I: Frontend dashboards (Codex 2 handles)
+
+───────────────────────────────────────────────────────────────────────
+PHASE 6D: INTERNAL LINKING ENGINE
+───────────────────────────────────────────────────────────────────────
+
+GOAL: Semantic similarity-based internal link suggestions
+
+TASKS:
+
+1. Create apps/api/src/services/internal-linking.ts
+   - Function: suggestInternalLinks(contentId, content, limit)
+     * Generate embedding for source content (OpenAI)
+     * Vector search against published content (exclude self)
+     * Use chunks.embedding with IVFFLAT index
+     * Return top K related articles with similarity scores
+   
+   - Function: generateAnchorText(sourceContext, targetTitle, keyword)
+     * Use GPT-4o-mini to suggest natural anchor text
+     * Incorporate target keyword if relevant
+     * Return 3-5 word anchor phrase
+   
+   - Function: trackLinkGraph(sourceId, targetId, anchorText)
+     * Store in database (create LinkGraph model if needed)
+     * Track for SEO authority flow analysis
+
+2. Add tRPC endpoint: apps/api/src/trpc/routers/content.router.ts
+   ```typescript
+   suggestInternalLinks: protectedProcedure
+     .input(z.object({
+       contentId: z.string().cuid(),
+       content: z.string().min(100),
+       limit: z.number().int().min(1).max(10).default(5),
+     }))
+     .query(async ({ input }) => {
+       return suggestInternalLinks(input);
+     }),
+   ```
+
+3. Create tests: apps/api/src/__tests__/services/internal-linking.spec.ts
+   - Test similarity search accuracy
+   - Test anchor text generation
+   - Test link graph tracking
+
+4. Document completion in logs/phase6d-complete.md
+
+SUCCESS CRITERIA:
+  ✅ Internal linking service functional
+  ✅ tRPC endpoint operational
+  ✅ Tests passing (≥ 90% coverage)
+  ✅ Anchor text quality ≥ 80% (manual review sample)
+
+───────────────────────────────────────────────────────────────────────
+PHASE 6E: SITEMAP & ROBOTS GENERATOR
+───────────────────────────────────────────────────────────────────────
+
+GOAL: Auto-generate XML sitemaps and robots.txt
+
+TASKS:
+
+1. Create apps/api/src/services/sitemap-generator.ts
+   ```typescript
+   export async function generateSitemap({
+     organizationId,
+   }: {
+     organizationId: string;
+   }): Promise<string> {
+     // 1. Fetch all published content
+     const content = await prisma.content.findMany({
+       where: { 
+         organizationId,
+         // Add published status filter
+       },
+       select: {
+         id: true,
+         slug: true,
+         updatedAt: true,
+       },
+     });
+
+     // 2. Build XML
+     const urls = content.map(c => `
+       <url>
+         <loc>${baseUrl}/content/${c.slug}</loc>
+         <lastmod>${c.updatedAt.toISOString()}</lastmod>
+         <changefreq>weekly</changefreq>
+         <priority>0.8</priority>
+       </url>
+     `).join('');
+
+     return `<?xml version="1.0" encoding="UTF-8"?>
+     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+       ${urls}
+     </urlset>`;
+   }
+   ```
+
+2. Create apps/api/src/routes/sitemaps.ts (Express route)
+   ```typescript
+   router.get('/sitemap.xml', async (req, res) => {
+     const orgId = req.query.orgId as string;
+     
+     // Check cache first
+     const cached = await cache.get(`sitemap:${orgId}`);
+     if (cached) {
+       res.set('Content-Type', 'application/xml');
+       return res.send(cached);
+     }
+
+     const sitemap = await generateSitemap({ organizationId: orgId });
+     
+     // Cache for 24 hours
+     await cache.set(`sitemap:${orgId}`, sitemap, 86400);
+     
+     res.set('Content-Type', 'application/xml');
+     res.set('Cache-Control', 'public, max-age=86400');
+     res.send(sitemap);
+   });
+
+   router.get('/robots.txt', (req, res) => {
+     const robotsTxt = `
+User-agent: *
+Allow: /
+
+Sitemap: ${process.env.PUBLIC_URL}/api/sitemap.xml
+     `.trim();
+     
+     res.set('Content-Type', 'text/plain');
+     res.send(robotsTxt);
+   });
+   ```
+
+3. Register route in apps/api/src/index.ts
+
+4. Test sitemap validity: https://www.xml-sitemaps.com/validate-xml-sitemap.html
+
+5. Document in logs/phase6e-complete.md
+
+SUCCESS CRITERIA:
+  ✅ Sitemap XML valid (schema.org)
+  ✅ Robots.txt accessible
+  ✅ Caching functional (24hr TTL)
+  ✅ Updates on content publish
+
+───────────────────────────────────────────────────────────────────────
+PHASE 6F: ANALYTICS LOOP (GSC INTEGRATION)
+───────────────────────────────────────────────────────────────────────
+
+GOAL: Capture Search Console data, identify underperformers, trigger optimization
+
+TASKS:
+
+1. Add Google Search Console connector
+   - Add to ConnectorKind enum if needed (or use existing)
+   - OAuth flow for GSC authentication
+   - Store in ConnectorAuth table
+
+2. Create apps/api/src/integrations/google-search-console.ts
+   ```typescript
+   export async function fetchGSCMetrics({
+     siteUrl,
+     startDate,
+     endDate,
+   }: {
+     siteUrl: string;
+     startDate: Date;
+     endDate: Date;
+   }): Promise<SearchConsoleMetric[]> {
+     // 1. Get OAuth token from ConnectorAuth
+     // 2. Call GSC API: searchanalytics.query
+     // 3. Fetch impressions, clicks, CTR, avg position
+     // 4. Group by page and query
+     // 5. Return metrics array
+   }
+   ```
+
+3. Create migration for SEOMetric model
+   ```prisma
+   model SEOMetric {
+     id          String   @id @default(cuid())
+     organizationId String
+     contentId   String?
+     url         String
+     keyword     String
+     impressions Int
+     clicks      Int
+     ctr         Float
+     avgPosition Float
+     date        DateTime
+     createdAt   DateTime @default(now())
+
+     organization Organization @relation(...)
+     content      Content?     @relation(...)
+
+     @@index([url, date])
+     @@index([keyword, date])
+     @@index([organizationId, date])
+     @@map("seo_metrics")
+   }
+   ```
+
+4. Create apps/api/src/services/seo-learning.ts
+   ```typescript
+   export async function identifyUnderperformers({
+     organizationId,
+   }: {
+     organizationId: string;
+   }): Promise<UnderperformingContent[]> {
+     // Query: High impressions (>1000) + Low CTR (<2%)
+     // Query: Declining position (>3 spots in 30 days)
+     // Return with recommended actions
+   }
+
+   export async function autoOptimizeContent(contentId: string): Promise<void> {
+     // 1. Get current metrics
+     // 2. Identify issue (CTR, position, etc.)
+     // 3. Regenerate meta description or title
+     // 4. Log optimization attempt
+     // 5. Track improvement over 7 days
+   }
+   ```
+
+5. Add tRPC endpoints: apps/api/src/trpc/routers/seo.router.ts
+   ```typescript
+   getMetrics: protectedProcedure.input(...).query(...),
+   getTrends: protectedProcedure.input(...).query(...),
+   identifyUnderperformers: protectedProcedure.input(...).query(...),
+   triggerOptimization: protectedProcedure.input(...).mutation(...),
+   ```
+
+6. Create daily sync job (BullMQ or cron)
+   - Fetch GSC data for all orgs
+   - Store in SEOMetric table
+   - Run underperformer analysis
+   - Send alerts for declining content
+
+7. Tests: apps/api/src/__tests__/integrations/google-search-console.spec.ts
+
+8. Document in logs/phase6f-complete.md
+
+SUCCESS CRITERIA:
+  ✅ GSC integration functional
+  ✅ Metrics stored in database
+  ✅ Underperformer detection working
+  ✅ Auto-optimization triggers
+  ✅ Learning loop complete
+
+───────────────────────────────────────────────────────────────────────
+VALIDATION & TESTING
+───────────────────────────────────────────────────────────────────────
+
+AFTER EACH PHASE:
+
+1. Run type-check:
+   ```bash
+   pnpm type-check
+   # Fix any errors immediately
+   ```
+
+2. Run lint:
+   ```bash
+   pnpm lint -- --fix
+   # Target: ≤ 50 warnings
+   ```
+
+3. Run tests:
+   ```bash
+   pnpm --filter @neonhub/backend-v3.2 test -- --runTestsByPath src/__tests__/<your-new-test>.spec.ts
+   ```
+
+4. Run smoke tests:
+   ```bash
+   node scripts/db-smoke.mjs
+   node scripts/check-extensions.mjs
+   ```
+
+5. Update progress:
+   ```bash
+   echo "✅ Phase 6X complete" >> logs/codex1-progress.log
+   ```
+
+───────────────────────────────────────────────────────────────────────
+SECURITY CHECKS (Run After All Phases)
+───────────────────────────────────────────────────────────────────────
+
+1. Secret Scanning:
+   ```bash
+   # No hardcoded secrets
+   grep -r "postgresql://" apps/api/src --include="*.ts" | grep -v "process.env" | grep -v "example" | grep -v "//"
+   grep -r "sk-" apps/api/src --include="*.ts" | grep -v "process.env"
+   
+   # Log results
+   echo "Secret scan: $(date)" > logs/verification/secret-scan.log
+   ```
+
+2. SQL Injection Check:
+   ```bash
+   # Audit all raw queries
+   grep -r "\$queryRaw\|\$executeRaw" apps/api/src --include="*.ts" -A 5 > logs/verification/raw-queries-audit.log
+   
+   # Manual review: Ensure all use parameterized queries ($1, $2, etc.)
+   ```
+
+3. Dependency Audit:
+   ```bash
+   pnpm audit --production --json > logs/verification/dependency-audit.json
+   pnpm audit --production | grep -E "high|critical"
+   ```
+
+4. Rate Limiting Verification:
+   ```bash
+   grep -r "RateLimiter\|rateLimit" apps/api/src --include="*.ts" | wc -l
+   # Should be > 5 (multiple rate limiters)
+   ```
+
+───────────────────────────────────────────────────────────────────────
+DATABASE OPTIMIZATION
+───────────────────────────────────────────────────────────────────────
+
+1. IVFFLAT Index Tuning:
+   ```sql
+   -- Check row counts
+   SELECT 
+     'chunks' AS table, COUNT(*) AS rows, COUNT(*) / 1000 AS recommended_lists
+   FROM chunks
+   UNION ALL
+   SELECT 'messages', COUNT(*), COUNT(*) / 1000 FROM messages
+   UNION ALL
+   SELECT 'brand_voices', COUNT(*), COUNT(*) / 1000 FROM brand_voices
+   UNION ALL
+   SELECT 'mem_embeddings', COUNT(*), COUNT(*) / 1000 FROM mem_embeddings;
+   
+   -- If rows > 100, update lists parameter
+   -- ALTER INDEX chunks_embedding_idx SET (lists = <calculated_value>);
+   ```
+
+2. Vacuum Vector Tables:
+   ```bash
+   node -e "
+   import { PrismaClient } from '@prisma/client';
+   const prisma = new PrismaClient();
+   await prisma.\$executeRaw\`VACUUM ANALYZE chunks\`;
+   await prisma.\$executeRaw\`VACUUM ANALYZE messages\`;
+   await prisma.\$executeRaw\`VACUUM ANALYZE brand_voices\`;
+   await prisma.\$executeRaw\`VACUUM ANALYZE mem_embeddings\`;
+   console.log('✅ Vector tables vacuumed');
+   "
+   ```
+
+3. Document in logs/db-optimization-complete.md
+
+───────────────────────────────────────────────────────────────────────
+DELIVERABLES CHECKLIST
+───────────────────────────────────────────────────────────────────────
+
+Phase 6D (Internal Linking):
+  [ ] apps/api/src/services/internal-linking.ts created
+  [ ] suggestInternalLinks function (vector similarity)
+  [ ] generateAnchorText function (AI-powered)
+  [ ] trackLinkGraph function (relationship tracking)
+  [ ] tRPC endpoint: content.suggestInternalLinks
+  [ ] Tests: internal-linking.spec.ts (≥ 90% coverage)
+  [ ] Documentation: logs/phase6d-complete.md
+
+Phase 6E (Sitemap & Robots):
+  [ ] apps/api/src/services/sitemap-generator.ts created
+  [ ] generateSitemap function (XML builder)
+  [ ] apps/api/src/routes/sitemaps.ts (Express routes)
+  [ ] GET /api/sitemap.xml endpoint
+  [ ] GET /robots.txt endpoint
+  [ ] Caching layer (24hr TTL)
+  [ ] XML validation passed
+  [ ] Documentation: logs/phase6e-complete.md
+
+Phase 6F (Analytics Loop):
+  [ ] apps/api/src/integrations/google-search-console.ts created
+  [ ] fetchGSCMetrics function (API integration)
+  [ ] Migration: SEOMetric model added
+  [ ] apps/api/src/services/seo-learning.ts created
+  [ ] identifyUnderperformers function
+  [ ] autoOptimizeContent function
+  [ ] tRPC endpoints: seo.getMetrics, seo.getTrends
+  [ ] Daily sync job configured (BullMQ)
+  [ ] Tests: google-search-console.spec.ts
+  [ ] Documentation: logs/phase6f-complete.md
+
+Testing & Validation:
+  [ ] All new tests passing
+  [ ] Lint errors: 0
+  [ ] Lint warnings: ≤ 50
+  [ ] Test coverage: ≥ 90% (new code)
+  [ ] Secret scan clean
+  [ ] Dependency audit: 0 critical/high
+  [ ] SQL injection audit complete
+
+Database Optimization:
+  [ ] IVFFLAT indexes tuned
+  [ ] Vector tables vacuumed
+  [ ] Query performance benchmarked
+  [ ] Documentation: logs/db-optimization-complete.md
+
+Final Deliverable:
+  [ ] logs/verification/CODEX1_COMPLETE.md - Summary report
+
+───────────────────────────────────────────────────────────────────────
+ERROR HANDLING PROTOCOLS
+───────────────────────────────────────────────────────────────────────
+
+If TypeScript errors:
+  1. Run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
+  2. Check schema matches (BrandVoice fields, Organization relations)
+  3. Fix and document in logs/fixes/ts-errors-YYYYMMDD.log
+
+If test failures:
+  1. Check mock setup (OpenAI, Prisma)
+  2. Verify import paths (ESM .js extensions)
+  3. Update fixtures to match schema
+  4. Document in logs/fixes/test-failures-YYYYMMDD.log
+
+If database connection issues:
+  1. Check DATABASE_URL in .env
+  2. Verify Neon.tech endpoint reachable
+  3. Fallback to local Postgres if needed
+  4. Document in logs/fixes/db-connection-YYYYMMDD.log
+
+If network/sandbox restrictions:
+  1. Use --prefer-offline for pnpm
+  2. Skip network-dependent tests temporarily
+  3. Document workarounds in logs/fixes/sandbox-YYYYMMDD.log
+
+───────────────────────────────────────────────────────────────────────
+COORDINATION CHECKPOINTS
+───────────────────────────────────────────────────────────────────────
+
+After Phase 6D Complete:
+  echo "CODEX1:6D:COMPLETE:$(date -Iseconds)" >> logs/coordination.log
+
+After Phase 6E Complete:
+  echo "CODEX1:6E:COMPLETE:$(date -Iseconds)" >> logs/coordination.log
+
+After Phase 6F Complete:
+  echo "CODEX1:6F:COMPLETE:$(date -Iseconds)" >> logs/coordination.log
+
+After All Testing Complete:
+  echo "CODEX1:TESTING:COMPLETE:$(date -Iseconds)" >> logs/coordination.log
+  echo "CODEX1:READY_FOR_INTEGRATION:$(date -Iseconds)" >> logs/coordination.log
+
+Codex 2 will check this file before frontend integration.
+
+───────────────────────────────────────────────────────────────────────
+FINAL VALIDATION COMMAND
+───────────────────────────────────────────────────────────────────────
+
+```bash
+cd /Users/kofirusu/Desktop/NeonHub
+
+echo "═══ CODEX 1 FINAL VALIDATION ═══"
+
+# Type check
+pnpm type-check && echo "✅ TypeCheck passed" || echo "❌ TypeCheck failed"
+
+# Lint
+pnpm lint -- --max-warnings=50 && echo "✅ Lint passed" || echo "❌ Lint failed"
+
+# Tests
+pnpm --filter @neonhub/backend-v3.2 test && echo "✅ Tests passed" || echo "❌ Tests failed"
+
+# Database
+node scripts/db-smoke.mjs && echo "✅ Database healthy" || echo "❌ Database unhealthy"
+
+# Security
+echo "Security checks:"
+grep -r "postgresql://" apps/api/src --include="*.ts" | grep -v "process.env" | grep -v "example" | wc -l
+pnpm audit --production | grep -E "high|critical" | wc -l
+
+echo ""
+echo "═══ CODEX 1 STATUS ═══"
+echo "Phase 6D: $(test -f logs/phase6d-complete.md && echo '✅' || echo '⏳')"
+echo "Phase 6E: $(test -f logs/phase6e-complete.md && echo '✅' || echo '⏳')"
+echo "Phase 6F: $(test -f logs/phase6f-complete.md && echo '✅' || echo '⏳')"
+echo "Testing: $(test -f logs/verification/CODEX1_COMPLETE.md && echo '✅' || echo '⏳')"
+echo ""
+echo "Ready for Codex 2 integration: $(test -f logs/coordination.log && grep -q 'READY_FOR_INTEGRATION' logs/coordination.log && echo '✅ YES' || echo '⏳ Not yet')"
+```
+
+───────────────────────────────────────────────────────────────────────
+EXECUTION STRATEGY
+───────────────────────────────────────────────────────────────────────
+
+1. Work sequentially: 6D → 6E → 6F
+2. Test after each phase (don't accumulate errors)
+3. Commit after each phase: feat(seo): implement phase 6X
+4. Document progress in logs/codex1-progress.log
+5. Signal completion via logs/coordination.log
+6. Wait for Codex 2 to complete before final integration
+
+───────────────────────────────────────────────────────────────────────
+START EXECUTION
+───────────────────────────────────────────────────────────────────────
+
+Begin with Phase 6D. Create internal-linking.ts. Report progress as you go.
+Execute autonomously. Fix errors as they arise. Document everything.
+
+Expected completion time: 3-4 hours
+Target: 100% backend infrastructure ready for frontend integration
+
+GO.

@@ -5,7 +5,7 @@ import * as tasksService from '../services/tasks.service.js';
 import type { CreateTaskInput, UpdateTaskInput } from '../services/tasks.service.js';
 import { ok, fail } from '../lib/http.js';
 
-export const tasksRouter = Router();
+export const tasksRouter: Router = Router();
 
 // Validation schemas
 const createTaskSchema = z.object({

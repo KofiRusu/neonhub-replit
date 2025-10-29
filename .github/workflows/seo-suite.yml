@@ -1,0 +1,314 @@
+name: SEO Suite Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/api/src/services/seo.service.ts'
+      - 'apps/api/src/routes/seo.ts'
+      - 'apps/api/src/agents/SEOAgent.ts'
+      - 'apps/api/prisma/schema.prisma'
+      - 'apps/web/src/app/api/seo/**'
+      - 'apps/web/src/lib/route-map.ts'
+      - '.github/workflows/seo-suite.yml'
+  pull_request:
+    paths:
+      - 'apps/api/src/services/seo.service.ts'
+      - 'apps/api/src/routes/seo.ts'
+      - 'apps/api/src/agents/SEOAgent.ts'
+      - 'apps/api/prisma/schema.prisma'
+      - 'apps/web/src/app/api/seo/**'
+      - 'apps/web/src/lib/route-map.ts'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  prisma-validate:
+    name: Prisma Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: pnpm --filter apps/api prisma:validate
+
+      - name: Generate Prisma client
+        run: pnpm --filter apps/api exec prisma generate
+
+  typecheck:
+    name: TypeScript Type Checking
+    runs-on: ubuntu-latest
+    needs: prisma-validate
+    strategy:
+      matrix:
+        workspace: ['apps/api', 'apps/web']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client (API only)
+        if: matrix.workspace == 'apps/api'
+        run: pnpm --filter apps/api exec prisma generate
+
+      - name: Type check ${{ matrix.workspace }}
+        run: pnpm --filter ${{ matrix.workspace }} typecheck
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    needs: prisma-validate
+    strategy:
+      matrix:
+        workspace: ['apps/api', 'apps/web']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client (API only)
+        if: matrix.workspace == 'apps/api'
+        run: pnpm --filter apps/api exec prisma generate
+
+      - name: Lint ${{ matrix.workspace }}
+        run: pnpm --filter ${{ matrix.workspace }} lint
+
+  seo-endpoint-tests:
+    name: SEO Endpoint Tests
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter apps/api exec prisma generate
+
+      - name: Run database migrations
+        run: pnpm --filter apps/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+      - name: Seed test database
+        run: pnpm --filter apps/api exec prisma db seed
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+      - name: Run API tests (SEO services)
+        run: pnpm --filter apps/api test -- --testPathPattern=seo
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          NODE_ENV: test
+          PORT: 3001
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Upload test coverage
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: seo-test-coverage
+          path: apps/api/coverage/
+
+  integration-smoke:
+    name: SEO Integration Smoke Test
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter apps/api exec prisma generate
+
+      - name: Run database migrations
+        run: pnpm --filter apps/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+      - name: Seed test database
+        run: pnpm --filter apps/api exec prisma db seed
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
+      - name: Start API server in background
+        run: |
+          pnpm --filter apps/api dev &
+          echo $! > api_pid.txt
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          NODE_ENV: development
+          PORT: 3001
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Test SEO audit endpoint
+        run: |
+          curl -f -X POST http://localhost:3001/api/seo/audit \
+            -H "Content-Type: application/json" \
+            -d '{"url":"https://example.com"}' \
+            -o audit_response.json
+          cat audit_response.json | jq .
+
+      - name: Test SEO keywords analyze endpoint
+        run: |
+          curl -f -X POST http://localhost:3001/api/seo/keywords/analyze \
+            -H "Content-Type: application/json" \
+            -d '{"terms":["seo","content marketing","digital strategy"]}' \
+            -o analyze_response.json
+          cat analyze_response.json | jq .
+
+      - name: Test SEO content optimize endpoint
+        run: |
+          curl -f -X POST http://localhost:3001/api/seo/content/optimize \
+            -H "Content-Type: application/json" \
+            -d '{"markdown":"# Test Content\n\nSample body text","targetKeyword":"seo"}' \
+            -o optimize_response.json
+          cat optimize_response.json | jq .
+
+      - name: Verify JSON-LD in optimize response
+        run: |
+          jq -e '.data.jsonLd."@context" == "https://schema.org"' optimize_response.json
+          jq -e '.data.jsonLd."@type" == "Article"' optimize_response.json
+
+      - name: Kill API server
+        if: always()
+        run: |
+          if [ -f api_pid.txt ]; then
+            kill $(cat api_pid.txt) || true
+          fi
+
+      - name: Upload responses
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: seo-endpoint-responses
+          path: '*_response.json'
+
+  summary:
+    name: SEO Suite Summary
+    runs-on: ubuntu-latest
+    needs: [prisma-validate, typecheck, lint, seo-endpoint-tests, integration-smoke]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# SEO Suite Validation Results 🔍" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Prisma Schema | ${{ needs.prisma-validate.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript | ${{ needs.typecheck.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting | ${{ needs.lint.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint Tests | ${{ needs.seo-endpoint-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Smoke | ${{ needs.integration-smoke.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**New endpoints validated:**" >> $GITHUB_STEP_SUMMARY
+          echo "- \`POST /api/seo/keywords/analyze\` - Analyze keyword intent and scoring" >> $GITHUB_STEP_SUMMARY
+          echo "- \`POST /api/seo/content/optimize\` - Optimize content with JSON-LD" >> $GITHUB_STEP_SUMMARY
+

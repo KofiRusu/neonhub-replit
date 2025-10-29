@@ -5,7 +5,7 @@ import * as documentsService from "../services/documents.service.js";
 import type { CreateDocumentInput, UpdateDocumentInput } from "../services/documents.service.js";
 import { ok, fail } from "../lib/http.js";
 
-export const documentsRouter = Router();
+export const documentsRouter: Router = Router();
 
 // Validation schemas
 const createDocumentSchema = z.object({

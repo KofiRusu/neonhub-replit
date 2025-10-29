@@ -1,0 +1,1 @@
+Screenshots could not be generated in the CLI sandbox. Next.js UI requires running pnpm dev, which is blocked because pnpm install cannot run offline. See logs/audit/install.log for the failure.

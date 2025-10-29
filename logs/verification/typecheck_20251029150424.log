@@ -1,0 +1,16 @@
+
+> neonhub@3.2.0 typecheck /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+

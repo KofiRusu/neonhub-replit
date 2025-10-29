@@ -17,7 +17,7 @@ export declare class DynamicPricingEngine {
     updatePricingModel(modelId: string, updates: Partial<PricingModel>): boolean;
     getMarketData(tokenId: string): MarketData | undefined;
     getAllPricingModels(): PricingModel[];
-    getPriceUpdateObservable(): any;
+    getPriceUpdateObservable(): import("rxjs").Observable<Map<string, number>>;
     calculatePriceImpact(tokenId: string, tradeSize: number, isBuy: boolean): number;
     getPricePrediction(tokenId: string, timeHorizon: number): number[];
     getPricingAnalytics(tokenId: string): any;

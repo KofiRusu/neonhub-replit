@@ -1,0 +1,22 @@
+[SDK Structure]
+CHANGELOG.md
+dist
+eslint.config.mjs
+examples
+jest.config.js
+package.json
+PHASE1_COMPLETE.md
+README.md
+src
+tsconfig.json
+[SDK Modules]
+agents.ts
+budget.ts
+campaigns.ts
+content.ts
+events.ts
+marketing.ts
+orchestration.ts
+person.ts
+send.ts
+voice.ts

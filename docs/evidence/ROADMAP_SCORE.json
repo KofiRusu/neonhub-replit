@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-10-28T16:48:25+01:00",
+  "node": "v20.17.0",
+  "pnpm": "9.12.1",
+  "phases": {
+    "0": 0.25,
+    "1": 0.5,
+    "2": 0.25,
+    "3": 0.25,
+    "4": 0.5,
+    "5": 0.0,
+    "6": 0.25,
+    "7": 0.5,
+    "8": 0.25,
+    "9": 0.5,
+    "10": 0.5,
+    "11": 0.25
+  },
+  "overall_mean": 0.33,
+  "blocked": [
+    "pnpm -w install requires network access; node_modules removed and cannot be restored (logs/audit/install.log)",
+    "Prisma CLI and Jest binaries unavailable without workspace dependencies"
+  ],
+  "notes": "Phase0: Baseline commands fail without node_modules (logs/audit/typecheck.log) even though env validation exists in apps/api/src/config/env.ts:1. Phase1: SDK ships dist bundles (core/sdk/dist/index.js:1) and tests (core/sdk/src/__tests__/client.test.ts:1) but cannot execute. Phase2: tRPC router defined (apps/api/src/trpc/router.ts:1) yet not mounted in Express (apps/api/src/server.ts:71). Phase3: Dashboard queries live adapters (apps/web/src/app/dashboard/page.tsx:1, apps/web/src/lib/adapters/trends.ts:1) but requires backend to serve data. Phase4: Allocation engine implemented (apps/api/src/services/budgeting/allocation-engine.ts:1) while history remains TODO (apps/api/src/services/budgeting/index.ts:46). Phase5: Stripe webhook stub lacks signature + ledger writes (apps/api/src/routes/stripe-webhook.ts:1). Phase6: Subscription models exist (apps/api/prisma/schema.prisma:1419) but team invites stay in memory without RBAC (apps/api/src/routes/team.ts:40). Phase7: SEO outputs defined (apps/web/src/app/sitemap.ts:1, apps/web/src/app/layout.tsx:11) yet scripts blocked by missing deps. Phase8: Orchestrator wrapper present (apps/api/src/services/orchestration/router.ts:1) though BrandVoiceAgent remains unregistered (apps/api/src/agents/BrandVoiceAgent.ts:5). Phase9: Learning loop updates available (apps/api/src/services/learning-loop.service.ts:1) with tests (apps/api/src/__tests__/agentic-services.test.ts:1) pending execution. Phase10: Workflows and smoke script exist (.github/workflows/ci.yml:1, scripts/smoke.sh:1) but local runs blocked. Phase11: Launch docs cite smoke steps (PRODUCTION_READY.md:92) without blue/green automation beyond scripts/smoke.sh:1."
+}

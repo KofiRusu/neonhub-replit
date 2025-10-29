@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import {
   Policy,
   PolicyRule,
@@ -47,7 +47,7 @@ export class PolicyEngine extends EventEmitter {
       // Log audit entry
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           policyId: policy.id,
           action: AuditAction.POLICY_UPDATE,
@@ -99,7 +99,7 @@ export class PolicyEngine extends EventEmitter {
       // Log evaluation result
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: AuditAction.POLICY_EVALUATION,
           subject,
@@ -117,7 +117,7 @@ export class PolicyEngine extends EventEmitter {
       // Log evaluation error
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: AuditAction.POLICY_EVALUATION,
           subject,
@@ -159,7 +159,7 @@ export class PolicyEngine extends EventEmitter {
     // Log audit entry
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         policyId,
         action: AuditAction.POLICY_UPDATE,
@@ -190,7 +190,7 @@ export class PolicyEngine extends EventEmitter {
     // Log audit entry
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         policyId,
         action: AuditAction.POLICY_UPDATE,
@@ -275,7 +275,7 @@ export class PolicyEngine extends EventEmitter {
           // Log rule trigger
           if (this.auditLogger) {
             await this.auditLogger.log({
-              id: uuidv4(),
+              id: randomUUID(),
               timestamp: new Date(),
               policyId: policy.id,
               ruleId: rule.id,
@@ -290,7 +290,7 @@ export class PolicyEngine extends EventEmitter {
         // Log rule evaluation error
         if (this.auditLogger) {
           await this.auditLogger.log({
-            id: uuidv4(),
+            id: randomUUID(),
             timestamp: new Date(),
             policyId: policy.id,
             ruleId: rule.id,

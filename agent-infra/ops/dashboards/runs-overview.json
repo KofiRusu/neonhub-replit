@@ -1,0 +1,35 @@
+{
+  "title": "Agent Runs Overview",
+  "panels": [
+    {
+      "title": "Runs Started",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "increase(agent_runs_started_total[5m])",
+          "legendFormat": "Runs"
+        }
+      ]
+    },
+    {
+      "title": "Run Failures",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "increase(agent_runs_failed_total[5m])",
+          "legendFormat": "Failures"
+        }
+      ]
+    },
+    {
+      "title": "Step Success Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "increase(agent_steps_succeeded_total[5m]) / clamp_min(increase(agent_steps_started_total[5m]), 1)",
+          "legendFormat": "Success Rate"
+        }
+      ]
+    }
+  ]
+}

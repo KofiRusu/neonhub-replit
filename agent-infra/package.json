@@ -1,0 +1,24 @@
+{
+  "name": "agent-infra",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NeonHub Agent Infrastructure monorepo",
+  "packageManager": "pnpm@9.12.2",
+  "scripts": {
+    "install:all": "pnpm install",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "dev:all": "concurrently -n api,worker -c auto \"pnpm --filter @agent-infra/api dev\" \"pnpm --filter @agent-infra/worker dev\"",
+    "prisma:generate": "pnpm --filter @agent-infra/api prisma:generate",
+    "prisma:migrate": "pnpm --filter @agent-infra/api prisma:migrate",
+    "prisma:seed": "pnpm --filter @agent-infra/api prisma:seed",
+    "e2e:smoke": "pnpm --filter @agent-infra/api e2e:smoke",
+    "dev:worker": "pnpm --filter @agent-infra/worker dev",
+    "build:worker": "pnpm --filter @agent-infra/worker build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

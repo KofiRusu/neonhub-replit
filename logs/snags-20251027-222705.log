@@ -1,0 +1,2 @@
+→ pnpm --filter apps/api prisma db execute --stdin <<< 'SELECT COUNT(*) as total_users FROM users;'
+Script executed successfully.

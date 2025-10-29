@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ok, fail } from "../lib/http";
 import { sequence } from "../services/email.service";
 
-export const emailRouter = Router();
+export const emailRouter: Router = Router();
 
 emailRouter.post("/email/sequence", async (req, res) => {
   try {

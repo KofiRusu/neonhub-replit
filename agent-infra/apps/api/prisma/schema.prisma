@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RunStatus {
+  queued
+  running
+  completed
+  failed
+  cancelled
+}
+
+enum StepStatus {
+  ready
+  running
+  succeeded
+  failed
+  skipped
+  retrying
+  dlq
+}
+
+enum CredentialKind {
+  oauth2
+  apiKey
+  basic
+}
+
+enum TriggerKind {
+  manual
+  schedule
+  webhook
+}
+
+model User {
+  id          String             @id @default(cuid())
+  email       String             @unique
+  name        String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  memberships WorkspaceMember[]
+  auditLogs   AuditLog[]
+  apiTokens   ApiToken[]
+}
+
+model ApiToken {
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String
+  token       String   @unique
+  scopes      String[]
+  createdAt   DateTime @default(now())
+  revokedAt   DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+}
+
+model Workspace {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  users       WorkspaceMember[]
+  workflows   Workflow[]
+  credentials Credential[]
+  auditLogs   AuditLog[]
+  webhookEvents WebhookEvent[]
+  apiTokens   ApiToken[]
+  runs        AgentRun[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        String
+  createdAt   DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model Workflow {
+  id              String            @id @default(cuid())
+  workspaceId     String
+  name            String
+  latestVersionId String?           @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  workspace     Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  latestVersion WorkflowVersion? @relation("latestVersion", fields: [latestVersionId], references: [id])
+  versions      WorkflowVersion[]
+  runs          AgentRun[]
+
+  @@index([workspaceId, name])
+  @@unique([workspaceId, name], name: "workspaceId_name")
+}
+
+model WorkflowVersion {
+  id         String    @id @default(cuid())
+  workflowId String
+  version    Int
+  dagJson    Json
+  status     String
+  createdAt  DateTime  @default(now())
+
+  workflow      Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  runs          AgentRun[]
+  latestForWorkflow Workflow? @relation("latestVersion")
+
+  @@unique([workflowId, version])
+}
+
+model AgentRun {
+  id             String     @id @default(cuid())
+  workflowId     String
+  versionId      String
+  workspaceId    String
+  status         RunStatus  @default(queued)
+  trigger        TriggerKind
+  input          Json?
+  output         Json?
+  error          Json?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  idempotencyKey String?    @unique
+  createdAt      DateTime   @default(now())
+
+  workflow  Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  version   WorkflowVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  workspace Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  steps     RunStep[]
+  metrics   AgentRunMetric[]
+
+  @@index([workspaceId, status, createdAt])
+}
+
+model AgentRunMetric {
+  id        String   @id @default(cuid())
+  runId     String
+  name      String
+  value     Float?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, name])
+}
+
+model RunStep {
+  id           String     @id @default(cuid())
+  runId        String
+  nodeId       String
+  type         String
+  status       StepStatus @default(ready)
+  attempt      Int        @default(0)
+  maxAttempts  Int        @default(3)
+  scheduledFor DateTime?
+  input        Json?
+  output       Json?
+  error        Json?
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime    @default(now())
+
+  run        AgentRun       @relation(fields: [runId], references: [id], onDelete: Cascade)
+  executions ToolExecution[]
+
+  @@index([runId, status])
+  @@unique([runId, nodeId, attempt])
+}
+
+model ToolExecution {
+  id         String   @id @default(cuid())
+  stepId     String
+  connector  String
+  action     String
+  request    Json
+  response   Json?
+  error      Json?
+  durationMs Int?
+  createdAt  DateTime @default(now())
+
+  step RunStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([connector, action])
+}
+
+model Credential {
+  id           String         @id @default(cuid())
+  workspaceId  String
+  connectorKey String
+  kind         CredentialKind
+  label        String
+  cipherText   Bytes
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, connectorKey])
+}
+
+model Connector {
+  key       String   @id
+  name      String
+  version   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  actorId     String?
+  event       String
+  data        Json?
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor     User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  workspaceId String
+  source      String
+  payload     Json
+  receivedAt  DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, receivedAt])
+}
+
+model IdempotencyKey {
+  key        String  @id
+  scope      String
+  resourceId String
+  createdAt  DateTime @default(now())
+}

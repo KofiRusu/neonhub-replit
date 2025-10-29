@@ -1,0 +1,154 @@
+
+> neonhub@3.2.0 build /Users/kofirusu/Desktop/NeonHub
+> npm run prisma:generate && npm run build:api && npm run build:web && npm run build:engine
+
+
+> neonhub@3.2.0 prisma:generate
+> npm run prisma:generate --workspace=apps/api
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 330ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+
+> neonhub@3.2.0 build:api
+> npm run build --workspace=apps/api
+
+
+> @neonhub/backend-v3.2@3.2.0 build
+> npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 350ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+
+> neonhub@3.2.0 build:web
+> npm run build --workspace=apps/web
+
+
+> @neonhub/ui-v3.2@3.2.0 build
+> npm run prisma:generate && node ../../scripts/run-cli.mjs next build
+
+
+> @neonhub/ui-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Environment variables loaded from .env
+Prisma schema loaded from ../api/prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 473ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+   ▲ Next.js 15.5.6
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 5.4s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/16) ...
+   Generating static pages (4/16) 
+   Generating static pages (8/16) 
+   Generating static pages (12/16) 
+ ✓ Generating static pages (16/16)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                      379 B         102 kB
+├ ƒ /_not-found                            191 B         102 kB
+├ ƒ /agents                               9.1 kB         175 kB
+├ ƒ /analytics                           2.78 kB         171 kB
+├ ƒ /api/analytics/brand-voice-kpis        191 B         102 kB
+├ ƒ /api/analytics/executive-summary       191 B         102 kB
+├ ƒ /api/auth/[...nextauth]                191 B         102 kB
+├ ƒ /api/brand-voice/profile               191 B         102 kB
+├ ƒ /api/brand-voice/search                191 B         102 kB
+├ ƒ /api/content/generate-post             191 B         102 kB
+├ ƒ /api/email/sequence                    191 B         102 kB
+├ ƒ /api/seo/audit                         191 B         102 kB
+├ ƒ /api/seo/content/optimize              191 B         102 kB
+├ ƒ /api/seo/keywords/analyze              191 B         102 kB
+├ ƒ /api/sms/send                          191 B         102 kB
+├ ƒ /api/support/reply                     191 B         102 kB
+├ ƒ /api/trends/brief                      191 B         102 kB
+├ ƒ /auth/signin                         1.85 kB         149 kB
+├ ƒ /billing                             10.6 kB         203 kB
+├ ƒ /brand-voice                         9.66 kB         170 kB
+├ ƒ /campaigns                           5.33 kB         176 kB
+├ ƒ /content                             13.3 kB         179 kB
+├ ƒ /content/[id]/review                 1.04 kB         136 kB
+├ ƒ /content/new                           589 B         135 kB
+├ ƒ /dashboard                           5.73 kB         188 kB
+├ ƒ /dashboard/seo                       3.42 kB         139 kB
+├ ƒ /dashboard/seo/analytics               191 B         102 kB
+├ ƒ /dashboard/seo/content               4.99 kB         137 kB
+├ ƒ /dashboard/seo/keywords              3.43 kB         136 kB
+├ ƒ /dashboard/seo/links                 3.02 kB         135 kB
+├ ƒ /dashboard/seo/trends                1.45 kB         137 kB
+├ ƒ /deployment                          6.87 kB         137 kB
+├ ƒ /documents                           7.45 kB         222 kB
+├ ƒ /email                               9.84 kB         181 kB
+├ ƒ /feedback                              191 B         102 kB
+├ ƒ /legal/privacy                         191 B         102 kB
+├ ƒ /legal/terms                           191 B         102 kB
+├ ƒ /marketing                             347 B         102 kB
+├ ƒ /marketing/attribution                 338 B         102 kB
+├ ƒ /marketing/campaigns                   340 B         102 kB
+├ ƒ /marketing/funnel                      352 B         102 kB
+├ ƒ /marketing/insights                    354 B         102 kB
+├ ƒ /marketing/leads                       343 B         102 kB
+├ ƒ /marketing/roi                         340 B         102 kB
+├ ƒ /messaging                             191 B         102 kB
+├ ƒ /metrics                               191 B         102 kB
+├ ƒ /settings                            4.65 kB         173 kB
+├ ○ /sitemap.xml                           191 B         102 kB
+├ ƒ /social-media                        6.59 kB         215 kB
+├ ƒ /support                             1.63 kB         140 kB
+├ ƒ /tasks                                 191 B         102 kB
+├ ƒ /team                                 9.2 kB         224 kB
+└ ƒ /trends                              8.39 kB         190 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/7610-67bfc49cd3331fe4.js      45.6 kB
+  ├ chunks/ea88c1da-8a86e8fb9e4a5c7f.js  54.2 kB
+  └ other shared chunks (total)          1.94 kB
+
+
+ƒ Middleware                             61.4 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+> neonhub@3.2.0 build:engine
+> npm run build --workspace=@neonhub/predictive-engine
+
+
+> @neonhub/predictive-engine@3.2.0 build
+> tsc
+

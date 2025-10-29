@@ -1,0 +1,16 @@
+
+> @neonhub/backend-v3.2@3.2.0 test /Users/kofirusu/Desktop/NeonHub/apps/api
+> NODE_ENV=test node ../../scripts/run-cli.mjs jest "--runInBand" "--testPathPattern=budget"
+
+testPathPattern:
+
+  Option "testPathPattern" was replaced by "--testPathPatterns". "--testPathPatterns" is only available as a command-line option.
+  
+  Please update your configuration.
+
+  CLI Options Documentation:
+  https://jestjs.io/docs/cli
+
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 test: `NODE_ENV=test node ../../scripts/run-cli.mjs jest "--runInBand" "--testPathPattern=budget"`
+Exit status 1

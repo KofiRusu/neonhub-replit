@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ok, fail } from "../lib/http";
 import { executiveSummary, brandVoiceKpis } from "../services/analytics.service";
 
-export const analyticsRouter = Router();
+export const analyticsRouter: Router = Router();
 
 analyticsRouter.post("/analytics/executive-summary", async (req, res) => {
   try {

@@ -1,13 +1,24 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { config as loadEnv } from 'dotenv';
+import path from "path";
+import { jest } from "@jest/globals";
+import { config as loadEnv } from "dotenv";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const envPath = path.resolve(process.cwd(), ".env.test");
 
 loadEnv({
-  path: path.resolve(__dirname, '.env.test'),
-  override: false
+  path: envPath,
+  override: false,
 });
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+process.env.NODE_ENV = process.env.NODE_ENV || "test";
+
+jest.mock("superjson", () => ({
+  __esModule: true,
+  default: {
+    serialize: (data: unknown) => ({ json: data }),
+    deserialize: <T>(value: T) => value,
+  },
+  serialize: (data: unknown) => ({ json: data }),
+  deserialize: <T>(value: T) => value,
+  stringify: JSON.stringify,
+  parse: JSON.parse,
+}));

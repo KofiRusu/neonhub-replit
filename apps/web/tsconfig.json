@@ -39,6 +39,18 @@
       ],
       "@/types/*": [
         "./src/types/*"
+      ],
+      "@/mocks/*": [
+        "./src/mocks/*"
+      ],
+      "@neonhub/sdk": [
+        "../../core/sdk/dist"
+      ],
+      "@neonhub/sdk/*": [
+        "../../core/sdk/dist/*"
+      ],
+      "@neonhub/sdk/client": [
+        "../../core/sdk/dist/client"
       ]
     },
     "target": "ES2020",

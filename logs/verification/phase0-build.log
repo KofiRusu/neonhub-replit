@@ -1,0 +1,790 @@
+
+> neonhub@3.2.0 build /Users/kofirusu/Desktop/NeonHub
+> npm run prisma:generate && npm run build --workspaces --if-present
+
+
+> neonhub@3.2.0 prisma:generate
+> npm run prisma:generate --workspace=apps/api
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+Error: Cannot find module 'prisma/build/index.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+[prisma:generate] Prisma client artifacts already present. Skipping engine download.
+
+> @neonhub/backend-v3.2@3.2.0 build
+> npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+Error: Cannot find module 'prisma/build/index.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+[prisma:generate] Prisma client artifacts already present. Skipping engine download.
+src/routes/brand-voice.ts(26,52): error TS2345: Argument of type '{ objective?: string; brandId?: string; channel?: "post" | "email" | "sms" | "dm"; personId?: string; constraints?: Record<string, unknown>; }' is not assignable to parameter of type 'ComposeArgs'.
+  Property 'channel' is optional in type '{ objective?: string; brandId?: string; channel?: "post" | "email" | "sms" | "dm"; personId?: string; constraints?: Record<string, unknown>; }' but required in type 'ComposeArgs'.
+src/routes/budget.ts(34,70): error TS2345: Argument of type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }[]' is not assignable to parameter of type 'BudgetObjectivePlan[]'.
+  Type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }' is not assignable to type 'BudgetObjectivePlan'.
+    Property 'objectiveId' is optional in type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }' but required in type 'BudgetObjectivePlan'.
+src/routes/budgets.ts(11,7): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/routes/person.ts(98,9): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': length, concat, join, slice, and 20 more.
+src/routes/sms.ts(18,25): error TS2345: Argument of type '{ operatorId: string; objective?: string; brandId?: string; personId?: string; }' is not assignable to parameter of type 'SmsSendArgs'.
+  Property 'personId' is optional in type '{ operatorId: string; objective?: string; brandId?: string; personId?: string; }' but required in type 'SmsSendArgs'.
+src/routes/social.ts(30,39): error TS2345: Argument of type '{ platform: "instagram" | "reddit" | "x" | "whatsapp"; operatorId: string; objective?: string; brandId?: string; personId?: string; }' is not assignable to parameter of type 'SocialDMArgs'.
+  Property 'personId' is optional in type '{ platform: "instagram" | "reddit" | "x" | "whatsapp"; operatorId: string; objective?: string; brandId?: string; personId?: string; }' but required in type 'SocialDMArgs'.
+src/services/budget.service.ts(53,11): error TS2322: Type '{ objectives: BudgetObjectivePlan[]; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'objectives' are incompatible.
+    Type 'BudgetObjectivePlan[]' is not assignable to type 'InputJsonValue'.
+      Type 'BudgetObjectivePlan[]' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'BudgetObjectivePlan[]'.
+src/services/event-intake.service.ts(44,25): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(44,44): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(44,81): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(106,7): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/event-intake.service.ts(165,11): error TS2322: Type '{ classification: EventClassification; summary: string; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'classification' are incompatible.
+    Type 'EventClassification' is not assignable to type 'InputJsonValue'.
+      Type 'EventClassification' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'EventClassification'.
+src/services/learning-loop.service.ts(29,5): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/learning-loop.service.ts(60,9): error TS2322: Type '{ lastOutcome: PromptOutcome; lastUpdatedAt: string; objective: string; channel: string; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'lastOutcome' are incompatible.
+    Type 'PromptOutcome' is not assignable to type 'InputJsonValue'.
+      Type 'PromptOutcome' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'PromptOutcome'.
+src/services/learning-loop.service.ts(140,7): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/person.service.ts(251,78): error TS2339: Property 'embedding' does not exist on type '{ sourceEvent: { type: string; topic: string; id: string; createdAt: Date; metadata: JsonValue; organizationId: string; channel: string; personId: string; source: string; campaignId: string; ... 5 more ...; occurredAt: Date; }; } & { ...; }'.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(13,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(13,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/agents.router.ts(9,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/agents.router.ts(9,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/agents.router.ts(75,11): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'InputJsonValue | JsonNull'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': length, concat, join, slice, and 20 more.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(57,14): error TS2742: The inferred type of 'loggerMiddleware' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(57,14): error TS2742: The inferred type of 'loggerMiddleware' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(70,14): error TS2742: The inferred type of 'loggedProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(70,14): error TS2742: The inferred type of 'loggedProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/types/brand-voice.ts(7,15): error TS2305: Module '"./agentic"' has no exported member 'Channel'.
+src/types/brand-voice.ts(7,24): error TS2305: Module '"./agentic"' has no exported member 'ObjectiveType'.
+src/types/budget.ts(7,15): error TS2305: Module '"./agentic"' has no exported member 'Channel'.
+src/types/budget.ts(7,24): error TS2305: Module '"./agentic"' has no exported member 'ObjectiveType'.
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .
+
+
+> @neonhub/ui-v3.2@3.2.0 build
+> npm run prisma:generate && node ../../scripts/run-cli.mjs next build
+
+
+> @neonhub/ui-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+Error: Cannot find module 'prisma/build/index.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+[prisma:generate] Prisma client artifacts already present. Skipping engine download.
+Unable to resolve binary for "next" (module "next/dist/bin/next"). Did you install dependencies?
+Error: Cannot find module 'next/dist/bin/next'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error workspace @neonhub/ui-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error command failed
+npm error command sh -c npm run prisma:generate && node ../../scripts/run-cli.mjs next build
+
+
+> @neonhub/ai-economy@5.0.0 build
+> tsc
+
+
+> @neonhub/ai-governance@1.0.0 build
+> tsc
+
+src/compliance/LegalComplianceManager.ts(2,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/core/EthicalFramework.ts(2,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/core/PolicyEnforcer.ts(2,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/core/PolicyEngine.ts(2,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/monitoring/AuditLogger.ts(2,26): error TS2307: Cannot find module 'winston' or its corresponding type declarations.
+src/monitoring/AuditLogger.ts(3,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/types/index.ts(1,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/ai-governance
+npm error workspace @neonhub/ai-governance@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/ai-governance
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/cognitive-ethics@7.1.0 build
+> tsc
+
+
+> @neonhub/cognitive-infra@5.0.0 build
+> tsc
+
+
+> @neonhub/compliance-consent@4.0.0 build
+> tsc
+
+
+> @neonhub/cooperative-intelligence@7.0.0 build
+> tsc
+
+error TS18003: No inputs were found in config file '/Users/kofirusu/Desktop/NeonHub/core/cooperative-intelligence/tsconfig.json'. Specified 'include' paths were '["src/**/*"]' and 'exclude' paths were '["node_modules","dist","**/*.test.ts"]'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/cooperative-intelligence
+npm error workspace @neonhub/cooperative-intelligence@7.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/cooperative-intelligence
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/data-trust@1.0.0 build
+> tsc
+
+src/core/AuditTrail.ts(3,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+src/core/AuditTrail.ts(4,26): error TS2307: Cannot find module 'winston' or its corresponding type declarations.
+src/core/ProvenanceTracker.ts(1,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/data-trust
+npm error workspace @neonhub/data-trust@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/data-trust
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/eco-optimizer@1.0.0 build
+> tsc
+
+
+> @neonhub/federation@4.0.0 build
+> tsc
+
+src/websocket/WebSocketServer.ts(21,26): error TS2694: Namespace 'WebSocket' has no exported member 'Server'.
+src/websocket/WebSocketServer.ts(47,32): error TS2339: Property 'Server' does not exist on type 'typeof WebSocket'.
+src/websocket/WebSocketServer.ts(49,49): error TS7006: Parameter 'request' implicitly has an 'any' type.
+src/websocket/WebSocketServer.ts(53,29): error TS7006: Parameter 'error' implicitly has an 'any' type.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/federation
+npm error workspace @neonhub/federation@4.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/federation
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/mesh-resilience@7.0.0 build
+> tsc
+
+
+> @neonhub/orchestrator-global@1.0.0 build
+> tsc
+
+src/services/HealthMonitoringService.ts(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/services/NodeDiscoveryService.ts(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/services/NodeDiscoveryService.ts(4,30): error TS2307: Cannot find module 'uuid' or its corresponding type declarations.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/orchestrator-global
+npm error workspace @neonhub/orchestrator-global@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/orchestrator-global
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/qa-sentinel@5.1.0 build
+> tsc
+
+../../apps/api/src/config/env.ts(137,3): error TS2739: Type '{ DATABASE_URL: string; NEXTAUTH_SECRET: string; NEXTAUTH_URL: string; CORS_ORIGINS: string[]; REDIS_URL: string; STRIPE_SECRET_KEY: string; STRIPE_WEBHOOK_SECRET: string; RESEND_API_KEY: string; ... 8 more ...; TWILIO_PHONE_NUMBER: string | undefined; }' is missing the following properties from type '{ DATABASE_URL: string; NEXTAUTH_SECRET: string; NEXTAUTH_URL: string; CORS_ORIGINS: string[]; STRIPE_SECRET_KEY: string; STRIPE_WEBHOOK_SECRET: string; RESEND_API_KEY: string; OPENAI_API_KEY: string; ... 13 more ...; REDDIT_CLIENT_SECRET?: string | undefined; }': BETA_ENABLED, REDDIT_USER_AGENT
+../../apps/api/src/lib/logger.ts(2,24): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/apps/api/src/config/env.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+../../apps/api/src/lib/logger.ts(2,24): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/apps/api/src/config/env.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../aib/index.ts(2,56): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/aib/types.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+../aib/index.ts(2,56): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/aib/types.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../federation/src/federated-learning/FederatedLearningCoordinator.ts(11,37): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '../privacy/DifferentialPrivacy' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via './privacy/DifferentialPrivacy' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/federated-learning/FederatedLearningCoordinator.ts(11,37): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '../privacy/DifferentialPrivacy' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via './privacy/DifferentialPrivacy' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/federated-learning/FederatedLearningCoordinator.ts(12,39): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '../crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via './crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via './crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/federated-learning/FederatedLearningCoordinator.ts(12,39): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '../crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via './crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via './crypto/HomomorphicEncryption' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(16,8): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/types/index.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via './types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(16,8): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/types/index.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via './types' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(17,24): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/Logger.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(17,24): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/Logger.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via './Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/DifferentialPrivacy.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/HomomorphicEncryption.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via '../utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+    Imported via './utils/Logger' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(19,29): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(19,29): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/auth/AuthManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts'
+    Imported via '../auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './auth/AuthManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(20,33): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './websocket/WebSocketServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './websocket/WebSocketServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(20,33): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketServer.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './websocket/WebSocketServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './websocket/WebSocketServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(21,33): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(21,33): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/websocket/WebSocketClient.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via './websocket/WebSocketClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(22,28): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './grpc/GRPCServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './grpc/GRPCServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(22,28): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCServer.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './grpc/GRPCServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './grpc/GRPCServer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(23,28): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via '../grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via './grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(23,28): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/grpc/GRPCClient.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via '../grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts'
+    Imported via '../grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts'
+    Imported via './grpc/GRPCClient' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(24,32): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './utils/ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via './utils/ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(24,32): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/ConnectionPool.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './utils/ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts'
+    Imported via './utils/ConnectionPool' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(25,53): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './utils/LoadBalancer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/LoadBalancer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(25,53): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/LoadBalancer.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './utils/LoadBalancer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/LoadBalancer' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(26,31): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './utils/HealthChecker' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/HealthChecker' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(26,31): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/utils/HealthChecker.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './utils/HealthChecker' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './utils/HealthChecker' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(27,46): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './federated-learning/FederatedLearningCoordinator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/FederatedLearningCoordinator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(27,46): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/FederatedLearningCoordinator.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './federated-learning/FederatedLearningCoordinator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/FederatedLearningCoordinator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(28,35): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './federated-learning/SecureAggregation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/SecureAggregation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(28,35): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/SecureAggregation.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './federated-learning/SecureAggregation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/SecureAggregation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(29,33): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './federated-learning/ModelValidation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/ModelValidation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(29,33): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ModelValidation.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './federated-learning/ModelValidation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/ModelValidation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(30,36): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './federated-learning/ParticipantManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/ParticipantManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(30,36): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/federated-learning/ParticipantManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './federated-learning/ParticipantManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './federated-learning/ParticipantManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(31,38): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './privacy/PrivacyBudgetManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './privacy/PrivacyBudgetManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(31,38): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/privacy/PrivacyBudgetManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './privacy/PrivacyBudgetManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './privacy/PrivacyBudgetManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(33,28): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './crypto/KeyManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './crypto/KeyManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(33,28): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/KeyManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './crypto/KeyManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './crypto/KeyManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(34,45): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './crypto/SecureMultiPartyComputation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './crypto/SecureMultiPartyComputation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(34,45): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/crypto/SecureMultiPartyComputation.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './crypto/SecureMultiPartyComputation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './crypto/SecureMultiPartyComputation' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(35,47): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './aix/AIXProtocolManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/AIXProtocolManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(35,47): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/AIXProtocolManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './aix/AIXProtocolManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/AIXProtocolManager' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(36,34): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './aix/ModelCompression' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/ModelCompression' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(36,34): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelCompression.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './aix/ModelCompression' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/ModelCompression' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(37,40): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './aix/IntelligenceAggregator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/IntelligenceAggregator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(37,40): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/IntelligenceAggregator.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './aix/IntelligenceAggregator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/IntelligenceAggregator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(38,32): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './aix/ModelEvaluator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/ModelEvaluator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/FederationManager.ts(38,32): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/aix/ModelEvaluator.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './aix/ModelEvaluator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts'
+    Imported via './aix/ModelEvaluator' from file '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts'
+../federation/src/index.ts(2,53): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+../federation/src/index.ts(2,53): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/FederationManager.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../federation/src/websocket/WebSocketServer.ts(21,26): error TS2694: Namespace 'WebSocket' has no exported member 'Server'.
+../federation/src/websocket/WebSocketServer.ts(47,32): error TS2339: Property 'Server' does not exist on type 'typeof WebSocket'.
+../federation/src/websocket/WebSocketServer.ts(49,49): error TS7006: Parameter 'request' implicitly has an 'any' type.
+../federation/src/websocket/WebSocketServer.ts(53,29): error TS7006: Parameter 'error' implicitly has an 'any' type.
+src/anomaly-detection/AnomalyDetector.ts(2,27): error TS7016: Could not find a declaration file for module 'stats-lite'. '/Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/stats-lite@2.2.0/node_modules/stats-lite/stats.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/stats-lite` if it exists or add a new declaration (.d.ts) file containing `declare module 'stats-lite';`
+src/benchmarking/AdaptiveBenchmarking.ts(2,27): error TS7016: Could not find a declaration file for module 'stats-lite'. '/Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/stats-lite@2.2.0/node_modules/stats-lite/stats.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/stats-lite` if it exists or add a new declaration (.d.ts) file containing `declare module 'stats-lite';`
+src/core/QASentinel.ts(3,38): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/aib/index.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '../../../aib' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/core/QASentinel.ts' with packageId '@neonhub/aib/index.ts@4.0.0'
+    Imported via '../aib' from file '/Users/kofirusu/Desktop/NeonHub/core/self-healing/index.ts' with packageId '@neonhub/aib/index.ts@4.0.0'
+src/core/QASentinel.ts(3,38): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/aib/index.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '../../../aib' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/core/QASentinel.ts' with packageId '@neonhub/aib/index.ts@4.0.0'
+    Imported via '../aib' from file '/Users/kofirusu/Desktop/NeonHub/core/self-healing/index.ts' with packageId '@neonhub/aib/index.ts@4.0.0'
+src/core/QASentinel.ts(4,50): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/self-healing/index.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '../../../self-healing' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/core/QASentinel.ts' with packageId '@neonhub/self-healing/index.ts@3.3.0'
+    Imported via '../../../self-healing' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/self-healing/QASelfHealingIntegration.ts' with packageId '@neonhub/self-healing/index.ts@3.3.0'
+src/core/QASentinel.ts(4,50): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/self-healing/index.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '../../../self-healing' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/core/QASentinel.ts' with packageId '@neonhub/self-healing/index.ts@3.3.0'
+    Imported via '../../../self-healing' from file '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/src/self-healing/QASelfHealingIntegration.ts' with packageId '@neonhub/self-healing/index.ts@3.3.0'
+src/core/QASentinel.ts(5,34): error TS2307: Cannot find module '../../../modules/predictive-engine/src/core/PredictiveEngine' or its corresponding type declarations.
+src/core/QASentinel.ts(336,52): error TS2339: Property 'analyze' does not exist on type 'CognitiveInfrastructure'.
+src/ml/TestGenerator.ts(1,21): error TS2307: Cannot find module '@tensorflow/tfjs-node' or its corresponding type declarations.
+src/ml/TestGenerator.ts(2,37): error TS7016: Could not find a declaration file for module 'stats-lite'. '/Users/kofirusu/Desktop/NeonHub/node_modules/.pnpm/stats-lite@2.2.0/node_modules/stats-lite/stats.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/stats-lite` if it exists or add a new declaration (.d.ts) file containing `declare module 'stats-lite';`
+src/ml/TestGenerator.ts(65,24): error TS7006: Parameter 'epoch' implicitly has an 'any' type.
+src/ml/TestGenerator.ts(65,31): error TS7006: Parameter 'logs' implicitly has an 'any' type.
+src/self-healing/QASelfHealingIntegration.ts(45,29): error TS2339: Property 'on' does not exist on type 'SelfHealingManager'.
+src/self-healing/QASelfHealingIntegration.ts(46,29): error TS2339: Property 'on' does not exist on type 'SelfHealingManager'.
+../self-healing/index.ts(1,24): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/logger.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+../self-healing/index.ts(1,24): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/logger.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+../self-healing/index.ts(3,35): error TS6059: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts' is not under 'rootDir' '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel'. 'rootDir' is expected to contain all source files.
+../self-healing/index.ts(3,35): error TS6307: File '/Users/kofirusu/Desktop/NeonHub/core/federation/src/index.ts' is not listed within the file list of project '/Users/kofirusu/Desktop/NeonHub/core/qa-sentinel/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/core/qa-sentinel
+npm error workspace @neonhub/qa-sentinel@5.1.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/qa-sentinel
+npm error command failed
+npm error command sh -c tsc
+
+
+> @neonhub/sdk@1.0.0 build
+> tsup src/index.ts src/client.ts src/mocks/index.ts --format cjs,esm --dts --clean
+
+CLI Building entry: src/client.ts, src/index.ts, src/mocks/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.0
+CLI Target: es2020
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:12:6:
+[37m      12 │       [32m"types"[37m: "./dist/index.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:10:6:
+[37m      10 │       [32m"import"[37m: "./dist/index.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:11:6:
+[37m      11 │       [32m"require"[37m: "./dist/index.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:17:6:
+[37m      17 │       [32m"types"[37m: "./dist/client.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:15:6:
+[37m      15 │       [32m"import"[37m: "./dist/client.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:16:6:
+[37m      16 │       [32m"require"[37m: "./dist/client.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:22:6:
+[37m      22 │       [32m"types"[37m: "./dist/mocks/index.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:20:6:
+[37m      20 │       [32m"import"[37m: "./dist/mocks/index.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:21:6:
+[37m      21 │       [32m"require"[37m: "./dist/mocks/index.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:12:6:
+[37m      12 │       [32m"types"[37m: "./dist/index.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:10:6:
+[37m      10 │       [32m"import"[37m: "./dist/index.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:11:6:
+[37m      11 │       [32m"require"[37m: "./dist/index.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:17:6:
+[37m      17 │       [32m"types"[37m: "./dist/client.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:15:6:
+[37m      15 │       [32m"import"[37m: "./dist/client.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:16:6:
+[37m      16 │       [32m"require"[37m: "./dist/client.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+
+ WARN  [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe condition "types" here will never be used as it comes after both "import" and "require"[0m [package.json]
+
+    package.json:22:6:
+[37m      22 │       [32m"types"[37m: "./dist/mocks/index.d.ts"
+         ╵       [32m~~~~~~~[0m
+
+  The "import" condition comes earlier and will be used for all "import" statements:
+
+    package.json:20:6:
+[37m      20 │       [32m"import"[37m: "./dist/mocks/index.mjs",
+         ╵       [32m~~~~~~~~[0m
+
+  The "require" condition comes earlier and will be used for all "require" calls:
+
+    package.json:21:6:
+[37m      21 │       [32m"require"[37m: "./dist/mocks/index.js",
+         ╵       [32m~~~~~~~~~[0m
+
+
+
+CJS dist/mocks/index.js 9.82 KB
+CJS dist/index.js       36.68 KB
+CJS dist/client.js      4.69 KB
+CJS ⚡️ Build success in 69ms
+ESM dist/chunk-TH44ABPO.mjs 3.61 KB
+ESM dist/index.mjs          30.98 KB
+ESM dist/mocks/index.mjs    8.75 KB
+ESM dist/client.mjs         162.00 B
+ESM ⚡️ Build success in 70ms
+DTS Build start
+DTS ⚡️ Build success in 1543ms
+DTS dist/index.d.ts            39.67 KB
+DTS dist/mocks/index.d.ts      406.00 B
+DTS dist/client.d.ts           123.00 B
+DTS dist/client-CwS0ppOh.d.ts  5.82 KB
+DTS dist/index.d.mts           39.67 KB
+DTS dist/mocks/index.d.mts     407.00 B
+DTS dist/client.d.mts          124.00 B
+DTS dist/client-CwS0ppOh.d.mts 5.82 KB
+
+> @neonhub/predictive-engine@3.2.0 build
+> tsc
+
+src/memory/PgVectorStore.ts(129,50): error TS2345: Argument of type 'Sql' is not assignable to parameter of type 'string'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine
+npm error workspace @neonhub/predictive-engine@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine
+npm error command failed
+npm error command sh -c tsc
+ ELIFECYCLE  Command failed with exit code 2.

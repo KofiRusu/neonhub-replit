@@ -7,6 +7,8 @@ const envSchema = z.object({
     NEXTAUTH_URL: z.string().url('NEXTAUTH_URL must be a valid URL'),
     // CORS
     CORS_ORIGINS: z.string().min(1, 'CORS_ORIGINS must be provided').transform((val) => val.split(',').map(origin => origin.trim()).filter(Boolean)),
+    // Infrastructure
+    REDIS_URL: z.string().url().optional(),
     // Payment
     STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
     STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
@@ -17,12 +19,20 @@ const envSchema = z.object({
     // Environment
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     PORT: z.coerce.number().positive().default(3001),
+    // Beta Program
+    BETA_ENABLED: z.coerce.boolean().default(false),
     // Optional - Monitoring
     SENTRY_DSN: z.string().url().optional(),
     // Optional - SMS
     TWILIO_ACCOUNT_SID: z.string().optional(),
+    TWILIO_SID: z.string().optional(),
     TWILIO_AUTH_TOKEN: z.string().optional(),
     TWILIO_PHONE_NUMBER: z.string().optional(),
+    // Social APIs (for trends service)
+    TWITTER_BEARER_TOKEN: z.string().optional(),
+    REDDIT_CLIENT_ID: z.string().optional(),
+    REDDIT_CLIENT_SECRET: z.string().optional(),
+    REDDIT_USER_AGENT: z.string().default('NeonHub/3.2'),
 });
 let hasWarnedNonProd = false;
 export function validateEnv() {
@@ -74,6 +84,7 @@ function buildFallbackEnv(target) {
                 : 'dev-secret-min-32-chars-long-12345'),
         NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
         CORS_ORIGINS: parseOrigins(process.env.CORS_ORIGINS),
+        REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ||
             (target === 'test' ? 'sk_test_fake' : 'sk_test_dev'),
         STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ||
@@ -88,6 +99,7 @@ function buildFallbackEnv(target) {
         PORT: Number(process.env.PORT ?? 3001),
         SENTRY_DSN: process.env.SENTRY_DSN,
         TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+        TWILIO_SID: process.env.TWILIO_SID || process.env.TWILIO_ACCOUNT_SID,
         TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
         TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
     };

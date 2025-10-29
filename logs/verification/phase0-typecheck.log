@@ -1,0 +1,78 @@
+
+> neonhub@3.2.0 typecheck /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/routes/brand-voice.ts(26,52): error TS2345: Argument of type '{ objective?: string; brandId?: string; channel?: "post" | "email" | "sms" | "dm"; personId?: string; constraints?: Record<string, unknown>; }' is not assignable to parameter of type 'ComposeArgs'.
+  Property 'channel' is optional in type '{ objective?: string; brandId?: string; channel?: "post" | "email" | "sms" | "dm"; personId?: string; constraints?: Record<string, unknown>; }' but required in type 'ComposeArgs'.
+src/routes/budget.ts(34,70): error TS2345: Argument of type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }[]' is not assignable to parameter of type 'BudgetObjectivePlan[]'.
+  Type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }' is not assignable to type 'BudgetObjectivePlan'.
+    Property 'objectiveId' is optional in type '{ channel?: string; objectiveId?: string; priority?: number; amount?: number; }' but required in type 'BudgetObjectivePlan'.
+src/routes/person.ts(98,9): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': length, concat, join, slice, and 20 more.
+src/routes/sms.ts(18,25): error TS2345: Argument of type '{ operatorId: string; objective?: string; brandId?: string; personId?: string; }' is not assignable to parameter of type 'SmsSendArgs'.
+  Property 'personId' is optional in type '{ operatorId: string; objective?: string; brandId?: string; personId?: string; }' but required in type 'SmsSendArgs'.
+src/routes/social.ts(30,39): error TS2345: Argument of type '{ platform: "instagram" | "reddit" | "x" | "whatsapp"; operatorId: string; objective?: string; brandId?: string; personId?: string; }' is not assignable to parameter of type 'SocialDMArgs'.
+  Property 'personId' is optional in type '{ platform: "instagram" | "reddit" | "x" | "whatsapp"; operatorId: string; objective?: string; brandId?: string; personId?: string; }' but required in type 'SocialDMArgs'.
+src/services/budget.service.ts(53,11): error TS2322: Type '{ objectives: BudgetObjectivePlan[]; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'objectives' are incompatible.
+    Type 'BudgetObjectivePlan[]' is not assignable to type 'InputJsonValue'.
+      Type 'BudgetObjectivePlan[]' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'BudgetObjectivePlan[]'.
+src/services/event-intake.service.ts(44,25): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(44,44): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(44,81): error TS1361: 'Prisma' cannot be used as a value because it was imported using 'import type'.
+src/services/event-intake.service.ts(106,7): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/event-intake.service.ts(165,11): error TS2322: Type '{ classification: EventClassification; summary: string; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'classification' are incompatible.
+    Type 'EventClassification' is not assignable to type 'InputJsonValue'.
+      Type 'EventClassification' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'EventClassification'.
+src/services/learning-loop.service.ts(29,5): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/learning-loop.service.ts(60,9): error TS2322: Type '{ lastOutcome: PromptOutcome; lastUpdatedAt: string; objective: string; channel: string; }' is not assignable to type 'InputJsonValue | NullableJsonNullValueInput'.
+  Types of property 'lastOutcome' are incompatible.
+    Type 'PromptOutcome' is not assignable to type 'InputJsonValue'.
+      Type 'PromptOutcome' is not assignable to type 'InputJsonObject'.
+        Index signature for type 'string' is missing in type 'PromptOutcome'.
+src/services/learning-loop.service.ts(140,7): error TS2322: Type 'string' is not assignable to type 'ChannelKind'.
+src/services/person.service.ts(251,78): error TS2339: Property 'embedding' does not exist on type '{ sourceEvent: { type: string; topic: string; id: string; createdAt: Date; metadata: JsonValue; organizationId: string; channel: string; personId: string; source: string; campaignId: string; ... 5 more ...; occurredAt: Date; }; } & { ...; }'.
+src/trpc/routers/agents.router.ts(75,11): error TS2322: Type 'Record<string, unknown>' is not assignable to type 'InputJsonValue | JsonNull'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'readonly InputJsonValue[]': length, concat, join, slice, and 20 more.
+src/types/brand-voice.ts(7,15): error TS2305: Module '"./agentic"' has no exported member 'Channel'.
+src/types/brand-voice.ts(7,24): error TS2305: Module '"./agentic"' has no exported member 'ObjectiveType'.
+src/types/budget.ts(7,15): error TS2305: Module '"./agentic"' has no exported member 'Channel'.
+src/types/budget.ts(7,24): error TS2305: Module '"./agentic"' has no exported member 'ObjectiveType'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/actions/composeEmail.ts(3,37): error TS2307: Cannot find module '@neonhub/sdk' or its corresponding type declarations.
+src/actions/composeEmail.ts(4,20): error TS2307: Cannot find module '@neonhub/sdk' or its corresponding type declarations.
+src/app/(dashboard)/contacts/[id]/timeline.tsx(4,20): error TS2307: Cannot find module '@neonhub/sdk' or its corresponding type declarations.
+src/app/api/sms/send/route.ts(2,20): error TS2307: Cannot find module '@neonhub/sdk' or its corresponding type declarations.
+src/mocks/nhTransport.ts(1,32): error TS2307: Cannot find module '@neonhub/sdk/client' or its corresponding type declarations.
+src/providers/Providers.tsx(5,30): error TS2307: Cannot find module '@neonhub/sdk/client' or its corresponding type declarations.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error workspace @neonhub/ui-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed with exit code 2.

@@ -1,0 +1,32 @@
+[tRPC Files]
+context.ts
+router.ts
+routers
+trpc.ts
+[Router contents]
+/**
+ * Main tRPC Router
+ * Combines all sub-routers into the application router
+ */
+
+import { router } from './trpc';
+import { agentsRouter } from './routers/agents.router';
+
+/**
+ * Application router
+ * All tRPC procedures are namespaced under their respective routers
+ */
+export const appRouter = router({
+  agents: agentsRouter,
+  // Additional routers will be added here:
+  // content: contentRouter,
+  // campaigns: campaignsRouter,
+  // marketing: marketingRouter,
+  // orchestration: orchestrationRouter,
+});
+
+// Export type definition for use in frontend
+export type AppRouter = typeof appRouter;
+
+
+[Server registration check snippet]

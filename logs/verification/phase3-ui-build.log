@@ -1,0 +1,42 @@
+
+> @neonhub/ui-v3.2@3.2.0 build /Users/kofirusu/Desktop/NeonHub/apps/web
+> npm run prisma:generate && node ../../scripts/run-cli.mjs next build
+
+
+> @neonhub/ui-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+Error: Cannot find module 'prisma/build/index.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+[prisma:generate] Prisma client artifacts already present. Skipping engine download.
+Unable to resolve binary for "next" (module "next/dist/bin/next"). Did you install dependencies?
+Error: Cannot find module 'next/dist/bin/next'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+/Users/kofirusu/Desktop/NeonHub/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/ui-v3.2@3.2.0 build: `npm run prisma:generate && node ../../scripts/run-cli.mjs next build`
+Exit status 1

@@ -7,7 +7,7 @@ import { sendInviteEmail, isEmailServiceConfigured } from "../services/team/invi
 import { logger } from "../lib/logger.js";
 import * as teamService from "../services/team.service.js";
 
-export const teamRouter = Router();
+export const teamRouter: Router = Router();
 
 // In-memory token store (TODO: replace with database)
 const inviteTokens = new Map<string, {

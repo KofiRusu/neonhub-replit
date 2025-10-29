@@ -1,0 +1,217 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdaptiveAgent = void 0;
+const baselineLoader_1 = require("../utils/baselineLoader");
+const winston = __importStar(require("winston"));
+class AdaptiveAgent {
+    constructor(kpiWeights) {
+        this.qTable = new Map();
+        this.learningRate = 0.1;
+        this.discountFactor = 0.9;
+        this.explorationRate = 0.1;
+        this.kpiWeights = {
+            latency: 0.3,
+            errorRate: 0.25,
+            conversion: 0.2,
+            uptime: 0.15,
+            cost: 0.1,
+            ...kpiWeights
+        };
+        this.logger = winston.createLogger({
+            level: 'info',
+            format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+            transports: [
+                new winston.transports.Console(),
+                new winston.transports.File({ filename: 'adaptive-agent.log' })
+            ]
+        });
+    }
+    async initialize() {
+        try {
+            this.baselineMetrics = await baselineLoader_1.BaselineLoader.loadV31Baseline();
+            this.logger.info('Adaptive agent initialized with v3.1 baseline metrics');
+        }
+        catch (error) {
+            this.logger.error('Failed to load baseline metrics for adaptive agent', error);
+            throw error;
+        }
+    }
+    calculateReward(currentMetrics, action) {
+        // Calculate reward based on KPI improvements vs baseline
+        const latencyScore = Math.max(0, 1 - (currentMetrics.latency.apiResponseTimeAvg / this.baselineMetrics.latency.apiResponseTimeAvg));
+        const errorScore = Math.max(0, 1 - (currentMetrics.errors.apiErrorRate / this.baselineMetrics.errors.apiErrorRate));
+        const conversionScore = Math.min(1, currentMetrics.conversions.conversionRate / this.baselineMetrics.conversions.conversionRate);
+        const uptimeScore = currentMetrics.infrastructure.uptimePercentage / 100;
+        // Cost penalty based on scaling action (more replicas = higher cost)
+        const costPenalty = Math.max(0, (action.targetReplicas - 1) * 0.05);
+        const reward = (this.kpiWeights.latency * latencyScore +
+            this.kpiWeights.errorRate * errorScore +
+            this.kpiWeights.conversion * conversionScore +
+            this.kpiWeights.uptime * uptimeScore -
+            this.kpiWeights.cost * costPenalty);
+        return Math.max(-1, Math.min(1, reward)); // Clamp between -1 and 1
+    }
+    getStateKey(state) {
+        // Create a discretized state representation
+        const trafficLevel = this.discretizeValue(state.currentMetrics.traffic.totalPageViews, [10000, 50000, 100000]);
+        const latencyLevel = this.discretizeValue(state.currentMetrics.latency.apiResponseTimeAvg, [500, 800, 1200]);
+        const errorLevel = this.discretizeValue(state.currentMetrics.errors.apiErrorRate, [0.01, 0.05, 0.1]);
+        const conversionLevel = this.discretizeValue(state.currentMetrics.conversions.conversionRate, [0.01, 0.05, 0.1]);
+        return `${trafficLevel}_${latencyLevel}_${errorLevel}_${conversionLevel}`;
+    }
+    chooseAction(state) {
+        const stateKey = this.getStateKey(state);
+        // Initialize Q-table for new state
+        if (!this.qTable.has(stateKey)) {
+            this.qTable.set(stateKey, new Map([
+                ['scale_up', 0],
+                ['scale_down', 0],
+                ['no_action', 0]
+            ]));
+        }
+        const qValues = this.qTable.get(stateKey);
+        // Epsilon-greedy action selection
+        if (Math.random() < this.explorationRate) {
+            // Explore: random action
+            const actions = ['scale_up', 'scale_down', 'no_action'];
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            return {
+                action: randomAction,
+                targetReplicas: this.getTargetReplicasForAction(randomAction, state),
+                reason: 'Exploratory action selection',
+                confidence: 0.5,
+                predictedLoad: this.calculatePredictedLoad(state)
+            };
+        }
+        else {
+            // Exploit: best known action
+            let bestAction = 'no_action';
+            let bestValue = -Infinity;
+            for (const [action, value] of qValues.entries()) {
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestAction = action;
+                }
+            }
+            return {
+                action: bestAction,
+                targetReplicas: this.getTargetReplicasForAction(bestAction, state),
+                reason: 'Exploitative action selection based on learned Q-values',
+                confidence: Math.min(0.95, Math.max(0.5, bestValue)),
+                predictedLoad: this.calculatePredictedLoad(state)
+            };
+        }
+    }
+    updateQValue(state, action, reward, nextState) {
+        const stateKey = this.getStateKey(state);
+        const nextStateKey = this.getStateKey(nextState);
+        const qValues = this.qTable.get(stateKey);
+        if (!qValues)
+            return;
+        const currentQ = qValues.get(action.action) || 0;
+        // Get max Q-value for next state
+        const nextQValues = this.qTable.get(nextStateKey);
+        const maxNextQ = nextQValues ? Math.max(...Array.from(nextQValues.values())) : 0;
+        // Q-learning update
+        const newQ = currentQ + this.learningRate * (reward + this.discountFactor * maxNextQ - currentQ);
+        qValues.set(action.action, newQ);
+        this.logger.debug(`Updated Q-value for state ${stateKey}, action ${action.action}: ${currentQ} -> ${newQ}`);
+    }
+    adaptWeightsBasedOnPerformance(recentRewards) {
+        if (recentRewards.length < 10)
+            return;
+        const avgReward = recentRewards.reduce((a, b) => a + b, 0) / recentRewards.length;
+        // Adjust exploration rate based on performance
+        if (avgReward > 0.7) {
+            this.explorationRate = Math.max(0.01, this.explorationRate * 0.9); // Reduce exploration
+        }
+        else if (avgReward < 0.3) {
+            this.explorationRate = Math.min(0.3, this.explorationRate * 1.1); // Increase exploration
+        }
+        this.logger.info(`Adapted exploration rate to ${this.explorationRate} based on average reward ${avgReward}`);
+    }
+    getLearningStats() {
+        let totalQValues = 0;
+        let qValueSum = 0;
+        for (const qValues of this.qTable.values()) {
+            for (const qValue of qValues.values()) {
+                totalQValues++;
+                qValueSum += qValue;
+            }
+        }
+        return {
+            statesLearned: this.qTable.size,
+            explorationRate: this.explorationRate,
+            averageQValue: totalQValues > 0 ? qValueSum / totalQValues : 0
+        };
+    }
+    discretizeValue(value, thresholds) {
+        for (let i = 0; i < thresholds.length; i++) {
+            if (value <= thresholds[i]) {
+                return i;
+            }
+        }
+        return thresholds.length;
+    }
+    getTargetReplicasForAction(action, state) {
+        const currentReplicas = 1; // This should come from actual deployment state
+        switch (action) {
+            case 'scale_up':
+                return Math.min(currentReplicas + 1, 10); // Max 10 replicas
+            case 'scale_down':
+                return Math.max(currentReplicas - 1, 1); // Min 1 replica
+            case 'no_action':
+            default:
+                return currentReplicas;
+        }
+    }
+    calculatePredictedLoad(state) {
+        // Simple load prediction based on current metrics
+        const trafficLoad = state.currentMetrics.traffic.totalPageViews / this.baselineMetrics.traffic.totalPageViews;
+        const latencyLoad = state.currentMetrics.latency.apiResponseTimeAvg / this.baselineMetrics.latency.apiResponseTimeAvg;
+        return (trafficLoad + latencyLoad) / 2;
+    }
+    saveModel(filePath) {
+        // In a real implementation, this would serialize the Q-table to disk
+        this.logger.info(`Saving adaptive agent model to ${filePath}`);
+    }
+    loadModel(filePath) {
+        // In a real implementation, this would deserialize the Q-table from disk
+        this.logger.info(`Loading adaptive agent model from ${filePath}`);
+    }
+}
+exports.AdaptiveAgent = AdaptiveAgent;
+//# sourceMappingURL=AdaptiveAgent.js.map

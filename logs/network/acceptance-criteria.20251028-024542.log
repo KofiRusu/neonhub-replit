@@ -1,0 +1,26 @@
+=== ACCEPTANCE CRITERIA VALIDATION ===
+
+TEST 1: dig registry.npmjs.org +short
+104.16.25.34
+104.16.0.35
+104.16.27.34
+104.16.31.34
+104.16.24.34
+104.16.2.35
+104.16.3.35
+104.16.26.34
+104.16.30.34
+104.16.1.35
+104.16.28.34
+104.16.29.34
+✅ DNS resolution: PASS
+
+TEST 2: curl -I https://registry.npmjs.org/
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/2 200 
+date: Tue, 28 Oct 2025 01:45:42 GMT
+❌ HTTPS connectivity: FAIL
+
+TEST 3: pnpm install --frozen-lockfile (check last run)

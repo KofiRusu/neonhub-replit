@@ -14,7 +14,7 @@ const config = {
       }
     ]
   },
-  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(uuid|superjson|copy-anything|is-what)/)'],
   passWithNoTests: false,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {

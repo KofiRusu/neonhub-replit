@@ -3,12 +3,12 @@
 
 User-agent: *
 Allow: /
-
-# Disallow admin and API routes
+Disallow: /admin/
 Disallow: /api/
-Disallow: /auth/
+Disallow: /auth/signin
+Disallow: /auth/signout
 Disallow: /_next/
+Crawl-delay: 1
 
 # Sitemap location
 Sitemap: https://neonhubecosystem.com/sitemap.xml
-

@@ -1,0 +1,2 @@
+→ pnpm install --frozen-lockfile
+[pnpm-shim] install is unavailable offline; falling back to npm is recommended.

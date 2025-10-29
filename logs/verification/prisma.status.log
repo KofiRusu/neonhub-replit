@@ -1,0 +1,11 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+
+11 migrations found in prisma/migrations
+Following migrations have not yet been applied:
+20251028_budget_transactions
+20251101093000_add_agentic_models
+
+To apply migrations in development run prisma migrate dev.
+To apply migrations in production run prisma migrate deploy.

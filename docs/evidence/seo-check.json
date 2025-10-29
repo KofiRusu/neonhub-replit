@@ -1,0 +1,5 @@
+{
+  "status": "blocked",
+  "reason": "SEO automation scripts (e.g., scripts/seo-audit.mjs) require pnpm-installed deps; pnpm -w install fails offline, so no sitemap or JSON-LD checks could be executed.",
+  "evidence": "Workspace lacks node_modules after failed pnpm -w install (logs/audit/install.log)."
+}

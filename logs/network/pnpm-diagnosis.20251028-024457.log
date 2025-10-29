@@ -1,0 +1,23 @@
+=== Current pnpm binary ===
+/opt/homebrew/bin/pnpm
+
+=== All pnpm binaries in PATH ===
+/opt/homebrew/bin/pnpm
+
+=== Homebrew pnpm version ===
+ WARN  The "workspaces" field in package.json is not supported by pnpm. Create a "pnpm-workspace.yaml" file instead.
+9.12.1
+
+=== pnpm config ===
+//registry.npmjs.org/:_authToken=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
+package-import-method=copy
+prefix=/Users/kofirusu/.npm-global
+registry=https://registry.npmjs.org/
+strict-peer-dependencies=false
+user-agent=pnpm/9.12.1 npm/? node/v20.17.0 darwin arm64
+
+=== Check for Corepack shim ===
+No ~/.local/bin/pnpm found (good)
+
+=== Node version ===
+v20.17.0

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import {
   EthicalAssessment,
   EthicalPrinciple,
@@ -82,7 +82,7 @@ export class EthicalFramework extends EventEmitter {
   ): Promise<EthicalAssessment> {
     try {
       const assessment: EthicalAssessment = {
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         subject,
         principles: [],
@@ -112,7 +112,7 @@ export class EthicalFramework extends EventEmitter {
       // Log assessment
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: 'ethical_assessment',
           subject,

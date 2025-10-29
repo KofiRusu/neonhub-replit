@@ -81,6 +81,8 @@ const nextConfig: NextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "@": path.resolve(__dirname, "src"),
+      "@neonhub/sdk": path.resolve(__dirname, "..", "..", "core", "sdk", "dist"),
+      "@neonhub/sdk/client": path.resolve(__dirname, "..", "..", "core", "sdk", "dist", "client"),
     };
 
     if (!isServer) {

@@ -1,0 +1,2 @@
+[Phase 0] corepack enable failed: requires permission to create symlink in /usr/local/bin (EACCES). Fix: run with sudo or preinstall pnpm manually.
+[Phase 1] pnpm install --frozen-lockfile failed: pnpm-shim offline; need network/package registry access or local cache.

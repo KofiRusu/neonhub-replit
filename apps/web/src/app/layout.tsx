@@ -4,12 +4,15 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import Providers from "../providers/Providers"
+import Canonical from "@/components/seo/Canonical"
+import AnalyticsProvider from "@/components/analytics/AnalyticsProvider"
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://neonhubecosystem.com"
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -61,6 +64,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
+  verification: googleVerification ? { google: googleVerification } : undefined,
 }
 
 export default function RootLayout({
@@ -73,6 +77,8 @@ export default function RootLayout({
       <body className="font-sans">
         <Providers>
           <ThemeProvider defaultTheme="dark">
+            <Canonical baseUrl={siteUrl} />
+            <AnalyticsProvider />
             {children}
             <Toaster />
           </ThemeProvider>

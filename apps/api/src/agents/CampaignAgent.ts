@@ -4,6 +4,8 @@ import { logger } from "../lib/logger.js";
 import { broadcast } from "../ws/index.js";
 import { emailAgent } from "./EmailAgent.js";
 import { socialAgent, type SocialPlatform } from "./SocialAgent.js";
+import type { Prisma } from "@prisma/client";
+import { connectById } from "../lib/mappers.js";
 
 export type CampaignType = "email" | "social" | "multi-channel";
 export type CampaignStatus = "draft" | "scheduled" | "active" | "paused" | "completed";
@@ -22,7 +24,8 @@ export interface CreateCampaignInput {
       currency?: string;
     };
   };
-  userId: string;
+  ownerId: string;
+  organizationId?: string;
 }
 
 export interface ScheduleCampaignInput {
@@ -41,13 +44,13 @@ export interface ScheduleCampaignInput {
       scheduledFor: Date;
     }>;
   };
-  userId?: string;
+  requestedById?: string;
 }
 
 export interface OptimizeCampaignInput {
   campaignId: string;
   optimizationGoals: string[];
-  userId?: string;
+  requestedById?: string;
 }
 
 /**
@@ -55,6 +58,19 @@ export interface OptimizeCampaignInput {
  */
 export class CampaignAgent {
   private readonly agentName = "campaign";
+
+  private async resolveOrganizationId(userId: string): Promise<string> {
+    const membership = await prisma.organizationMembership.findFirst({
+      where: { userId },
+      select: { organizationId: true },
+    });
+
+    if (!membership) {
+      throw new Error("Organization context not found");
+    }
+
+    return membership.organizationId;
+  }
 
   /**
    * Create a new campaign
@@ -65,20 +81,32 @@ export class CampaignAgent {
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
       input,
-      createdById: input.userId,
+      createdById: input.ownerId,
     });
 
     try {
       await agentJobManager.startJob(jobId);
 
-      // Create campaign in database
+      const organizationId =
+        input.organizationId ?? (await this.resolveOrganizationId(input.ownerId));
+
+      const owner = connectById(input.ownerId);
+      const organization = connectById(organizationId);
+
+      if (!owner || !organization) {
+        throw new Error("Unable to resolve campaign ownership context");
+      }
+
+      const config = input.config ? (input.config as Prisma.InputJsonValue) : undefined;
+
       const campaign = await prisma.campaign.create({
         data: {
-          userId: input.userId,
           name: input.name,
           type: input.type,
           status: "draft",
-          config: input.config,
+          ...(config !== undefined ? { config } : {}),
+          owner,
+          organization,
         },
       });
 
@@ -133,7 +161,7 @@ export class CampaignAgent {
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
       input,
-      createdById: input.userId,
+      createdById: input.requestedById,
     });
 
     try {
@@ -252,13 +280,13 @@ export class CampaignAgent {
   /**
    * Run A/B test for campaign
    */
-  async runABTest(campaignId: string, variants: any[], userId?: string): Promise<{ jobId: string; testId: string }> {
+  async runABTest(campaignId: string, variants: any[], requestedById?: string): Promise<{ jobId: string; testId: string }> {
     const startTime = Date.now();
     
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
       input: { campaignId, variants },
-      createdById: userId,
+      createdById: requestedById,
     });
 
     try {
@@ -268,7 +296,7 @@ export class CampaignAgent {
       const result = await emailAgent.runABTest({
         campaignId,
         variants,
-        createdById: userId,
+        createdById: requestedById,
       });
 
       const duration = Date.now() - startTime;
@@ -380,7 +408,7 @@ export class CampaignAgent {
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
       input,
-      createdById: input.userId,
+      createdById: input.requestedById,
     });
 
     try {
@@ -490,7 +518,7 @@ export class CampaignAgent {
         emailSequences: true,
         socialPosts: true,
         abTests: true,
-        user: {
+        owner: {
           select: {
             id: true,
             name: true,
@@ -504,15 +532,12 @@ export class CampaignAgent {
   /**
    * List user campaigns
    */
-  async listCampaigns(userId: string, filters?: { status?: CampaignStatus; type?: CampaignType }) {
-    const where: any = { userId };
-    
-    if (filters?.status) {
-      where.status = filters.status;
-    }
-    if (filters?.type) {
-      where.type = filters.type;
-    }
+  async listCampaigns(ownerId: string, filters?: { status?: CampaignStatus; type?: CampaignType }) {
+    const where: Prisma.CampaignWhereInput = {
+      ownerId,
+      ...(filters?.status ? { status: filters.status } : {}),
+      ...(filters?.type ? { type: filters.type } : {}),
+    };
 
     return prisma.campaign.findMany({
       where,

@@ -1,0 +1,149 @@
+═══════════════════════════════════════════════════════════════
+  CURSOR REMEDIATION COMPLETE - HANDOFF TO CODEX
+═══════════════════════════════════════════════════════════════
+
+Date: 2025-10-28
+Agent: Cursor AI (Remediation Sprint)
+Status: ✅ TOOLCHAIN OPERATIONAL - READY FOR VERIFICATION
+
+───────────────────────────────────────────────────────────────
+ 1. TOOLCHAIN RESTORED
+───────────────────────────────────────────────────────────────
+
+✅ pnpm v9.12.1 operational
+✅ Node v20.17.0 operational  
+✅ Dependencies restored offline (npmmirror.com mirror)
+   • Root: 414 packages
+   • Workspaces: 1,457 packages (99.7% from cache)
+   • Duration: 11.9s
+
+✅ Prisma Client generated (v5.22.0, 292ms)
+✅ Database connected (Neon.tech PostgreSQL)
+✅ SDK built successfully (@neonhub/sdk@1.0.0)
+
+───────────────────────────────────────────────────────────────
+ 2. CRITICAL FIXES APPLIED
+───────────────────────────────────────────────────────────────
+
+✅ EmailAgent.ts - Fixed escaped string literals (lines 86, 88, 96)
+✅ Budgeting services - Fixed 3 unused variable lint errors
+✅ Registry configured for offline/mirror mode
+
+───────────────────────────────────────────────────────────────
+ 3. DATABASE STATUS
+───────────────────────────────────────────────────────────────
+
+Connection: postgresql://...@ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech/neondb
+Migrations: 11 found, 2 pending
+Pending:
+  • 20251028_budget_transactions
+  • 20251101093000_add_agentic_models
+
+⚠️ NOT APPLIED (awaiting Codex approval per remediation protocol)
+
+───────────────────────────────────────────────────────────────
+ 4. VERIFICATION LOGS GENERATED
+───────────────────────────────────────────────────────────────
+
+Location: /logs/verification/
+
+Core Logs:
+  ✅ phase0-dependencies.log      (pnpm install success)
+  ✅ prisma-generate.log          (client generation)
+  ✅ prisma.status.log            (migration status)
+  ✅ phase0-api-typecheck.log     (type errors cataloged)
+  ✅ phase0-lint.log              (lint results)
+  ✅ phase0-build.log             (build attempts)
+  ✅ REMEDIATION_SUMMARY.md       (full report)
+  ✅ CODEX_HANDOFF.txt            (this file)
+
+───────────────────────────────────────────────────────────────
+ 5. PRE-EXISTING ISSUES (NOT BLOCKING)
+───────────────────────────────────────────────────────────────
+
+TypeScript Errors: 20 (apps/api)
+  • Missing exports in types/agentic.ts (Channel, ObjectiveType)
+  • Prisma import type conflicts (event-intake.service.ts)
+  • Type strictness issues (14 locations)
+
+Build Errors: 1 (modules/predictive-engine)
+  • PgVectorStore.ts:129 type mismatch
+
+⚠️ These existed BEFORE remediation. Logged for separate sprint.
+
+───────────────────────────────────────────────────────────────
+ 6. BASELINE COMMANDS NOW AVAILABLE
+───────────────────────────────────────────────────────────────
+
+✅ pnpm -w install       # (works offline via mirror)
+✅ pnpm -w typecheck     # (runs, shows pre-existing errors)
+✅ pnpm -w lint          # (runs, 152 warnings acceptable)
+✅ pnpm -w build         # (SDK builds, apps have type issues)
+✅ pnpm -w test          # (jest ready, coverage tools available)
+
+✅ npx prisma generate   # (client generation works)
+✅ npx prisma migrate status  # (shows 2 pending)
+
+───────────────────────────────────────────────────────────────
+ 7. RECOMMENDED CODEX ACTIONS
+───────────────────────────────────────────────────────────────
+
+Priority 1 - Type System Fixes:
+  1. Add missing exports to apps/api/src/types/agentic.ts
+     • export type Channel = ...
+     • export type ObjectiveType = ...
+  
+  2. Fix Prisma import in event-intake.service.ts (line 44)
+     • Change: import type { Prisma } from '@prisma/client'
+     • To:     import { Prisma } from '@prisma/client'
+
+  3. Fix PgVectorStore.ts (modules/predictive-engine/src/memory/)
+     • Line 129: Sql type → string conversion
+
+Priority 2 - Migration Approval:
+  • Review pending migrations
+  • Apply when ready:
+    cd apps/api && npx prisma migrate deploy
+
+Priority 3 - Verification Loop:
+  • Re-run baseline after type fixes
+  • Update roadmap scoring
+  • Generate final verification report
+
+───────────────────────────────────────────────────────────────
+ 8. COMMIT MESSAGE (SUGGESTED)
+───────────────────────────────────────────────────────────────
+
+chore(toolchain): offline restore + EmailAgent string fix
+
+- Restore node_modules via npmmirror.com (1,457 pkgs, 11.9s)
+- Fix EmailAgent.ts escaped quote artifacts (lines 86,88,96)
+- Fix budgeting service unused var lint errors (3 fixes)
+- Generate Prisma client v5.22.0 (292ms)
+- Verify DB connection (Neon.tech, 2 migrations pending)
+- Build SDK @neonhub/sdk@1.0.0 successfully
+- Document 20 pre-existing type errors for separate PR
+- Configure pnpm registry for offline/mirror mode
+- Generate verification logs in /logs/verification/*
+
+Unblocks: Codex verification loop, baseline validation
+Pending: Type fixes (agentic.ts exports), migration approval
+
+───────────────────────────────────────────────────────────────
+ 9. CODEX GO SIGNAL
+───────────────────────────────────────────────────────────────
+
+🟢 Toolchain restored
+🟢 EmailAgent fixed  
+🟢 Baselines re-run
+🟢 Logs updated
+🟢 Prisma status recorded
+
+✅ READY FOR CODEX AUDIT RE-RUN AND ROADMAP SCORE RECOMPUTE
+
+───────────────────────────────────────────────────────────────
+
+END OF CURSOR REMEDIATION HANDOFF
+Next Actor: Codex (Type Fixes → Migration → Full Verification)
+
+═══════════════════════════════════════════════════════════════

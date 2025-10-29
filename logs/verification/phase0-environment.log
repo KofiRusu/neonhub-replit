@@ -1,0 +1,12 @@
+[Environment Check]
+Node version:
+v20.17.0
+pnpm version:
+ WARN  The "workspaces" field in package.json is not supported by pnpm. Create a "pnpm-workspace.yaml" file instead.
+9.12.1
+corepack version:
+0.29.3
+docker version:
+Docker version 28.1.1, build 4eba377
+Key environment variables:
+[WARN] Key variables not present in process environment

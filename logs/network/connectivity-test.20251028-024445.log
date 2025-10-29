@@ -1,0 +1,41 @@
+=== Host lookup ===
+registry.npmjs.org has address 104.16.28.34
+registry.npmjs.org has address 104.16.29.34
+registry.npmjs.org has address 104.16.25.34
+registry.npmjs.org has address 104.16.0.35
+registry.npmjs.org has address 104.16.27.34
+registry.npmjs.org has address 104.16.31.34
+registry.npmjs.org has address 104.16.24.34
+registry.npmjs.org has address 104.16.2.35
+registry.npmjs.org has address 104.16.3.35
+registry.npmjs.org has address 104.16.26.34
+registry.npmjs.org has address 104.16.30.34
+registry.npmjs.org has address 104.16.1.35
+registry.npmjs.org has IPv6 address 2606:4700::6810:1b22
+registry.npmjs.org has IPv6 address 2606:4700::6810:1e22
+registry.npmjs.org has IPv6 address 2606:4700::6810:323
+registry.npmjs.org has IPv6 address 2606:4700::6810:123
+registry.npmjs.org has IPv6 address 2606:4700::6810:223
+registry.npmjs.org has IPv6 address 2606:4700::6810:1822
+registry.npmjs.org has IPv6 address 2606:4700::6810:23
+registry.npmjs.org has IPv6 address 2606:4700::6810:1f22
+registry.npmjs.org has IPv6 address 2606:4700::6810:1a22
+registry.npmjs.org has IPv6 address 2606:4700::6810:1922
+registry.npmjs.org has IPv6 address 2606:4700::6810:1c22
+registry.npmjs.org has IPv6 address 2606:4700::6810:1d22
+
+=== HTTPS connectivity test ===
+HTTP/2 200 
+date: Tue, 28 Oct 2025 01:44:45 GMT
+content-type: application/json
+cf-ray: 9956bff3bd43314e-MAD
+cache-control: public, immutable, max-age=31557600
+set-cookie: _cfuvid=zMYe13NxM1tVYFwu.ar8DaEgYWOsHHzRTXEqS9uWP4k-1761615885407-0.0.1.1-604800000; path=/; domain=.npmjs.org; HttpOnly; Secure; SameSite=None
+server: cloudflare
+
+
+=== Proxy environment variables ===
+No proxy variables set
+
+=== pnpm/npm environment variables ===
+No pnpm/npm variables set

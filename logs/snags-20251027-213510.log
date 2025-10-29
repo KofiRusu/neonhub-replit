@@ -1,0 +1,22 @@
+→ pnpm --filter apps/api prisma migrate deploy
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+
+7 migrations found in prisma/migrations
+
+Applying migration `20250105_phase4_beta`
+Error: P3018
+
+A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+Migration name: 20250105_phase4_beta
+
+Database error code: 42P01
+
+Database error:
+ERROR: relation "users" does not exist
+
+DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42P01), message: "relation \"users\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("namespace.c"), line: Some(435), routine: Some("RangeVarGetRelidExtended") }
+
+

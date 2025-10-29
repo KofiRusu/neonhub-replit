@@ -1,0 +1,15 @@
+→ pnpm --filter apps/api prisma db seed
+Environment variables loaded from .env
+Running seed command `ts-node --transpile-only prisma/seed.ts` ...
+TypeError: Unknown file extension ".ts" for /Users/kofirusu/Desktop/NeonHub/apps/api/prisma/seed.ts
+    at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:160:9)
+    at defaultGetFormat (node:internal/modules/esm/get_format:203:36)
+    at defaultLoad (node:internal/modules/esm/load:143:22)
+    at async ModuleLoader.load (node:internal/modules/esm/loader:553:7)
+    at async ModuleLoader.moduleProvider (node:internal/modules/esm/loader:434:45)
+    at async link (node:internal/modules/esm/module_job:87:21) {
+  code: 'ERR_UNKNOWN_FILE_EXTENSION'
+}
+
+An error occurred while running the seed command:
+Error: Command failed with exit code 1: ts-node --transpile-only prisma/seed.ts

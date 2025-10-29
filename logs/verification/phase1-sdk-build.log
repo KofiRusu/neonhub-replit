@@ -1,0 +1,9 @@
+
+> @neonhub/sdk@1.0.0 build /Users/kofirusu/Desktop/NeonHub/core/sdk
+> tsup src/index.ts src/mocks/index.ts --format cjs,esm --dts --clean
+
+sh: tsup: command not found
+/Users/kofirusu/Desktop/NeonHub/core/sdk:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/sdk@1.0.0 build: `tsup src/index.ts src/mocks/index.ts --format cjs,esm --dts --clean`
+spawn ENOENT
+ WARN   Local package.json exists, but node_modules missing, did you mean to install?

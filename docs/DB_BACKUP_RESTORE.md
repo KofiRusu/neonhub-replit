@@ -1,57 +1,36 @@
 # Database Backup & Restore Procedures
 
-**Document Version:** 1.0  
-**Last Updated:** 2025-10-26  
-**Applies To:** NeonHub Database Infrastructure
+**Version:** 1.0  
+**Last Updated:** 2025-10-28  
+**Database:** Neon.tech PostgreSQL 16 + pgvector
 
 ---
 
 ## Overview
 
-This document outlines backup, restore, and disaster recovery procedures for the NeonHub database across local development, staging, and production environments.
-
-**Database Details:**
-- **Provider:** PostgreSQL 16+ with pgvector extension
-- **Hosting:** Neon (recommended) or self-hosted
-- **Schema:** 48 models, 6 migrations, vector embeddings (1536 dimensions)
-- **Critical Data:** Organization/RBAC, Brand/Agent configs, Campaigns, Connectors (15 platforms), Vector embeddings
+This document outlines backup and restore procedures for NeonHub's production database. All procedures are designed for Neon.tech serverless PostgreSQL with consideration for vector embeddings and multi-tenant data.
 
 ---
 
 ## Local Development Backups
 
-### Quick Backup
+### Backup
 
 ```bash
-# Backup to timestamped SQL file
+# Full database dump
 pg_dump "$DATABASE_URL" > backup_$(date +%Y%m%d_%H%M%S).sql
 
-# With compression
+# Compressed backup (recommended)
 pg_dump "$DATABASE_URL" | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+
+# Schema-only backup
+pg_dump --schema-only "$DATABASE_URL" > schema_backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Data-only backup
+pg_dump --data-only "$DATABASE_URL" > data_backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
-### Schema-Only Backup
-
-```bash
-# Backup structure without data
-pg_dump --schema-only "$DATABASE_URL" > schema_$(date +%Y%m%d).sql
-```
-
-### Data-Only Backup
-
-```bash
-# Backup data without schema
-pg_dump --data-only "$DATABASE_URL" > data_$(date +%Y%m%d).sql
-```
-
-### Selective Table Backup
-
-```bash
-# Backup specific tables (e.g., connectors catalog)
-pg_dump -t connectors -t connector_auths "$DATABASE_URL" > connectors_backup.sql
-```
-
-### Restore from Backup
+### Restore
 
 ```bash
 # Restore from uncompressed backup
@@ -60,8 +39,23 @@ psql "$DATABASE_URL" < backup_YYYYMMDD_HHMMSS.sql
 # Restore from compressed backup
 gunzip -c backup_YYYYMMDD_HHMMSS.sql.gz | psql "$DATABASE_URL"
 
-# Restore with transaction safety
-psql "$DATABASE_URL" --single-transaction < backup.sql
+# Restore with transaction safety (all or nothing)
+psql "$DATABASE_URL" --single-transaction < backup_YYYYMMDD_HHMMSS.sql
+```
+
+### Selective Table Backup
+
+```bash
+# Backup specific tables (e.g., connectors and auth)
+pg_dump "$DATABASE_URL" \
+  -t connectors \
+  -t connector_auths \
+  -t agents \
+  -t tools \
+  > connectors_backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Restore specific tables
+psql "$DATABASE_URL" < connectors_backup_YYYYMMDD_HHMMSS.sql
 ```
 
 ---
@@ -70,44 +64,102 @@ psql "$DATABASE_URL" --single-transaction < backup.sql
 
 ### Branch-Based Backups
 
-Neon provides **database branching** for zero-downtime backups:
+Neon branches are the recommended backup method for production.
 
+#### Create Backup Branch
+
+**Via Neon Console:**
+1. Navigate to https://console.neon.tech
+2. Select your project
+3. Go to "Branches" tab
+4. Click "Create Branch"
+5. Name: `backup-YYYY-MM-DD-pre-migration`
+6. Source: `main` (or current production branch)
+7. Click "Create"
+
+**Via Neon CLI:**
 ```bash
-# Via Neon Console
-1. Navigate to Neon Console → Your Project
-2. Click "Branches" tab
-3. Click "Create Branch"
-4. Name: backup-YYYY-MM-DD
-5. Source: main (production)
-6. Click "Create"
+# Install Neon CLI
+npm install -g neonctl
+
+# Login
+neonctl auth
+
+# Create backup branch
+neonctl branches create \
+  --project-id <project-id> \
+  --name backup-$(date +%Y%m%d-%H%M%S) \
+  --parent main
 ```
 
-**Benefits:**
-- ✅ Instant (copy-on-write)
-- ✅ No downtime
-- ✅ Full database state preserved
-- ✅ Can promote branch to main if needed
+**Via API:**
+```bash
+curl -X POST \
+  https://console.neon.tech/api/v2/projects/<project-id>/branches \
+  -H "Authorization: Bearer $NEON_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "backup-2025-10-28-pre-migration",
+    "parent_id": "br-main-xxxxx"
+  }'
+```
+
+#### Restore from Branch
+
+**Option 1: Promote Branch to Main**
+1. In Neon Console, go to Branches
+2. Select backup branch
+3. Click "Set as Primary"
+4. Confirm promotion
+
+**Option 2: Connect Application to Branch**
+```bash
+# Update DATABASE_URL to backup branch connection string
+DATABASE_URL=postgresql://neondb_owner:****@ep-backup-branch.c-2.us-east-2.aws.neon.tech/neondb
+```
+
+**Option 3: Copy Data from Branch**
+```bash
+# Dump from backup branch
+pg_dump "$BACKUP_BRANCH_URL" > restore_from_branch.sql
+
+# Restore to main branch
+psql "$MAIN_BRANCH_URL" < restore_from_branch.sql
+```
+
+---
 
 ### Point-in-Time Recovery (PITR)
 
-Neon automatically retains **Write-Ahead Log (WAL)** history:
+**Retention Period:**
+- Free tier: 7 days of WAL history
+- Launch tier: 7 days
+- Scale tier: 30 days
+- Enterprise tier: Custom (up to 90 days)
 
-| Tier | Retention | Use Case |
-|------|-----------|----------|
-| Free | 7 days | Development/testing |
-| Pro | 14 days | Staging environments |
-| Enterprise | 30+ days | Production compliance |
+#### Restore to Specific Timestamp
 
-**Restore to Specific Timestamp:**
-1. Navigate to Neon Console → Branches
-2. Create new branch from `main`
-3. Select "Restore to timestamp"
-4. Choose date/time (within retention window)
-5. Click "Create"
-6. Test data integrity on new branch
-7. Promote to main if verified
+**Via Neon Console:**
+1. Go to Branches → Create Branch
+2. Select "Point in time" option
+3. Choose timestamp (within retention period)
+4. Create branch with desired state
+5. Test branch before promoting
 
-### Scheduled Backups via GitHub Actions
+**Via CLI:**
+```bash
+neonctl branches create \
+  --project-id <project-id> \
+  --name restore-$(date +%Y%m%d-%H%M%S) \
+  --parent main \
+  --timestamp "2025-10-28T10:30:00Z"
+```
+
+---
+
+## Automated Backups
+
+### GitHub Actions Workflow
 
 Create `.github/workflows/db-backup.yml`:
 
@@ -117,313 +169,369 @@ name: DB Backup
 on:
   schedule:
     - cron: '0 2 * * *'  # 2 AM UTC daily
-  workflow_dispatch:
+  workflow_dispatch:      # Manual trigger
 
 jobs:
   backup:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    timeout-minutes: 30
+    
     steps:
-      - name: Backup Database
+      - name: Install PostgreSQL client
         run: |
-          # Install PostgreSQL client
-          sudo apt-get update && sudo apt-get install -y postgresql-client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      
+      - name: Create backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="neonhub_backup_${TIMESTAMP}.sql.gz"
           
-          # Create timestamped backup
-          pg_dump "$DATABASE_URL" | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+          echo "Creating backup: $BACKUP_FILE"
+          pg_dump "$DATABASE_URL" | gzip > "$BACKUP_FILE"
+          
+          echo "Backup size: $(ls -lh $BACKUP_FILE | awk '{print $5}')"
+          echo "backup_file=$BACKUP_FILE" >> $GITHUB_OUTPUT
+        id: backup
       
       - name: Upload to S3
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      
-      - name: Sync to S3 Bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
         run: |
-          aws s3 cp backup_*.sql.gz s3://neonhub-backups/db/$(date +%Y/%m/)
+          aws s3 cp "${{ steps.backup.outputs.backup_file }}" \
+            s3://neonhub-backups/database/ \
+            --storage-class STANDARD_IA
       
-      - name: Cleanup Old Backups
+      - name: Notify Slack
+        if: always()
         run: |
-          # Delete S3 backups older than 90 days
-          aws s3 ls s3://neonhub-backups/db/ --recursive \
-            | awk '$1 < "'$(date -d '90 days ago' +%Y-%m-%d)'" {print $4}' \
-            | xargs -I {} aws s3 rm s3://neonhub-backups/{}
+          STATUS="${{ job.status }}"
+          EMOJI="✅"
+          [ "$STATUS" != "success" ] && EMOJI="❌"
+          
+          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            -d "{\"text\":\"${EMOJI} Database backup ${STATUS}: ${{ steps.backup.outputs.backup_file }}\"}"
 ```
 
-**Alternative: Upload to Google Cloud Storage**
-
-```yaml
-- name: Upload to GCS
-  uses: google-github-actions/upload-cloud-storage@v2
-  with:
-    path: backup_*.sql.gz
-    destination: neonhub-backups/db/${{ github.run_number }}
-    credentials: ${{ secrets.GCP_SA_KEY }}
-```
-
----
-
-## Self-Hosted PostgreSQL Backups
-
-### Continuous Archiving (WAL Shipping)
-
-Configure `postgresql.conf`:
-
-```conf
-wal_level = replica
-archive_mode = on
-archive_command = 'test ! -f /mnt/backup/wal/%f && cp %p /mnt/backup/wal/%f'
-```
-
-### Base Backup Script
+### Backup Script
 
 Create `scripts/backup-db.sh`:
 
 ```bash
 #!/bin/bash
-set -e
+set -euo pipefail
 
-BACKUP_DIR="/mnt/backup/postgres"
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE="$BACKUP_DIR/neonhub_$DATE.sql.gz"
+BACKUP_DIR="${BACKUP_DIR:-./backups}"
+RETENTION_DAYS="${RETENTION_DAYS:-30}"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="${BACKUP_DIR}/neonhub_${TIMESTAMP}.sql.gz"
 
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
 
-# Perform backup
+# Create backup
+echo "🔄 Creating database backup..."
 pg_dump "$DATABASE_URL" | gzip > "$BACKUP_FILE"
 
-# Verify backup
-if [ -f "$BACKUP_FILE" ]; then
-  echo "✅ Backup created: $BACKUP_FILE"
-  echo "Size: $(du -h $BACKUP_FILE | cut -f1)"
-else
-  echo "❌ Backup failed"
-  exit 1
-fi
+# Calculate size
+SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+echo "✅ Backup created: $BACKUP_FILE ($SIZE)"
 
-# Cleanup old backups (keep 30 days)
-find "$BACKUP_DIR" -name "neonhub_*.sql.gz" -mtime +30 -delete
+# Cleanup old backups
+echo "🧹 Cleaning up backups older than ${RETENTION_DAYS} days..."
+find "$BACKUP_DIR" -name "neonhub_*.sql.gz" -mtime +${RETENTION_DAYS} -delete
 
-echo "✅ Old backups cleaned up (>30 days removed)"
+echo "✨ Backup complete!"
 ```
 
-### Cron Schedule
-
+**Usage:**
 ```bash
-# Daily backup at 2 AM
-0 2 * * * /path/to/scripts/backup-db.sh >> /var/log/db-backup.log 2>&1
+chmod +x scripts/backup-db.sh
+./scripts/backup-db.sh
 ```
 
 ---
 
 ## Rollback Procedures
 
-### Revert Last Migration
-
-If a migration causes issues:
+### Revert Migration
 
 ```bash
-# Mark migration as rolled back
-pnpm --filter apps/api prisma migrate resolve --rolled-back 20251026_add_connector_kind_enum
+# Mark migration as rolled back (does not undo SQL)
+cd apps/api
+npx prisma migrate resolve --rolled-back <migration_name>
 
-# Manually revert SQL changes
-psql "$DATABASE_URL" << EOF
-DROP TYPE IF EXISTS "ConnectorKind" CASCADE;
-ALTER TABLE connectors ALTER COLUMN category TYPE TEXT;
-EOF
-
-# Update Prisma schema to match
-# Edit apps/api/prisma/schema.prisma (revert enum changes)
-
-# Regenerate client
-pnpm --filter apps/api prisma generate
+# Example:
+npx prisma migrate resolve --rolled-back 20251028_budget_transactions
 ```
 
-### Emergency Full Restore
+**Note:** This only updates migration records. You must manually restore data.
 
-If database is corrupted or data loss occurs:
+### Emergency Restore (Full Database)
 
 ```bash
-# 1. STOP application to prevent new writes
-# (Scale down API containers / stop server)
-
-# 2. Create backup of current state (even if corrupted)
-pg_dump "$DATABASE_URL" > emergency_pre_restore_$(date +%Y%m%d_%H%M%S).sql
-
-# 3. Drop and recreate database (DESTRUCTIVE)
+# 1. Stop application traffic (set maintenance mode)
+# 2. Drop current database (⚠️ DESTRUCTIVE)
 psql "$DATABASE_URL" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 
-# 4. Restore from last known-good backup
-psql "$DATABASE_URL" < backup_YYYYMMDD_HHMMSS.sql
+# 3. Restore from backup
+psql "$DATABASE_URL" < emergency_backup.sql
 
-# 5. Apply any missing migrations
-pnpm --filter apps/api prisma migrate deploy
+# 4. Reapply migrations to sync state
+cd apps/api
+npx prisma migrate deploy
 
-# 6. Verify data integrity
-node scripts/db-smoke.mjs
+# 5. Verify integrity
+node ../../scripts/db-smoke.mjs
 
-# 7. Restart application
+# 6. Resume traffic
 ```
 
-### Neon Branch Promotion (Zero-Downtime Rollback)
+### Partial Restore (Specific Tables)
 
-1. Create new branch from backup point
-2. Test branch with staging environment
-3. Update `DATABASE_URL` to point to new branch
-4. Redeploy application (no schema changes needed)
-5. Archive old main branch
+```bash
+# Restore only affected tables
+pg_restore --table=connectors \
+           --table=connector_auths \
+           --dbname="$DATABASE_URL" \
+           backup_YYYYMMDD.dump
+
+# Or with SQL backup:
+psql "$DATABASE_URL" << 'EOF'
+BEGIN;
+TRUNCATE connectors CASCADE;
+\i connectors_backup_YYYYMMDD.sql
+COMMIT;
+EOF
+```
 
 ---
 
-## Backup Verification & Testing
+## Backup Verification
 
-### Monthly Backup Test
-
-Test restore procedure monthly to ensure backups are viable:
+### Test Restore (Monthly)
 
 ```bash
-# 1. Spin up temporary PostgreSQL instance
-docker run --name backup-test -e POSTGRES_PASSWORD=test -d -p 5434:5432 postgres:16
+#!/bin/bash
+# Test restore to temporary database
 
-# 2. Restore backup to test instance
-psql "postgresql://postgres:test@localhost:5434/postgres" < backup_YYYYMMDD.sql
+# 1. Create test database
+TEST_DB_URL="postgresql://localhost:5432/neonhub_restore_test"
+createdb neonhub_restore_test
 
-# 3. Verify row counts match production
-psql "postgresql://postgres:test@localhost:5434/postgres" \
-  -c "SELECT COUNT(*) FROM connectors;"  # Should return 15
+# 2. Restore backup
+psql "$TEST_DB_URL" < latest_backup.sql
 
-# 4. Test critical queries
-psql "postgresql://postgres:test@localhost:5434/postgres" \
-  -c "SELECT name FROM connectors ORDER BY name;"
+# 3. Run smoke tests
+DATABASE_URL="$TEST_DB_URL" node scripts/db-smoke.mjs
 
-# 5. Cleanup
-docker stop backup-test && docker rm backup-test
+# 4. Cleanup
+dropdb neonhub_restore_test
 ```
 
-### Automated Backup Validation
+### Backup Integrity Check
 
-Add to GitHub Actions workflow:
+```bash
+# Verify backup file is not corrupted
+gunzip -t backup_YYYYMMDD_HHMMSS.sql.gz && echo "✅ Backup integrity OK"
 
-```yaml
-- name: Validate Backup
-  run: |
-    # Extract first 100 lines of backup
-    gunzip -c backup.sql.gz | head -100 > sample.sql
-    
-    # Check for critical schemas
-    grep -q "CREATE TYPE \"ConnectorKind\"" sample.sql || exit 1
-    grep -q "CREATE TABLE \"connectors\"" sample.sql || exit 1
-    
-    echo "✅ Backup validation passed"
+# Verify row counts match
+psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM connectors;" 
+# Compare with backup
+```
+
+---
+
+## Storage Recommendations
+
+### Storage Options
+
+| Option | Cost | Durability | Retrieval Time | Best For |
+|--------|------|------------|----------------|----------|
+| **Neon Branches** | Included | High | Instant | Recent backups (7-30 days) |
+| **S3 Standard** | $0.023/GB/mo | 99.999999999% | Immediate | Hot backups |
+| **S3 Standard-IA** | $0.0125/GB/mo | 99.999999999% | Immediate | Warm backups (30-90 days) |
+| **S3 Glacier** | $0.004/GB/mo | 99.999999999% | 1-5 minutes | Cold backups (> 90 days) |
+| **S3 Deep Archive** | $0.00099/GB/mo | 99.999999999% | 12 hours | Compliance (7 years) |
+
+### Retention Strategy
+
+**Recommended:**
+- **Daily backups:** Keep 7 days (S3 Standard)
+- **Weekly backups:** Keep 4 weeks (S3 Standard-IA)
+- **Monthly backups:** Keep 12 months (S3 Glacier)
+- **Yearly backups:** Keep 7 years (S3 Deep Archive) - for compliance
+
+**Lifecycle Policy:**
+```json
+{
+  "Rules": [
+    {
+      "Id": "NeonHub-Backup-Lifecycle",
+      "Status": "Enabled",
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "STANDARD_IA"
+        },
+        {
+          "Days": 90,
+          "StorageClass": "GLACIER"
+        },
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ],
+      "Expiration": {
+        "Days": 2555
+      }
+    }
+  ]
+}
 ```
 
 ---
 
 ## Best Practices
 
-### Backup Strategy (3-2-1 Rule)
+### ✅ Do's
 
-✅ **3 copies** of data:
-- Production database (live)
-- Daily automated backup (S3/GCS)
-- Weekly archive (cold storage)
+- ✅ Test backups monthly (restore to staging)
+- ✅ Store backups in separate region (disaster recovery)
+- ✅ Encrypt backup files (`gpg` or `openssl`)
+- ✅ Document restoration time objective (RTO)
+- ✅ Maintain 30-day retention minimum
+- ✅ Use Neon branches for quick rollbacks
+- ✅ Automate daily backups via GitHub Actions
+- ✅ Monitor backup job success/failure
+- ✅ Keep backup credentials secure (1Password, Vault)
 
-✅ **2 different media types**:
-- Cloud object storage (S3, GCS, Azure Blob)
-- Neon branch (database-native)
+### ❌ Don'ts
 
-✅ **1 off-site copy**:
-- Different geographic region
-- Different cloud provider (optional)
+- ❌ Don't backup to the same server as database
+- ❌ Don't skip backup verification
+- ❌ Don't store backups unencrypted
+- ❌ Don't forget to backup pgvector extension state
+- ❌ Don't rely on single backup method
+- ❌ Don't neglect off-site backups
+- ❌ Don't ignore backup failures
 
-### Retention Policies
+---
 
-| Backup Type | Retention | Frequency |
-|-------------|-----------|-----------|
-| Hourly snapshots | 24 hours | Every hour |
-| Daily backups | 30 days | Daily at 2 AM UTC |
-| Weekly backups | 12 weeks | Sunday 2 AM UTC |
-| Monthly backups | 1 year | 1st of month |
-| Annual backups | 7 years | Jan 1 (compliance) |
+## Disaster Recovery (DR)
 
-### Encryption
+### Recovery Time Objective (RTO)
 
-All backups must be encrypted:
+- **Neon Branch Restore:** < 5 minutes
+- **S3 Standard Restore:** < 15 minutes
+- **S3 Glacier Restore:** 1-5 minutes + restore time
+- **Full Database Rebuild:** < 1 hour
+
+### Recovery Point Objective (RPO)
+
+- **Neon PITR:** Up to 30 days (Scale tier)
+- **Daily Backups:** Last 24 hours
+- **Weekly Backups:** Last 7 days
+
+### DR Runbook
+
+**Scenario: Complete Database Loss**
+
+1. **Assess Situation**
+   - Confirm database is unreachable
+   - Determine last known-good state
+   - Notify stakeholders
+
+2. **Retrieve Backup**
+   - Find most recent backup (S3 or Neon branch)
+   - Verify backup integrity
+   - Download/prepare backup
+
+3. **Provision New Database**
+   - Create new Neon project (if needed)
+   - Configure extensions (pgvector, uuid-ossp)
+   - Set connection pooling
+
+4. **Restore Data**
+   - Restore from backup
+   - Apply pending migrations
+   - Verify data integrity
+
+5. **Update Application**
+   - Update DATABASE_URL secrets
+   - Redeploy applications
+   - Run smoke tests
+
+6. **Post-Mortem**
+   - Document incident
+   - Review backup procedures
+   - Implement improvements
+
+---
+
+## Encryption
+
+### Encrypt Backup
 
 ```bash
-# Encrypt backup with GPG
-pg_dump "$DATABASE_URL" | gzip | gpg --encrypt --recipient backup@neonhub.ai > backup.sql.gz.gpg
+# Using GPG
+pg_dump "$DATABASE_URL" | gzip | gpg -c --cipher-algo AES256 > backup_encrypted.sql.gz.gpg
 
-# Decrypt and restore
-gpg --decrypt backup.sql.gz.gpg | gunzip | psql "$DATABASE_URL"
+# Using OpenSSL
+pg_dump "$DATABASE_URL" | gzip | openssl enc -aes-256-cbc -salt -out backup_encrypted.sql.gz.enc
 ```
 
-### Backup Size Monitoring
+### Decrypt and Restore
 
 ```bash
-# Check backup growth trends
-aws s3 ls s3://neonhub-backups/db/ --recursive --human-readable \
-  | tail -30 \
-  | awk '{print $1, $2, $3, $4}' \
-  | sort
+# Using GPG
+gpg -d backup_encrypted.sql.gz.gpg | gunzip | psql "$DATABASE_URL"
+
+# Using OpenSSL
+openssl enc -aes-256-cbc -d -in backup_encrypted.sql.gz.enc | gunzip | psql "$DATABASE_URL"
 ```
 
-**Alert if backup size:**
-- Increases >50% week-over-week (potential data anomaly)
-- Decreases >30% (possible backup failure)
+---
+
+## Contact & Support
+
+**Database Administrator:** devops@neonhub.ai  
+**Emergency Contact:** +1-XXX-XXX-XXXX  
+**Neon Support:** https://neon.tech/docs/support  
+**Slack Channel:** #database-ops
 
 ---
 
-## Recovery Time Objectives (RTO)
+## Appendix: Neon-Specific Commands
 
-| Scenario | RTO Target | Actual |
-|----------|------------|--------|
-| Single table restore | 5 minutes | ~3 minutes |
-| Full database restore (Neon branch) | 15 minutes | ~10 minutes |
-| Full database restore (from S3) | 30 minutes | ~25 minutes |
-| Point-in-time recovery | 20 minutes | ~15 minutes |
+### List Branches
+```bash
+neonctl branches list --project-id <project-id>
+```
 
-## Recovery Point Objectives (RPO)
+### Get Branch Details
+```bash
+neonctl branches get <branch-id> --project-id <project-id>
+```
 
-| Environment | RPO Target | Backup Frequency |
-|-------------|------------|------------------|
-| Production | 1 hour | Continuous WAL + hourly snapshots |
-| Staging | 24 hours | Daily backups |
-| Development | 7 days | Weekly backups |
+### Delete Old Backup Branch
+```bash
+neonctl branches delete <branch-id> --project-id <project-id>
+```
 
----
-
-## Disaster Recovery Checklist
-
-- [ ] Identify failure scope (single table / full database / infrastructure)
-- [ ] Stop application traffic to prevent data corruption
-- [ ] Create emergency backup of current state
-- [ ] Identify last known-good backup within RPO
-- [ ] Restore backup to staging environment first
-- [ ] Verify data integrity with smoke tests
-- [ ] Apply any missing migrations
-- [ ] Update DNS/connection strings if needed
-- [ ] Resume application traffic
-- [ ] Monitor for errors and performance issues
-- [ ] Document incident in post-mortem
+### Get Connection String for Branch
+```bash
+neonctl connection-string <branch-id> --project-id <project-id>
+```
 
 ---
 
-## Support Contacts
-
-| Issue | Contact | Response Time |
-|-------|---------|---------------|
-| Neon platform issues | support@neon.tech | <4 hours |
-| S3 access issues | AWS Support | <2 hours |
-| Database corruption | DBA on-call | <30 minutes |
-| Backup script failures | DevOps team | <1 hour |
-
----
-
-**Document Owner:** Infrastructure Team  
-**Review Schedule:** Quarterly  
-**Next Review:** 2026-01-26
-
+**Document Version:** 1.0  
+**Next Review:** 2025-11-28  
+**Owner:** DevOps Team

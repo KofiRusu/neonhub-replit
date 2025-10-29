@@ -9,6 +9,7 @@ import { AsanaConnector } from "./services/AsanaConnector.js";
 import { HubSpotConnector } from "./services/HubSpotConnector.js";
 import { TwitterConnector } from "./services/TwitterConnector.js";
 import { DiscordConnector } from "./services/DiscordConnector.js";
+import { GoogleSearchConsoleConnector } from "./services/GoogleSearchConsoleConnector.js";
 
 const connectors = [
   new SlackConnector(),
@@ -21,6 +22,7 @@ const connectors = [
   new HubSpotConnector(),
   new TwitterConnector(),
   new DiscordConnector(),
+  new GoogleSearchConsoleConnector(),
 ];
 
 export async function registerConnectors() {

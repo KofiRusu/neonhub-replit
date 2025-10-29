@@ -1,0 +1,27 @@
+
+> neonhub@3.2.0 lint /Users/kofirusu/Desktop/NeonHub
+> pnpm --filter @neonhub/backend-v3.2 lint && pnpm --filter @neonhub/ui-v3.2 lint && pnpm --filter @neonhub/sdk lint
+
+
+> @neonhub/backend-v3.2@3.2.0 lint /Users/kofirusu/Desktop/NeonHub/apps/api
+> node ../../scripts/run-cli.mjs eslint src --ext .ts
+
+Unable to resolve binary for "eslint" (module "eslint/bin/eslint.js"). Did you install dependencies?
+Error: Cannot find module 'eslint/bin/eslint.js'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 lint: `node ../../scripts/run-cli.mjs eslint src --ext .ts`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.

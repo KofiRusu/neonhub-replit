@@ -1,0 +1,100 @@
+Scope: all 20 workspace projects
+[?25l[36m?[39m [1mThe modules directories will be removed and reinstalled from scratch. Proceed?[22m [2m(Y/n)[22m [2m›[22m [36mtrue[39m[4D[2K[F[2K[1G[32m✔[39m [1mThe modules directories will be removed and reinstalled from scratch. Proceed?[22m [2m(Y/n)[22m [2m·[22m [32mtrue[39m[3D
+
+[?25hRecreating /Users/kofirusu/Desktop/NeonHub/node_modules
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +1871
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ WARN  GET https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/globals/-/globals-30.2.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/environment/-/environment-30.2.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/fake-timers/-/fake-timers-30.2.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/types/-/types-30.2.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/pattern/-/pattern-30.0.1.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/node/-/node-20.19.23.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/jest-regex-util/-/jest-regex-util-30.0.1.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/schemas/-/schemas-30.0.5.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@sinclair/typebox/-/typebox-0.34.41.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-reports/-/istanbul-reports-3.0.4.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-report/-/istanbul-lib-report-3.0.3.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs/-/yargs-17.0.34.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs-parser/-/yargs-parser-21.0.3.tgz error (ENOTFOUND). Will retry in 10 seconds. 5 retries left.
+Progress: resolved 1871, reused 1, downloaded 0, added 1
+ WARN  GET https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/globals/-/globals-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/environment/-/environment-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/fake-timers/-/fake-timers-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/types/-/types-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/pattern/-/pattern-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/node/-/node-20.19.23.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/jest-regex-util/-/jest-regex-util-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/schemas/-/schemas-30.0.5.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@sinclair/typebox/-/typebox-0.34.41.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-reports/-/istanbul-reports-3.0.4.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-report/-/istanbul-lib-report-3.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs/-/yargs-17.0.34.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs-parser/-/yargs-parser-21.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 4 retries left.
+ WARN  GET https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/globals/-/globals-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/environment/-/environment-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/fake-timers/-/fake-timers-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/types/-/types-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/pattern/-/pattern-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/node/-/node-20.19.23.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/jest-regex-util/-/jest-regex-util-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/schemas/-/schemas-30.0.5.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@sinclair/typebox/-/typebox-0.34.41.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-reports/-/istanbul-reports-3.0.4.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-report/-/istanbul-lib-report-3.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs/-/yargs-17.0.34.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs-parser/-/yargs-parser-21.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 3 retries left.
+ WARN  GET https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/globals/-/globals-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/environment/-/environment-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/fake-timers/-/fake-timers-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/types/-/types-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/pattern/-/pattern-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/node/-/node-20.19.23.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/jest-regex-util/-/jest-regex-util-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/schemas/-/schemas-30.0.5.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@sinclair/typebox/-/typebox-0.34.41.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-reports/-/istanbul-reports-3.0.4.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-report/-/istanbul-lib-report-3.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs/-/yargs-17.0.34.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs-parser/-/yargs-parser-21.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 2 retries left.
+ WARN  GET https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/globals/-/globals-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/environment/-/environment-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/fake-timers/-/fake-timers-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/types/-/types-30.2.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/pattern/-/pattern-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/node/-/node-20.19.23.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/undici-types/-/undici-types-6.21.0.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/jest-regex-util/-/jest-regex-util-30.0.1.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@jest/schemas/-/schemas-30.0.5.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@sinclair/typebox/-/typebox-0.34.41.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-reports/-/istanbul-reports-3.0.4.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/istanbul-lib-report/-/istanbul-lib-report-3.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs/-/yargs-17.0.34.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ WARN  GET https://registry.npmmirror.com/@types/yargs-parser/-/yargs-parser-21.0.3.tgz error (ENOTFOUND). Will retry in 1 minute. 1 retries left.
+ ENOTFOUND  request to https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz failed, reason: getaddrinfo ENOTFOUND registry.npmmirror.com
+
+FetchError: request to https://registry.npmmirror.com/@prisma/client/-/client-5.22.0.tgz failed, reason: getaddrinfo ENOTFOUND registry.npmmirror.com
+    at ClientRequest.<anonymous> (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.1/node_modules/pnpm/dist/pnpm.cjs:68502:18)
+    at ClientRequest.emit (node:events:519:28)
+    at emitErrorEvent (node:_http_client:108:11)
+    at TLSSocket.socketErrorListener (node:_http_client:511:5)
+    at TLSSocket.emit (node:events:531:35)
+    at emitErrorNT (node:internal/streams/destroy:169:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)

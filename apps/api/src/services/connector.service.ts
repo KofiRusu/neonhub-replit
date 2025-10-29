@@ -1,4 +1,4 @@
-import { Prisma, type ConnectorAuth } from "@prisma/client";
+import { Prisma, type ConnectorAuth, ConnectorKind } from "@prisma/client";
 import { prisma } from "../db/prisma.js";
 import { logger } from "../lib/logger.js";
 import { connectorRegistry } from "../connectors/base/ConnectorRegistry.js";
@@ -11,7 +11,7 @@ function toDbPayload(connector: Connector) {
     name: meta.name,
     displayName: meta.displayName,
     description: meta.description,
-    category: meta.category,
+    category: meta.category as ConnectorKind,
     iconUrl: meta.iconUrl ?? null,
     websiteUrl: meta.websiteUrl ?? null,
     authType: meta.authType,

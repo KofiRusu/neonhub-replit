@@ -1,0 +1,33 @@
+import { PredictiveEngine } from './core/PredictiveEngine';
+import { KubernetesAutoscaler } from './services/KubernetesAutoscaler';
+import { AdaptiveAgent } from './models/AdaptiveAgent';
+import { BaselineLoader } from './utils/baselineLoader';
+import { PerformanceMetrics, PredictiveThresholds, ScalingDecision } from './types';
+export declare class NeonHubPredictiveEngine {
+    private predictiveEngine;
+    private kubernetesAutoscaler;
+    private adaptiveAgent;
+    private isInitialized;
+    constructor();
+    initialize(): Promise<void>;
+    processMetrics(currentMetrics: PerformanceMetrics): Promise<ScalingDecision>;
+    executeScaling(decision: ScalingDecision, namespace?: string, deploymentName?: string): Promise<void>;
+    getSystemHealth(): Promise<{
+        predictiveEngine: boolean;
+        kubernetesAutoscaler: boolean;
+        adaptiveAgent: boolean;
+        overall: boolean;
+    }>;
+    getAdaptiveAgentStats(): {
+        statesLearned: number;
+        explorationRate: number;
+        averageQValue: number;
+    };
+    getBaselineMetrics(): PerformanceMetrics;
+    static loadBaselineMetrics(): Promise<PerformanceMetrics>;
+    static validateMetrics(metrics: PerformanceMetrics): Promise<boolean>;
+}
+export { PredictiveEngine, KubernetesAutoscaler, AdaptiveAgent, BaselineLoader };
+export type { PerformanceMetrics, PredictiveThresholds, ScalingDecision };
+export default NeonHubPredictiveEngine;
+//# sourceMappingURL=index.d.ts.map

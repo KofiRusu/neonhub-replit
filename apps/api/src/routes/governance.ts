@@ -7,7 +7,7 @@ import { Router } from 'express';
 import * as governanceService from '../services/governance/index.js';
 import { logger } from '../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 
 // POST /api/governance/evaluate - Evaluate action against policies
 router.post('/evaluate', async (req, res) => {

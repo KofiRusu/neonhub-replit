@@ -3,16 +3,10 @@ import { prisma } from "../db/prisma.js";
 import { agentJobManager } from "./base/AgentJobManager.js";
 import { logger } from "../lib/logger.js";
 import { broadcast } from "../ws/index.js";
+import { normalizePostInput } from "./_shared/normalize.js";
+import type { GeneratePostInput, SocialPlatform } from "./_shared/normalize.js";
 
-export type SocialPlatform = "twitter" | "linkedin" | "facebook" | "instagram";
-
-export interface GeneratePostInput {
-  content: string;
-  platform: SocialPlatform;
-  tone?: "professional" | "casual" | "engaging";
-  includeHashtags?: boolean;
-  createdById?: string;
-}
+export type { GeneratePostInput, SocialPlatform } from "./_shared/normalize.js";
 
 export interface OptimizeForPlatformInput {
   content: string;
@@ -60,26 +54,37 @@ export class SocialAgent {
    */
   async generatePost(input: GeneratePostInput): Promise<GeneratePostOutput> {
     const startTime = Date.now();
+
+    const normalized = normalizePostInput(input);
     
     const jobId = await agentJobManager.createJob({
       agent: this.agentName,
-      input,
-      createdById: input.createdById,
+      input: normalized,
+      createdById: normalized.createdById,
     });
 
     try {
       await agentJobManager.startJob(jobId);
 
-      const platform = input.platform;
-      const limits = this.platformLimits[platform];
-      const tone = input.tone || "engaging";
+      const platform = normalized.platform;
+      const limits = this.platformLimits[platform] ?? this.platformLimits.twitter;
+      const tone = normalized.tone === "authoritative" ? "professional" : normalized.tone;
+      const contentTopic = normalized.content || normalized.topic;
+      const hashtagDirective =
+        normalized.includeHashtags && normalized.hashtags.length > 0
+          ? `Use these hashtags: ${normalized.hashtags.join(", ")}`
+          : normalized.includeHashtags
+          ? "Include relevant hashtags"
+          : "No hashtags";
 
-      const prompt = `Create a ${platform} post about: ${input.content}
+      const prompt = `Create a ${platform} post about: ${contentTopic}
 
 Platform: ${platform}
 Tone: ${tone}
 Character limit: ${limits.maxLength} (optimal: ${limits.optimal})
-${input.includeHashtags ? "Include relevant hashtags" : "No hashtags"}
+${hashtagDirective}
+Call to action: ${normalized.callToAction}
+Brand ID: ${normalized.brandId}
 
 Requirements:
 ${this.getPlatformRequirements(platform)}
@@ -91,7 +96,10 @@ Return as JSON with format:
   "estimatedReach": 1000
 }`;
 
-      logger.info({ jobId, platform, contentLength: input.content.length }, "Generating social post with AI");
+      logger.info(
+        { jobId, platform, contentLength: contentTopic.length, includeHashtags: normalized.includeHashtags },
+        "Generating social post with AI"
+      );
 
       const result = await generateText({
         prompt,

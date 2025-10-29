@@ -1,0 +1,19 @@
+groups:
+  - name: agent-infra
+    rules:
+      - alert: AgentRunFailureRate
+        expr: increase(agent_steps_failed_total[5m]) / clamp_min(increase(agent_steps_started_total[5m]), 1) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Agent failure rate above 5%"
+          description: "More than 5% of agent steps failed in the last 5 minutes."
+      - alert: QueueLagHigh
+        expr: (increase(agent_steps_enqueued_total[10m]) - increase(agent_steps_succeeded_total[10m])) > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Agent step backlog above 1000"
+          description: "Investigate worker availability or connector latency."

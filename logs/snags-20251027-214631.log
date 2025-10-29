@@ -1,0 +1,2 @@
+→ psql 'postgresql://neondb_owner:npg_r2D7UIdgPsVX@ep-quiet-sun-aegyjk46-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+psql: error: could not translate host name "ep-quiet-sun-aegyjk46-pooler.c-2.us-east-2.aws.neon.tech" to address: nodename nor servname provided, or not known

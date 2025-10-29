@@ -1,0 +1,2 @@
+→ pnpm --filter apps/api exec prisma migrate deploy
+[pnpm-shim] Unsupported command for --filter: exec

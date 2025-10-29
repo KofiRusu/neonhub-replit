@@ -1,7 +1,8 @@
 # 📱 GitHub Workflows - Visual Navigation Guide
 
 **For**: Finding and running your DB Deploy workflow  
-**Date**: 2025-10-27
+**Date**: 2025-10-27  
+> ⚠️ Local audit (2025-10-27) could not execute the database workflows. Ensure secrets (`DATABASE_URL`, `DIRECT_DATABASE_URL`) are configured and pnpm install succeeds before relying on this guide.
 
 ---
 
@@ -350,4 +351,3 @@ All workflows
 **Created**: 2025-10-27  
 **For**: GitHub Actions navigation  
 **Next**: Run your first workflow!
-

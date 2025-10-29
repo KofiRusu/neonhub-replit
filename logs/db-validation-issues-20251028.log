@@ -1,0 +1,2 @@
+[2025-10-28 21:58:25] Missing IVFFLAT indexes for embedding tables brand_voices, messages, chunks, agent_memories - pg_indexes shows only btree indexes. Investigate migration 20240107000000_gpt5_merge_vector on Neon.
+[2025-10-28 22:04:54] IVFFLAT indexes recreated on brand_voices, messages, chunks, mem_embeddings after enforcing vector(1536) dimensions.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Offline pnpm shim for the NeonHub workspace.
-# Supports the limited subset of commands used in this audit task.
+# Provides the subset of pnpm behaviour exercised by the current toolchain.
 
 set -euo pipefail
 
@@ -10,10 +10,20 @@ pnpm shim (offline)
 
 Supported invocations:
   pnpm -v
-  pnpm --filter apps/api prisma <command> [args...]
-  pnpm --filter apps/web prisma <command> [args...]
-  pnpm --filter apps/api prisma db seed
-  pnpm install --frozen-lockfile   (prints warning and exits 1 to allow npm fallback)
+  pnpm install [--frozen-lockfile]
+  pnpm exec <cmd> [args...]
+  pnpm <script> [-- <args...>]
+  pnpm run <script> [-- <args...>]
+  pnpm -r run <script>
+  pnpm --filter <workspace> run <script> [-- <args...>]
+  pnpm --filter <workspace> <script> [-- <args...>]
+  pnpm --filter <workspace> prisma <command> [args...]
+  pnpm --filter <workspace> exec <cmd> [args...]
+
+Recognised workspace filters:
+  apps/api, @neonhub/backend-v3.2
+  apps/web, @neonhub/ui-v3.2
+  core/sdk, @neonhub/sdk
 EOF
 }
 
@@ -22,14 +32,63 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
+resolve_workspace() {
+  local filter=$1
+  case "$filter" in
+    apps/api|@neonhub/backend-v3.2|backend|api)
+      printf '%s\n' "apps/api"
+      ;;
+    apps/web|@neonhub/ui-v3.2|frontend|web|ui)
+      printf '%s\n' "apps/web"
+      ;;
+    core/sdk|@neonhub/sdk|sdk)
+      printf '%s\n' "core/sdk"
+      ;;
+    *)
+      if [[ -d "$filter" ]]; then
+        printf '%s\n' "$filter"
+        return 0
+      fi
+      local found=""
+      local search_dirs=("apps" "core" "modules")
+      for dir in "${search_dirs[@]}"; do
+        [[ -d "$dir" ]] || continue
+        while IFS= read -r -d '' file; do
+          if grep -q "\"name\"[[:space:]]*:[[:space:]]*\"$filter\"" "$file"; then
+            found=$(dirname "$file")
+            break 2
+          fi
+        done < <(find "$dir" -maxdepth 4 -name package.json -print0 2>/dev/null)
+      done
+      if [[ -n "$found" ]]; then
+        printf '%s\n' "$found"
+      else
+        printf '[pnpm-shim] Unsupported filter target: %s\n' "$filter" >&2
+        return 1
+      fi
+      ;;
+  esac
+}
+
 if [[ "$1" == "-v" ]]; then
   echo "9.12.2-shim"
   exit 0
 fi
 
 if [[ "$1" == "install" ]]; then
-  echo "[pnpm-shim] install is unavailable offline; falling back to npm is recommended." >&2
-  exit 1
+  shift
+  install_args=()
+  for arg in "$@"; do
+    if [[ "$arg" == "--frozen-lockfile" || "$arg" == "--prefer-offline" || "$arg" == "--prefer-online" || "$arg" == "--offline" ]]; then
+      continue
+    fi
+    install_args+=("$arg")
+  done
+  if [[ ${#install_args[@]} -gt 0 ]]; then
+    exec npm install --workspaces --include-workspace-root "${install_args[@]}"
+  else
+    exec npm install --workspaces --include-workspace-root
+  fi
 fi
 
 if [[ "$1" == "add" ]]; then
@@ -39,31 +98,86 @@ if [[ "$1" == "add" ]]; then
 fi
 
 if [[ "$1" == "--filter" ]]; then
+  if [[ $# -lt 3 ]]; then
+    printf '%s\n' "[pnpm-shim] Missing command for --filter." >&2
+    exit 1
+  fi
+
   filter="$2"
   shift 2
 
-  if [[ "$1" != "prisma" ]]; then
-    echo "[pnpm-shim] Only Prisma commands are supported for now." >&2
-    exit 2
-  fi
+  workspace_dir=$(resolve_workspace "$filter") || exit 3
 
-  shift
-  prisma_cmd=("$@")
-
-  case "$filter" in
-    apps/api)
-      npx prisma "${prisma_cmd[@]}" --schema apps/api/prisma/schema.prisma
+  case "$1" in
+    prisma)
+      shift
+      (cd "$workspace_dir" && npx prisma "$@")
+      exit $?
       ;;
-    apps/web)
-      npx prisma "${prisma_cmd[@]}" --schema apps/web/prisma/schema.prisma
+    exec)
+      shift
+      if [[ $# -eq 0 ]]; then
+        printf '%s\n' "[pnpm-shim] Missing command for exec." >&2
+        exit 1
+      fi
+      (cd "$workspace_dir" && "$@")
+      exit $?
+      ;;
+    run)
+      if [[ $# -lt 2 ]]; then
+        printf '%s\n' "[pnpm-shim] Missing script name for filtered run." >&2
+        exit 1
+      fi
+      script="$2"
+      shift 2
+      (cd "$workspace_dir" && npm run "$script" -- "$@")
+      exit $?
       ;;
     *)
-      echo "[pnpm-shim] Unsupported filter target: $filter" >&2
-      exit 3
+      cmd="$1"
+      shift
+      (cd "$workspace_dir" && npm run "$cmd" -- "$@")
+      exit $?
       ;;
   esac
-  exit $?
 fi
+
+if [[ "$1" == "-r" && "${2:-}" == "run" ]]; then
+  if [[ $# -lt 3 ]]; then
+    printf '%s\n' "[pnpm-shim] Missing script name for recursive run." >&2
+    exit 1
+  fi
+  script="$3"
+  shift 3
+  exec npm run "$script" --workspaces --if-present "$@"
+fi
+
+if [[ "$1" == "run" ]]; then
+  if [[ $# -lt 2 ]]; then
+    printf '%s\n' "[pnpm-shim] Missing script name for run." >&2
+    exit 1
+  fi
+  script="$2"
+  shift 2
+  exec npm run "$script" -- "$@"
+fi
+
+if [[ "$1" == "exec" ]]; then
+  shift
+  if [[ $# -eq 0 ]]; then
+    printf '%s\n' "[pnpm-shim] Missing command for exec." >&2
+    exit 1
+  fi
+  exec "$@"
+fi
+
+case "$1" in
+  build|test|lint|type-check|typecheck|dev|start|format|format:check|prepare|verify|map|clean:dry|clean:apply|clean:deep|clean:docker|seo:lint|seo:audit|db:migrate|db:seed:test|quality:check|test:all|test:ci|test:quick|test:changed|test:autonomous|validate:api|fine-tune)
+    cmd="$1"
+    shift
+    exec npm run "$cmd" -- "$@"
+    ;;
+esac
 
 usage
 exit 1

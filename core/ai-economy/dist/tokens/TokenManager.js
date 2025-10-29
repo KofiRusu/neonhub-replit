@@ -10,8 +10,8 @@ export class TokenManager {
             id: 'neon-token',
             symbol: 'NEON',
             name: 'Neon Token',
-            totalSupply: 1000000000,
-            circulatingSupply: 100000000,
+            totalSupply: 1000000000, // 1 billion
+            circulatingSupply: 100000000, // 100 million initially
             decimals: 18,
             blockchain: 'internal',
             createdAt: new Date(),

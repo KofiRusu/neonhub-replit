@@ -1,0 +1,163 @@
+=== BASELINE VALIDATION ===
+Tue Oct 28 22:19:04 CET 2025
+
+=== TYPECHECK ===
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/services/brand-voice-ingestion.ts(79,70): error TS2345: Argument of type '{ error: any; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(103,7): error TS2353: Object literal may only specify known properties, and 'dimensions' does not exist in type '{ model?: string; input: string | string[]; }'.
+src/services/brand-voice-ingestion.ts(114,74): error TS2345: Argument of type '{ error: any; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(133,62): error TS2345: Argument of type '{ brandId: string; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(158,7): error TS2353: Object literal may only specify known properties, and 'summary' does not exist in type '(Without<BrandVoiceCreateInput, BrandVoiceUncheckedCreateInput> & BrandVoiceUncheckedCreateInput) | (Without<...> & BrandVoiceCreateInput)'.
+src/services/brand-voice-ingestion.ts(172,61): error TS2345: Argument of type '{ brandVoiceId: string; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(201,72): error TS2345: Argument of type '{ brandId: string; query: string; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(244,61): error TS2345: Argument of type '{ brandId: string; filename: string; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(260,61): error TS2345: Argument of type '{ brandVoiceId: string; }' is not assignable to parameter of type 'string'.
+src/services/brand-voice-ingestion.ts(299,3): error TS2322: Type '{ metrics: JsonValue; id: string; createdAt: Date; updatedAt: Date; brandId: string; promptTemplate: string; styleRulesJson: JsonValue; embeddingSpaceId: string; }[]' is not assignable to type '{ id: string; summary: string; metadata: JsonValue; createdAt: Date; }[]'.
+  Type '{ metrics: JsonValue; id: string; createdAt: Date; updatedAt: Date; brandId: string; promptTemplate: string; styleRulesJson: JsonValue; embeddingSpaceId: string; }' is missing the following properties from type '{ id: string; summary: string; metadata: JsonValue; createdAt: Date; }': summary, metadata
+src/services/brand-voice-ingestion.ts(303,7): error TS2353: Object literal may only specify known properties, and 'summary' does not exist in type 'BrandVoiceSelect<DefaultArgs>'.
+src/services/brand-voice-ingestion.ts(319,62): error TS2345: Argument of type '{ id: string; }' is not assignable to parameter of type 'string'.
+src/trpc/router.ts(9,10): error TS2300: Duplicate identifier 'brandRouter'.
+src/trpc/router.ts(11,10): error TS2300: Duplicate identifier 'brandRouter'.
+src/trpc/router.ts(22,3): error TS1117: An object literal cannot have multiple properties with the same name.
+src/trpc/routers/brand.router.ts(35,15): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/brand.router.ts(43,27): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/brand.router.ts(94,15): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/brand.router.ts(102,27): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/brand.router.ts(141,15): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/brand.router.ts(149,27): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/brand.router.ts(185,15): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/brand.router.ts(193,27): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/brand.router.ts(238,15): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/brand.router.ts(246,27): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/content.router.ts(18,11): error TS2353: Object literal may only specify known properties, and 'memberships' does not exist in type 'OrganizationInclude<DefaultArgs>'.
+src/trpc/routers/content.router.ts(26,23): error TS2551: Property 'organization' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; metadata: JsonValue; organizationId: string; slogan: string; slug: string; mainColor: string; }'. Did you mean 'organizationId'?
+src/trpc/routers/content.router.ts(51,57): error TS2345: Argument of type '{ createdById: any; topic?: string; brandId?: string; tone?: "professional" | "casual" | "friendly" | "authoritative"; audience?: string; brandVoiceId?: string; callToAction?: string; personaId?: string | number; primaryKeyword?: string; secondaryKeywords?: string[]; outline?: string[]; wordCount?: number; }' is not assignable to parameter of type 'GenerateArticleInput'.
+  Property 'topic' is optional in type '{ createdById: any; topic?: string; brandId?: string; tone?: "professional" | "casual" | "friendly" | "authoritative"; audience?: string; brandVoiceId?: string; callToAction?: string; personaId?: string | number; primaryKeyword?: string; secondaryKeywords?: string[]; outline?: string[]; wordCount?: number; }' but required in type 'GenerateArticleInput'.
+src/trpc/routers/content.router.ts(84,43): error TS2345: Argument of type '{ createdById: any; content?: string; brandId?: string; brandVoiceId?: string; callToAction?: string; personaId?: string | number; primaryKeyword?: string; draftId?: string; }' is not assignable to parameter of type 'OptimizeArticleInput'.
+  Property 'content' is optional in type '{ createdById: any; content?: string; brandId?: string; brandVoiceId?: string; callToAction?: string; personaId?: string | number; primaryKeyword?: string; draftId?: string; }' but required in type 'OptimizeArticleInput'.
+src/trpc/routers/content.router.ts(123,50): error TS2345: Argument of type '{ topic?: string; brandId?: string; tone?: "professional" | "casual" | "friendly" | "authoritative"; brandVoiceId?: string; primaryKeyword?: string; }' is not assignable to parameter of type 'SocialSnippetInput'.
+  Property 'topic' is optional in type '{ topic?: string; brandId?: string; tone?: "professional" | "casual" | "friendly" | "authoritative"; brandVoiceId?: string; primaryKeyword?: string; }' but required in type 'SocialSnippetInput'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed with exit code 2.
+
+=== TYPECHECK (RETRY) ===
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/routes/budgets.ts(11,7): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/routes/sdk-handshake.ts(6,14): error TS2742: The inferred type of 'sdkHandshakeRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS4023: Exported variable 'appRouter' has or is using name 'MetaTags' from external module "/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/content/ContentAgent" but cannot be named.
+src/trpc/routers/agents.router.ts(10,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/agents.router.ts(10,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/brand.router.ts(12,14): error TS2742: The inferred type of 'brandRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/brand.router.ts(12,14): error TS2742: The inferred type of 'brandRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS2742: The inferred type of 'contentRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS2742: The inferred type of 'contentRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS4023: Exported variable 'contentRouter' has or is using name 'MetaTags' from external module "/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/content/ContentAgent" but cannot be named.
+src/trpc/routers/seo.router.ts(7,14): error TS2742: The inferred type of 'seoRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/seo.router.ts(7,14): error TS2742: The inferred type of 'seoRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(57,14): error TS2742: The inferred type of 'loggerMiddleware' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(57,14): error TS2742: The inferred type of 'loggerMiddleware' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(70,14): error TS2742: The inferred type of 'loggedProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(70,14): error TS2742: The inferred type of 'loggedProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed with exit code 2.
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/routes/budgets.ts(11,7): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/routes/sdk-handshake.ts(6,14): error TS2742: The inferred type of 'sdkHandshakeRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/context.ts(23,23): error TS2742: The inferred type of 'createContext' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS2742: The inferred type of 'appRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/router.ts(16,14): error TS4023: Exported variable 'appRouter' has or is using name 'MetaTags' from external module "/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/content/ContentAgent" but cannot be named.
+src/trpc/routers/agents.router.ts(10,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/agents.router.ts(10,14): error TS2742: The inferred type of 'agentsRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/brand.router.ts(12,14): error TS2742: The inferred type of 'brandRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/brand.router.ts(12,14): error TS2742: The inferred type of 'brandRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS2742: The inferred type of 'contentRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS2742: The inferred type of 'contentRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/content.router.ts(31,14): error TS4023: Exported variable 'contentRouter' has or is using name 'MetaTags' from external module "/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/content/ContentAgent" but cannot be named.
+src/trpc/routers/seo.router.ts(7,14): error TS2742: The inferred type of 'seoRouter' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/routers/seo.router.ts(7,14): error TS2742: The inferred type of 'seoRouter' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(32,14): error TS2742: The inferred type of 'router' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(33,14): error TS2742: The inferred type of 'publicProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+express-serve-static-core@4.19.7/node_modules/@types/express-serve-static-core'. This is likely not portable. A type annotation is necessary.
+src/trpc/trpc.ts(38,14): error TS2742: The inferred type of 'protectedProcedure' cannot be named without a reference to '.pnpm/@types+qs@6.14.0/node_modules/@types/qs'. This is likely not portable. A type annotation is necessary.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed with exit code 2.

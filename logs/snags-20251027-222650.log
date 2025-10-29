@@ -1,0 +1,8 @@
+→ pnpm --filter apps/api prisma migrate status
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+
+7 migrations found in prisma/migrations
+
+Database schema is up to date!

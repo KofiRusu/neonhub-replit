@@ -1,0 +1,2 @@
+→ pnpm --filter apps/api prisma validate
+bash: pnpm: command not found

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import {
   Policy,
   AuditSubject,
@@ -92,7 +92,7 @@ export class PolicyEnforcer extends EventEmitter {
       // Log enforcement result
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: AuditAction.POLICY_EVALUATION,
           subject,
@@ -120,7 +120,7 @@ export class PolicyEnforcer extends EventEmitter {
       // Log enforcement error
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: AuditAction.POLICY_EVALUATION,
           subject,
@@ -215,7 +215,7 @@ export class PolicyEnforcer extends EventEmitter {
     // Log blocking action
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         action: AuditAction.POLICY_EVALUATION,
         subject,
@@ -245,7 +245,7 @@ export class PolicyEnforcer extends EventEmitter {
     // Log quarantine action
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         action: AuditAction.POLICY_EVALUATION,
         subject,
@@ -276,7 +276,7 @@ export class PolicyEnforcer extends EventEmitter {
     // Log alert action
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         action: AuditAction.POLICY_EVALUATION,
         subject,
@@ -306,7 +306,7 @@ export class PolicyEnforcer extends EventEmitter {
     // Log logging action (meta-logging)
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         action: AuditAction.POLICY_EVALUATION,
         subject,

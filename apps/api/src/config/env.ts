@@ -13,6 +13,9 @@ const envSchema = z.object({
     val.split(',').map(origin => origin.trim()).filter(Boolean)
   ),
   
+  // Infrastructure
+  REDIS_URL: z.string().url().optional(),
+  
   // Payment
   STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
   STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
@@ -34,6 +37,7 @@ const envSchema = z.object({
   
   // Optional - SMS
   TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(), 
   TWILIO_PHONE_NUMBER: z.string().optional(),
   
@@ -107,6 +111,7 @@ function buildFallbackEnv(target: 'test' | 'development'): Env {
         : 'dev-secret-min-32-chars-long-12345'),
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
     CORS_ORIGINS: parseOrigins(process.env.CORS_ORIGINS),
+    REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
     STRIPE_SECRET_KEY:
       process.env.STRIPE_SECRET_KEY ||
       (target === 'test' ? 'sk_test_fake' : 'sk_test_dev'),
@@ -124,6 +129,7 @@ function buildFallbackEnv(target: 'test' | 'development'): Env {
     PORT: Number(process.env.PORT ?? 3001),
     SENTRY_DSN: process.env.SENTRY_DSN,
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_SID: process.env.TWILIO_SID || process.env.TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
     TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
   };

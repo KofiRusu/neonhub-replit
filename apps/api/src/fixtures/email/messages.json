@@ -1,0 +1,18 @@
+[
+  {
+    "id": "msg_1",
+    "threadId": "thread_1",
+    "subject": "Welcome to NeonHub",
+    "from": "team@neonhub.dev",
+    "snippet": "Thanks for trying the deterministic test harness.",
+    "receivedAt": "2025-02-01T00:00:00.000Z"
+  },
+  {
+    "id": "msg_2",
+    "threadId": "thread_2",
+    "subject": "Status Update",
+    "from": "agent@neonhub.dev",
+    "snippet": "Orchestrator integration tests succeeded.",
+    "receivedAt": "2025-02-02T00:00:00.000Z"
+  }
+]

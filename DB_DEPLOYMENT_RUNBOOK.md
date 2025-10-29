@@ -1,9 +1,11 @@
 # 🚀 NeonHub Database Deployment Runbook (Enterprise-Safe)
 
-**Version**: 1.0  
+**Version**: 1.1  
 **Last Updated**: 2025-10-27  
 **Owner**: DevOps Team  
-**Status**: ✅ Production-Ready
+**Status**: ❌ Verification Required
+
+> ⚠️ 2025-10-27: Local audit could not reach Postgres, so backup/drift/deploy workflows remain unvalidated. Complete the action items in `DB_COMPLETION_REPORT.md` before treating this runbook as authoritative.
 
 ---
 
@@ -633,4 +635,3 @@ pnpm --filter apps/api exec prisma generate
 **Last Updated**: 2025-10-27  
 **Next Review**: 2025-11-27  
 **Maintainer**: DevOps Team
-

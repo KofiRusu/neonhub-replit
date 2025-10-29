@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ok, fail } from "../lib/http";
 import * as trendsService from "../services/trends.service";
 
-export const trendsRouter = Router();
+export const trendsRouter: Router = Router();
 
 // Validation schemas
 const trendBriefSchema = z.object({

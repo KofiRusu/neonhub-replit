@@ -1,0 +1,9 @@
+→ corepack enable --install-directory "/Users/kofirusu/.local/bin"
+[31m[1mInternal Error[22m[39m: EPERM: operation not permitted, symlink '../../../../usr/local/lib/node_modules/corepack/dist/pnpm.js' -> '/Users/kofirusu/.local/bin/pnpm'
+    at async Object.symlink (node:internal/fs/promises:1000:10)
+    at async EnableCommand.generatePosixLink (/usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs:22608:5)
+    at async Promise.all (index 0)
+    at async EnableCommand.execute (/usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs:22595:5)
+    at async EnableCommand.validateAndExecute (/usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs:19835:22)
+    at async _Cli.run (/usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs:20772:18)
+    at async Object.runMain (/usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs:23091:19)

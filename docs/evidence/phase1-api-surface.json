@@ -1,0 +1,4 @@
+{
+  "status": "blocked",
+  "reason": "SDK build/test commands require tsup and jest binaries; pnpm install failed due to offline registry so API surface cannot be validated programmatically. See logs/verification/phase1-sdk-build.log for details."
+}

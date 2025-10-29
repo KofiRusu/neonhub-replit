@@ -1,0 +1,7 @@
+→ pnpm --filter apps/api prisma db seed
+Environment variables loaded from .env
+Running seed command `tsx prisma/seed.ts` ...
+Seeding core NeonHub data…
+Editorial seed complete.
+
+🌱  The seed command has been executed.

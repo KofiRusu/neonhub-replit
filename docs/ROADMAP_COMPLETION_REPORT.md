@@ -1,0 +1,24 @@
+# Roadmap Completion Report
+
+**Executive Summary**
+Overall roadmap completion is roughly 33%. Core SDK, budgeting logic, and SEO scaffolding exist, but baseline pnpm commands fail because node_modules were removed during `pnpm -w install` and cannot be restored inside the restricted sandbox. Stripe, RBAC, orchestration, and launch automation remain largely unimplemented or unverifiable without installing dependencies.
+
+| Phase | Score | Key Evidence | Gaps | Next Actions |
+| --- | --- | --- | --- | --- |
+| 0. Pre-Flight | 0.25 | Env validation with relaxed fallbacks (apps/api/src/config/env.ts:1); command failures recorded (logs/audit/typecheck.log) | pnpm install/typecheck/test/build all fail without node_modules | Reinstall deps with network access, rerun `pnpm -w` baseline suite, capture logs |
+| 1. SDK & Types | 0.5 | Bundled outputs present (core/sdk/dist/index.js:1); Jest suite defined (core/sdk/src/__tests__/client.test.ts:1) | Tests and typecheck blocked by missing dependencies | Restore workspace deps; run `pnpm --filter @neonhub/sdk test:coverage` and publish artifacts |
+| 2. tRPC Foundation | 0.25 | Agents router defined with zod validation (apps/api/src/trpc/routers/agents.router.ts:8) | Router never mounted on Express API (apps/api/src/server.ts:71), no e2e call | Mount tRPC handler, add health mutation, validate with supertest |
+| 3. UI / Interface | 0.25 | Dashboard fetchers hit API adapters (apps/web/src/hooks/useTrends.ts:5); JSON-LD injected in content studio (apps/web/src/app/content/ContentStudioClient.tsx:730) | UI depends on live API but tRPC client absent; screenshots unavailable | Wire Next.js to tRPC `AppRouter`, run dev build, capture phase3 screenshots |
+| 4. Budgeting Function | 0.5 | Allocation engine + simulations implemented (apps/api/src/services/budgeting/allocation-engine.ts:1); Jest specs in place (apps/api/src/services/budgeting/__tests__/allocation-engine.test.ts:1) | Budget history stubbed out (apps/api/src/services/budgeting/index.ts:46); tests not run | Hook BudgetTransaction writes, execute coverage suite, export reasoning sample |
+| 5. Stripe Infra & Ledger | 0.0 | Billing service calls Stripe REST API (apps/api/src/services/billing/stripe.ts:1) | Webhook route is stub without signature or idempotency (apps/api/src/routes/stripe-webhook.ts:1); no ledger reconciliation | Implement signature verification + idempotent store, emit BudgetTransaction entries, replay webhook fixture |
+| 6. Subscriptions / RBAC | 0.25 | Subscription schema + usage counters defined (apps/api/prisma/schema.prisma:1419); Prisma-backed team service (apps/api/src/services/team.service.ts:1) | Team invites kept in-memory (apps/api/src/routes/team.ts:59); auth middleware lacks role checks (apps/api/src/middleware/auth.ts:38) | Persist invitations, enforce role guards/entitlements, add negative tests |
+| 7. SEO Fast-Track | 0.5 | Sitemap generator (apps/web/src/app/sitemap.ts:1) and canonical head component (apps/web/src/components/seo/Canonical.tsx:1) | SEO scripts / audits blocked by missing deps (logs/audit/install.log); no automated output | Restore deps, run `node scripts/seo-audit.mjs`, collect sitemap/JSON-LD proofs |
+| 8. Agent Orchestration | 0.25 | Orchestrator wraps handlers with retry + circuit breaker (apps/api/src/services/orchestration/router.ts:1); agent contract tests exist (apps/api/src/agents/tests/agents.test.ts:1) | BrandVoiceAgent lacks runtime registration (apps/api/src/agents/BrandVoiceAgent.ts:5); no persisted runs/traces | Instantiate agents on boot, persist executions, export trace log |
+| 9. Learning & Self-Enhancement | 0.5 | Learning loop updates snippet win rates (apps/api/src/services/learning-loop.service.ts:1); feedback bus triggers learn() (apps/api/src/events/bus.ts:1) | Predictive engine and tests not executed (logs/audit/test.log) | Reinstall module deps, run agentic test suite, dump cadence recommendation sample |
+| 10. Audit & Workflows | 0.5 | CI/CD workflows defined (.github/workflows/ci.yml:1); smoke automation script available (scripts/smoke.sh:1) | pnpm lint/typecheck/build all failing locally (logs/audit/lint.log) so workflow parity unverified | Rehydrate node_modules, run `pnpm -w lint`/`build`/`test` + capture workflow logs |
+| 11. Production Launch | 0.25 | Launch checklist cites smoke validation (PRODUCTION_READY.md:92); shared smoke script (scripts/smoke.sh:1) | No evidence of blue/green rollout tooling or executed smoke logs | Add blue/green deployment instructions + generate logs/audit/smoke.log from live run |
+
+**Linked Logs & Evidence**
+- Baseline logs: logs/audit/install.log, logs/audit/typecheck.log, logs/audit/lint.log, logs/audit/test.log, logs/audit/build.log, logs/audit/prisma-migrate-status.log, logs/audit/prisma-seed.log
+- Evidence files: docs/evidence/budget-explain.json, docs/evidence/ledger-reconcile.json, docs/evidence/seo-check.json
+- Screenshot placeholder: docs/screens/phase3/NOTE.txt

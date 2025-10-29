@@ -13,7 +13,7 @@ import {
   syncRegisteredConnectors,
 } from "../services/connector.service.js";
 
-export const connectorsRouter = Router();
+export const connectorsRouter: Router = Router();
 
 const apiKeySchema = z.object({
   apiKey: z.string().min(1).optional(),

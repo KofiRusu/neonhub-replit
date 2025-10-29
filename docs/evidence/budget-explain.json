@@ -1,0 +1,5 @@
+{
+  "status": "blocked",
+  "reason": "Unable to execute budgeting tests or capture allocation reasoning because pnpm workspace commands fail without node_modules (offline sandbox).",
+  "evidence": "See logs/audit/test.log for jest resolution failure after pnpm -w test -- --coverage."
+}

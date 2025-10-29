@@ -5,7 +5,7 @@ import * as feedbackService from "../services/feedback.service.js";
 import type { CreateFeedbackInput, UpdateFeedbackInput } from "../services/feedback.service.js";
 import { ok, fail } from "../lib/http.js";
 
-export const feedbackRouter = Router();
+export const feedbackRouter: Router = Router();
 
 // Validation schemas
 const createFeedbackSchema = z.object({

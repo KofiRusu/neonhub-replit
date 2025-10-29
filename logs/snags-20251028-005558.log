@@ -1,0 +1,7 @@
+→ corepack prepare pnpm@9 --activate --install-directory "/Users/kofirusu/.local/bin"
+[31m[1mUnknown Syntax Error[22m[39m: Command not found; did you mean one of:
+
+  0. corepack prepare [--activate] [--json] [-o,--output] ...
+  1. corepack prepare [--activate] [--json] [-o,--output] ...
+
+While running prepare pnpm@9 --activate --install-directory /Users/kofirusu/.local/bin

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ok, fail } from "../lib/http";
 import { getBrandProfile, searchKnowledge } from "../services/brandVoice.service";
 
-export const brandVoiceRouter = Router();
+export const brandVoiceRouter: Router = Router();
 
 brandVoiceRouter.get("/brand-voice/profile", async (_req, res) => {
   try {

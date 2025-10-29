@@ -38,7 +38,7 @@ export class NeuralNetwork {
             id,
             type,
             activation,
-            bias: Math.random() * 2 - 1,
+            bias: Math.random() * 2 - 1, // Random bias between -1 and 1
             weights: new Map(),
             output: 0,
             error: 0,

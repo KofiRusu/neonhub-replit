@@ -32,6 +32,19 @@ interface MessageMetadata {
 
 const toJsonValue = (value: unknown): JsonValue => value as JsonValue;
 
+const toJsonObject = (input?: Record<string, unknown>): JsonObject | undefined => {
+  if (!input) {
+    return undefined;
+  }
+  const result: JsonObject = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (value !== undefined) {
+      result[key] = value as JsonValue;
+    }
+  }
+  return result;
+};
+
 const uniqueStrings = (values: Array<string | null | undefined>) => {
   const result = new Set<string>();
   for (const value of values) {
@@ -93,16 +106,16 @@ const serializeConversationMetadata = (metadata: ConversationMetadata): JsonObje
     record[SUBJECT_KEY] = metadata.subject;
   }
   if (metadata.tags?.length) {
-    record[TAGS_KEY] = metadata.tags;
+   record[TAGS_KEY] = metadata.tags;
   }
-  if (metadata.legacy && Object.keys(metadata.legacy).length) {
-    record[LEGACY_KEY] = metadata.legacy;
+  const legacyRecord = toJsonObject(metadata.legacy);
+  if (legacyRecord && Object.keys(legacyRecord).length) {
+    record[LEGACY_KEY] = legacyRecord;
   }
-  if (metadata.extra && Object.keys(metadata.extra).length) {
-    for (const [key, value] of Object.entries(metadata.extra)) {
-      if (value !== undefined) {
-        record[key] = value as JsonValue;
-      }
+  const extraRecord = toJsonObject(metadata.extra);
+  if (extraRecord) {
+    for (const [key, value] of Object.entries(extraRecord)) {
+      record[key] = value;
     }
   }
   return record;
@@ -123,14 +136,14 @@ const serializeMessageMetadata = (metadata: MessageMetadata): JsonObject => {
     record.attachments = metadata.attachments;
   }
   record[READ_BY_KEY] = metadata.readBy;
-  if (metadata.legacy && Object.keys(metadata.legacy).length) {
-    record[LEGACY_KEY] = metadata.legacy;
+  const legacyRecord = toJsonObject(metadata.legacy);
+  if (legacyRecord && Object.keys(legacyRecord).length) {
+    record[LEGACY_KEY] = legacyRecord;
   }
-  if (metadata.extra && Object.keys(metadata.extra).length) {
-    for (const [key, value] of Object.entries(metadata.extra)) {
-      if (value !== undefined) {
-        record[key] = value as JsonValue;
-      }
+  const extraRecord = toJsonObject(metadata.extra);
+  if (extraRecord) {
+    for (const [key, value] of Object.entries(extraRecord)) {
+      record[key] = value;
     }
   }
   return record;

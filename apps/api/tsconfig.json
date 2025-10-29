@@ -16,6 +16,7 @@
     "outDir": "./dist",
     "baseUrl": "../../",
     "paths": {
+      "@/*": ["apps/api/src/*"],
       "@core/*": ["core/*"],
       "@modules/*": ["modules/*"],
       "@neonhub/predictive-engine": ["modules/predictive-engine/src"],
@@ -32,6 +33,7 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
+    "../../apps/web/**/*",
     "../../core/ai-economy/**/*",
     "../../core/cognitive-infra/**/*",
     "../../core/data-trust/**/*",

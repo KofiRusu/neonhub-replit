@@ -1,0 +1,124 @@
+Tue Oct 28 02:44:14 CET 2025
+Darwin MacBook-Air.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:30:40 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8132 arm64
+PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/anaconda3/bin:/opt/anaconda3/condabin:/Users/kofirusu/.cargo/bin
+/usr/bin/curl
+/opt/anaconda3/bin/curl
+/usr/bin/dig
+/usr/bin/host
+/usr/sbin/scutil
+/usr/sbin/networksetup
+=== DNS Configuration ===
+DNS configuration
+
+resolver #1
+  nameserver[0] : 192.168.1.1
+  nameserver[1] : 80.58.61.250
+  nameserver[2] : 80.58.61.254
+  if_index : 11 (en0)
+  flags    : Request A records
+  reach    : 0x00020002 (Reachable,Directly Reachable Address)
+
+resolver #2
+  domain   : local
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 300000
+
+resolver #3
+  domain   : 254.169.in-addr.arpa
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 300200
+
+resolver #4
+  domain   : 8.e.f.ip6.arpa
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 300400
+
+resolver #5
+  domain   : 9.e.f.ip6.arpa
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 300600
+
+resolver #6
+  domain   : a.e.f.ip6.arpa
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 300800
+
+resolver #7
+  domain   : b.e.f.ip6.arpa
+  options  : mdns
+  timeout  : 5
+  flags    : Request A records
+  reach    : 0x00000000 (Not Reachable)
+  order    : 301000
+
+DNS configuration (for scoped queries)
+
+resolver #1
+  nameserver[0] : 192.168.1.1
+  nameserver[1] : 80.58.61.250
+  nameserver[2] : 80.58.61.254
+  if_index : 11 (en0)
+  flags    : Scoped, Request A records
+  reach    : 0x00020002 (Reachable,Directly Reachable Address)
+=== Wi-Fi DNS Servers ===
+There aren't any DNS Servers set on Wi-Fi.
+=== Ethernet DNS Servers ===
+Ethernet is not a recognized network service.
+** Error: The parameters were not valid.
+=== Ping Cloudflare ===
+PING 1.1.1.1 (1.1.1.1): 56 data bytes
+64 bytes from 1.1.1.1: icmp_seq=0 ttl=54 time=14.104 ms
+64 bytes from 1.1.1.1: icmp_seq=1 ttl=54 time=24.867 ms
+
+--- 1.1.1.1 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 14.104/19.486/24.867/5.381 ms
+=== Ping Google ===
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=114 time=48.806 ms
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=114 time=74.856 ms
+
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 48.806/61.831/74.856/13.025 ms
+=== Dig npmjs.org ===
+104.16.1.35
+104.16.24.34
+104.16.2.35
+104.16.27.34
+104.16.0.35
+104.16.3.35
+104.16.28.34
+104.16.25.34
+104.16.29.34
+104.16.26.34
+104.16.30.34
+104.16.31.34
+=== Dig registry.npmjs.org ===
+104.16.1.35
+104.16.28.34
+104.16.29.34
+104.16.25.34
+104.16.0.35
+104.16.27.34
+104.16.31.34
+104.16.24.34
+104.16.2.35
+104.16.3.35
+104.16.26.34
+104.16.30.34

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { ComplianceStatus, LegalSeverity, SubjectType, GovernanceError, ComplianceError } from '../types/index.js';
 export class LegalComplianceManager extends EventEmitter {
     constructor(config, auditLogger) {
@@ -105,7 +105,7 @@ export class LegalComplianceManager extends EventEmitter {
     async checkCompliance(jurisdiction, framework) {
         try {
             const check = {
-                id: uuidv4(),
+                id: randomUUID(),
                 timestamp: new Date(),
                 jurisdiction,
                 framework: framework || this.config.frameworks[0],
@@ -137,7 +137,7 @@ export class LegalComplianceManager extends EventEmitter {
             // Log compliance check
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: uuidv4(),
+                    id: randomUUID(),
                     timestamp: new Date(),
                     action: 'compliance_check',
                     subject: {
@@ -304,7 +304,7 @@ export class LegalComplianceManager extends EventEmitter {
         // Log status update
         if (this.auditLogger) {
             await this.auditLogger.log({
-                id: uuidv4(),
+                id: randomUUID(),
                 timestamp: new Date(),
                 action: 'compliance_update',
                 subject: {

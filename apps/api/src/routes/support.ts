@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ok, fail } from "../lib/http";
 import { reply } from "../services/support.service";
 
-export const supportRouter = Router();
+export const supportRouter: Router = Router();
 
 supportRouter.post("/support/reply", async (req, res) => {
   try {

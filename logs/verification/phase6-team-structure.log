@@ -1,0 +1,410 @@
+[Subscription Model Snippet]
+1419:model Subscription {
+  webhookSecret         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String    @unique
+  stripePriceId        String
+  stripeProductId      String
+  plan                 String
+  status               String
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean   @default(false)
+  canceledAt           DateTime?
+  campaignsUsed        Int       @default(0)
+  emailsSent           Int       @default(0)
+  socialPosts          Int       @default(0)
+  agentCalls           Int       @default(0)
+  campaignLimit        Int       @default(5)
+  emailLimit           Int       @default(1000)
+  socialLimit          Int       @default(100)
+  agentCallLimit       Int       @default(100)
+  trialEndsAt          DateTime?
+  metadata             Json?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
+  usageRecords UsageRecord[]
+
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id                    String    @id @default(cuid())
+  subscriptionId        String
+  stripeInvoiceId       String    @unique
+  stripePaymentIntentId String?
+  amountDue             Int
+  amountPaid            Int       @default(0)
+  currency              String    @default("usd")
+  status                String
+  invoicePdf            String?
+  hostedInvoiceUrl      String?
+  dueDate               DateTime?
+  paidAt                DateTime?
+  metadata              Json?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, status])
+  @@map("invoices")
+}
+
+model UsageRecord {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  resourceType   String
+  resourceId     String?
+  quantity       Int      @default(1)
+  cost           Int?
+  timestamp      DateTime @default(now())
+  metadata       Json?
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, resourceType, timestamp])
+  @@map("usage_records")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  userId         String?
+  actorType      String?
+[Team Service Snippet]
+import { Prisma } from '@prisma/client';
+import { prisma } from '../db/prisma.js';
+import { logger } from '../lib/logger.js';
+
+export interface CreateTeamMemberInput {
+  userId: string;
+  organizationId?: string;
+  role?: string;
+  department?: string;
+  status?: string;
+  invitedBy?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UpdateTeamMemberInput {
+  role?: string;
+  department?: string;
+  status?: string;
+  metadata?: Record<string, unknown> | null;
+}
+
+async function resolveOrganizationId(userId: string): Promise<string | null> {
+  const membership = await prisma.organizationMembership.findFirst({
+    where: { userId },
+    select: { organizationId: true },
+  });
+
+  return membership?.organizationId ?? null;
+}
+
+const toMetadataObject = (value: Prisma.JsonValue | null | undefined): Record<string, unknown> => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+  return { ...(value as Record<string, unknown>) };
+};
+
+const stripUndefined = (record: Record<string, unknown>): Record<string, unknown> => {
+  return Object.fromEntries(Object.entries(record).filter(([, value]) => value !== undefined));
+};
+
+const prepareMetadata = (input?: Record<string, unknown>): Prisma.JsonValue | undefined => {
+  if (!input) {
+    return undefined;
+  }
+  const cleaned = stripUndefined(input);
+  return Object.keys(cleaned).length ? (cleaned as Prisma.JsonObject) : undefined;
+};
+
+const mergeMetadata = (
+  current: Prisma.JsonValue | null | undefined,
+  updates?: Record<string, unknown>,
+): Prisma.JsonValue | undefined => {
+  if (!updates || Object.keys(updates).length === 0) {
+    return current ?? undefined;
+  }
+  const base = toMetadataObject(current);
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === undefined) {
+      delete base[key];
+    } else {
+      base[key] = value;
+    }
+  }
+  return Object.keys(base).length ? (base as Prisma.JsonObject) : undefined;
+};
+
+export async function getTeamMembers(filters?: { role?: string; status?: string }) {
+  try {
+    const where: Prisma.TeamMemberWhereInput = {};
+    
+    if (filters?.role) {
+      where.role = filters.role;
+    }
+    
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    const members = await prisma.teamMember.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: [
+        { role: 'asc' },
+        { joinedAt: 'desc' },
+      ],
+    });
+
+    // Transform to match expected format
+    return members.map(member => ({
+      id: member.id,
+      userId: member.userId,
+      name: member.user.name || 'Unknown',
+      email: member.user.email,
+      avatar: member.user.image || '/placeholder-user.jpg',
+      role: member.role,
+      department: member.department || 'General',
+      status: member.status,
+      joinedAt: member.joinedAt.toISOString().split('T')[0],
+      metadata: toMetadataObject(member.metadata ?? null),
+    }));
+  } catch (error) {
+    logger.error({ error }, 'Failed to fetch team members');
+    throw error;
+  }
+}
+
+export async function getTeamMemberById(memberId: string) {
+  try {
+    const member = await prisma.teamMember.findUnique({
+      where: { id: memberId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!member) {
+      throw new Error('Team member not found');
+    }
+
+    return {
+      id: member.id,
+      userId: member.userId,
+      name: member.user.name || 'Unknown',
+      email: member.user.email,
+      avatar: member.user.image || '/placeholder-user.jpg',
+      role: member.role,
+      department: member.department || 'General',
+      status: member.status,
+      joinedAt: member.joinedAt,
+      invitedAt: member.invitedAt,
+      invitedBy: member.invitedBy,
+      metadata: toMetadataObject(member.metadata),
+    };
+  } catch (error) {
+    logger.error({ error, memberId }, 'Failed to fetch team member');
+    throw error;
+  }
+}
+
+export async function createTeamMember(input: CreateTeamMemberInput) {
+  try {
+    // Check if user exists
+[Team Routes Snippet]
+import { Router } from "express";
+import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import { ok, fail } from "../lib/http";
+import { ValidationError } from "../lib/errors";
+import { sendInviteEmail, isEmailServiceConfigured } from "../services/team/invite.js";
+import { logger } from "../lib/logger.js";
+import * as teamService from "../services/team.service.js";
+
+export const teamRouter: Router = Router();
+
+// In-memory token store (TODO: replace with database)
+const inviteTokens = new Map<string, {
+  email: string;
+  role: string;
+  createdAt: Date;
+  expiresAt: Date;
+  used: boolean;
+}>();
+
+// Validation schemas
+const InviteMemberSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["Admin", "Member", "Guest"]),
+  message: z.string().optional(),
+});
+
+// GET /team/members - List all team members
+teamRouter.get("/team/members", async (req, res) => {
+  try {
+    const { role, status } = req.query;
+    const filters: any = {};
+    
+    if (role && typeof role === 'string') {
+      filters.role = role;
+    }
+    
+    if (status && typeof status === 'string') {
+      filters.status = status;
+    }
+    
+    const members = await teamService.getTeamMembers(filters);
+    return res.json(ok(members));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+// GET /team/stats - Get team statistics
+teamRouter.get("/team/stats", async (req, res) => {
+  try {
+    const stats = await teamService.getTeamStats();
+    return res.json(ok(stats));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+// GET /team/members/:id - Get specific team member
+teamRouter.get("/team/members/:id", async (req, res) => {
+  try {
+    const member = await teamService.getTeamMemberById(req.params.id);
+    return res.json(ok(member));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// PUT /team/members/:id - Update team member
+teamRouter.put("/team/members/:id", async (req, res) => {
+  try {
+    const { role, department, status } = req.body;
+    const member = await teamService.updateTeamMember(req.params.id, {
+      role,
+      department,
+      status,
+    });
+    return res.json(ok(member));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// DELETE /team/members/:id - Remove team member
+teamRouter.delete("/team/members/:id", async (req, res) => {
+  try {
+    const result = await teamService.removeTeamMember(req.params.id);
+    return res.json(ok(result));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    const status = message.includes('not found') || message.includes('Cannot remove') ? 404 : 500;
+    return res.status(status).json(fail(message).body);
+  }
+});
+
+// GET /team/invitations - Get pending invitations
+teamRouter.get("/team/invitations", async (req, res) => {
+  try {
+    // Get pending invitations from tokens map
+    const invitations = Array.from(inviteTokens.entries())
+      .filter(([_, invite]) => !invite.used && invite.expiresAt > new Date())
+      .map(([token, invite]) => ({
+        id: token,
+        email: invite.email,
+        role: invite.role,
+        invitedBy: "Current User", // TODO: Track who sent invite
+        sentAt: invite.createdAt.toISOString().split('T')[0],
+        expiresAt: invite.expiresAt.toISOString().split('T')[0],
+      }));
+    
+    return res.json(ok(invitations));
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return res.status(500).json(fail(message));
+  }
+});
+
+// POST /team/invite
+teamRouter.post("/team/invite", async (req, res) => {
+  try {
+    const result = InviteMemberSchema.safeParse(req.body);
+    
+    if (!result.success) {
+      throw new ValidationError(result.error.errors[0].message);
+    }
+
+    const { email, role } = result.data;
+
+    // Generate unique token
+    const token = uuidv4();
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    // Store token (TODO: persist in database)
+    inviteTokens.set(token, {
+      email,
+      role,
+      createdAt: now,
+      expiresAt,
+      used: false,
+    });
+
+    // Send invitation email
+    const emailResult = await sendInviteEmail({
+      to: email,
+      token,
+      role,
+      fromName: "NeonHub Team", // TODO: Get from authenticated user
+      redirectUrl: process.env.INVITE_REDIRECT_URL || process.env.APP_BASE_URL,
+    });
+
+    logger.info({ email, role, token, emailConfigured: isEmailServiceConfigured() }, "Team invitation created");
+
+    const newInvitation = {

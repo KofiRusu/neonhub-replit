@@ -7,7 +7,7 @@ import {
   getBaselineMetrics
 } from '../services/predictive-engine';
 
-const router = Router();
+const router: Router = Router();
 
 // POST /api/predictive/scale - Process metrics and make scaling decisions
 router.post('/scale', async (req, res) => {

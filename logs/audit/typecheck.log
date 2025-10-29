@@ -1,0 +1,72 @@
+
+> neonhub@3.2.0 typecheck /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+Unable to resolve binary for "tsc" (module "typescript/bin/tsc"). Did you install dependencies?
+Error: Cannot find module 'typescript/bin/tsc'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 1
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+Unable to resolve binary for "tsc" (module "typescript/bin/tsc"). Did you install dependencies?
+Error: Cannot find module 'typescript/bin/tsc'
+Require stack:
+- /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Function.resolve (node:internal/modules/helpers:190:19)
+    at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+    at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+    at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+}
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 1
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error workspace @neonhub/ui-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+sh: tsc: command not found
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 127
+npm error path /Users/kofirusu/Desktop/NeonHub/core/sdk
+npm error workspace @neonhub/sdk@1.0.0
+npm error location /Users/kofirusu/Desktop/NeonHub/core/sdk
+npm error command failed
+npm error command sh -c tsc --noEmit
+
+ ELIFECYCLE  Command failed.

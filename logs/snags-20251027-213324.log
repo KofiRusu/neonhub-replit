@@ -1,0 +1,7 @@
+→ pnpm --filter apps/api prisma migrate status
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neonhub", schema "public" at "localhost:5433"
+Error: P1001: Can't reach database server at `localhost:5433`
+
+Please make sure your database server is running at `localhost:5433`.

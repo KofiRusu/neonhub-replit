@@ -1,11 +1,12 @@
 import express from "express";
+import type { Express } from "express";
 import { createServer } from "http";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
 // Create Express app
-const app = express();
+const app: Express = express();
 const httpServer = createServer(app);
 
 // Security Middleware

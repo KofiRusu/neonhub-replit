@@ -1,0 +1,28 @@
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+. postinstall$ npm run prisma:generate
+. postinstall: > neonhub@3.2.0 prisma:generate
+. postinstall: > npm run prisma:generate --workspace=apps/api
+. postinstall: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+. postinstall: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+. postinstall: Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+. postinstall: Error: Cannot find module 'prisma/build/index.js'
+. postinstall: Require stack:
+. postinstall: - /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+. postinstall:     at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+. postinstall:     at Function.resolve (node:internal/modules/helpers:190:19)
+. postinstall:     at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+. postinstall:     at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+. postinstall:     at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+. postinstall:     at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+. postinstall:     at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+. postinstall:     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+. postinstall:   code: 'MODULE_NOT_FOUND',
+. postinstall:   requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+. postinstall: }
+. postinstall: [prisma:generate] Prisma client artifacts already present. Skipping engine download.
+. postinstall: Done
+. prepare$ husky
+. prepare: Done
+Done in 1.7s

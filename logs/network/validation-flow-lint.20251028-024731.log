@@ -1,0 +1,15 @@
+=== Step 4: Linting ===
+Scope: 18 of 19 workspace projects
+apps/api lint$ node ../../scripts/run-cli.mjs eslint src --ext .ts
+core/ai-governance lint$ eslint src/**/*.ts
+apps/web lint$ node ../../scripts/run-cli.mjs eslint .
+core/cooperative-intelligence lint$ eslint src/**/*.ts
+core/cooperative-intelligence lint: Oops! Something went wrong! :(
+core/cooperative-intelligence lint: ESLint: 8.57.1
+core/cooperative-intelligence lint: No files matching the pattern "src/**/*.ts" were found.
+core/cooperative-intelligence lint: Please check for typing mistakes in the pattern.
+core/cooperative-intelligence lint: Failed
+/Users/kofirusu/Desktop/NeonHub/core/cooperative-intelligence:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/cooperative-intelligence@7.0.0 lint: `eslint src/**/*.ts`
+Exit status 2
+core/data-trust lint$ eslint src/**/*.ts

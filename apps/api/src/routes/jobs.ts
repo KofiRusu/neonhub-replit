@@ -3,7 +3,7 @@ import { agentJobManager } from "../agents/base/AgentJobManager.js";
 import { NotFoundError } from "../lib/errors.js";
 import { getAuthenticatedUserId } from "../lib/requestUser.js";
 
-export const jobsRouter = Router();
+export const jobsRouter: Router = Router();
 
 // Get job status
 jobsRouter.get("/jobs/:id", async (req, res, next) => {

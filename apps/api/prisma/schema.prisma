@@ -9,7 +9,7 @@ datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
   directUrl  = env("DIRECT_DATABASE_URL")
-  extensions = [vector(schema: "public")]
+  extensions = [vector(schema: "public"), citext(schema: "public")]
 }
 
 enum AgentKind {
@@ -80,11 +80,126 @@ enum ConnectorKind {
   YOUTUBE
   TIKTOK
   GOOGLE_ADS
+  GOOGLE_SEARCH_CONSOLE
   SHOPIFY
   STRIPE
   SLACK
   DISCORD
   LINKEDIN
+}
+
+enum MarketingCampaignType {
+  email
+  social
+  ppc
+  content
+  seo
+  display
+  video
+  influencer
+  event
+  other
+}
+
+enum MarketingCampaignStatus {
+  draft
+  scheduled
+  active
+  paused
+  completed
+  archived
+}
+
+enum MarketingLeadGrade {
+  A
+  B
+  C
+  D
+  F
+}
+
+enum MarketingLeadStatus {
+  new
+  contacted
+  qualified
+  nurturing
+  converted
+  lost
+  unqualified
+}
+
+enum MarketingTouchpointType {
+  page_view
+  email_open
+  email_click
+  ad_impression
+  ad_click
+  social_view
+  social_click
+  form_submit
+  download
+  video_view
+  call
+  chat
+}
+
+enum ConsentStatus {
+  granted
+  revoked
+  denied
+  pending
+}
+
+enum BudgetAllocationStatus {
+  planned
+  approved
+  executing
+  completed
+  cancelled
+}
+
+model Persona {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  keywords  Keyword[]
+  calendars EditorialCalendar[]
+
+  @@map("personas")
+}
+
+model Keyword {
+  id        Int      @id @default(autoincrement())
+  term      String   @db.Citext
+  intent    String
+  priority  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  personaId Int?
+  persona   Persona? @relation(fields: [personaId], references: [id])
+
+  @@unique([term], map: "ux_keyword_term_ci")
+  @@index([personaId], map: "ix_keyword_persona")
+  @@map("keywords")
+}
+
+model EditorialCalendar {
+  id        Int      @id @default(autoincrement())
+  title     String
+  publishAt DateTime
+  priority  Int?
+  status    String?  @default("planned")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  personaId Int?
+  persona   Persona? @relation(fields: [personaId], references: [id])
+
+  @@map("editorial_calendar")
 }
 
 model User {
@@ -115,6 +230,8 @@ model User {
   connectorAuths         ConnectorAuth[]
   teamMemberships        TeamMember[]
   campaigns              Campaign[]
+  personNotes            Note[]                   @relation("NoteAuthor")
+  budgetTransactions     BudgetTransaction[]      @relation("BudgetTransactionCreator")
 
   stripeCustomerId String?   @unique
   isBetaUser       Boolean   @default(false)
@@ -171,29 +288,49 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members           OrganizationMembership[]
-  roles             OrganizationRole[]
-  permissions       OrganizationPermission[]
-  apiKeys           ApiKey[]
-  brands            Brand[]
-  embeddingSpaces   EmbeddingSpace[]
-  agents            Agent[]
-  datasets          Dataset[]
-  modelVersions     ModelVersion[]
-  campaigns         Campaign[]
-  conversations     Conversation[]
-  contentItems      Content[]
-  auditLogs         AuditLog[]
-  AgentRun          AgentRun[]
-  Tool              Tool[]
-  Document          Document[]
-  InferenceEndpoint InferenceEndpoint[]
-  ContentDraft      ContentDraft[]
-  AgentJob          AgentJob[]
-  Task              Task[]
-  Feedback          Feedback[]
-  TeamMember        TeamMember[]
-  ConnectorAuth     ConnectorAuth[]
+  members            OrganizationMembership[]
+  roles              OrganizationRole[]
+  permissions        OrganizationPermission[]
+  apiKeys            ApiKey[]
+  brands             Brand[]
+  embeddingSpaces    EmbeddingSpace[]
+  agents             Agent[]
+  datasets           Dataset[]
+  modelVersions      ModelVersion[]
+  campaigns          Campaign[]
+  conversations      Conversation[]
+  contentItems       Content[]
+  auditLogs          AuditLog[]
+  AgentRun           AgentRun[]
+  Tool               Tool[]
+  Document           Document[]
+  InferenceEndpoint  InferenceEndpoint[]
+  ContentDraft       ContentDraft[]
+  AgentJob           AgentJob[]
+  Task               Task[]
+  Feedback           Feedback[]
+  TeamMember         TeamMember[]
+  ConnectorAuth      ConnectorAuth[]
+  marketingCampaigns MarketingCampaign[]
+  marketingLeads     MarketingLead[]
+  marketingMetrics   MarketingMetric[]
+  people             Person[]
+  identities         Identity[]
+  consents           Consent[]
+  events             Event[]
+  notes              Note[]
+  memories           MemEmbedding[]
+  topics             Topic[]
+  objectives         Objective[]
+  budgetProfiles     BudgetProfile[]
+  budgetAllocations  BudgetAllocation[]
+  budgetLedgers      BudgetLedger[]
+  budgetTransactions BudgetTransaction[]
+  payments           Payment[]
+  payouts            Payout[]
+  snippetLibraries   SnippetLibrary[]
+  linkGraphEntries   LinkGraph[]
+  seoMetrics         SEOMetric[]
 
   @@map("organizations")
 }
@@ -312,9 +449,12 @@ model Brand {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  brandVoices  BrandVoice[]
-  assets       BrandAsset[]
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brandVoices        BrandVoice[]
+  assets             BrandAsset[]
+  marketingCampaigns MarketingCampaign[]
+  budgetProfiles     BudgetProfile[]
+  snippetLibraries   SnippetLibrary[]
 
   @@unique([organizationId, slug])
   @@map("brands")
@@ -634,8 +774,53 @@ model Content {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   author       User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  outgoingLinks LinkGraph[] @relation("LinkGraphSource")
+  incomingLinks LinkGraph[] @relation("LinkGraphTarget")
+  seoMetrics    SEOMetric[]
 
   @@map("content")
+}
+
+model LinkGraph {
+  id               String   @id @default(cuid())
+  organizationId   String
+  sourceContentId  String
+  targetContentId  String
+  anchorText       String
+  similarity       Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  source       Content       @relation("LinkGraphSource", fields: [sourceContentId], references: [id], onDelete: Cascade)
+  target       Content       @relation("LinkGraphTarget", fields: [targetContentId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceContentId, targetContentId, anchorText])
+  @@index([organizationId])
+  @@map("link_graph")
+}
+
+model SEOMetric {
+  id             String   @id @default(cuid())
+  organizationId String
+  contentId      String?
+  url            String
+  keyword        String
+  impressions    Int
+  clicks         Int
+  ctr            Float
+  avgPosition    Float
+  date           DateTime
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  content      Content?     @relation(fields: [contentId], references: [id], onDelete: SetNull)
+
+  @@index([url, date])
+  @@index([keyword, date])
+  @@index([organizationId, date])
+  @@unique([organizationId, url, keyword, date])
+  @@map("seo_metrics")
 }
 
 model Campaign {
@@ -651,12 +836,13 @@ model Campaign {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  owner          User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  metrics        CampaignMetric[]
-  emailSequences EmailSequence[]
-  socialPosts    SocialPost[]
-  abTests        ABTest[]
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner              User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  metrics            CampaignMetric[]
+  emailSequences     EmailSequence[]
+  socialPosts        SocialPost[]
+  abTests            ABTest[]
+  budgetTransactions BudgetTransaction[]
 
   @@index([organizationId, status])
   @@map("campaigns")
@@ -674,6 +860,455 @@ model CampaignMetric {
 
   @@index([campaignId, kind, timestamp])
   @@map("campaign_metrics")
+}
+
+model MarketingCampaign {
+  id             String                  @id @default(cuid())
+  organizationId String
+  brandId        String?
+  name           String
+  description    String?
+  type           MarketingCampaignType
+  status         MarketingCampaignStatus @default(draft)
+  budget         Float?
+  spent          Float                   @default(0)
+  startDate      DateTime
+  endDate        DateTime?
+  impressions    Int                     @default(0)
+  clicks         Int                     @default(0)
+  conversions    Int                     @default(0)
+  revenue        Float                   @default(0)
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  organization        Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brand               Brand?                @relation(fields: [brandId], references: [id])
+  leads               MarketingLead[]
+  touchpoints         MarketingTouchpoint[]
+  consents            Consent[]
+  events              Event[]
+  budgetAllocations   BudgetAllocation[]
+  budgetLedgerEntries BudgetLedger[]
+
+  @@index([organizationId, status])
+  @@index([startDate, endDate])
+  @@map("marketing_campaigns")
+}
+
+model MarketingLead {
+  id              String              @id @default(cuid())
+  organizationId  String
+  email           String
+  firstName       String?
+  lastName        String?
+  company         String?
+  phone           String?
+  source          String
+  medium          String?
+  campaign        String?
+  campaignId      String?
+  utmParams       Json?
+  score           Int                 @default(0)
+  grade           MarketingLeadGrade?
+  status          MarketingLeadStatus @default(new)
+  firstTouch      DateTime            @default(now())
+  lastTouch       DateTime            @default(now())
+  touchCount      Int                 @default(1)
+  pageViews       Int                 @default(0)
+  engagementScore Int                 @default(0)
+  convertedAt     DateTime?
+  convertedValue  Float?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  organization      Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  marketingCampaign MarketingCampaign?    @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  touchpoints       MarketingTouchpoint[]
+
+  @@index([organizationId, status])
+  @@index([email])
+  @@index([source, medium])
+  @@index([score])
+  @@map("marketing_leads")
+}
+
+model MarketingTouchpoint {
+  id                String                  @id @default(cuid())
+  leadId            String
+  campaignId        String?
+  type              MarketingTouchpointType
+  channel           String
+  url               String?
+  referrer          String?
+  device            String?
+  location          String?
+  sessionId         String?
+  eventData         Json?
+  attributionWeight Float                   @default(0)
+  timestamp         DateTime                @default(now())
+
+  lead     MarketingLead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  campaign MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([leadId, timestamp])
+  @@index([campaignId])
+  @@index([channel, type])
+  @@map("marketing_touchpoints")
+}
+
+model MarketingMetric {
+  id               String   @id @default(cuid())
+  organizationId   String
+  date             DateTime
+  impressions      Int      @default(0)
+  clicks           Int      @default(0)
+  conversions      Int      @default(0)
+  revenue          Float    @default(0)
+  cost             Float    @default(0)
+  leadsGenerated   Int      @default(0)
+  leadsCost        Float    @default(0)
+  channelBreakdown Json?
+  createdAt        DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date])
+  @@index([date])
+  @@map("marketing_metrics")
+}
+
+model Person {
+  id             String    @id @default(cuid())
+  organizationId String
+  externalId     String?
+  displayName    String?
+  primaryEmail   String?
+  primaryPhone   String?
+  primaryHandle  String?
+  locale         String?
+  timezone       String?
+  personaTags    String[]  @default([])
+  attributes     Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastSeenAt     DateTime?
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  identities    Identity[]
+  consents      Consent[]
+  events        Event[]
+  notes         Note[]
+  memories      MemEmbedding[]
+  topics        Topic[]
+  objectives    Objective[]
+  ledgerEntries BudgetLedger[]
+
+  @@unique([organizationId, externalId])
+  @@index([organizationId, primaryEmail])
+  @@index([organizationId, primaryPhone])
+  @@index([organizationId, lastSeenAt])
+  @@map("people")
+}
+
+model Identity {
+  id             String    @id @default(cuid())
+  personId       String
+  organizationId String
+  type           String
+  value          String    @db.Citext
+  channel        String?
+  verifiedAt     DateTime?
+  source         String?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, type, value])
+  @@index([personId, type])
+  @@map("person_identities")
+}
+
+model Consent {
+  id             String        @id @default(cuid())
+  personId       String
+  organizationId String
+  campaignId     String?
+  channel        String
+  status         ConsentStatus @default(granted)
+  source         String?
+  collectedAt    DateTime      @default(now())
+  expiresAt      DateTime?
+  evidence       Json?
+  metadata       Json?
+  updatedAt      DateTime      @updatedAt
+
+  person       Person             @relation(fields: [personId], references: [id], onDelete: Cascade)
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  campaign     MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([personId, channel])
+  @@index([organizationId, channel])
+  @@map("person_consents")
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  organizationId String
+  personId       String
+  campaignId     String?
+  objectiveId    String?
+  channel        String
+  type           String
+  source         String?
+  providerId     String?
+  topic          String?
+  intent         String?
+  sentiment      String?
+  payload        Json?
+  metadata       Json?
+  occurredAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  person       Person             @relation(fields: [personId], references: [id], onDelete: Cascade)
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  campaign     MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  objective    Objective?         @relation(fields: [objectiveId], references: [id], onDelete: SetNull)
+  memories     MemEmbedding[]
+
+  @@index([organizationId, occurredAt])
+  @@index([personId, occurredAt])
+  @@index([organizationId, channel, type])
+  @@map("events")
+}
+
+model Note {
+  id             String   @id @default(cuid())
+  organizationId String
+  personId       String
+  authorId       String?
+  body           String   @db.Text
+  tags           String[] @default([])
+  visibility     String   @default("internal")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author       User?        @relation("NoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([personId, createdAt])
+  @@index([organizationId])
+  @@map("person_notes")
+}
+
+model MemEmbedding {
+  id             String                 @id @default(cuid())
+  organizationId String
+  personId       String
+  sourceEventId  String?
+  label          String?
+  embedding      Unsupported("vector")?
+  metadata       Json?
+  createdAt      DateTime               @default(now())
+  expiresAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  sourceEvent  Event?       @relation(fields: [sourceEventId], references: [id], onDelete: SetNull)
+
+  @@index([personId, createdAt])
+  @@index([organizationId])
+  @@map("mem_embeddings")
+}
+
+model Topic {
+  id             String   @id @default(cuid())
+  organizationId String
+  personId       String
+  name           String
+  weight         Float    @default(0)
+  trend          Float?   @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, name])
+  @@index([organizationId, name])
+  @@map("person_topics")
+}
+
+model Objective {
+  id             String    @id @default(cuid())
+  organizationId String
+  personId       String
+  title          String
+  description    String?
+  status         String    @default("active")
+  priority       Int       @default(0)
+  successMetric  String?
+  targetValue    Float?
+  dueAt          DateTime?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  person       Person             @relation(fields: [personId], references: [id], onDelete: Cascade)
+  events       Event[]
+  allocations  BudgetAllocation[]
+
+  @@index([organizationId, status])
+  @@index([personId, status])
+  @@map("person_objectives")
+}
+
+model BudgetProfile {
+  id             String   @id @default(cuid())
+  organizationId String
+  brandId        String?
+  name           String
+  currency       String   @default("usd")
+  totalBudget    Float?
+  reserved       Float    @default(0)
+  spent          Float    @default(0)
+  constraints    Json?
+  settings       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brand         Brand?             @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  allocations   BudgetAllocation[]
+  ledgerEntries BudgetLedger[]
+  payments      Payment[]
+  payouts       Payout[]
+
+  @@unique([organizationId, name])
+  @@index([brandId])
+  @@map("budget_profiles")
+}
+
+model BudgetAllocation {
+  id              String                 @id @default(cuid())
+  organizationId  String
+  budgetProfileId String
+  campaignId      String?
+  objectiveId     String?
+  channel         String
+  amount          Float
+  currency        String                 @default("usd")
+  windowStart     DateTime?
+  windowEnd       DateTime?
+  status          BudgetAllocationStatus @default(planned)
+  metadata        Json?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  organization  Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  budgetProfile BudgetProfile      @relation(fields: [budgetProfileId], references: [id], onDelete: Cascade)
+  campaign      MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  objective     Objective?         @relation(fields: [objectiveId], references: [id], onDelete: SetNull)
+  ledgerEntries BudgetLedger[]
+
+  @@index([organizationId, status])
+  @@index([budgetProfileId])
+  @@index([campaignId])
+  @@map("budget_allocations")
+}
+
+model BudgetLedger {
+  id              String   @id @default(cuid())
+  organizationId  String
+  budgetProfileId String
+  allocationId    String?
+  campaignId      String?
+  personId        String?
+  entryType       String
+  amount          Float
+  currency        String   @default("usd")
+  occurredAt      DateTime @default(now())
+  metadata        Json?
+
+  organization  Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  budgetProfile BudgetProfile      @relation(fields: [budgetProfileId], references: [id], onDelete: Cascade)
+  allocation    BudgetAllocation?  @relation(fields: [allocationId], references: [id], onDelete: SetNull)
+  campaign      MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  person        Person?            @relation(fields: [personId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, occurredAt])
+  @@index([budgetProfileId])
+  @@index([allocationId])
+  @@map("budget_ledger")
+}
+
+model Payment {
+  id                    String   @id @default(cuid())
+  organizationId        String
+  budgetProfileId       String?
+  stripePaymentIntentId String   @unique
+  status                String
+  amount                Float
+  currency              String   @default("usd")
+  customerId            String?
+  metadata              Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  budgetProfile BudgetProfile? @relation(fields: [budgetProfileId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@map("payments")
+}
+
+model Payout {
+  id               String    @id @default(cuid())
+  organizationId   String
+  budgetProfileId  String?
+  partnerId        String
+  stripeTransferId String?
+  status           String
+  amount           Float
+  currency         String    @default("usd")
+  metadata         Json?
+  createdAt        DateTime  @default(now())
+  processedAt      DateTime?
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  budgetProfile BudgetProfile? @relation(fields: [budgetProfileId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@map("payouts")
+}
+
+model SnippetLibrary {
+  id             String    @id @default(cuid())
+  organizationId String
+  brandId        String?
+  channel        String
+  name           String
+  content        String    @db.Text
+  tone           String?
+  useCases       String[]  @default([])
+  winRate        Float?
+  usageCount     Int       @default(0)
+  lastWonAt      DateTime?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  brand        Brand?       @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, name, channel])
+  @@index([organizationId, channel])
+  @@index([brandId])
+  @@map("snippet_library")
 }
 
 model EmailSequence {
@@ -1087,4 +1722,38 @@ model ActionConfig {
 
   @@index([connectorAuthId, isActive])
   @@map("action_configs")
+}
+
+enum BudgetTransactionType {
+  allocate
+  spend
+  reserve
+  refund
+  adjustment
+}
+
+model BudgetTransaction {
+  id             String                @id @default(cuid())
+  campaignId     String
+  organizationId String
+  type           BudgetTransactionType
+  amount         Float
+  currency       String                @default("USD")
+  channel        String?
+  description    String?
+  metadata       Json?
+  balanceBefore  Float
+  balanceAfter   Float
+  createdAt      DateTime              @default(now())
+  createdBy      String?
+
+  campaign     Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User?        @relation("BudgetTransactionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([organizationId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("budget_transactions")
 }

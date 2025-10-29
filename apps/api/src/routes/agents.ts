@@ -11,7 +11,7 @@ import { socialApiClient } from '../lib/socialApiClient.js';
 import { leadScraper } from '../lib/leadScraper.js';
 import { pdfGenerator } from '../lib/pdfGenerator.js';
 
-export const agentsRouter = Router();
+export const agentsRouter: Router = Router();
 
 // Ad Agent Routes
 agentsRouter.post('/ad/generate', async (req, res) => {

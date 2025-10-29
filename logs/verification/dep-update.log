@@ -1,0 +1,112 @@
+ WARN  `node_modules` is present. Lockfile only installation will make it out-of-date
+Progress: resolved 1, reused 0, downloaded 0, added 0
+apps/api                                 |  WARN  deprecated @types/redis@4.0.11
+apps/api                                 |  WARN  deprecated puppeteer@23.11.1
+Progress: resolved 70, reused 1, downloaded 0, added 0
+Progress: resolved 73, reused 1, downloaded 0, added 0
+Progress: resolved 101, reused 1, downloaded 0, added 0
+core/eco-optimizer                       |  WARN  deprecated @azure/monitor-query@1.3.3
+modules/predictive-engine                |  WARN  deprecated @types/winston@2.4.4
+modules/predictive-engine                |  WARN  deprecated json2csv@5.0.7
+Progress: resolved 148, reused 1, downloaded 0, added 0
+core/compliance-consent                  |  WARN  deprecated crypto@1.0.1
+Progress: resolved 166, reused 1, downloaded 0, added 0
+Progress: resolved 458, reused 1, downloaded 0, added 0
+Progress: resolved 1025, reused 1, downloaded 0, added 0
+Progress: resolved 1762, reused 1, downloaded 0, added 0
+Progress: resolved 1971, reused 1, downloaded 0, added 0
+Progress: resolved 1999, reused 1, downloaded 0, added 0
+ WARN  14 deprecated subdependencies found: @aws-sdk/credential-provider-web-identity@3.917.0, @types/glob@9.0.0, glob@7.2.3, glob@8.1.0, google-p12-pem@4.0.1, har-validator@5.1.5, inflight@1.0.6, jose@1.28.2, lodash.get@4.4.2, node-domexception@1.0.0, querystring@0.2.0, request@2.88.2, source-map@0.8.0-beta.0, uuid@3.4.0
+Progress: resolved 1999, reused 1, downloaded 0, added 0, done
+
+Already up to date
+. postinstall$ npm run prisma:generate
+. postinstall: > neonhub@3.2.0 prisma:generate
+. postinstall: > npm run prisma:generate --workspace=apps/api
+. postinstall: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+. postinstall: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+. postinstall: Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+. postinstall: Error: Cannot find module 'prisma/build/index.js'
+. postinstall: Require stack:
+. postinstall: - /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+. postinstall:     at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+. postinstall:     at Function.resolve (node:internal/modules/helpers:190:19)
+. postinstall:     at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+. postinstall:     at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+. postinstall:     at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+. postinstall:     at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+. postinstall:     at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+. postinstall:     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+. postinstall:   code: 'MODULE_NOT_FOUND',
+. postinstall:   requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+. postinstall: }
+. postinstall: [prisma:generate] Prisma client artifacts already present. Skipping engine download.
+. postinstall: Done
+. prepare$ husky
+. prepare: Done
+Done in 12.3s
+Scope: all 20 workspace projects
+Progress: resolved 0, reused 1, downloaded 0, added 0
+apps/api                                 |  WARN  deprecated @types/redis@4.0.11
+apps/api                                 |  WARN  deprecated puppeteer@23.11.1
+core/compliance-consent                  |  WARN  deprecated crypto@1.0.1
+modules/predictive-engine                |  WARN  deprecated @types/winston@2.4.4
+modules/predictive-engine                |  WARN  deprecated json2csv@5.0.7
+core/eco-optimizer                       |  WARN  deprecated @azure/monitor-query@1.3.3
+Progress: resolved 1257, reused 1164, downloaded 0, added 0
+Progress: resolved 1917, reused 1780, downloaded 6, added 0
+Progress: resolved 1931, reused 1787, downloaded 16, added 0
+Progress: resolved 1941, reused 1792, downloaded 21, added 0
+Progress: resolved 1945, reused 1795, downloaded 24, added 0
+Progress: resolved 1955, reused 1805, downloaded 25, added 0
+Progress: resolved 1983, reused 1833, downloaded 26, added 0
+ WARN  10 deprecated subdependencies found: @aws-sdk/credential-provider-web-identity@3.917.0, @types/glob@9.0.0, glob@7.2.3, glob@8.1.0, google-p12-pem@4.0.1, inflight@1.0.6, lodash.get@4.4.2, node-domexception@1.0.0, querystring@0.2.0, source-map@0.8.0-beta.0
+Packages: +27
++++++++++++++++++++++++++++
+Progress: resolved 1987, reused 1837, downloaded 26, added 27, done
+. postinstall$ npm run prisma:generate
+apps/api prepare$ npm run prisma:generate
+. postinstall: > neonhub@3.2.0 prisma:generate
+. postinstall: > npm run prisma:generate --workspace=apps/api
+apps/api prepare: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+apps/api prepare: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+apps/api prepare: Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+apps/api prepare: Error: Cannot find module 'prisma/build/index.js'
+apps/api prepare: Require stack:
+apps/api prepare: - /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+apps/api prepare:     at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+apps/api prepare:     at Function.resolve (node:internal/modules/helpers:190:19)
+apps/api prepare:     at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+apps/api prepare:     at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+apps/api prepare:     at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+apps/api prepare:     at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+apps/api prepare:     at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+apps/api prepare:     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+apps/api prepare:   code: 'MODULE_NOT_FOUND',
+apps/api prepare:   requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+apps/api prepare: }
+apps/api prepare: [prisma:generate] Prisma client artifacts already present. Skipping engine download.
+apps/api prepare: Done
+. postinstall: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+. postinstall: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+. postinstall: Unable to resolve binary for "prisma" (module "prisma/build/index.js"). Did you install dependencies?
+. postinstall: Error: Cannot find module 'prisma/build/index.js'
+. postinstall: Require stack:
+. postinstall: - /Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs
+. postinstall:     at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+. postinstall:     at Function.resolve (node:internal/modules/helpers:190:19)
+. postinstall:     at resolveBinary (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:52:22)
+. postinstall:     at main (file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:91:14)
+. postinstall:     at file:///Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs:138:1
+. postinstall:     at ModuleJob.run (node:internal/modules/esm/module_job:234:25)
+. postinstall:     at async ModuleLoader.import (node:internal/modules/esm/loader:473:24)
+. postinstall:     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:123:5) {
+. postinstall:   code: 'MODULE_NOT_FOUND',
+. postinstall:   requireStack: [ '/Users/kofirusu/Desktop/NeonHub/scripts/run-cli.mjs' ]
+. postinstall: }
+. postinstall: [prisma:generate] Prisma client artifacts already present. Skipping engine download.
+. postinstall: Done
+. prepare$ husky
+. prepare: Done
+
+Done in 8.8s

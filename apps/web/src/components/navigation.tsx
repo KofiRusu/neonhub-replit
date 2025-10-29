@@ -18,15 +18,19 @@ import {
   Brain,
   Megaphone,
   FileText,
+  LineChart,
+  Search,
 } from "lucide-react"
 import { HealthBadge } from "./health-badge"
 import AuthButton from "./AuthButton"
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Marketing", href: "/marketing", icon: LineChart },
   { name: "AI Agents", href: "/agents", icon: Bot },
   { name: "Campaigns", href: "/campaigns", icon: Target },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "SEO", href: "/dashboard/seo", icon: Search },
   { name: "Content", href: "/content", icon: FileText },
   { name: "Email", href: "/email", icon: Mail },
   { name: "Social Media", href: "/social-media", icon: Megaphone },

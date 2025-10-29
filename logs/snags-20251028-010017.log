@@ -1,0 +1,27 @@
+→ brew install pnpm
+==> Auto-updating Homebrew...
+Adjust how often this is run with `$HOMEBREW_AUTO_UPDATE_SECS` or disable with
+`$HOMEBREW_NO_AUTO_UPDATE=1`. Hide these hints with `$HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Auto-updated Homebrew!
+Updated 1 tap (homebrew/cask).
+==> New Casks
+labymod: Launcher for LabyMod (Minecraft client)
+
+You have 60 outdated formulae and 2 outdated casks installed.
+
+==> Fetching downloads for: pnpm
+==> Downloading https://ghcr.io/v2/homebrew/core/pnpm/manifests/10.19.0
+==> Fetching pnpm
+==> Downloading https://ghcr.io/v2/homebrew/core/pnpm/blobs/sha256:aae4cdf6c4aaf3e916247e7b0100327f25bbc194ce4a249c51ceca261b168557
+==> Pouring pnpm--10.19.0.arm64_sequoia.bottle.tar.gz
+==> Caveats
+pnpm requires a Node installation to function. You can install one with:
+  brew install node
+==> Summary
+🍺  /opt/homebrew/Cellar/pnpm/10.19.0: 1,057 files, 15.7MB
+==> Running `brew cleanup pnpm`...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Caveats
+zsh completions have been installed to:
+  /opt/homebrew/share/zsh/site-functions

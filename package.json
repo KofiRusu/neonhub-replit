@@ -12,9 +12,26 @@
     "core/*",
     "modules/*"
   ],
+  "pnpm": {
+    "overrides": {
+      "eslint": "^9.15.0",
+      "@typescript-eslint/eslint-plugin": "^8.46.0",
+      "@typescript-eslint/parser": "^8.46.0",
+      "protobufjs": "^7.4.0",
+      "jsonpath-plus": "^10.3.0",
+      "form-data": "^4.0.1",
+      "got": "^11.8.6",
+      "jose": "^5.9.6",
+      "tough-cookie": "^5.0.0",
+      "request": "npm:@cypress/request@^3.0.5"
+    }
+  },
   "scripts": {
     "type-check": "npm run typecheck --workspaces --if-present",
-    "build": "npm run prisma:generate && npm run build --workspaces --if-present",
+    "build": "npm run prisma:generate && npm run build:api && npm run build:web && npm run build:engine",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:engine": "npm run build --workspace=@neonhub/predictive-engine",
     "test:ci": "npm run test --workspaces -- --passWithNoTests || true",
     "test:all": "npm run test --workspaces",
     "postinstall": "npm run prisma:generate",
@@ -25,8 +42,9 @@
     "start": "concurrently \"npm run start --workspace=apps/api\" \"npm run start --workspace=apps/web\"",
     "start:api": "npm run start --workspace=apps/api",
     "start:web": "npm run start --workspace=apps/web",
-    "verify": "npm run lint && npm run typecheck && npm run test",
-    "lint": "npm run lint --workspaces --if-present",
+    "verify": "pnpm --filter apps/api run typecheck && pnpm --filter apps/web run typecheck && pnpm --filter apps/api run lint",
+    "map": "node scripts/repo-map.mjs",
+    "lint": "pnpm --filter @neonhub/backend-v3.2 lint && pnpm --filter @neonhub/ui-v3.2 lint && pnpm --filter @neonhub/sdk lint",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspace apps/api -- --runInBand --ci --passWithNoTests",
     "test:quick": "npm run test --workspace apps/api -- --runInBand --ci --passWithNoTests",
@@ -42,6 +60,8 @@
     "clean:apply": "bash scripts/cleanup.sh --apply",
     "clean:deep": "bash scripts/cleanup.sh --apply --deep",
     "clean:docker": "bash scripts/cleanup.sh --apply --docker",
+    "seo:lint": "node scripts/seo-lint.mjs",
+    "seo:audit": "node scripts/seo-audit.mjs",
     "cline": "cline",
     "cline:task": "cline",
     "cline:fix": "cline 'Fix all TypeScript and linting errors in the codebase'",
@@ -52,15 +72,21 @@
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
   },
-  "packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4",
+  "packageManager": "pnpm@9.12.2",
   "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@jest/globals": "^30.2.0",
+    "@types/jest": "^30.0.0",
     "concurrently": "^8.2.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jest": "^29.0.1",
     "husky": "^9.0.11",
     "jest": "^30.2.0",
     "prettier": "^3.3.3",
     "ts-jest": "^29.4.5",
     "tsx": "^4.19.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0"

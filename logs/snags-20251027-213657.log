@@ -1,0 +1,14 @@
+→ pnpm --filter apps/api prisma db push --accept-data-loss --skip-generate
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+Error: ERROR: cannot drop index "team_members_userId_key" because constraint team_members_userId_key on table team_members requires it
+HINT: You can drop constraint team_members_userId_key on table team_members instead.
+   0: sql_schema_connector::apply_migration::migration_step
+           with step=DropIndex { index_id: IndexId(40) }
+             at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:21
+   1: sql_schema_connector::apply_migration::apply_migration
+             at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:10
+   2: schema_core::state::SchemaPush
+             at schema-engine/core/src/state.rs:504
+

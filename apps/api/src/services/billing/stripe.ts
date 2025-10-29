@@ -4,7 +4,7 @@ import { logger } from "../../lib/logger.js"
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || ""
 
-const resolveEnv = (candidates: string[]): string => {
+const resolveEnv = (candidates: readonly string[]): string => {
   for (const key of candidates) {
     const value = process.env[key]
     if (value && value.length > 0) {

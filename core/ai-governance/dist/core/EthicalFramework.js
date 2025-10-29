@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { EthicalSeverity, SubjectType, GovernanceError } from '../types/index.js';
 export class EthicalFramework extends EventEmitter {
     constructor(config, auditLogger) {
@@ -64,7 +64,7 @@ export class EthicalFramework extends EventEmitter {
     async assessEthicalImpact(subject, context) {
         try {
             const assessment = {
-                id: uuidv4(),
+                id: randomUUID(),
                 timestamp: new Date(),
                 subject,
                 principles: [],
@@ -88,7 +88,7 @@ export class EthicalFramework extends EventEmitter {
             // Log assessment
             if (this.auditLogger) {
                 await this.auditLogger.log({
-                    id: uuidv4(),
+                    id: randomUUID(),
                     timestamp: new Date(),
                     action: 'ethical_assessment',
                     subject,

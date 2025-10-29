@@ -7,7 +7,7 @@ import { Router } from 'express';
 import * as dataTrustService from '../services/data-trust/index.js';
 import { logger } from '../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 
 // POST /api/data-trust/hash - Hash data
 router.post('/hash', async (req, res) => {

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import {
   LegalComplianceCheck,
   LegalRequirement,
@@ -127,7 +127,7 @@ export class LegalComplianceManager extends EventEmitter {
   ): Promise<LegalComplianceCheck> {
     try {
       const check: LegalComplianceCheck = {
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         jurisdiction,
         framework: framework || this.config.frameworks[0],
@@ -167,7 +167,7 @@ export class LegalComplianceManager extends EventEmitter {
       // Log compliance check
       if (this.auditLogger) {
         await this.auditLogger.log({
-          id: uuidv4(),
+          id: randomUUID(),
           timestamp: new Date(),
           action: 'compliance_check',
           subject: {
@@ -398,7 +398,7 @@ export class LegalComplianceManager extends EventEmitter {
     // Log status update
     if (this.auditLogger) {
       await this.auditLogger.log({
-        id: uuidv4(),
+        id: randomUUID(),
         timestamp: new Date(),
         action: 'compliance_update',
         subject: {

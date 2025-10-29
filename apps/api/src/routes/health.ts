@@ -6,9 +6,10 @@ import Stripe from "stripe";
 import OpenAI from "openai";
 import { env } from "../config/env.js";
 import { ensureOrchestratorBootstrap } from "../services/orchestration/bootstrap.js";
-import { listAgents } from "../services/orchestration/index.js";
+import { listAgents } from "../services/orchestration/registry.js";
+import { logger } from "../lib/logger.js";
 
-export const healthRouter = Router();
+export const healthRouter: Router = Router();
 
 // Health check helpers
 async function checkDatabase(): Promise<{ status: string; latency?: number }> {

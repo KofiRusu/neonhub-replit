@@ -1,0 +1,22 @@
+No projects matched the filters in "/Users/kofirusu/Desktop/NeonHub"
+
+> @neonhub/backend-v3.2@3.2.0 typecheck /Users/kofirusu/Desktop/NeonHub/apps/api
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/agents/EmailAgent.ts(86,11): error TS1127: Invalid character.
+src/agents/EmailAgent.ts(86,20): error TS1002: Unterminated string literal.
+src/agents/EmailAgent.ts(88,3): error TS1005: ',' expected.
+src/agents/EmailAgent.ts(88,59): error TS1127: Invalid character.
+src/agents/EmailAgent.ts(88,60): error TS1134: Variable declaration expected.
+src/agents/EmailAgent.ts(88,64): error TS1002: Unterminated string literal.
+src/agents/EmailAgent.ts(92,43): error TS1127: Invalid character.
+src/agents/EmailAgent.ts(92,44): error TS1003: Identifier expected.
+src/agents/EmailAgent.ts(92,114): error TS1002: Unterminated string literal.
+src/agents/EmailAgent.ts(93,3): error TS1390: 'try' is not allowed as a parameter name.
+src/agents/EmailAgent.ts(96,39): error TS1127: Invalid character.
+src/agents/EmailAgent.ts(96,72): error TS1002: Unterminated string literal.
+src/agents/EmailAgent.ts(97,3): error TS1005: ',' expected.
+src/agents/EmailAgent.ts(98,1): error TS1128: Declaration or statement expected.
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 typecheck: `node ../../scripts/run-cli.mjs tsc --noEmit`
+Exit status 2

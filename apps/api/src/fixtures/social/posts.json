@@ -1,0 +1,20 @@
+[
+  {
+    "id": "post_1",
+    "platform": "twitter",
+    "content": "NeonHub orchestrator now routes intents deterministically.",
+    "metrics": {
+      "impressions": 1500,
+      "engagement": 120
+    }
+  },
+  {
+    "id": "post_2",
+    "platform": "linkedin",
+    "content": "Adaptive memory uses pgvector-backed recall in test mode.",
+    "metrics": {
+      "impressions": 2100,
+      "engagement": 340
+    }
+  }
+]

@@ -7,7 +7,7 @@ import { Router } from 'express';
 import * as orchestrationService from '../services/orchestration/index.js';
 import { logger } from '../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 
 // POST /api/orchestration/nodes/register - Register a new node
 router.post('/nodes/register', async (req, res) => {

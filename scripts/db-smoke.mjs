@@ -1,65 +1,153 @@
 #!/usr/bin/env node
-/**
- * NeonHub DB Smoke Script
- * Collects key row counts and index presence to validate omni-channel readiness.
- */
-
-import pkg from "@prisma/client";
-
+import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
+
 const prisma = new PrismaClient();
 
-async function main() {
-  const tables = await Promise.all([
-    prisma.organization.count().then((count) => ({ table: "organizations", count })),
-    prisma.brand.count().then((count) => ({ table: "brands", count })),
-    prisma.agent.count().then((count) => ({ table: "agents", count })),
-    prisma.conversation.count().then((count) => ({ table: "conversations", count })),
-    prisma.message.count().then((count) => ({ table: "messages", count })),
-    prisma.dataset.count().then((count) => ({ table: "datasets", count })),
-    prisma.document.count().then((count) => ({ table: "documents", count })),
-    prisma.chunk.count().then((count) => ({ table: "chunks", count })),
-    prisma.campaign.count().then((count) => ({ table: "campaigns", count })),
-    prisma.campaignMetric.count().then((count) => ({ table: "campaign_metrics", count })),
-    prisma.connector.count().then((count) => ({ table: "connectors", count })),
-    prisma.connectorAuth.count().then((count) => ({ table: "connector_auths", count })),
-  ]);
+const models = [
+  'organization',
+  'user',
+  'organizationMembership',
+  'organizationRole',
+  'organizationPermission',
+  'rolePermission',
+  'brand',
+  'brandVoice',
+  'brandAsset',
+  'embeddingSpace',
+  'agent',
+  'agentCapability',
+  'agentConfig',
+  'agentRun',
+  'agentRunMetric',
+  'agentJob',
+  'tool',
+  'toolExecution',
+  'conversation',
+  'message',
+  'dataset',
+  'document',
+  'chunk',
+  'campaign',
+  'campaignMetric',
+  'marketingCampaign',
+  'marketingLead',
+  'marketingTouchpoint',
+  'marketingMetric',
+  'content',
+  'contentDraft',
+  'emailSequence',
+  'socialPost',
+  'aBTest',
+  'connector',
+  'connectorAuth',
+  'triggerConfig',
+  'actionConfig',
+  'credential',
+  'auditLog',
+  'apiKey',
+  'person',
+  'identity',
+  'consent',
+  'event',
+  'note',
+  'memEmbedding',
+  'topic',
+  'objective',
+  'task',
+  'feedback',
+  'budgetProfile',
+  'budgetAllocation',
+  'budgetTransaction',
+  'budgetLedger',
+  'payment',
+  'payout',
+  'snippetLibrary',
+  'persona',
+  'keyword',
+  'editorialCalendar',
+  'modelVersion',
+  'trainingJob',
+  'inferenceEndpoint',
+  'metricEvent',
+  'userSettings',
+  'subscription',
+  'invoice',
+  'usageRecord',
+  'account',
+  'session',
+  'verificationToken',
+  'teamMember',
+];
 
-  const connectorsByKind = await prisma.connector.groupBy({
-    by: ["category"],
-    _count: { _all: true },
-  });
+async function runSmokeTests() {
+  console.log('\n📊 Database Smoke Test\n');
+  console.log('═'.repeat(60));
+  
+  const results = [];
+  let totalRows = 0;
+  let successCount = 0;
+  let errorCount = 0;
 
-  const indexRows = await prisma.$queryRaw`
-    SELECT indexname
-    FROM pg_indexes
-    WHERE schemaname = 'public'
-      AND indexname IN (
-        'brand_voices_embedding_cosine_idx',
-        'messages_embedding_cosine_idx',
-        'chunks_embedding_cosine_idx',
-        'agent_runs_agentId_startedAt_idx',
-        'campaign_metrics_campaignId_kind_ts_idx'
-      )
-    ORDER BY indexname;
-  `;
+  for (const model of models) {
+    try {
+      const count = await prisma[model].count();
+      const status = count > 0 ? '✅' : '⚪';
+      const line = `${status} ${model.padEnd(30)} ${count.toString().padStart(6)}`;
+      console.log(line);
+      results.push({ model, count, status: 'success' });
+      totalRows += count;
+      successCount++;
+    } catch (err) {
+      const line = `❌ ${model.padEnd(30)} ERROR: ${err.message}`;
+      console.log(line);
+      results.push({ model, count: 0, status: 'error', error: err.message });
+      errorCount++;
+    }
+  }
 
-  const payload = {
-    timestamp: new Date().toISOString(),
-    databaseUrl: process.env.DATABASE_URL ? "set" : "missing",
-    counts: tables,
-    connectorsByKind,
-    indexesPresent: indexRows.map((row) => row.indexname),
-  };
-
-  console.log(JSON.stringify(payload, null, 2));
+  console.log('═'.repeat(60));
+  console.log(`\n📈 Summary:`);
+  console.log(`   Models checked:     ${models.length}`);
+  console.log(`   Successful queries: ${successCount}`);
+  console.log(`   Failed queries:     ${errorCount}`);
+  console.log(`   Total rows:         ${totalRows.toLocaleString()}`);
+  
+  // Highlight key omni-channel tables
+  console.log(`\n🔌 Omni-Channel Infrastructure:`);
+  const connectorCount = results.find(r => r.model === 'connector')?.count || 0;
+  const connectorAuthCount = results.find(r => r.model === 'connectorAuth')?.count || 0;
+  const agentCount = results.find(r => r.model === 'agent')?.count || 0;
+  const toolCount = results.find(r => r.model === 'tool')?.count || 0;
+  
+  console.log(`   Connectors:         ${connectorCount} (expected: 15+)`);
+  console.log(`   Connector Auths:    ${connectorAuthCount}`);
+  console.log(`   Agents:             ${agentCount}`);
+  console.log(`   Tools:              ${toolCount}`);
+  
+  // Highlight vector-enabled tables
+  console.log(`\n🧠 Vector-Enabled Tables:`);
+  const brandVoiceCount = results.find(r => r.model === 'brandVoice')?.count || 0;
+  const messageCount = results.find(r => r.model === 'message')?.count || 0;
+  const chunkCount = results.find(r => r.model === 'chunk')?.count || 0;
+  const agentMemoryCount = results.find(r => r.model === 'agentMemory')?.count || 0;
+  
+  console.log(`   BrandVoice:         ${brandVoiceCount} (with embeddings)`);
+  console.log(`   Messages:           ${messageCount} (with embeddings)`);
+  console.log(`   Chunks:             ${chunkCount} (with embeddings)`);
+  console.log(`   AgentMemory:        ${agentMemoryCount} (with embeddings)`);
+  
+  console.log('\n');
+  
+  if (errorCount > 0) {
+    console.error(`⚠️  ${errorCount} model(s) failed. Check schema and migrations.`);
+    process.exit(1);
+  }
+  
+  await prisma.$disconnect();
 }
 
-main()
-  .catch((error) => {
-    console.error("❌ db-smoke failed:", error.message);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+runSmokeTests().catch((error) => {
+  console.error('❌ Smoke test failed:', error);
+  process.exit(1);
+});

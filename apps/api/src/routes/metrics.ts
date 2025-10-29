@@ -6,7 +6,7 @@ import { logger } from "../lib/logger.js";
 import { MetricEventInputSchema, MetricsSummaryQuerySchema } from "./metrics.schemas.js";
 import { getAuthenticatedUserId } from "../lib/requestUser.js";
 
-export const metricsRouter = Router();
+export const metricsRouter: Router = Router();
 
 // Track an event
 metricsRouter.post("/metrics/events", async (req, res, next) => {

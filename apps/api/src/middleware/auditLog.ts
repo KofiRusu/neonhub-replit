@@ -16,11 +16,15 @@ export function auditMiddleware(action: string) {
     res.json = function (body: any) {
       // Audit on success (2xx/3xx status codes)
       if (res.statusCode < 400) {
+        const resourceId = (req.params.id as string | undefined) ?? (req.params.provider as string | undefined);
+        const resourceType = req.baseUrl?.split('/').filter(Boolean).pop();
         audit({
           userId,
+          actorType: userId ? 'user' : 'system',
           ip,
           action,
-          resource: req.params.id || req.params.provider || undefined,
+          resourceId,
+          resourceType,
           metadata: {
             method: req.method,
             path: req.path,

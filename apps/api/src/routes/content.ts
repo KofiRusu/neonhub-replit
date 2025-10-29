@@ -21,15 +21,14 @@ contentRouter.post("/content/generate", async (req, res, next) => {
     const { topic, tone, audience, notes, brandId, brandVoiceId, campaignGoal, callToAction } = result.data;
 
     // Use real ContentAgent to generate content
-    const output = await contentAgent.generateDraft({
+    const output = await contentAgent.generateArticle({
       topic,
+      primaryKeyword: topic,
       tone: tone as any,
       audience,
-      notes,
+      callToAction,
       brandId,
       brandVoiceId,
-      campaignGoal,
-      callToAction,
       createdById: userId,
     });
 
@@ -41,7 +40,9 @@ contentRouter.post("/content/generate", async (req, res, next) => {
         jobId: output.jobId,
         draftId: output.draftId,
         title: output.title,
-        preview: output.preview,
+        summary: output.summary,
+        meta: output.meta,
+        schema: output.schema,
       },
     });
   } catch (error) {

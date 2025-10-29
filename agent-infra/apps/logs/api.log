@@ -1,0 +1,85 @@
+AggregateError [EPERM]: 
+    at internalConnectMultiple (node:net:1118:18)
+    at internalConnectMultiple (node:net:1186:5)
+    at internalConnectMultiple (node:net:1186:5)
+    at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+    at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+  code: 'EPERM',
+  [errors]: [
+    Error: connect EPERM ::1:6380 - Local (:::0)
+        at internalConnectMultiple (node:net:1182:16)
+        at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+        at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+      errno: -1,
+      code: 'EPERM',
+      syscall: 'connect',
+      address: '::1',
+      port: 6380
+    },
+    Error: connect EPERM 127.0.0.1:6380 - Local (0.0.0.0:0)
+        at internalConnectMultiple (node:net:1182:16)
+        at internalConnectMultiple (node:net:1186:5)
+        at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+        at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+      errno: -1,
+      code: 'EPERM',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6380
+    }
+  ]
+}
+AggregateError [EPERM]: 
+    at internalConnectMultiple (node:net:1118:18)
+    at internalConnectMultiple (node:net:1186:5)
+    at internalConnectMultiple (node:net:1186:5)
+    at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+    at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+  code: 'EPERM',
+  [errors]: [
+    Error: connect EPERM ::1:6380 - Local (:::0)
+        at internalConnectMultiple (node:net:1182:16)
+        at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+        at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+      errno: -1,
+      code: 'EPERM',
+      syscall: 'connect',
+      address: '::1',
+      port: 6380
+    },
+    Error: connect EPERM 127.0.0.1:6380 - Local (0.0.0.0:0)
+        at internalConnectMultiple (node:net:1182:16)
+        at internalConnectMultiple (node:net:1186:5)
+        at defaultTriggerAsyncIdScope (node:internal/async_hooks:464:18)
+        at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1522:7)
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:132:8) {
+      errno: -1,
+      code: 'EPERM',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6380
+    }
+  ]
+}
+prisma:error 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Can't reach database server at `localhost:5442`
+
+Please make sure your database server is running at `localhost:5442`.
+[2025-10-28 01:21:45.869 +0100] [31mERROR[39m (agent-api/42089): [36mDatabase connection failed[39m
+    error: {
+      "name": "PrismaClientInitializationError",
+      "clientVersion": "5.22.0"
+    }
+[2025-10-28 01:21:45.869 +0100] [31mERROR[39m (agent-api/42089): [36mDatabase connection failed on startup[39m
+    error: {
+      "name": "PrismaClientInitializationError",
+      "clientVersion": "5.22.0"
+    }

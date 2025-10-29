@@ -7,7 +7,7 @@ import { Router } from 'express';
 import * as ecoService from '../services/eco-optimizer/index.js';
 import { logger } from '../lib/logger.js';
 
-const router = Router();
+const router: Router = Router();
 
 // GET /api/eco-metrics/energy - Get current energy metrics
 router.get('/energy', async (req, res) => {

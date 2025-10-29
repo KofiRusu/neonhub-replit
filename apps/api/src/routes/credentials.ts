@@ -3,7 +3,7 @@ import { requireAuth, type AuthRequest } from '../middleware/auth.js';
 import { CredentialService } from '../services/credentials.service.js';
 import { z } from 'zod';
 
-const router = Router();
+const router: Router = Router();
 const credService = new CredentialService();
 
 // Validation schemas

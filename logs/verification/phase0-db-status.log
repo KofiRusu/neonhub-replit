@@ -1,0 +1,19 @@
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-polished-flower-aefsjkya-pooler.c-2.us-east-2.aws.neon.tech"
+
+11 migrations found in prisma/migrations
+Following migrations have not yet been applied:
+20251028_budget_transactions
+20251101093000_add_agentic_models
+
+To apply migrations in development run npx prisma migrate dev.
+To apply migrations in production run npx prisma migrate deploy.
+npm notice
+npm notice New major version of npm available! 10.8.3 -> 11.6.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.2
+npm notice To update run: npm install -g npm@11.6.2
+npm notice

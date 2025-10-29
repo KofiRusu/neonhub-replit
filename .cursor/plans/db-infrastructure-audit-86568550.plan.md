@@ -9,10 +9,10 @@
 2. Read existing reports: `DB_COMPLETION_REPORT.md`, `DB_AUDIT.md`, `MIGRATION_SUMMARY.md`, `SEED_RUN_LOG.md`
 3. Create `SYNC_LOG.md` with:
 
-      - Current commit hash and branch
-      - Timestamp and agent identifier (Codex)
-      - List of applied migrations from `apps/api/prisma/migrations/`
-      - File hashes of critical schema/seed files
+                        - Current commit hash and branch
+                        - Timestamp and agent identifier (Codex)
+                        - List of applied migrations from `apps/api/prisma/migrations/`
+                        - File hashes of critical schema/seed files
 
 **Deliverable:** `SYNC_LOG.md`
 
@@ -101,10 +101,10 @@ And update Connector model to use this enum for the `category` field.
 4. Verify vector dimensions: `Message.embedding`, `Chunk.embedding`, `BrandVoice.embedding` (currently `Unsupported("vector")` due to Prisma limitation - document this)
 5. Verify indexes:
 
-      - `@@index([conversationId, createdAt])` on Message ✅
-      - `@@index([agentId, startedAt])` on AgentRun ✅
-      - `@@index([campaignId, kind, timestamp])` on CampaignMetric ✅
-      - `@@unique([userId, organizationId])` on OrganizationMembership ✅
+                        - `@@index([conversationId, createdAt])` on Message ✅
+                        - `@@index([agentId, startedAt])` on AgentRun ✅
+                        - `@@index([campaignId, kind, timestamp])` on CampaignMetric ✅
+                        - `@@unique([userId, organizationId])` on OrganizationMembership ✅
 
 6. Run `pnpm --filter apps/api prisma format && pnpm --filter apps/api prisma validate`
 
@@ -284,17 +284,17 @@ Enhance `apps/api/prisma/seed.ts` to add:
 
 1. Review workflow steps:
 
-      - ✅ Corepack/pnpm setup
-      - ✅ Dependency installation
-      - ✅ Prisma generate
-      - ✅ Migrate deploy
-      - ✅ Seed execution (optional)
+                        - ✅ Corepack/pnpm setup
+                        - ✅ Dependency installation
+                        - ✅ Prisma generate
+                        - ✅ Migrate deploy
+                        - ✅ Seed execution (optional)
 
 2. Verify documentation at `docs/CI_DB_DEPLOY.md` (already exists ✅)
 3. Document secret requirements:
 
-      - `DATABASE_URL` (required)
-      - `DIRECT_DATABASE_URL` (optional, for pooling)
+                        - `DATABASE_URL` (required)
+                        - `DIRECT_DATABASE_URL` (optional, for pooling)
 
 4. Add workflow run instructions to completion report
 
@@ -532,22 +532,22 @@ const export = {
 1. Open existing `DB_COMPLETION_REPORT.md`
 2. Update with new information:
 
-      - Add omni-channel connector coverage section
-      - List all 12+ connector types seeded
-      - Document ConnectorKind enum addition
-      - Link to new governance docs
-      - Update smoke test results with connector counts
-      - Add db-smoke.mjs automation note
+                        - Add omni-channel connector coverage section
+                        - List all 12+ connector types seeded
+                        - Document ConnectorKind enum addition
+                        - Link to new governance docs
+                        - Update smoke test results with connector counts
+                        - Add db-smoke.mjs automation note
 
 3. Verify all acceptance criteria:
 
-      - ✅ `prisma validate` passes
-      - ✅ No pending migrations
-      - ✅ Seed includes omni-channel fixtures
-      - ✅ IVFFLAT indexes present
-      - ✅ Governance docs complete
-      - ✅ CI/CD workflow ready
-      - ✅ Backup/rollback procedures documented
+                        - ✅ `prisma validate` passes
+                        - ✅ No pending migrations
+                        - ✅ Seed includes omni-channel fixtures
+                        - ✅ IVFFLAT indexes present
+                        - ✅ Governance docs complete
+                        - ✅ CI/CD workflow ready
+                        - ✅ Backup/rollback procedures documented
 
 4. Declare final gate: **"100% READY"** only if all above confirmed
 

@@ -1,0 +1,98 @@
+import { Router } from "express";
+import { z } from "zod";
+import { requireAuth, type AuthRequest } from "../middleware/auth.js";
+import { BudgetService } from "../services/budget.service.js";
+import { ok, fail } from "../lib/http.js";
+import { normalizeChannel, DEFAULT_CHANNEL } from "../types/agentic.js";
+import type { BudgetObjectivePlan } from "../types/agentic.js";
+
+export const budgetRouter: Router = Router();
+
+const objectiveSchema = z.object({
+  objectiveId: z.string().min(1),
+  amount: z.number().positive(),
+  channel: z.string().optional(),
+  priority: z.number().int().optional(),
+});
+
+const planSchema = z.object({
+  workspaceId: z.string().min(1),
+  objectives: z.array(objectiveSchema).min(1),
+});
+
+const allocationSchema = z.object({
+  allocationId: z.string().min(1),
+});
+
+const ledgerQuerySchema = z.object({
+  workspaceId: z.string().min(1),
+  start: z.string().datetime(),
+  end: z.string().datetime(),
+});
+
+budgetRouter.post("/plan", requireAuth, async (_req: AuthRequest, res) => {
+  try {
+    const payload = planSchema.parse(_req.body ?? {});
+    const objectives: BudgetObjectivePlan[] = payload.objectives.map((objective) => ({
+      objectiveId: objective.objectiveId,
+      amount: objective.amount,
+      channel: objective.channel ? normalizeChannel(objective.channel, DEFAULT_CHANNEL) : undefined,
+      priority: objective.priority,
+    }));
+    const allocation = await BudgetService.plan(payload.workspaceId, objectives);
+    return res.status(201).json(ok(allocation));
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0]?.message ?? "Invalid request").body);
+    }
+    const message = error instanceof Error ? error.message : "Failed to plan budget";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+budgetRouter.post("/execute", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { allocationId } = allocationSchema.parse(req.body ?? {});
+    await BudgetService.execute(allocationId);
+    return res.json(ok({ status: "executing" }));
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0]?.message ?? "Invalid request").body);
+    }
+    const message = error instanceof Error ? error.message : "Failed to execute budget allocation";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+budgetRouter.post("/reconcile", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { allocationId } = allocationSchema.parse(req.body ?? {});
+    await BudgetService.reconcile(allocationId);
+    return res.json(ok({ status: "completed" }));
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0]?.message ?? "Invalid request").body);
+    }
+    const message = error instanceof Error ? error.message : "Failed to reconcile allocation";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+budgetRouter.get("/ledger", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const query = ledgerQuerySchema.parse(req.query);
+    const entries = await BudgetService.getLedger(query.workspaceId, {
+      start: new Date(query.start),
+      end: new Date(query.end),
+    });
+    return res.json(ok(entries));
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json(fail(error.errors[0]?.message ?? "Invalid query").body);
+    }
+    const message = error instanceof Error ? error.message : "Failed to fetch ledger";
+    return res.status(500).json(fail(message).body);
+  }
+});
+
+export default budgetRouter;

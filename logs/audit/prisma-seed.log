@@ -1,0 +1,3 @@
+undefined
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "prisma" not found

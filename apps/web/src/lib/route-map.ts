@@ -1,6 +1,8 @@
 export const routeMap = {
   content_generatePost: "content/generate",
   seo_audit: "seo/audit",
+  seo_keywordsAnalyze: "seo/keywords/analyze",
+  seo_contentOptimize: "seo/content/optimize",
   email_sequence: "email/sequence",
   support_reply: "support/reply",
   trends_brief: "trends/brief",

@@ -1,0 +1,5 @@
+{
+  "status": "not_implemented",
+  "reason": "BudgetService.reconcile() (apps/api/src/services/budget.service.ts:73) settles allocations but skips BudgetTransaction writes, leaving ledger history empty.",
+  "notes": "BudgetingService.getHistory() explicitly returns an empty array pending BudgetTransaction integration (apps/api/src/services/budgeting/index.ts:46)."
+}

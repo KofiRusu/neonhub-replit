@@ -3,7 +3,7 @@ import { requireAuth, type AuthRequest } from '../middleware/auth.js';
 import { SettingsService } from '../services/settings.service.js';
 import { z } from 'zod';
 
-const router = Router();
+const router: Router = Router();
 const settingsService = new SettingsService();
 
 // Validation
