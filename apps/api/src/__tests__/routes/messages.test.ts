@@ -1,4 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import type { Prisma } from '@prisma/client';
 import * as messagingService from '../../services/messaging.service';
 
 jest.mock('../../services/messaging.service');
@@ -12,29 +13,23 @@ describe('Messaging Service', () => {
     it('should send message successfully', async () => {
       const mockMessage = {
         id: 'msg_123',
-        subject: 'Hello',
-        body: 'Test message',
-        senderId: 'user_123',
-        sender: {
+        conversationId: 'thread_1',
+        authorId: 'user_123',
+        role: 'user',
+        contentJson: { body: 'Test message' } as Prisma.JsonObject,
+        metadata: {
+          readBy: ['user_123'],
+          receiverId: 'user_456',
+          subject: 'Hello',
+        } as Prisma.JsonObject,
+        createdAt: new Date(),
+        embedding: null,
+        author: {
           id: 'user_123',
           name: 'Sender',
           email: 'sender@example.com',
           image: null,
         },
-        receiverId: 'user_456',
-        receiver: {
-          id: 'user_456',
-          name: 'Receiver',
-          email: 'receiver@example.com',
-          image: null,
-        },
-        threadId: null,
-        replyToId: null,
-        isRead: false,
-        readAt: null,
-        attachments: [],
-        metadata: {},
-        createdAt: new Date(),
       };
 
       (messagingService.sendMessage as jest.MockedFunction<typeof messagingService.sendMessage>)
@@ -47,15 +42,31 @@ describe('Messaging Service', () => {
       });
 
       expect(result).toEqual(mockMessage);
-      expect(result.isRead).toBe(false);
+      const metadata = (result.metadata ?? {}) as Prisma.JsonObject;
+      expect(Array.isArray(metadata.readBy)).toBe(true);
+      expect((metadata.readBy as unknown[])).toContain('user_123');
+      expect(metadata.receiverId).toBe('user_456');
     });
 
     it('should send message as reply', async () => {
       const mockMessage = {
         id: 'msg_456',
-        body: 'Reply to your message',
-        replyToId: 'msg_123',
-        threadId: 'thread_1',
+        conversationId: 'thread_1',
+        authorId: 'user_123',
+        role: 'user',
+        contentJson: { body: 'Reply to your message' } as Prisma.JsonObject,
+        metadata: {
+          replyToId: 'msg_123',
+          readBy: ['user_123'],
+        } as Prisma.JsonObject,
+        createdAt: new Date(),
+        embedding: null,
+        author: {
+          id: 'user_123',
+          name: 'Sender',
+          email: 'sender@example.com',
+          image: null,
+        },
       };
 
       (messagingService.sendMessage as jest.MockedFunction<typeof messagingService.sendMessage>)
@@ -68,8 +79,9 @@ describe('Messaging Service', () => {
         threadId: 'thread_1',
       });
 
-      expect(result.replyToId).toBe('msg_123');
-      expect(result.threadId).toBe('thread_1');
+      const metadata = (result.metadata ?? {}) as Prisma.JsonObject;
+      expect(metadata.replyToId).toBe('msg_123');
+      expect(result.conversationId).toBe('thread_1');
     });
 
     it('should throw error for non-existent receiver', async () => {
@@ -147,8 +159,15 @@ describe('Messaging Service', () => {
     it('should mark message as read', async () => {
       const mockUpdated = {
         id: 'msg_123',
-        isRead: true,
-        readAt: new Date(),
+        conversationId: 'thread_1',
+        authorId: 'user_123',
+        role: 'user',
+        contentJson: { body: 'Test message' } as Prisma.JsonObject,
+        metadata: {
+          readBy: ['user_456'],
+        } as Prisma.JsonObject,
+        createdAt: new Date(),
+        embedding: null,
       };
 
       (messagingService.markMessageAsRead as jest.MockedFunction<typeof messagingService.markMessageAsRead>)
@@ -156,8 +175,9 @@ describe('Messaging Service', () => {
 
       const result = await messagingService.markMessageAsRead('msg_123', 'user_456');
 
-      expect(result.isRead).toBe(true);
-      expect(result.readAt).toBeDefined();
+      const metadata = (result.metadata ?? {}) as Prisma.JsonObject;
+      expect(Array.isArray(metadata.readBy)).toBe(true);
+      expect((metadata.readBy as unknown[])).toContain('user_456');
     });
 
     it('should throw error for unauthorized user', async () => {
@@ -238,4 +258,3 @@ describe('Messaging Service', () => {
     });
   });
 });
-

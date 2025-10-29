@@ -1,4 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import type { Prisma } from '@prisma/client';
 import * as documentsService from '../../services/documents.service';
 
 jest.mock('../../services/documents.service');
@@ -180,20 +181,21 @@ describe('Documents Service', () => {
         id: 'doc_124',
         title: 'Test Document (v2)',
         content: 'Test content',
-        type: 'general',
         status: 'draft',
-        version: 2,
         ownerId: 'user_123',
         owner: {
           id: 'user_123',
           name: 'Test User',
           email: 'test@example.com',
         },
-        tags: [],
-        metadata: {},
+        metadata: {
+          version: 2,
+          previousDocumentId: 'doc_123',
+          type: 'general',
+          tags: [],
+        } as Prisma.JsonObject,
         createdAt: new Date(),
         updatedAt: new Date(),
-        parentId: 'doc_123',
       };
 
       (documentsService.createDocumentVersion as jest.MockedFunction<typeof documentsService.createDocumentVersion>)
@@ -201,8 +203,9 @@ describe('Documents Service', () => {
 
       const result = await documentsService.createDocumentVersion('doc_123', 'user_123');
 
-      expect(result.version).toBe(2);
-      expect(result.parentId).toBe('doc_123');
+      const metadata = (result.metadata ?? {}) as Prisma.JsonObject;
+      expect(metadata.version).toBe(2);
+      expect(metadata.previousDocumentId).toBe('doc_123');
       expect(result.status).toBe('draft');
     });
   });

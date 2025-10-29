@@ -1,4 +1,4 @@
-import { describe, expect, jest, test, beforeEach } from "@jest/globals";
+import { describe, expect, jest, test, beforeEach, beforeAll } from "@jest/globals";
 import type { NormalizedEvent } from "../types/agentic.js";
 
 const prismaMock = {
@@ -20,48 +20,68 @@ const prismaMock = {
   memEmbedding: {
     create: jest.fn(),
   },
-} as any;
+} as Record<string, any>;
+
+const resolveMock = jest.fn(async () => "person-123");
+const updateTopicMock = jest.fn();
+const getConsentMock = jest.fn(async () => "granted");
+const getMemoryMock = jest.fn(async () => []);
+
+const createCompletionMock = jest.fn(async () => ({
+  id: "mock",
+  choices: [
+    {
+      message: {
+        content: JSON.stringify({
+          body: "Hello",
+          variants: [{ body: "Hello" }],
+        }),
+      },
+    },
+  ],
+  usage: {},
+}));
+
+const createEmbeddingMock = jest.fn(async () => ({
+  data: [{ embedding: [0.1, 0.2, 0.3] }],
+}));
 
 jest.unstable_mockModule("../lib/prisma.js", () => ({ prisma: prismaMock }));
 jest.unstable_mockModule("../services/person.service.js", () => ({
   PersonService: {
-    resolve: jest.fn().mockResolvedValue("person-123"),
-    updateTopic: jest.fn(),
-    getConsent: jest.fn().mockResolvedValue("granted"),
-    getMemory: jest.fn().mockResolvedValue([]),
+    resolve: resolveMock,
+    updateTopic: updateTopicMock,
+    getConsent: getConsentMock,
+    getMemory: getMemoryMock,
   },
 }));
 jest.unstable_mockModule("../lib/openai.js", () => ({
   openai: {
     chat: {
       completions: {
-        create: jest.fn().mockResolvedValue({
-          id: "mock",
-          choices: [
-            {
-              message: {
-                content: JSON.stringify({
-                  body: "Hello",
-                  variants: [{ body: "Hello" }],
-                }),
-              },
-            },
-          ],
-          usage: {},
-        }),
+        create: createCompletionMock,
       },
     },
     embeddings: {
-      create: jest.fn().mockResolvedValue({ data: [{ embedding: [0.1, 0.2, 0.3] }] }),
+      create: createEmbeddingMock,
     },
   },
   isOpenAIConfigured: false,
 }));
 
-const { EventIntakeService } = await import("../services/event-intake.service.js");
-const { LearningService } = await import("../services/learning-loop.service.js");
-const { BrandVoiceService } = await import("../services/brand-voice.service.js");
-const { PersonService } = await import("../services/person.service.js");
+type EventIntakeServiceType = typeof import("../services/event-intake.service.js").EventIntakeService;
+type LearningServiceType = typeof import("../services/learning-loop.service.js").LearningService;
+type BrandVoiceServiceType = typeof import("../services/brand-voice.service.js").BrandVoiceService;
+
+let EventIntakeService: EventIntakeServiceType;
+let LearningService: LearningServiceType;
+let BrandVoiceService: BrandVoiceServiceType;
+
+beforeAll(async () => {
+  ({ EventIntakeService } = await import("../services/event-intake.service.js"));
+  ({ LearningService } = await import("../services/learning-loop.service.js"));
+  ({ BrandVoiceService } = await import("../services/brand-voice.service.js"));
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -94,7 +114,7 @@ describe("EventIntakeService", () => {
     } as any;
 
     const normalized = await EventIntakeService.normalize(rawEvent);
-    expect(PersonService.resolve).toHaveBeenCalled();
+    expect(resolveMock).toHaveBeenCalled();
     expect(normalized.personId).toBe("person-123");
     expect(normalized.channel).toBe("email");
     expect(normalized.type).toBe("click");

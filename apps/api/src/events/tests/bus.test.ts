@@ -1,7 +1,7 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 
 jest.mock("../../services/learning/index.js", () => ({
-  learnFrom: jest.fn().mockResolvedValue(undefined)
+  learnFrom: jest.fn(async () => undefined),
 }));
 
 import { publish, subscribe } from "../bus.js";

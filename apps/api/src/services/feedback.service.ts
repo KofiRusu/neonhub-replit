@@ -214,8 +214,14 @@ export async function getFeedbackStats(filters?: { startDate?: Date; endDate?: D
 
     return {
       total,
-      byType: byType.reduce((acc, item) => ({ ...acc, [item.type]: item._count }), {}),
-      byStatus: byStatus.reduce((acc, item) => ({ ...acc, [item.status]: item._count }), {}),
+      byType: byType.reduce<Record<string, number>>((acc, item) => {
+        acc[item.type] = item._count;
+        return acc;
+      }, {}),
+      byStatus: byStatus.reduce<Record<string, number>>((acc, item) => {
+        acc[item.status] = item._count;
+        return acc;
+      }, {}),
       averageRating: avgRating._avg.rating || 0,
     };
   } catch (error) {
