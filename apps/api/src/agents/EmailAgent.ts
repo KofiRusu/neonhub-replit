@@ -1,10 +1,11 @@
 import { Resend } from "resend";
+import { z } from "zod";
 import { generateText } from "../ai/openai.js";
 import { prisma } from "../db/prisma.js";
 import { agentJobManager } from "./base/AgentJobManager.js";
 import { logger } from "../lib/logger.js";
 import { broadcast } from "../ws/index.js";
-import { normalizeSequenceInput } from "./_shared/normalize.js";
+import { normalizeSequenceInput, validateAgentContext } from "./_shared/normalize.js";
 import type { GenerateSequenceInput } from "./_shared/normalize.js";
 import { env } from "../config/env.js";
 import { BrandVoiceService } from "../services/brand-voice.service.js";
@@ -12,6 +13,8 @@ import { PersonService } from "../services/person.service.js";
 import { EventIntakeService } from "../services/event-intake.service.js";
 import { queues } from "../queues/index.js";
 import type { ConsentStatus } from "../types/agentic.js";
+import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
+import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
 
 export type { GenerateSequenceInput } from "./_shared/normalize.js";
 
@@ -43,6 +46,25 @@ export interface OptimizeSubjectLineOutput {
   jobId: string;
   suggestions: string[];
 }
+
+const OptimizeSubjectLineInputSchema = z.object({
+  originalSubject: z.string().min(1, "originalSubject is required"),
+  context: z.string().optional(),
+  createdById: z.string().optional(),
+});
+
+const RunABTestInputSchema = z.object({
+  campaignId: z.string().min(1, "campaignId is required"),
+  variants: z
+    .array(
+      z.object({
+        subject: z.string().min(1, "subject is required"),
+        body: z.string().min(1, "body is required"),
+      }),
+    )
+    .min(2, "At least two variants are required"),
+  createdById: z.string().optional(),
+});
 
 export type SendPersonalizedArgs = {
   personId: string;
@@ -102,6 +124,7 @@ async function enqueueEmailJob(queueName: "email.compose" | "email.send", payloa
  */
 export class EmailAgent {
   private readonly agentName = "email";
+  private readonly orchestratorAgentId = "EmailAgent";
 
   /**
    * Generate an email sequence for a campaign
@@ -539,6 +562,134 @@ Return as a JSON array of strings.`;
       .map(line => line.trim())
       .filter(line => line.length > 10 && line.length < 100)
       .slice(0, 5);
+  }
+
+  private resolveExecutionContext(rawContext: unknown): AgentExecutionContext {
+    const validated = validateAgentContext(rawContext);
+    return {
+      organizationId: validated.organizationId,
+      prisma: validated.prisma,
+      logger: validated.logger,
+      userId: validated.userId,
+    };
+  }
+
+  private invalidInput(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Invalid input";
+    return { ok: false, error: message, code: "INVALID_INPUT" };
+  }
+
+  private executionError(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Agent execution failed";
+    return { ok: false, error: message, code: "AGENT_EXECUTION_FAILED" };
+  }
+
+  private async handleGenerateSequenceIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: GenerateSequenceInput;
+    try {
+      input = normalizeSequenceInput((payload ?? {}) as Partial<GenerateSequenceInput> & { topic?: string });
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        input,
+        () => this.generateSequence(input),
+        {
+          intent,
+          buildMetrics: output => ({ emailsGenerated: output.sequence.length }),
+        },
+      );
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleOptimizeSubjectIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: OptimizeSubjectLineInput;
+    try {
+      input = OptimizeSubjectLineInputSchema.parse(payload) as OptimizeSubjectLineInput;
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        input,
+        () => this.optimizeSubjectLine(input),
+        {
+          intent,
+          buildMetrics: output => ({ suggestions: output.suggestions.length }),
+        },
+      );
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleAbTestIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: RunABTestInput;
+    try {
+      input = RunABTestInputSchema.parse(payload) as RunABTestInput;
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        input,
+        () => this.runABTest(input),
+        {
+          intent,
+          buildMetrics: () => ({ variantsTested: input.variants.length }),
+        },
+      );
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  async handle(request: OrchestratorRequest): Promise<OrchestratorResponse> {
+    let executionContext: AgentExecutionContext;
+
+    try {
+      executionContext = this.resolveExecutionContext(request.context);
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : "Invalid context", code: "INVALID_CONTEXT" };
+    }
+
+    switch (request.intent) {
+      case "generate-sequence":
+        return this.handleGenerateSequenceIntent(request.payload, executionContext, request.intent);
+      case "optimize-subject":
+        return this.handleOptimizeSubjectIntent(request.payload, executionContext, request.intent);
+      case "ab-test":
+        return this.handleAbTestIntent(request.payload, executionContext, request.intent);
+      default:
+        return { ok: false, error: `Unsupported intent: ${request.intent}`, code: "UNSUPPORTED_INTENT" };
+    }
   }
 }
 

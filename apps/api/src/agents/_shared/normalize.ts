@@ -1,4 +1,6 @@
 import { z } from "zod";
+import type { PrismaClient } from "@prisma/client";
+import type { Logger } from "pino";
 
 const DEFAULT_BRAND_ID = "default-brand";
 
@@ -102,4 +104,55 @@ export function normalizePostInput(input: Partial<GeneratePostInput>): GenerateP
   }
 
   throw normalized.error;
+}
+
+export function normalizeAgentInput<T>(raw: unknown, schema: z.ZodSchema<T>): T {
+  const parsed = schema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`Invalid agent input: ${parsed.error.message}`);
+  }
+  return parsed.data;
+}
+
+export function normalizeAgentOutput<T>(result: unknown, schema: z.ZodSchema<T>): T {
+  const parsed = schema.safeParse(result);
+  if (!parsed.success) {
+    throw new Error(`Invalid agent output: ${parsed.error.message}`);
+  }
+  return parsed.data;
+}
+
+export interface AgentRuntimeContext {
+  organizationId: string;
+  prisma: PrismaClient;
+  logger?: Logger;
+  userId?: string;
+}
+
+export function validateAgentContext(context: unknown): AgentRuntimeContext {
+  if (!context || typeof context !== "object") {
+    throw new Error("Agent context must be provided");
+  }
+
+  const record = context as Record<string, unknown>;
+
+  const organizationId = typeof record.organizationId === "string" ? record.organizationId.trim() : "";
+  if (!organizationId) {
+    throw new Error("Missing organizationId in context");
+  }
+
+  const prisma = record.prisma as PrismaClient | undefined;
+  if (!prisma) {
+    throw new Error("Missing Prisma client in context");
+  }
+
+  const logger = record.logger as Logger | undefined;
+  const userId = typeof record.userId === "string" && record.userId.trim().length ? record.userId : undefined;
+
+  return {
+    organizationId,
+    prisma,
+    logger,
+    userId,
+  };
 }
