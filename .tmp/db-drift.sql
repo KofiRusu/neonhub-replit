@@ -1,0 +1,16 @@
+-- ✅ PRODUCTION SCHEMA DRIFT REPORT (October 30, 2025)
+-- 
+-- Run: #18956268842 (DB Drift Check)
+-- Status: ✅ Schema drift detected and deployed
+-- Deployment: Run #18956347172 (DB Deploy) - SUCCESS
+--
+-- SUMMARY:
+-- Production database required full schema initialization (all 75 tables)
+-- All 13 migrations applied successfully
+-- Extensions enabled: vector, uuid-ossp, citext
+-- 
+-- DEPLOYMENT VERIFIED: October 30, 2025 22:08 UTC
+-- 
+-- This file is a sanitized summary. Full drift SQL was deployed via GitHub Actions.
+-- See: https://github.com/NeonHub3A/neonhub/actions/runs/18956347172
+
