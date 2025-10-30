@@ -1,0 +1,103 @@
+
+> @neonhub/backend-v3.2@3.2.0 test /Users/kofirusu/Desktop/NeonHub/apps/api
+> NODE_ENV=test NODE_OPTIONS='--max-old-space-size=4096' node ../../scripts/run-cli.mjs jest --runInBand
+
+PASS src/__tests__/agents/ContentAgent.spec.ts (30.026 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      164 |
+      165 |   if (!hasWarnedNonProd) {
+    > 166 |     console.warn(
+          |             ^
+      167 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      168 |     );
+      169 |     hasWarnedNonProd = true;
+
+      at warn (src/config/env.ts:166:13)
+      at Object.<anonymous> (src/config/env.ts:174:2)
+      at Object.require (src/ai/openai.ts:2:1)
+      at Object.require (src/agents/content/ContentAgent.ts:2:1)
+      at Object.<anonymous> (src/__tests__/agents/ContentAgent.spec.ts:2:1)
+
+[16:43:49 UTC] [31mERROR[39m: [36mFailed to broadcast event[39m
+    event: "metrics:delta"
+    error: {}
+
+<--- Last few GCs --->
+
+[49027:0x148008000]    32568 ms: Scavenge 4031.5 (4127.5) -> 4021.0 (4127.7) MB, 25.46 / 0.00 ms  (average mu = 0.236, current mu = 0.030) allocation failure; 
+[49027:0x148008000]    32647 ms: Scavenge 4034.3 (4128.2) -> 4024.8 (4128.7) MB, 40.62 / 0.00 ms  (average mu = 0.236, current mu = 0.030) allocation failure; 
+[49027:0x148008000]    33582 ms: Mark-Compact 4037.5 (4129.2) -> 4014.7 (4133.0) MB, 911.29 / 0.00 ms  (average mu = 0.242, current mu = 0.249) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x10250b5a4 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+ 2: 0x10269404c v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+ 3: 0x102868720 v8::internal::Heap::GarbageCollectionReasonToString(v8::internal::GarbageCollectionReason) [/usr/local/bin/node]
+ 4: 0x10286c5d4 v8::internal::Heap::CollectGarbageShared(v8::internal::LocalHeap*, v8::internal::GarbageCollectionReason) [/usr/local/bin/node]
+ 5: 0x102869038 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [/usr/local/bin/node]
+ 6: 0x102866dc0 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]
+ 7: 0x10285da14 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]
+ 8: 0x10285e274 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]
+ 9: 0x1028432e4 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/local/bin/node]
+10: 0x102c2aff4 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/local/bin/node]
+11: 0x102f88c44 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/usr/local/bin/node]
+12: 0x1030293d4 Builtins_StringToLowerCaseIntl [/usr/local/bin/node]
+13: 0x1082ad31c 
+14: 0x102ff5124 Builtins_RegExpReplace [/usr/local/bin/node]
+15: 0x102f79b6c Builtins_StringPrototypeReplace [/usr/local/bin/node]
+16: 0x1086cebc4 
+17: 0x10835ad38 
+18: 0x108b681fc 
+19: 0x108d8bcb0 
+20: 0x108264844 
+21: 0x108709c64 
+22: 0x108667dd0 
+23: 0x108363d70 
+24: 0x108c5dbb4 
+25: 0x108673dac 
+26: 0x108e381f0 
+27: 0x108b493e4 
+28: 0x108c3056c 
+29: 0x102f003e4 Builtins_InterpreterEntryTrampoline [/usr/local/bin/node]
+30: 0x108c32ef0 
+31: 0x102f003e4 Builtins_InterpreterEntryTrampoline [/usr/local/bin/node]
+32: 0x108612c6c 
+33: 0x108c49f40 
+34: 0x108e3308c 
+35: 0x108eccb74 
+36: 0x1083b6560 
+37: 0x1083afb34 
+38: 0x1083b5894 
+39: 0x1083ac4f8 
+40: 0x102f003e4 Builtins_InterpreterEntryTrampoline [/usr/local/bin/node]
+41: 0x102f37210 Builtins_AsyncFunctionAwaitResolveClosure [/usr/local/bin/node]
+42: 0x102fe4fb8 Builtins_PromiseFulfillReactionJob [/usr/local/bin/node]
+43: 0x102f26b94 Builtins_RunMicrotasks [/usr/local/bin/node]
+44: 0x102efe3f4 Builtins_JSRunMicrotasksEntry [/usr/local/bin/node]
+45: 0x1027d5ba0 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/usr/local/bin/node]
+46: 0x1027d608c v8::internal::(anonymous namespace)::InvokeWithTryCatch(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/usr/local/bin/node]
+47: 0x1027d6268 v8::internal::Execution::TryRunMicrotasks(v8::internal::Isolate*, v8::internal::MicrotaskQueue*) [/usr/local/bin/node]
+48: 0x1027fd434 v8::internal::MicrotaskQueue::RunMicrotasks(v8::internal::Isolate*) [/usr/local/bin/node]
+49: 0x1027fdbd0 v8::internal::MicrotaskQueue::PerformCheckpoint(v8::Isolate*) [/usr/local/bin/node]
+50: 0x102434c4c node::InternalCallbackScope::Close() [/usr/local/bin/node]
+51: 0x102434fe4 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context) [/usr/local/bin/node]
+52: 0x1024352b8 node::MakeCallback(v8::Isolate*, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context) [/usr/local/bin/node]
+53: 0x1024ab558 node::Environment::CheckImmediate(uv_check_s*) [/usr/local/bin/node]
+54: 0x102ee6144 uv__run_check [/usr/local/bin/node]
+55: 0x102edfe64 uv_run [/usr/local/bin/node]
+56: 0x1024356f0 node::SpinEventLoopInternal(node::Environment*) [/usr/local/bin/node]
+57: 0x10254b3f0 node::NodeMainInstance::Run(node::ExitCode*, node::Environment*) [/usr/local/bin/node]
+58: 0x10254b104 node::NodeMainInstance::Run() [/usr/local/bin/node]
+59: 0x1024d2fa0 node::Start(int, char**) [/usr/local/bin/node]
+60: 0x1976d2b98 start [/usr/lib/dyld]
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 test: `NODE_ENV=test NODE_OPTIONS='--max-old-space-size=4096' node ../../scripts/run-cli.mjs jest --runInBand`
+Command failed with signal "SIGABRT"

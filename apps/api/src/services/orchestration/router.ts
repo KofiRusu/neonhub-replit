@@ -2,6 +2,8 @@ import { logger } from "../../lib/logger.js";
 import { getAgent } from "./registry.js";
 import { withCircuitBreaker, withRetry, CircuitBreakerOpenError } from "./policies.js";
 import { ensureOrchestratorBootstrap } from "./bootstrap.js";
+import { executeAgentRun } from "../../agents/utils/agent-run.js";
+import { prisma } from "../../db/prisma.js";
 import type { AgentHandler, AgentName, OrchestratorRequest, OrchestratorResponse } from "./types.js";
 
 type CircuitWrapped = (req: OrchestratorRequest) => Promise<OrchestratorResponse>;
@@ -106,16 +108,75 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
       return rateLimitResult;
     }
 
-    const executor = withRetry(getCircuit(req.agent, registryEntry.handler), {
-      maxAttempts: 3,
-      baseDelayMs: 75
+    // Find or create Agent record in database for persistence
+    const organizationId = req.context?.organizationId as string;
+    if (!organizationId) {
+      logger.warn({ agent: req.agent }, "No organizationId in context, skipping AgentRun persistence");
+      // Fallback to in-memory execution without persistence
+      const executor = withRetry(getCircuit(req.agent, registryEntry.handler), {
+        maxAttempts: 3,
+        baseDelayMs: 75
+      });
+      const response = await executor(req);
+      span.end();
+      return response;
+    }
+
+    // Get or create agent in database
+    let dbAgent = await prisma.agent.findFirst({
+      where: {
+        organizationId,
+        name: req.agent,
+      }
     });
 
-    const response = await executor(req);
+    if (!dbAgent) {
+      // Create agent record if it doesn't exist
+      dbAgent = await prisma.agent.create({
+        data: {
+          organizationId,
+          name: req.agent,
+          kind: "COPILOT", // Default, should be properly typed
+          status: "ACTIVE",
+          description: `Auto-created agent for ${req.agent}`,
+          config: {},
+        }
+      });
+      logger.info({ agentId: dbAgent.id, agentName: req.agent }, "Created new agent record");
+    }
+
+    // Execute with AgentRun persistence
+    const { runId, result: response } = await executeAgentRun(
+      dbAgent.id,
+      {
+        organizationId,
+        userId,
+        prisma,
+        logger,
+      },
+      req.input,
+      async () => {
+        const executor = withRetry(getCircuit(req.agent, registryEntry.handler), {
+          maxAttempts: 3,
+          baseDelayMs: 75
+        });
+        return await executor(req);
+      },
+      {
+        intent: req.intent,
+        buildMetrics: (result) => ({
+          agent: req.agent,
+          intent: req.intent,
+          responseOk: result.ok,
+        }),
+      }
+    );
+
+    logger.info({ runId, agent: req.agent, intent: req.intent }, "Agent run completed with persistence");
 
     if (!response.ok) {
       const failure = response as Extract<OrchestratorResponse, { ok: false }>;
-      logger.warn({ agent: req.agent, intent: req.intent, error: failure.error }, "Agent responded with error");
+      logger.warn({ runId, agent: req.agent, intent: req.intent, error: failure.error }, "Agent responded with error");
     }
 
     span.end();
