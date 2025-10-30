@@ -45,7 +45,7 @@ describe("Orchestrator AgentRun Persistence", () => {
       handle: async (req: OrchestratorRequest) => {
         return {
           ok: true,
-          data: { message: "Success", input: req.input },
+          data: { message: "Success", payload: req.payload },
         };
       },
     };
@@ -56,7 +56,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     const request: OrchestratorRequest = {
       agent: "test-agent",
       intent: "test-intent",
-      input: { foo: "bar" },
+      payload: { foo: "bar" },
       context: {
         organizationId: testOrgId,
         userId: testUserId,
@@ -70,7 +70,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     if (response.ok) {
       expect(response.data).toMatchObject({
         message: "Success",
-        input: { foo: "bar" },
+        payload: { foo: "bar" },
       });
     }
 
@@ -87,7 +87,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     expect(run.input).toMatchObject({ foo: "bar" });
     expect(run.output).toMatchObject({
       ok: true,
-      data: { message: "Success", input: { foo: "bar" } },
+      data: { message: "Success", payload: { foo: "bar" } },
     });
     expect(run.agent.name).toBe("test-agent");
     expect(run.agent.organizationId).toBe(testOrgId);
@@ -109,7 +109,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     const request: OrchestratorRequest = {
       agent: "failing-agent",
       intent: "test-failure",
-      input: { test: "failure" },
+      payload: { test: "failure" },
       context: {
         organizationId: testOrgId,
         userId: testUserId,
@@ -152,7 +152,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     const request: OrchestratorRequest = {
       agent: "metrics-agent",
       intent: "metrics-test",
-      input: { metric: "test" },
+      payload: { metric: "test" },
       context: {
         organizationId: testOrgId,
         userId: testUserId,
@@ -191,7 +191,7 @@ describe("Orchestrator AgentRun Persistence", () => {
     const request: OrchestratorRequest = {
       agent: "fallback-agent",
       intent: "no-org",
-      input: {},
+      payload: {},
       context: {
         userId: testUserId,
         // organizationId is missing

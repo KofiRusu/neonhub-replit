@@ -1,6 +1,5 @@
 import { env } from "../config/env.js";
 import { logger } from "../lib/logger.js";
-import type { ConnectorService } from "./base/ConnectorService.js";
 import { GmailMockConnector } from "./services/gmail-mock.js";
 import { SlackMockConnector } from "./services/slack-mock.js";
 import { TwilioMockConnector } from "./services/twilio-mock.js";
@@ -27,7 +26,7 @@ export class ConnectorFactory {
   static create(
     type: ConnectorType,
     credentials?: { accessToken?: string; apiKey?: string; [key: string]: any }
-  ): ConnectorService {
+  ): any {
     if (USE_MOCK_CONNECTORS) {
       return this.createMock(type);
     }
@@ -38,7 +37,7 @@ export class ConnectorFactory {
   /**
    * Create a mock connector (no network calls, deterministic responses)
    */
-  private static createMock(type: ConnectorType): ConnectorService {
+  private static createMock(type: ConnectorType): any {
     logger.debug({ type }, "Creating mock connector");
     
     switch (type) {
@@ -67,7 +66,7 @@ export class ConnectorFactory {
   private static createReal(
     type: ConnectorType,
     credentials?: { accessToken?: string; apiKey?: string; [key: string]: any }
-  ): ConnectorService {
+  ): any {
     logger.debug({ type }, "Creating real connector");
     
     // TODO: Implement real connectors when USE_MOCK_CONNECTORS=false
@@ -110,7 +109,7 @@ export class ConnectorFactory {
 /**
  * Generic mock connector for connectors not yet implemented
  */
-class GenericMockConnector implements ConnectorService {
+class GenericMockConnector {
   constructor(private type: ConnectorType) {}
 
   async execute(method: string, params: any): Promise<any> {

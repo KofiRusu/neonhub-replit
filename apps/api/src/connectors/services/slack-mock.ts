@@ -1,7 +1,6 @@
-import type { ConnectorService } from "../base/ConnectorService.js";
 import { logger } from "../../lib/logger.js";
 
-export class SlackMockConnector implements ConnectorService {
+export class SlackMockConnector {
   async postMessage(params: {
     channel: string;
     text: string;

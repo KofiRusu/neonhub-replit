@@ -137,8 +137,9 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
       // Create agent record if it doesn't exist
       dbAgent = await prisma.agent.create({
         data: {
-          organizationId,
+          organization: { connect: { id: organizationId } },
           name: req.agent,
+          slug: req.agent.toLowerCase().replace(/agent$/i, ''),
           kind: "COPILOT", // Default, should be properly typed
           status: "ACTIVE",
           description: `Auto-created agent for ${req.agent}`,
@@ -158,9 +159,8 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
         organizationId,
         userId,
         prisma,
-        logger,
       },
-      req.input,
+      req.payload,
       async () => {
         const executor = withRetry(getCircuit(req.agent, registryEntry.handler), {
           maxAttempts: 3,

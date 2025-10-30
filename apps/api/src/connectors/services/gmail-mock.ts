@@ -1,7 +1,6 @@
-import type { ConnectorService } from "../base/ConnectorService.js";
 import { logger } from "../../lib/logger.js";
 
-export class GmailMockConnector implements ConnectorService {
+export class GmailMockConnector {
   async send(params: {
     to: string;
     subject: string;

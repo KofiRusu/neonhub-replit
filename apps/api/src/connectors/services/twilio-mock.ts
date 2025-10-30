@@ -1,7 +1,6 @@
-import type { ConnectorService } from "../base/ConnectorService.js";
 import { logger } from "../../lib/logger.js";
 
-export class TwilioMockConnector implements ConnectorService {
+export class TwilioMockConnector {
   async sendSms(params: {
     to: string;
     from: string;
