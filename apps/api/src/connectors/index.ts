@@ -10,6 +10,16 @@ import { HubSpotConnector } from "./services/HubSpotConnector.js";
 import { TwitterConnector } from "./services/TwitterConnector.js";
 import { DiscordConnector } from "./services/DiscordConnector.js";
 import { GoogleSearchConsoleConnector } from "./services/GoogleSearchConsoleConnector.js";
+import { SMSConnector } from "./services/SMSConnector.js";
+import { WhatsAppConnector } from "./services/WhatsAppConnector.js";
+import { RedditConnector } from "./services/RedditConnector.js";
+import { InstagramConnector } from "./services/InstagramConnector.js";
+import { FacebookConnector } from "./services/FacebookConnector.js";
+import { YouTubeConnector } from "./services/YouTubeConnector.js";
+import { TikTokConnector } from "./services/TikTokConnector.js";
+import { GoogleAdsConnector } from "./services/GoogleAdsConnector.js";
+import { ShopifyConnector } from "./services/ShopifyConnector.js";
+import { LinkedInConnector } from "./services/LinkedInConnector.js";
 
 const connectors = [
   new SlackConnector(),
@@ -23,6 +33,16 @@ const connectors = [
   new TwitterConnector(),
   new DiscordConnector(),
   new GoogleSearchConsoleConnector(),
+  new SMSConnector(),
+  new WhatsAppConnector(),
+  new RedditConnector(),
+  new InstagramConnector(),
+  new FacebookConnector(),
+  new YouTubeConnector(),
+  new TikTokConnector(),
+  new GoogleAdsConnector(),
+  new ShopifyConnector(),
+  new LinkedInConnector(),
 ];
 
 export async function registerConnectors() {

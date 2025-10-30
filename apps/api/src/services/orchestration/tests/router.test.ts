@@ -1,21 +1,21 @@
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
-
-jest.mock("../bootstrap.js", () => ({
-  ensureOrchestratorBootstrap: jest.fn().mockResolvedValue(undefined)
-}));
-
-import type { OrchestratorResponse } from "../types.js";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import type { AgentHandler, OrchestratorRequest, OrchestratorResponse } from "../types.js";
+import { clearRegistry, registerAgent } from "../registry.js";
 import { route } from "../router.js";
-import { registerAgent, clearRegistry } from "../registry.js";
 import { ensureOrchestratorBootstrap } from "../bootstrap.js";
 
-const bootstrapMock = ensureOrchestratorBootstrap as jest.Mock;
+jest.mock("../bootstrap.js", () => ({
+  ensureOrchestratorBootstrap: jest.fn(async () => undefined),
+}));
 
-const baseRequest = {
+const bootstrapMock = ensureOrchestratorBootstrap as jest.MockedFunction<typeof ensureOrchestratorBootstrap>;
+
+const buildRequest = (agent: OrchestratorRequest["agent"]): OrchestratorRequest => ({
+  agent,
   intent: "test",
   payload: {},
-  context: { userId: "test-user" }
-};
+  context: { userId: "test-user" },
+});
 
 describe("orchestrator router", () => {
   beforeEach(() => {
@@ -24,51 +24,57 @@ describe("orchestrator router", () => {
   });
 
   it("routes requests to registered agents", async () => {
-    const handler = jest.fn(async () => ({ ok: true, data: { message: "ok" } } satisfies OrchestratorResponse));
-    registerAgent("AdAgent", { handle: handler }, { version: "test", capabilities: [] });
+    const handle = jest.fn(async (): Promise<OrchestratorResponse> => ({
+      ok: true,
+      data: { message: "ok" },
+    }));
 
-    const response = await route({ agent: "AdAgent", ...baseRequest });
+    const handler: AgentHandler = { handle };
+    registerAgent("AdAgent", handler, { version: "test", capabilities: [] });
+
+    const response = await route(buildRequest("AdAgent"));
 
     expect(response).toEqual({ ok: true, data: { message: "ok" } });
-    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handle).toHaveBeenCalledTimes(1);
   });
 
   it("returns error when agent is not registered", async () => {
-    const response = await route({ agent: "SupportAgent", ...baseRequest });
+    const response = await route(buildRequest("SupportAgent"));
     expect(response.ok).toBe(false);
     expect(response).toMatchObject({ code: "AGENT_NOT_REGISTERED" });
   });
 
   it("retries failed handlers and succeeds on subsequent attempt", async () => {
-    const handler = jest
-      .fn()
-      .mockRejectedValueOnce(new Error("temporary"))
-      .mockResolvedValue({ ok: true, data: { retried: true } } satisfies OrchestratorResponse);
+    const handle = jest.fn(async (): Promise<OrchestratorResponse> => ({
+      ok: true,
+      data: { retried: true },
+    }));
+    handle.mockRejectedValueOnce(new Error("temporary"));
 
-    registerAgent("AdAgent", { handle: handler }, { version: "test", capabilities: [] });
+    const handler: AgentHandler = { handle };
+    registerAgent("BrandVoiceAgent", handler, { version: "test", capabilities: [] });
 
-    const response = await route({ agent: "AdAgent", ...baseRequest });
+    const response = await route(buildRequest("BrandVoiceAgent"));
 
     expect(response).toEqual({ ok: true, data: { retried: true } });
-    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handle).toHaveBeenCalledTimes(2);
   });
 
   it("opens circuit after repeated failures", async () => {
-    const handler = jest.fn(async () => {
-      throw new Error("failure");
+    const failure = new Error("failure");
+    const handle = jest.fn(async () => {
+      throw failure;
     });
 
-    registerAgent("AdAgent", { handle: handler }, { version: "test", capabilities: [] });
+    const handler: AgentHandler = { handle };
+    registerAgent("ContentAgent", handler, { version: "test", capabilities: [] });
 
-    // First three attempts increment failure count
-    for (let i = 0; i < 3; i++) {
-      const response = await route({ agent: "AdAgent", ...baseRequest });
-      expect(response.ok).toBe(false);
-      expect(response.code).toBe("AGENT_EXECUTION_FAILED");
-    }
+    const failureResponse = await route(buildRequest("ContentAgent"));
+    expect(failureResponse.ok).toBe(false);
+    expect(failureResponse).toMatchObject({ code: "AGENT_EXECUTION_FAILED" });
 
-    const circuitResponse = await route({ agent: "AdAgent", ...baseRequest });
+    const circuitResponse = await route(buildRequest("ContentAgent"));
     expect(circuitResponse.ok).toBe(false);
-    expect(circuitResponse.code).toBe("CIRCUIT_OPEN");
+    expect(circuitResponse).toMatchObject({ code: "CIRCUIT_OPEN" });
   });
 });

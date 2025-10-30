@@ -1,5 +1,5 @@
 import { describe, expect, jest, test, beforeEach, beforeAll } from "@jest/globals";
-import type { NormalizedEvent } from "../types/agentic.js";
+import type { ConsentStatus, NormalizedEvent } from "../types/agentic.js";
 
 const prismaMock = {
   snippetLibrary: {
@@ -20,12 +20,43 @@ const prismaMock = {
   memEmbedding: {
     create: jest.fn(),
   },
+  person: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+  identity: {
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+  },
 } as Record<string, any>;
 
+const txMock = {
+  identity: {
+    findFirst: jest.fn(),
+    upsert: jest.fn(),
+  },
+  person: {
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+};
+
+prismaMock.$transaction = jest.fn(async (callback: (tx: typeof txMock) => Promise<unknown>) =>
+  callback(txMock),
+);
+
+(globalThis as Record<string, unknown>).prisma = prismaMock;
+
+const checkDatabaseConnectionMock = jest.fn();
+
 const resolveMock = jest.fn(async () => "person-123");
-const updateTopicMock = jest.fn();
-const getConsentMock = jest.fn(async () => "granted");
-const getMemoryMock = jest.fn(async () => []);
+const updateTopicMock = jest.fn(async (_personId: string, _topic: string, _weight: number) => undefined);
+const getConsentMock = jest.fn(async (_personId: string, _channel: string) => "granted" as ConsentStatus);
+const getMemoryMock = jest.fn(async (_personId: string) => []);
 
 const createCompletionMock = jest.fn(async () => ({
   id: "mock",
@@ -45,39 +76,43 @@ const createCompletionMock = jest.fn(async () => ({
 const createEmbeddingMock = jest.fn(async () => ({
   data: [{ embedding: [0.1, 0.2, 0.3] }],
 }));
-
-jest.unstable_mockModule("../lib/prisma.js", () => ({ prisma: prismaMock }));
-jest.unstable_mockModule("../services/person.service.js", () => ({
-  PersonService: {
-    resolve: resolveMock,
-    updateTopic: updateTopicMock,
-    getConsent: getConsentMock,
-    getMemory: getMemoryMock,
-  },
-}));
-jest.unstable_mockModule("../lib/openai.js", () => ({
-  openai: {
-    chat: {
-      completions: {
-        create: createCompletionMock,
+const moduleMocksReady = (async () => {
+  await jest.unstable_mockModule("../db/prisma.js", () => ({
+    prisma: prismaMock,
+    checkDatabaseConnection: checkDatabaseConnectionMock,
+  }));
+  await jest.unstable_mockModule("../lib/prisma.js", () => ({
+    prisma: prismaMock,
+    checkDatabaseConnection: checkDatabaseConnectionMock,
+  }));
+  await jest.unstable_mockModule("../lib/openai.js", () => ({
+    openai: {
+      chat: {
+        completions: {
+          create: createCompletionMock,
+        },
+      },
+      embeddings: {
+        create: createEmbeddingMock,
       },
     },
-    embeddings: {
-      create: createEmbeddingMock,
-    },
-  },
-  isOpenAIConfigured: false,
-}));
+    isOpenAIConfigured: false,
+  }));
+})();
 
 type EventIntakeServiceType = typeof import("../services/event-intake.service.js").EventIntakeService;
 type LearningServiceType = typeof import("../services/learning-loop.service.js").LearningService;
 type BrandVoiceServiceType = typeof import("../services/brand-voice.service.js").BrandVoiceService;
+type PersonServiceModuleType = typeof import("../services/person.service.js");
 
 let EventIntakeService: EventIntakeServiceType;
 let LearningService: LearningServiceType;
 let BrandVoiceService: BrandVoiceServiceType;
+let PersonServiceModule: PersonServiceModuleType;
 
 beforeAll(async () => {
+  await moduleMocksReady;
+  PersonServiceModule = await import("../services/person.service.js");
   ({ EventIntakeService } = await import("../services/event-intake.service.js"));
   ({ LearningService } = await import("../services/learning-loop.service.js"));
   ({ BrandVoiceService } = await import("../services/brand-voice.service.js"));
@@ -85,6 +120,18 @@ beforeAll(async () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.spyOn(PersonServiceModule.PersonService, "resolve").mockImplementation(resolveMock);
+  jest
+    .spyOn(PersonServiceModule.PersonService, "updateTopic")
+    .mockImplementation(async (personId: string, topic: string, weight: number) => {
+      await updateTopicMock(personId, topic, weight);
+    });
+  jest
+    .spyOn(PersonServiceModule.PersonService, "getConsent")
+    .mockImplementation(async (personId: string, channel: string) => getConsentMock(personId, channel));
+  jest
+    .spyOn(PersonServiceModule.PersonService, "getMemory")
+    .mockImplementation(async (personId: string) => getMemoryMock(personId));
 });
 
 describe("EventIntakeService", () => {

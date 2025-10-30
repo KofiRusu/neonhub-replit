@@ -1,133 +1,174 @@
-/**
- * Agents tRPC Router
- * Type-safe procedures for agent operations
- */
-
-import { Prisma } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc.js";
+import type { OrchestratorRequest, OrchestratorResponse } from "../../services/orchestration/types.js";
+import { createTRPCRouter, protectedProcedure } from "../trpc.js";
+
+type AgentInstance = {
+  handle: (request: OrchestratorRequest) => Promise<OrchestratorResponse>;
+};
+
+const agentRegistry = {
+  email: {
+    load: async () => (await import("../../agents/EmailAgent.js")).emailAgent as AgentInstance,
+    orchestratorAgentId: "EmailAgent" as OrchestratorRequest["agent"],
+  },
+  seo: {
+    load: async () => (await import("../../agents/SEOAgent.js")).seoAgent as AgentInstance,
+    orchestratorAgentId: "SEOAgent" as OrchestratorRequest["agent"],
+  },
+  social: {
+    load: async () => (await import("../../agents/SocialAgent.js")).socialAgent as AgentInstance,
+    orchestratorAgentId: "SocialAgent" as OrchestratorRequest["agent"],
+  },
+  content: {
+    load: async () => (await import("../../agents/content/ContentAgent.js")).contentAgent as AgentInstance,
+    orchestratorAgentId: "ContentAgent" as OrchestratorRequest["agent"],
+  },
+  support: {
+    load: async () => (await import("../../agents/SupportAgent.js")).supportAgent as AgentInstance,
+    orchestratorAgentId: "SupportAgent" as OrchestratorRequest["agent"],
+  },
+} as const;
+
+type AgentKey = keyof typeof agentRegistry;
+
+const agentKeySchema = z.enum(["email", "seo", "social", "content", "support"]);
+
+function normalizeAgentId(agentId: string | undefined): string | undefined {
+  if (!agentId) return undefined;
+
+  const map: Record<string, string> = {
+    email: agentRegistry.email.orchestratorAgentId,
+    "email-agent": agentRegistry.email.orchestratorAgentId,
+    EmailAgent: agentRegistry.email.orchestratorAgentId,
+    seo: agentRegistry.seo.orchestratorAgentId,
+    "seo-agent": agentRegistry.seo.orchestratorAgentId,
+    SEOAgent: agentRegistry.seo.orchestratorAgentId,
+    social: agentRegistry.social.orchestratorAgentId,
+    "social-agent": agentRegistry.social.orchestratorAgentId,
+    SocialAgent: agentRegistry.social.orchestratorAgentId,
+    content: agentRegistry.content.orchestratorAgentId,
+    "content-agent": agentRegistry.content.orchestratorAgentId,
+    ContentAgent: agentRegistry.content.orchestratorAgentId,
+    support: agentRegistry.support.orchestratorAgentId,
+    "support-agent": agentRegistry.support.orchestratorAgentId,
+    SupportAgent: agentRegistry.support.orchestratorAgentId,
+  };
+
+  return map[agentId] ?? agentId;
+}
 
 export const agentsRouter = createTRPCRouter({
-  /**
-   * List all agents
-   */
-  list: publicProcedure
-    .input(
-      z.object({
-        organizationId: z.string().optional(),
-        status: z.enum(['DRAFT', 'ACTIVE', 'PAUSED', 'DISABLED']).optional(),
-        limit: z.number().min(1).max(100).default(10),
-        offset: z.number().min(0).default(0),
-      }).optional()
-    )
-    .query(async ({ ctx, input }) => {
-      const where = {
-        ...(input?.organizationId && { organizationId: input.organizationId }),
-        ...(input?.status && { status: input.status }),
-      };
-
-      const agents = await ctx.prisma.agent.findMany({
-        where,
-        take: input?.limit || 10,
-        skip: input?.offset || 0,
-        orderBy: { createdAt: 'desc' },
-      });
-
-      return agents;
-    }),
-
-  /**
-   * Get agent by ID
-   */
-  getById: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const agent = await ctx.prisma.agent.findUnique({
-        where: { id: input.id },
-        include: {
-          capabilities: true,
-          configs: true,
-        },
-      });
-
-      if (!agent) {
-        throw new Error('Agent not found');
-      }
-
-      return agent;
-    }),
-
-  /**
-   * Execute an agent
-   */
   execute: protectedProcedure
     .input(
       z.object({
-        agent: z.string(),
-        input: z.record(z.unknown()),
-        organizationId: z.string().optional(),
-      })
+        agent: agentKeySchema,
+        intent: z.string().min(1, "intent is required"),
+        payload: z.unknown().optional(),
+      }),
     )
-    .mutation(async ({ ctx, input }) => {
-      // Create agent job
-      const job = await ctx.prisma.agentJob.create({
-        data: {
-          agent: input.agent,
-          input: input.input as Prisma.JsonValue,
-          status: 'queued',
-          organizationId: input.organizationId,
-          createdById: ctx.user.id,
+    .mutation(async ({ input, ctx }) => {
+      const registryEntry = agentRegistry[input.agent as AgentKey];
+      const agent = await registryEntry.load();
+
+      const organizationId =
+        typeof ctx.user?.organizationId === "string" && ctx.user.organizationId.trim().length > 0
+          ? ctx.user.organizationId
+          : null;
+
+      if (!organizationId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Authenticated user is missing an organization context.",
+        });
+      }
+
+      const result = await agent.handle({
+        agent: registryEntry.orchestratorAgentId,
+        intent: input.intent,
+        payload: input.payload,
+        context: {
+          organizationId,
+          userId: ctx.user.id,
+          prisma: ctx.prisma,
+          logger: ctx.logger,
         },
       });
 
-      // TODO: Trigger actual agent execution asynchronously
-      // For now, return the queued job
-      return job;
+      return result;
     }),
 
-  /**
-   * Get agent job status
-   */
-  getJobStatus: protectedProcedure
-    .input(z.object({ jobId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const job = await ctx.prisma.agentJob.findUnique({
-        where: { id: input.jobId },
-      });
-
-      if (!job) {
-        throw new Error('Job not found');
-      }
-
-      return job;
-    }),
-
-  /**
-   * List agent jobs
-   */
-  listJobs: protectedProcedure
+  listRuns: protectedProcedure
     .input(
       z.object({
-        agent: z.string().optional(),
-        status: z.string().optional(),
-        limit: z.number().min(1).max(100).default(20),
-        offset: z.number().min(0).default(0),
-      }).optional()
+        agentId: z.string().optional(),
+        limit: z.number().int().min(1).max(100).default(20),
+      }),
     )
-    .query(async ({ ctx, input }) => {
-      const where = {
-        createdById: ctx.user.id,
-        ...(input?.agent && { agent: input.agent }),
-        ...(input?.status && { status: input.status }),
-      };
+    .query(async ({ input, ctx }) => {
+      const organizationId =
+        typeof ctx.user?.organizationId === "string" && ctx.user.organizationId.trim().length > 0
+          ? ctx.user.organizationId
+          : null;
 
-      const jobs = await ctx.prisma.agentJob.findMany({
-        where,
-        take: input?.limit || 20,
-        skip: input?.offset || 0,
-        orderBy: { createdAt: 'desc' },
+      if (!organizationId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Authenticated user is missing an organization context.",
+        });
+      }
+
+      const normalizedAgentId = normalizeAgentId(input.agentId);
+
+      const runs = await ctx.prisma.agentRun.findMany({
+        where: {
+          organizationId,
+          ...(normalizedAgentId ? { agentId: normalizedAgentId } : {}),
+        },
+        orderBy: { startedAt: "desc" },
+        take: input.limit,
+        select: {
+          id: true,
+          agentId: true,
+          status: true,
+          startedAt: true,
+          completedAt: true,
+          metrics: true,
+        },
       });
 
-      return jobs;
+      return runs;
+    }),
+
+  getRun: protectedProcedure
+    .input(z.object({ runId: z.string().min(1, "runId is required") }))
+    .query(async ({ input, ctx }) => {
+      const organizationId =
+        typeof ctx.user?.organizationId === "string" && ctx.user.organizationId.trim().length > 0
+          ? ctx.user.organizationId
+          : null;
+
+      if (!organizationId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Authenticated user is missing an organization context.",
+        });
+      }
+
+      const run = await ctx.prisma.agentRun.findFirst({
+        where: {
+          id: input.runId,
+          organizationId,
+        },
+      });
+
+      if (!run) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Agent run not found",
+        });
+      }
+
+      return run;
     }),
 });

@@ -1,10 +1,17 @@
+import { z } from "zod";
 import { generateText } from "../ai/openai.js";
 import { prisma } from "../db/prisma.js";
 import { agentJobManager } from "./base/AgentJobManager.js";
 import { logger } from "../lib/logger.js";
 import { broadcast } from "../ws/index.js";
-import { normalizePostInput } from "./_shared/normalize.js";
+import {
+  normalizePostInput,
+  validateAgentContext,
+  SocialPlatformSchema,
+} from "./_shared/normalize.js";
 import type { GeneratePostInput, SocialPlatform } from "./_shared/normalize.js";
+import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
+import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
 
 export type { GeneratePostInput, SocialPlatform } from "./_shared/normalize.js";
 
@@ -35,11 +42,33 @@ export interface GeneratePostOutput {
   estimatedReach?: number;
 }
 
+const OptimizeForPlatformInputSchema = z.object({
+  content: z.string().min(1, "content is required"),
+  platform: SocialPlatformSchema,
+  createdById: z.string().optional(),
+});
+
+const HashtagPackInputSchema = z.object({
+  content: z.string().min(1, "content is required"),
+  topic: z.string().optional(),
+  platform: SocialPlatformSchema.default("instagram"),
+  createdById: z.string().optional(),
+});
+
+type HashtagPackInput = z.infer<typeof HashtagPackInputSchema>;
+
+interface HashtagPackOutput {
+  jobId: string;
+  platform: SocialPlatform;
+  hashtags: string[];
+}
+
 /**
  * SocialAgent - Generates and optimizes social media content
  */
 export class SocialAgent {
   private readonly agentName = "social";
+  private readonly orchestratorAgentId = "SocialAgent";
 
   // Platform-specific constraints
   private readonly platformLimits = {
@@ -48,6 +77,44 @@ export class SocialAgent {
     facebook: { maxLength: 63206, optimal: 250 },
     instagram: { maxLength: 2200, optimal: 138 },
   };
+  private readonly hashtagStopWords = new Set<string>([
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "that",
+    "this",
+    "about",
+    "into",
+    "your",
+    "you",
+    "have",
+    "will",
+    "just",
+    "more",
+    "than",
+    "then",
+    "them",
+    "they",
+    "their",
+    "what",
+    "when",
+    "where",
+    "which",
+    "while",
+    "after",
+    "before",
+    "over",
+    "under",
+    "between",
+    "across",
+    "within",
+    "without",
+    "take",
+    "make",
+    "made",
+  ]);
 
   /**
    * Generate platform-optimized social media post
@@ -232,6 +299,59 @@ Return optimized version as JSON:
       
       await agentJobManager.failJob(jobId, errorMessage);
       
+      throw error;
+    }
+  }
+
+  /**
+   * Build hashtag recommendations without external calls
+   */
+  async generateHashtagPack(input: HashtagPackInput): Promise<HashtagPackOutput> {
+    const startTime = Date.now();
+
+    const jobId = await agentJobManager.createJob({
+      agent: this.agentName,
+      input,
+      createdById: input.createdById,
+    });
+
+    try {
+      await agentJobManager.startJob(jobId);
+
+      const hashtags = this.buildHashtagPack(input);
+      const duration = Date.now() - startTime;
+
+      await agentJobManager.completeJob(
+        jobId,
+        {
+          hashtags,
+          platform: input.platform,
+        },
+        {
+          duration,
+          hashtagCount: hashtags.length,
+          platform: input.platform,
+        },
+      );
+
+      broadcast("metrics:delta", {
+        type: "social_hashtag_pack_created",
+        increment: 1,
+        platform: input.platform,
+        timestamp: new Date(),
+      });
+
+      return {
+        jobId,
+        platform: input.platform,
+        hashtags,
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger.error({ jobId, error: errorMessage }, "Hashtag pack generation failed");
+
+      await agentJobManager.failJob(jobId, errorMessage);
+
       throw error;
     }
   }
@@ -452,6 +572,220 @@ Return optimized version as JSON:
   private extractHashtags(text: string): string[] {
     const matches = text.match(/#\w+/g);
     return matches ? matches.slice(0, 5) : [];
+  }
+
+  private buildHashtagPack(input: HashtagPackInput): string[] {
+    const existing = this.extractHashtags(input.content);
+    const baseText = `${input.topic ?? ""} ${input.content}`;
+    const candidates = this.extractHashtagCandidates(baseText);
+
+    const normalized = new Set<string>();
+    existing.forEach(tag => {
+      const formatted = this.normalizeHashtag(tag);
+      if (formatted) {
+        normalized.add(formatted);
+      }
+    });
+
+    candidates.forEach(candidate => {
+      const formatted = this.normalizeHashtag(candidate);
+      if (formatted) {
+        normalized.add(formatted);
+      }
+    });
+
+    const hashtags = Array.from(normalized).slice(0, 8);
+    if (hashtags.length === 0) {
+      hashtags.push("#neonhub");
+    }
+
+    return hashtags;
+  }
+
+  private extractHashtagCandidates(text: string): string[] {
+    return (text.match(/\b[a-zA-Z0-9]{3,}\b/g) ?? [])
+      .map(token => token.toLowerCase())
+      .filter(token => !this.hashtagStopWords.has(token))
+      .filter((token, index, array) => array.indexOf(token) === index)
+      .slice(0, 12);
+  }
+
+  private normalizeHashtag(token: string): string | null {
+    const cleaned = token.replace(/^#+/, "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    if (!cleaned) {
+      return null;
+    }
+    return `#${cleaned.slice(0, 32)}`;
+  }
+
+  private withUserFallback<T extends { createdById?: string | undefined }>(
+    input: T,
+    context: AgentExecutionContext,
+  ): T {
+    if (input.createdById || !context.userId) {
+      return input;
+    }
+
+    return {
+      ...input,
+      createdById: context.userId ?? undefined,
+    } as T;
+  }
+
+  private resolveExecutionContext(context: unknown): AgentExecutionContext {
+    const validated = validateAgentContext(context);
+    return {
+      organizationId: validated.organizationId,
+      prisma: validated.prisma,
+      logger: validated.logger,
+      userId: validated.userId ?? null,
+    };
+  }
+
+  private invalidInput(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Invalid input";
+    return { ok: false, error: message, code: "INVALID_INPUT" };
+  }
+
+  private executionError(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Agent execution failed";
+    return { ok: false, error: message, code: "AGENT_EXECUTION_FAILED" };
+  }
+
+  private async handleGeneratePostIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: GeneratePostInput;
+    try {
+      input = normalizePostInput((payload ?? {}) as Partial<GeneratePostInput>);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const resolvedInput = this.withUserFallback(input, context);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        resolvedInput,
+        () => this.generatePost(resolvedInput),
+        {
+          intent,
+          buildMetrics: output => ({
+            platform: resolvedInput.platform,
+            contentLength: output.content.length,
+            hashtagCount: output.hashtags?.length ?? 0,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleOptimizeCaptionIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: OptimizeForPlatformInput;
+    try {
+      input = OptimizeForPlatformInputSchema.parse(payload) as OptimizeForPlatformInput;
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const resolvedInput = this.withUserFallback(input, context);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        resolvedInput,
+        () => this.optimizeForPlatform(resolvedInput),
+        {
+          intent,
+          buildMetrics: output => ({
+            platform: resolvedInput.platform,
+            contentLength: output.content.length,
+            hashtagCount: output.hashtags?.length ?? 0,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleHashtagPackIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let input: HashtagPackInput;
+    try {
+      input = HashtagPackInputSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const resolvedInput = this.withUserFallback(input, context);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        resolvedInput,
+        () => this.generateHashtagPack(resolvedInput),
+        {
+          intent,
+          buildMetrics: output => ({
+            platform: resolvedInput.platform,
+            hashtagCount: output.hashtags.length,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  async handle(request: OrchestratorRequest): Promise<OrchestratorResponse> {
+    let executionContext: AgentExecutionContext;
+
+    try {
+      executionContext = this.resolveExecutionContext(request.context);
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : "Invalid context",
+        code: "INVALID_CONTEXT",
+      };
+    }
+
+    switch (request.intent) {
+      case "generate-post":
+        return this.handleGeneratePostIntent(request.payload, executionContext, request.intent);
+      case "optimize-caption":
+        return this.handleOptimizeCaptionIntent(request.payload, executionContext, request.intent);
+      case "hashtag-pack":
+        return this.handleHashtagPackIntent(request.payload, executionContext, request.intent);
+      default:
+        return {
+          ok: false,
+          error: `Unsupported intent: ${request.intent}`,
+          code: "UNSUPPORTED_INTENT",
+        };
+    }
   }
 }
 

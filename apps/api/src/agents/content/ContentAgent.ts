@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { generateText as defaultGenerateText } from "../../ai/openai.js";
 import { prisma as defaultPrisma } from "../../db/prisma.js";
 import { agentJobManager as defaultJobManager } from "../base/AgentJobManager.js";
@@ -9,6 +10,9 @@ import { logger } from "../../lib/logger.js";
 import { broadcast } from "../../ws/index.js";
 import type { GenerateTextResult, GenerateTextOptions } from "../../ai/openai.js";
 import type { AgentJobInput } from "../base/AgentJobManager.js";
+import { validateAgentContext } from "../_shared/normalize.js";
+import type { OrchestratorRequest, OrchestratorResponse } from "../../services/orchestration/types.js";
+import { executeAgentRun, type AgentExecutionContext } from "../utils/agent-run.js";
 
 type PrismaLike = typeof defaultPrisma;
 
@@ -197,6 +201,67 @@ export interface SocialSnippetOutput {
   emailSubject: string;
 }
 
+const RepurposeFormatSchema = z.enum(["linkedin", "twitter", "email", "outline"]);
+
+const GenerateDraftPayloadSchema = z.object({
+  topic: z.string().min(1, "topic is required"),
+  primaryKeyword: z.string().min(1, "primaryKeyword is required"),
+  personaId: z.union([z.string(), z.number()]).optional(),
+  secondaryKeywords: z.array(z.string().min(1)).optional(),
+  outline: z.array(z.string().min(1)).optional(),
+  tone: z.enum(["professional", "casual", "friendly", "authoritative"]).optional(),
+  audience: z.string().optional(),
+  callToAction: z.string().optional(),
+  brandId: z.string().optional(),
+  brandVoiceId: z.string().optional(),
+  wordCount: z.number().int().min(300).max(4000).optional(),
+  createdById: z.string().optional(),
+});
+
+const SummarizePayloadSchema = z.object({
+  content: z.string().min(1, "content is required"),
+  sentences: z.number().int().min(1).max(6).optional(),
+  highlights: z.number().int().min(1).max(6).optional(),
+  createdById: z.string().optional(),
+});
+
+const RepurposePayloadSchema = z.object({
+  content: z.string().min(1, "content is required"),
+  format: RepurposeFormatSchema.default("linkedin"),
+  topic: z.string().optional(),
+  primaryKeyword: z.string().optional(),
+  tone: z.string().optional(),
+  brandId: z.string().optional(),
+  brandVoiceId: z.string().optional(),
+  createdById: z.string().optional(),
+});
+
+type GenerateDraftPayload = z.infer<typeof GenerateDraftPayloadSchema>;
+type SummarizePayload = z.infer<typeof SummarizePayloadSchema>;
+type RepurposePayload = z.infer<typeof RepurposePayloadSchema>;
+type RepurposeFormat = z.infer<typeof RepurposeFormatSchema>;
+
+interface SummarizeContentOutput {
+  summary: string;
+  highlights: string[];
+  stats: {
+    sentences: number;
+    words: number;
+    readingTimeMinutes: number;
+  };
+}
+
+interface RepurposeContentOutput {
+  format: RepurposeFormat;
+  content: string;
+  metadata: {
+    topic: string;
+    primaryKeyword: string;
+    tone: string;
+    estimatedLength: number;
+  };
+}
+
 const rateLimiter = new RateLimiter(RATE_LIMIT_MAX_CALLS, RATE_LIMIT_WINDOW_MS);
 
 function clampLength(text: string, min: number, max: number): string {
@@ -322,6 +387,46 @@ export class ContentAgent {
   private readonly brandVoiceSearch: BrandVoiceSearch;
   private readonly generateText: GenerateTextFn;
   private readonly now: () => Date;
+  private readonly orchestratorAgentId = "ContentAgent";
+  private readonly contentStopWords = new Set<string>([
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "that",
+    "this",
+    "about",
+    "into",
+    "your",
+    "you",
+    "have",
+    "will",
+    "just",
+    "more",
+    "than",
+    "then",
+    "them",
+    "they",
+    "their",
+    "what",
+    "when",
+    "where",
+    "which",
+    "while",
+    "after",
+    "before",
+    "over",
+    "under",
+    "between",
+    "across",
+    "within",
+    "without",
+    "make",
+    "made",
+    "toward",
+    "towards",
+  ]);
 
   constructor(deps: {
     prisma?: PrismaLike;
@@ -1049,6 +1154,357 @@ Improve keyword placement, clarity, and readability. Return JSON with keys "revi
       organization: organizationSchema,
       breadcrumb: breadcrumbSchema,
     };
+  }
+
+  private buildSummary(input: SummarizePayload): SummarizeContentOutput {
+    const sentences = this.extractSentences(input.content);
+    const desiredSentences = Math.max(
+      1,
+      Math.min(input.sentences ?? 3, sentences.length || 1),
+    );
+    const summarySentences = sentences.slice(0, desiredSentences);
+    const summaryText = summarySentences.join(" ").trim();
+
+    const highlights = this.buildHighlightSentences(
+      sentences,
+      input.highlights ?? Math.min(3, sentences.length || 1),
+    );
+
+    const wordCount = input.content.split(/\s+/).filter(Boolean).length;
+    const readingTimeMinutes = Number((wordCount / 200).toFixed(2));
+
+    return {
+      summary: summaryText,
+      highlights,
+      stats: {
+        sentences: summarySentences.length,
+        words: wordCount,
+        readingTimeMinutes,
+      },
+    };
+  }
+
+  private extractSentences(content: string): string[] {
+    return (content.match(/[^.!?]+[.!?]?/g) ?? [content])
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+  }
+
+  private buildHighlightSentences(sentences: string[], limit: number): string[] {
+    if (sentences.length === 0 || limit <= 0) {
+      return [];
+    }
+
+    const scored = sentences.map((sentence, index) => ({
+      index,
+      sentence: sentence.replace(/\s+/g, " ").trim(),
+      score: sentence.length,
+    }));
+
+    scored.sort((a, b) => b.score - a.score || a.index - b.index);
+    const selected = scored.slice(0, Math.min(limit, scored.length));
+    selected.sort((a, b) => a.index - b.index);
+
+    return selected.map((item) => item.sentence);
+  }
+
+  private deriveTopicFromContent(content: string): string {
+    const sentences = this.extractSentences(content);
+    if (sentences.length > 0) {
+      const words = sentences[0].split(/\s+/).filter(Boolean);
+      return words.slice(0, 12).join(" ") || "Content insight";
+    }
+    const fallbackWords = content.split(/\s+/).filter(Boolean);
+    return fallbackWords.slice(0, 8).join(" ") || "Content insight";
+  }
+
+  private deriveKeywordFromContent(content: string): string {
+    const tokens = content.toLowerCase().match(/\b[a-z0-9]{4,}\b/g) ?? [];
+    const tally = new Map<string, number>();
+
+    tokens.forEach((token) => {
+      if (!this.contentStopWords.has(token)) {
+        tally.set(token, (tally.get(token) ?? 0) + 1);
+      }
+    });
+
+    if (tally.size === 0) {
+      return tokens[0] ?? "insights";
+    }
+
+    const [top] = Array.from(tally.entries()).sort((a, b) => b[1] - a[1]);
+    return top?.[0] ?? "insights";
+  }
+
+  private buildOutlineFromContent(content: string): string {
+    const paragraphs = content
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+
+    if (paragraphs.length === 0) {
+      return ["1. Introduction", "2. Key Insight", "3. Next Steps"].join("\n");
+    }
+
+    return paragraphs
+      .slice(0, 5)
+      .map((paragraph, index) => {
+        const sentence = this.extractSentences(paragraph)[0] ?? paragraph;
+        const words = sentence.split(/\s+/).filter(Boolean);
+        const heading = words.slice(0, 10).join(" ");
+        return `${index + 1}. ${heading}`;
+      })
+      .join("\n");
+  }
+
+  private truncateTweet(text: string): string {
+    const limit = 260;
+    if (text.length <= limit) {
+      return text;
+    }
+    return `${text.slice(0, limit - 3).trimEnd()}...`;
+  }
+
+  private async repurposeContent(input: RepurposePayload): Promise<RepurposeContentOutput> {
+    const format = input.format;
+    const topic = input.topic?.trim() || this.deriveTopicFromContent(input.content);
+    const primaryKeyword =
+      input.primaryKeyword?.trim() || this.deriveKeywordFromContent(input.content);
+    const requestedTone = input.tone?.trim().toLowerCase() ?? DEFAULT_TONE;
+    const allowedTones = new Set(["professional", "casual", "friendly", "authoritative"]);
+    const tone = allowedTones.has(requestedTone)
+      ? (requestedTone as GenerateArticleInput["tone"])
+      : DEFAULT_TONE;
+
+    const snippets = await this.generateSocialSnippets({
+      topic,
+      primaryKeyword,
+      brandId: input.brandId,
+      brandVoiceId: input.brandVoiceId,
+      tone,
+    });
+
+    const summary = this.buildSummary({
+      content: input.content,
+      sentences: 2,
+      highlights: 3,
+    });
+
+    let repurposed: string;
+    switch (format) {
+      case "twitter":
+        repurposed = this.truncateTweet(snippets.twitter);
+        break;
+      case "email":
+        repurposed = `Subject: ${snippets.emailSubject}\n\n${summary.summary}`;
+        break;
+      case "outline":
+        repurposed = this.buildOutlineFromContent(input.content);
+        break;
+      case "linkedin":
+      default:
+        repurposed = snippets.linkedin;
+        break;
+    }
+
+    return {
+      format,
+      content: repurposed.trim(),
+      metadata: {
+        topic,
+        primaryKeyword,
+        tone,
+        estimatedLength: repurposed.length,
+      },
+    };
+  }
+
+  private attachUser<T extends { createdById?: string | undefined }>(
+    input: T,
+    context: AgentExecutionContext,
+  ): T {
+    if (input.createdById || !context.userId) {
+      return input;
+    }
+
+    return {
+      ...input,
+      createdById: context.userId ?? undefined,
+    } as T;
+  }
+
+  private resolveExecutionContext(context: unknown): AgentExecutionContext {
+    const validated = validateAgentContext(context);
+    return {
+      organizationId: validated.organizationId,
+      prisma: validated.prisma,
+      logger: validated.logger,
+      userId: validated.userId ?? null,
+    };
+  }
+
+  private invalidInput(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Invalid input";
+    return { ok: false, error: message, code: "INVALID_INPUT" };
+  }
+
+  private executionError(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Agent execution failed";
+    return { ok: false, error: message, code: "AGENT_EXECUTION_FAILED" };
+  }
+
+  private async handleGenerateDraftIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let parsed: GenerateDraftPayload;
+    try {
+      parsed = GenerateDraftPayloadSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const augmented = this.attachUser(parsed, context);
+    if (!augmented.createdById) {
+      return this.invalidInput(new Error("createdById is required for draft generation"));
+    }
+
+    const generateInput: GenerateArticleInput = {
+      topic: augmented.topic,
+      primaryKeyword: augmented.primaryKeyword,
+      personaId: augmented.personaId,
+      secondaryKeywords: augmented.secondaryKeywords,
+      outline: augmented.outline,
+      tone: augmented.tone ?? DEFAULT_TONE,
+      audience: augmented.audience,
+      callToAction: augmented.callToAction,
+      brandId: augmented.brandId,
+      brandVoiceId: augmented.brandVoiceId,
+      wordCount: augmented.wordCount,
+      createdById: augmented.createdById,
+    };
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        generateInput,
+        () => this.generateArticle(generateInput),
+        {
+          intent,
+          buildMetrics: (output) => ({
+            draftId: output.draftId,
+            wordCount: output.body.split(/\s+/).filter(Boolean).length,
+            keywordInsights: output.keywordInsights.length,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleSummarizeIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let parsed: SummarizePayload;
+    try {
+      parsed = SummarizePayloadSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const augmented = this.attachUser(parsed, context);
+    const summary = this.buildSummary(augmented);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        augmented,
+        async () => summary,
+        {
+          intent,
+          buildMetrics: () => ({
+            sentences: summary.stats.sentences,
+            words: summary.stats.words,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleRepurposeIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let parsed: RepurposePayload;
+    try {
+      parsed = RepurposePayloadSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const augmented = this.attachUser(parsed, context);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        augmented,
+        () => this.repurposeContent(augmented),
+        {
+          intent,
+          buildMetrics: (output) => ({
+            format: output.format,
+            length: output.content.length,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  async handle(request: OrchestratorRequest): Promise<OrchestratorResponse> {
+    let executionContext: AgentExecutionContext;
+
+    try {
+      executionContext = this.resolveExecutionContext(request.context);
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : "Invalid context",
+        code: "INVALID_CONTEXT",
+      };
+    }
+
+    switch (request.intent) {
+      case "generate-draft":
+        return this.handleGenerateDraftIntent(request.payload, executionContext, request.intent);
+      case "summarize":
+        return this.handleSummarizeIntent(request.payload, executionContext, request.intent);
+      case "repurpose":
+        return this.handleRepurposeIntent(request.payload, executionContext, request.intent);
+      default:
+        return {
+          ok: false,
+          error: `Unsupported intent: ${request.intent}`,
+          code: "UNSUPPORTED_INTENT",
+        };
+    }
   }
 }
 

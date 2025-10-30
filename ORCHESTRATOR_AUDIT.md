@@ -26,3 +26,20 @@
 2. Replace stubbed node management methods with actual persistence (e.g., `orchestrator_nodes` table) or remove unsupported endpoints.
 3. Tie `AgentIntelligenceBus` registrations into the orchestrator bootstrap and ensure graceful shutdown unregisters agents.
 4. Store orchestrator state / circuit status in Redis or Prisma for multi-instance resilience.
+
+## AgentRun Persistence - Complete ✅
+
+Date: October 29, 2025
+
+All 5 agents now persist AgentRun records:
+- EmailAgent ✅
+- SEOAgent ✅
+- SocialAgent ✅
+- ContentAgent ✅
+- SupportAgent ✅
+
+Pattern: All use executeAgentRun() from utils/agent-run.ts
+
+Verification: TypeScript compiles cleanly
+
+Note: Unit tests deferred - using integration tests instead

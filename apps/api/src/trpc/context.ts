@@ -5,6 +5,7 @@
 
 import type { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { logger } from "../lib/logger.js";
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,7 @@ export interface CreateContextOptions {
 
 export type AuthUser = {
   id: string;
+  organizationId?: string | null;
   [key: string]: unknown;
 };
 
@@ -23,6 +25,7 @@ export type Context = {
   req: Request;
   res: Response;
   user: AuthUser | null;
+  logger: typeof logger;
 };
 
 /**
@@ -40,5 +43,6 @@ export async function createContext({ req, res }: CreateContextOptions): Promise
     req,
     res,
     user,
+    logger,
   };
 }

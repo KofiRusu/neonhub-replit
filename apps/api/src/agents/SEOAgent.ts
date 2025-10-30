@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { z } from "zod";
 import type { Keyword, PrismaClient } from "@prisma/client";
 import { prisma as defaultPrisma } from "../db/prisma.js";
 import {
@@ -6,6 +7,9 @@ import {
   type AgentJobInput,
 } from "./base/AgentJobManager.js";
 import { logger } from "../lib/logger.js";
+import { validateAgentContext } from "./_shared/normalize.js";
+import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
+import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
 
 export type SearchIntent =
   | "informational"
@@ -201,6 +205,37 @@ const DEFAULT_DESCRIPTOR: AgentDescriptor = {
   },
 };
 
+const DiscoverKeywordsPayloadSchema = z
+  .object({
+    seeds: z.array(z.string().min(1, "seed keyword cannot be empty")).optional(),
+    seed: z.string().min(1).optional(),
+    topic: z.string().min(1).optional(),
+    personaId: z.union([z.string(), z.number()]).optional(),
+    limit: z.number().int().positive().max(100).optional(),
+    competitorDomains: z.array(z.string().min(1)).optional(),
+    createdById: z.string().optional(),
+  })
+  .refine(
+    data => Boolean((data.seeds && data.seeds.length > 0) || data.seed || data.topic),
+    { message: "At least one seed keyword is required." },
+  );
+
+const SeoAuditPayloadSchema = z
+  .object({
+    keyword: z.string().min(1).optional(),
+    url: z.string().url().optional(),
+    competitorDomains: z.array(z.string().min(1)).optional(),
+    backlinkCount: z.number().int().nonnegative().optional(),
+    domainAuthority: z.number().min(0).max(100).optional(),
+    createdById: z.string().optional(),
+  })
+  .refine(data => Boolean(data.keyword || data.url), {
+    message: "Provide either keyword or url.",
+  });
+
+type DiscoverKeywordsPayload = z.infer<typeof DiscoverKeywordsPayloadSchema>;
+type SeoAuditPayload = z.infer<typeof SeoAuditPayloadSchema>;
+
 /**
  * SEOAgent coordinates keyword discovery, intent analysis, and opportunity scoring.
  * The implementation is deterministic to remain test-friendly in offline environments.
@@ -210,6 +245,7 @@ export class SEOAgent {
   private readonly jobManager: AgentJobManagerLike;
   private readonly now: () => Date;
   private readonly agentName = "seo";
+  private readonly orchestratorAgentId = "SEOAgent";
   private readonly descriptor = DEFAULT_DESCRIPTOR;
 
   constructor(deps: {
@@ -1041,6 +1077,203 @@ export class SEOAgent {
     });
     return (Object.entries(tallies).sort((a, b) => b[1] - a[1])[0]?.[0] ??
       "informational") as SearchIntent;
+  }
+
+  private withUserFallback<T extends { createdById?: string | undefined }>(
+    input: T,
+    context: AgentExecutionContext,
+  ): T {
+    if (input.createdById || !context.userId) {
+      return input;
+    }
+
+    return {
+      ...input,
+      createdById: context.userId ?? undefined,
+    } as T;
+  }
+
+  private resolveExecutionContext(context: unknown): AgentExecutionContext {
+    const validated = validateAgentContext(context);
+    return {
+      organizationId: validated.organizationId,
+      prisma: validated.prisma,
+      logger: validated.logger,
+      userId: validated.userId ?? null,
+    };
+  }
+
+  private invalidInput(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Invalid input";
+    return { ok: false, error: message, code: "INVALID_INPUT" };
+  }
+
+  private executionError(error: unknown): OrchestratorResponse {
+    const message = error instanceof Error ? error.message : "Agent execution failed";
+    return { ok: false, error: message, code: "AGENT_EXECUTION_FAILED" };
+  }
+
+  private deriveKeywordFromUrl(rawUrl: string): string {
+    try {
+      const parsed = new URL(rawUrl);
+      const segments = parsed.pathname.split("/").filter(Boolean);
+      if (segments.length > 0) {
+        const lastSegment = segments[segments.length - 1];
+        const normalized = lastSegment.replace(/[-_]+/g, " ").trim();
+        if (normalized.length > 0) {
+          return normalized;
+        }
+      }
+      const host = parsed.hostname.replace(/^www\./, "");
+      return host.replace(/\./g, " ").trim() || "homepage";
+    } catch {
+      return rawUrl.replace(/https?:\/\//gi, "").replace(/[^a-z0-9]+/gi, " ").trim() || "homepage";
+    }
+  }
+
+  private async handleKeywordResearchIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let parsed: DiscoverKeywordsPayload;
+    try {
+      parsed = DiscoverKeywordsPayloadSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const seeds = [
+      ...(parsed.seeds ?? []),
+      ...(parsed.seed ? [parsed.seed] : []),
+      ...(parsed.topic ? [parsed.topic] : []),
+    ]
+      .map((seed) => seed.trim())
+      .filter(Boolean);
+
+    if (seeds.length === 0) {
+      return this.invalidInput(new Error("At least one seed keyword is required."));
+    }
+
+    const input: DiscoverKeywordsInput = {
+      seeds,
+      personaId: parsed.personaId,
+      limit: parsed.limit,
+      competitorDomains: parsed.competitorDomains,
+      createdById: parsed.createdById,
+    };
+
+    const resolvedInput = this.withUserFallback(input, context);
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        resolvedInput,
+        () => this.discoverKeywords(resolvedInput),
+        {
+          intent,
+          buildMetrics: output => ({
+            clusters: output.clusters.length,
+            totalKeywords: output.summary.totalKeywords,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  private async handleSeoAuditIntent(
+    payload: unknown,
+    context: AgentExecutionContext,
+    intent: string,
+  ): Promise<OrchestratorResponse> {
+    let parsed: SeoAuditPayload;
+    try {
+      parsed = SeoAuditPayloadSchema.parse(payload);
+    } catch (error) {
+      return this.invalidInput(error);
+    }
+
+    const keywordSource = parsed.keyword?.trim() ?? "";
+    const keyword =
+      keywordSource.length > 0
+        ? keywordSource
+        : parsed.url
+        ? this.deriveKeywordFromUrl(parsed.url)
+        : "";
+
+    if (!keyword) {
+      return this.invalidInput(new Error("Unable to derive keyword for audit"));
+    }
+
+    const payloadWithUser = this.withUserFallback(
+      {
+        keyword,
+        competitorDomains: parsed.competitorDomains,
+        backlinkCount: parsed.backlinkCount,
+        domainAuthority: parsed.domainAuthority,
+        createdById: parsed.createdById,
+      },
+      context,
+    );
+
+    const scoreInput: ScoreDifficultyInput = {
+      keyword: payloadWithUser.keyword,
+      competitorDomains: payloadWithUser.competitorDomains,
+      backlinkCount: payloadWithUser.backlinkCount,
+      domainAuthority: payloadWithUser.domainAuthority,
+    };
+
+    try {
+      const { result } = await executeAgentRun(
+        this.orchestratorAgentId,
+        context,
+        payloadWithUser,
+        () => this.scoreDifficulty(scoreInput),
+        {
+          intent,
+          buildMetrics: output => ({
+            difficulty: output.difficulty,
+            tier: output.tier,
+          }),
+        },
+      );
+
+      return { ok: true, data: result };
+    } catch (error) {
+      return this.executionError(error);
+    }
+  }
+
+  async handle(request: OrchestratorRequest): Promise<OrchestratorResponse> {
+    let executionContext: AgentExecutionContext;
+
+    try {
+      executionContext = this.resolveExecutionContext(request.context);
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : "Invalid context",
+        code: "INVALID_CONTEXT",
+      };
+    }
+
+    switch (request.intent) {
+      case "keyword-research":
+        return this.handleKeywordResearchIntent(request.payload, executionContext, request.intent);
+      case "seo-audit":
+        return this.handleSeoAuditIntent(request.payload, executionContext, request.intent);
+      default:
+        return {
+          ok: false,
+          error: `Unsupported intent: ${request.intent}`,
+          code: "UNSUPPORTED_INTENT",
+        };
+    }
   }
 }
 
