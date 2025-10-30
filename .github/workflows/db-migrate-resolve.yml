@@ -1,0 +1,77 @@
+name: DB Migrate Resolve
+
+on:
+  workflow_dispatch:
+    inputs:
+      MIGRATION_NAME:
+        description: "Migration to resolve (e.g., 20240103000000_realign_schema)"
+        required: true
+      ACTION:
+        description: "Action to take: rolled-back or applied"
+        required: true
+        default: "rolled-back"
+        type: choice
+        options:
+          - rolled-back
+          - applied
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CI: "true"
+      PRISMA_HIDE_UPDATE_MESSAGE: "1"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Enable Corepack
+        run: corepack enable && corepack prepare pnpm@9 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
+
+      - name: Check current migration status
+        run: |
+          echo "## 🔍 Current Migration Status" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate status || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Resolve failed migration
+        run: |
+          echo "## 🔧 Resolving Migration" >> $GITHUB_STEP_SUMMARY
+          echo "Migration: ${{ github.event.inputs.MIGRATION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "Action: --${{ github.event.inputs.ACTION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate resolve \
+            --${{ github.event.inputs.ACTION }} "${{ github.event.inputs.MIGRATION_NAME }}"
+          
+          echo "✅ Migration resolved" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify migration status after resolve
+        run: |
+          echo "## ✅ Migration Status After Resolve" >> $GITHUB_STEP_SUMMARY
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate status
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Success Notice
+        run: |
+          echo "::notice::✅ Migration resolved successfully"
+          echo "Next step: Run DB Deploy workflow to apply remaining migrations"
