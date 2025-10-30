@@ -1,0 +1,71 @@
+# SEO Engine Integration Completion Rules
+# Purpose: Guide final 22% integration to achieve 100% production readiness
+# Status: Active execution plan (Oct 30 - Nov 20, 2025)
+# Related: SEO_ENGINE_PROGRESS_REPORT_VALIDATED.md
+
+[meta]
+task = "SEO Engine Integration to 100%"
+current_completion = "78%"
+target_completion = "100%"
+estimated_duration = "2-3 weeks"
+priority = "high"
+mode = "execution"
+
+[context]
+# Current state: Services implemented, integration pending
+# - Phase 6D: Internal Linking (90% - service ready, wiring needed)
+# - Phase 6E: Sitemap & Robots (95% - code ready, deployment needed)
+# - Phase 6F: Analytics Loop (85% - OAuth credentials needed)
+
+[task_1_database_connectivity]
+priority = "critical"
+estimated_hours = 8
+files_to_check = [".env", "apps/api/.env", "apps/api/prisma/schema.prisma"]
+validation_command = "pnpm --filter apps/api prisma db pull"
+
+[task_2_internal_linking_integration]
+priority = "high"
+estimated_hours = 16
+integration_location = "apps/api/src/agents/content/ContentAgent.ts"
+service_path = "apps/api/src/services/seo/internal-linking.service.ts"
+
+[task_3_dynamic_sitemap]
+priority = "high"
+estimated_hours = 8
+sitemap_file = "apps/web/src/app/sitemap.ts"
+robots_file = "apps/web/src/app/robots.ts"
+
+[task_4_analytics_loop]
+priority = "high"
+estimated_hours = 20
+gsc_integration = "apps/api/src/integrations/google-search-console.ts"
+oauth_guide = "docs/GA4_OAUTH_SETUP.md"
+
+[task_5_ci_stabilization]
+priority = "medium"
+estimated_hours = 24
+workflow_file = ".github/workflows/seo-suite.yml"
+seo_lint = "scripts/seo-lint.mjs"
+
+[task_6_documentation_updates]
+priority = "low"
+estimated_hours = 8
+docs_to_update = ["docs/SEO_QUICK_START.md", "docs/SEO_API_REFERENCE.md", "README.md"]
+
+[task_7_final_validation]
+priority = "critical"
+estimated_hours = 8
+final_report = "SEO_ENGINE_100_PERCENT_COMPLETE.md"
+
+[quality_gates]
+gate_1 = "TypeScript strict, ESLint 0 errors, 85% coverage"
+gate_2 = "All endpoints operational, queries <500ms"
+gate_3 = "Links in content, sitemap auto-updates, analytics live"
+gate_4 = "All docs complete, training ready"
+
+[success_metrics]
+target_traffic_growth = "+25%"
+target_indexation = ">80%"
+target_ctr = ">3%"
+target_links_per_page = ">5"
+target_uptime = ">99.9%"

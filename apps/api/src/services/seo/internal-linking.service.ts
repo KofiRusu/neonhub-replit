@@ -9,7 +9,7 @@
  * @date 2025-10-27
  */
 
-import { openai } from '@/lib/openai';
+import { openai } from '../../lib/openai.js';
 import type { PrismaClient } from '@prisma/client';
 
 // ============================================================================

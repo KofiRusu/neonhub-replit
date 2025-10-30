@@ -6,6 +6,7 @@ import { seoAgent as defaultSeoAgent, SEOAgent } from "../SEOAgent.js";
 import {
   searchSimilarBrandVoice as defaultBrandVoiceSearch,
 } from "../../services/brand-voice-ingestion.js";
+import { InternalLinkingService } from "../../services/seo/internal-linking.service.js";
 import { logger } from "../../lib/logger.js";
 import { broadcast } from "../../ws/index.js";
 import type { GenerateTextResult, GenerateTextOptions } from "../../ai/openai.js";
@@ -474,7 +475,32 @@ export class ContentAgent {
       ]);
 
       const structuredArticle = await this.requestArticleFromModel(input, brandVoice, keywordContext);
-      const body = this.composeMarkdownBody(structuredArticle);
+      let body = this.composeMarkdownBody(structuredArticle);
+
+      // Internal linking integration
+      try {
+        const internalLinkingService = new InternalLinkingService(this.prisma);
+        const contentSlug = structuredArticle.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+        const linkSuggestions = await internalLinkingService.suggestLinks({
+          currentPageUrl: `/content/${contentSlug}`,
+          currentPageContent: body,
+          targetKeyword: input.primaryKeyword,
+          maxSuggestions: 5,
+        });
+
+        // Insert top 3-5 high-priority links into content
+        const highPriorityLinks = linkSuggestions.filter(link => link.priority === 'high').slice(0, 3);
+        const mediumPriorityLinks = linkSuggestions.filter(link => link.priority === 'medium').slice(0, 2);
+        const linksToInsert = [...highPriorityLinks, ...mediumPriorityLinks].slice(0, 5);
+
+        if (linksToInsert.length > 0) {
+          body = this.insertLinksIntoContent(body, linksToInsert);
+          logger.info({ linkCount: linksToInsert.length }, '[ContentAgent] Internal links inserted');
+        }
+      } catch (linkError) {
+        logger.warn({ error: linkError }, '[ContentAgent] Internal linking failed, continuing without links');
+        // Continue without links if linking fails
+      }
 
       const meta = this.createMetaTags({
         title: structuredArticle.title,
@@ -1154,6 +1180,55 @@ Improve keyword placement, clarity, and readability. Return JSON with keys "revi
       organization: organizationSchema,
       breadcrumb: breadcrumbSchema,
     };
+  }
+
+  /**
+   * Insert internal links into markdown content at optimal positions
+   * @private
+   */
+  private insertLinksIntoContent(
+    markdownBody: string,
+    linkSuggestions: Array<{
+      targetUrl: string;
+      targetTitle: string;
+      anchorText: string;
+      position?: { paragraph: number; sentence?: number };
+    }>
+  ): string {
+    const paragraphs = markdownBody.split('\n\n');
+    let insertedCount = 0;
+
+    for (const link of linkSuggestions) {
+      const linkMarkdown = `[${link.anchorText}](${link.targetUrl} "${link.targetTitle}")`;
+
+      // Try to insert at specified position
+      if (link.position && link.position.paragraph < paragraphs.length) {
+        const targetParagraph = paragraphs[link.position.paragraph];
+        
+        // Replace first occurrence of anchor text with link
+        if (targetParagraph.toLowerCase().includes(link.anchorText.toLowerCase())) {
+          const regex = new RegExp(`\\b${link.anchorText}\\b`, 'i');
+          paragraphs[link.position.paragraph] = targetParagraph.replace(regex, linkMarkdown);
+          insertedCount++;
+        } else {
+          // Append to end of paragraph if exact match not found
+          paragraphs[link.position.paragraph] = `${targetParagraph} ${linkMarkdown}`;
+          insertedCount++;
+        }
+      } else {
+        // No position specified or invalid — append as "Related" link at end
+        const relatedSection = paragraphs[paragraphs.length - 1];
+        if (relatedSection?.startsWith('**Related:**')) {
+          paragraphs[paragraphs.length - 1] = `${relatedSection}, ${linkMarkdown}`;
+        } else {
+          paragraphs.push(`\n**Related:** ${linkMarkdown}`);
+        }
+        insertedCount++;
+      }
+    }
+
+    logger.debug({ insertedCount }, '[ContentAgent] Inserted internal links');
+    return paragraphs.join('\n\n');
   }
 
   private buildSummary(input: SummarizePayload): SummarizeContentOutput {
