@@ -43,24 +43,24 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm -F apps/api prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
 
       - name: Verify DB connectivity
-        run: pnpm -F apps/api prisma validate
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:validate
 
       - name: Apply migrations (deploy)
-        run: pnpm -F apps/api prisma migrate deploy
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:migrate:deploy
 
       - name: Seed database (optional, staging only)
         if: ${{ github.event.inputs.RUN_SEED == 'true' }}
         run: |
           # Safety: Only seed if explicitly requested
           echo "⚠️  Seeding requested - USE CAUTION in production!"
-          pnpm -F apps/api prisma db seed
+          pnpm --filter @neonhub/backend-v3.2 run prisma:seed
         continue-on-error: false
 
       - name: Status
-        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:status
 
       - name: Log migration telemetry
         if: always()
