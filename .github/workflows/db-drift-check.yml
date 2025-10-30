@@ -68,7 +68,7 @@ jobs:
           
           pnpm --filter @neonhub/backend-v3.2 exec prisma migrate diff \
             --from-url "$DATABASE_URL" \
-            --to-schema-datamodel "apps/api/prisma/schema.prisma" \
+            --to-schema-datamodel "prisma/schema.prisma" \
             --script > drift.sql 2>&1 || true
           
           if [ -s drift.sql ] && ! grep -q "No difference detected" drift.sql; then
