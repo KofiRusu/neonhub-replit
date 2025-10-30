@@ -42,6 +42,7 @@ import { AppError } from "./lib/errors.js";
 import { registerConnectors } from "./connectors/index.js";
 import { syncRegisteredConnectors } from "./services/connector.service.js";
 import connectorsRouter from "./routes/connectors.js";
+import { getMetrics, recordHttpRequest } from "./lib/metrics.js";
 import cookieParser from "cookie-parser";
 import brandVoiceRouter from "./routes/brand-voice.js";
 import personRouter from "./routes/person.js";
@@ -92,9 +93,18 @@ app.use(strictCORS);
 // 5. Rate limiting (global, with feature flag support)
 app.use(rateLimit);
 
-// Request logging
-app.use((req, _res, next) => {
+// Request logging with metrics
+app.use((req, res, next) => {
+  const startTime = Date.now();
   logger.info({ method: req.method, url: req.url }, "Request received");
+  
+  // Record metrics when response finishes
+  res.on("finish", () => {
+    const duration = (Date.now() - startTime) / 1000; // Convert to seconds
+    const route = req.route?.path || req.url;
+    recordHttpRequest(req.method, route, res.statusCode, duration);
+  });
+  
   next();
 });
 
@@ -103,6 +113,18 @@ app.use(healthRouter);
 app.use(authRateLimit, authRouter); // Stricter rate limit on auth endpoints
 app.use(sdkHandshakeRouter);
 app.use("/api", sitemapsRouter);
+
+// Prometheus metrics endpoint (public, typically accessed by Prometheus scraper)
+app.get("/metrics", async (_req, res) => {
+  try {
+    res.set("Content-Type", "text/plain; version=0.0.4");
+    const metrics = await getMetrics();
+    res.send(metrics);
+  } catch (error) {
+    logger.error({ error }, "Failed to generate metrics");
+    res.status(500).send("Error generating metrics");
+  }
+});
 
 // Protected routes (auth required + audit logging)
 app.use(requireAuth, contentRouter);

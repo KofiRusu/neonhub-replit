@@ -4,6 +4,7 @@ import { withCircuitBreaker, withRetry, CircuitBreakerOpenError } from "./polici
 import { ensureOrchestratorBootstrap } from "./bootstrap.js";
 import { executeAgentRun } from "../../agents/utils/agent-run.js";
 import { prisma } from "../../db/prisma.js";
+import { recordAgentRun, recordCircuitBreakerFailure, recordRateLimitHit } from "../../lib/metrics.js";
 import type { AgentHandler, AgentName, OrchestratorRequest, OrchestratorResponse } from "./types.js";
 
 type CircuitWrapped = (req: OrchestratorRequest) => Promise<OrchestratorResponse>;
@@ -64,6 +65,8 @@ function enforceRateLimit(agent: AgentName, userId: string): OrchestratorRespons
   }
 
   if (entry.count >= RATE_LIMIT_PER_MINUTE) {
+    // Record rate limit hit in metrics
+    recordRateLimitHit(agent, userId);
     return { ok: false, error: "rate_limited", code: "RATE_LIMITED" };
   }
 
@@ -145,6 +148,9 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
       logger.info({ agentId: dbAgent.id, agentName: req.agent }, "Created new agent record");
     }
 
+    // Track start time for metrics
+    const startTime = Date.now();
+
     // Execute with AgentRun persistence
     const { runId, result: response } = await executeAgentRun(
       dbAgent.id,
@@ -172,7 +178,12 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
       }
     );
 
-    logger.info({ runId, agent: req.agent, intent: req.intent }, "Agent run completed with persistence");
+    // Calculate duration and record metrics
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    const status = response.ok ? "completed" : "failed";
+    recordAgentRun(req.agent, status, durationSeconds, req.intent);
+
+    logger.info({ runId, agent: req.agent, intent: req.intent, durationSeconds }, "Agent run completed with persistence");
 
     if (!response.ok) {
       const failure = response as Extract<OrchestratorResponse, { ok: false }>;
@@ -185,10 +196,14 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
     span.end(error);
     if (error instanceof CircuitBreakerOpenError) {
       logger.error({ agent: req.agent }, "Circuit breaker open for agent");
+      // Record circuit breaker failure in metrics
+      recordCircuitBreakerFailure(req.agent);
       return { ok: false, error: "circuit_open", code: "CIRCUIT_OPEN" };
     }
 
     logger.error({ agent: req.agent, intent: req.intent, error }, "Agent execution failed");
+    // Record failed agent run
+    recordAgentRun(req.agent, "failed", 0, req.intent);
     return { ok: false, error: "agent_execution_failed", code: "AGENT_EXECUTION_FAILED" };
   }
 }
