@@ -38,13 +38,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter apps/api run prisma:generate
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
 
       - name: Check migration status
         id: status
         run: |
           echo "## 🔍 Migration Status" >> $GITHUB_STEP_SUMMARY
-          pnpm --filter apps/api exec prisma migrate status >> status.txt 2>&1 || true
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate status >> status.txt 2>&1 || true
           cat status.txt >> $GITHUB_STEP_SUMMARY
           
           if grep -q "Database schema is up to date" status.txt; then
@@ -66,7 +66,7 @@ jobs:
           echo "## 📊 Schema Drift Analysis" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          pnpm --filter apps/api exec prisma migrate diff \
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate diff \
             --from-url "$DATABASE_URL" \
             --to-schema-datamodel "apps/api/prisma/schema.prisma" \
             --script > drift.sql 2>&1 || true

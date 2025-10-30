@@ -74,7 +74,7 @@ jobs:
               2) If a referenced file/script is missing, create a minimal safe stub that does nothing harmful and exits 0 (when allowed) or make the workflow skip gracefully using bash checks.
               3) Keep Auto-Sync safe: if SOURCE_PAT is missing, skip with neutral success and a clear log line. If scripts are missing, skip.
               4) Do not refactor app logic. Keep changes surgical to CI/scripts/workflows.
-              5) Verify locally: pnpm -r lint; pnpm -r build; pnpm --filter apps/api run prisma:generate; pnpm -r test --if-present.
+              5) Verify locally: pnpm -r lint; pnpm -r build; pnpm --filter @neonhub/backend-v3.2 run prisma:generate; pnpm -r test --if-present.
               6) Summarize root cause and all edits in ≤ 200 words for the PR body.
             
             Output: final diff summary + commands you ran.

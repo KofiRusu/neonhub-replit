@@ -31,7 +31,7 @@ jobs:
       - name: Run type check
         run: pnpm run typecheck
       - name: Run tests with coverage
-        run: pnpm --filter apps/api run test -- --coverage --runInBand --ci --passWithNoTests
+        run: pnpm --filter @neonhub/backend-v3.2 run test -- --coverage --runInBand --ci --passWithNoTests
       - name: Verify coverage report generated
         run: |
           if [ ! -f "apps/api/coverage/coverage-summary.json" ]; then

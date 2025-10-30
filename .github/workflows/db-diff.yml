@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter apps/api run prisma:generate
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
 
       - name: Show SQL diff (no apply)
         id: diff
@@ -46,7 +46,7 @@ jobs:
           echo "## 📊 Database Migration Diff" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`sql" >> $GITHUB_STEP_SUMMARY
-          pnpm --filter apps/api exec prisma migrate diff \
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate diff \
             --from-url "$DATABASE_URL" \
             --to-schema-datamodel "apps/api/prisma/schema.prisma" \
             --script | tee -a $GITHUB_STEP_SUMMARY
@@ -55,7 +55,7 @@ jobs:
       - name: Check Migration Status
         run: |
           echo "## 🔍 Current Migration Status" >> $GITHUB_STEP_SUMMARY
-          pnpm --filter apps/api exec prisma migrate status >> $GITHUB_STEP_SUMMARY 2>&1 || true
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate status >> $GITHUB_STEP_SUMMARY 2>&1 || true
 
       - name: Success Notice
         run: echo "::notice::✅ Dry-run diff complete - review STEP SUMMARY for changes"

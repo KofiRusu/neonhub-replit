@@ -48,10 +48,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate Prisma schema
-        run: pnpm --filter apps/api prisma:validate
+        run: pnpm --filter @neonhub/backend-v3.2 prisma:validate
 
       - name: Generate Prisma client
-        run: pnpm --filter apps/api exec prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
 
   typecheck:
     name: TypeScript Type Checking
@@ -80,7 +80,7 @@ jobs:
 
       - name: Generate Prisma client (API only)
         if: matrix.workspace == 'apps/api'
-        run: pnpm --filter apps/api exec prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
 
       - name: Type check ${{ matrix.workspace }}
         run: pnpm --filter ${{ matrix.workspace }} typecheck
@@ -112,7 +112,7 @@ jobs:
 
       - name: Generate Prisma client (API only)
         if: matrix.workspace == 'apps/api'
-        run: pnpm --filter apps/api exec prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
 
       - name: Lint ${{ matrix.workspace }}
         run: pnpm --filter ${{ matrix.workspace }} lint
@@ -156,20 +156,20 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter apps/api exec prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
 
       - name: Run database migrations
-        run: pnpm --filter apps/api exec prisma migrate deploy
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma migrate deploy
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: Seed test database
-        run: pnpm --filter apps/api exec prisma db seed
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma db seed
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: Run API tests (SEO services)
-        run: pnpm --filter apps/api test -- --testPathPattern=seo
+        run: pnpm --filter @neonhub/backend-v3.2 test -- --testPathPattern=seo
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
           NODE_ENV: test
@@ -223,21 +223,21 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter apps/api exec prisma generate
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma generate
 
       - name: Run database migrations
-        run: pnpm --filter apps/api exec prisma migrate deploy
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma migrate deploy
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: Seed test database
-        run: pnpm --filter apps/api exec prisma db seed
+        run: pnpm --filter @neonhub/backend-v3.2 exec prisma db seed
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
 
       - name: Start API server in background
         run: |
-          pnpm --filter apps/api dev &
+          pnpm --filter @neonhub/backend-v3.2 dev &
           echo $! > api_pid.txt
           sleep 10
         env:

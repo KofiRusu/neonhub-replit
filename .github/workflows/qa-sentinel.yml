@@ -136,8 +136,8 @@ jobs:
       - name: Setup test database
         if: steps.check_qa.outputs.ready == 'true'
         run: |
-          pnpm --filter apps/api run prisma:migrate:deploy
-          pnpm --filter apps/api run seed
+          pnpm --filter @neonhub/backend-v3.2 run prisma:migrate:deploy
+          pnpm --filter @neonhub/backend-v3.2 run seed
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/neonhub_test
 

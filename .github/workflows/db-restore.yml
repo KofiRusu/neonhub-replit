@@ -99,7 +99,7 @@ jobs:
           echo "🔄 Checking if migrations needed..."
           # This will apply any new migrations that weren't in the backup
           pnpm install --frozen-lockfile
-          pnpm --filter apps/api exec prisma migrate deploy || echo "⚠️ No new migrations"
+          pnpm --filter @neonhub/backend-v3.2 exec prisma migrate deploy || echo "⚠️ No new migrations"
 
       - name: Summary
         if: always()
