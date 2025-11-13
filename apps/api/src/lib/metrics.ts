@@ -23,6 +23,21 @@ export const agentRunDuration = new Histogram({
   registers: [register],
 });
 
+export const toolExecutionsTotal = new Counter({
+  name: "neonhub_tool_executions_total",
+  help: "Total number of tool executions",
+  labelNames: ["tool", "status"],
+  registers: [register],
+});
+
+export const toolExecutionDuration = new Histogram({
+  name: "neonhub_tool_execution_duration_seconds",
+  help: "Duration of tool executions in seconds",
+  labelNames: ["tool", "status"],
+  buckets: [0.05, 0.1, 0.25, 0.5, 1, 2, 5],
+  registers: [register],
+});
+
 // Circuit Breaker Metrics
 export const circuitBreakerFailures = new Counter({
   name: "neonhub_circuit_breaker_failures_total",
@@ -175,6 +190,11 @@ export function recordConnectorRequest(
 
 export function recordRateLimitHit(agent: string, user: string) {
   rateLimitHits.inc({ agent, user });
+}
+
+export function recordToolExecutionMetric(tool: string, status: "completed" | "failed", durationSeconds: number) {
+  toolExecutionsTotal.inc({ tool, status });
+  toolExecutionDuration.observe({ tool, status }, durationSeconds);
 }
 
 // Get all metrics as string (for /metrics endpoint)

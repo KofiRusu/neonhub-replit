@@ -1,6 +1,7 @@
 import { Queue } from "bullmq";
 import { env } from "../config/env.js";
 import { logger } from "../lib/logger.js";
+import { recordQueueJob, updateQueuePending } from "../lib/metrics.js";
 
 type QueueMap = {
   "intake.fetch": Queue;
@@ -33,7 +34,7 @@ function buildQueue(name: keyof QueueMap): Queue {
     logger.error({ error, queue: name }, "BullMQ queue error");
   });
 
-  return queue;
+  return attachQueueTelemetry(queue, name);
 }
 
 export const queues: QueueMap = {
@@ -52,3 +53,32 @@ export const queues: QueueMap = {
 };
 
 export type QueueName = keyof QueueMap;
+
+function attachQueueTelemetry(queue: Queue, name: keyof QueueMap): Queue {
+  const originalAdd = queue.add.bind(queue);
+
+  queue.add = (async (...args: Parameters<typeof originalAdd>) => {
+    recordQueueJob(name, "added");
+    const job = await originalAdd(...args);
+    try {
+      const counts = await queue.getJobCounts("waiting");
+      updateQueuePending(name, counts.waiting ?? 0);
+    } catch {
+      // no-op in mock environments
+    }
+    return job;
+  }) as typeof queue.add;
+
+  queue.on("completed", () => recordQueueJob(name, "completed"));
+  queue.on("failed", () => recordQueueJob(name, "failed"));
+  queue.on("waiting", async () => {
+    try {
+      const counts = await queue.getJobCounts("waiting");
+      updateQueuePending(name, counts.waiting ?? 0);
+    } catch {
+      // no-op in mock environments
+    }
+  });
+
+  return queue;
+}

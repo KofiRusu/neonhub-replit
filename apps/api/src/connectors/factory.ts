@@ -3,6 +3,7 @@ import { logger } from "../lib/logger.js";
 import { GmailMockConnector } from "./services/gmail-mock.js";
 import { SlackMockConnector } from "./services/slack-mock.js";
 import { TwilioMockConnector } from "./services/twilio-mock.js";
+import { recordToolExecution } from "../services/tool-execution.service.js";
 
 // Real connector imports (when implemented)
 // import { GmailConnector } from "./services/gmail.js";
@@ -27,11 +28,8 @@ export class ConnectorFactory {
     type: ConnectorType,
     credentials?: { accessToken?: string; apiKey?: string; [key: string]: any }
   ): any {
-    if (USE_MOCK_CONNECTORS) {
-      return this.createMock(type);
-    }
-    
-    return this.createReal(type, credentials);
+    const connector = USE_MOCK_CONNECTORS ? this.createMock(type) : this.createReal(type, credentials);
+    return attachToolTelemetry(connector, type);
   }
 
   /**
@@ -123,4 +121,35 @@ class GenericMockConnector {
       timestamp: new Date().toISOString(),
     };
   }
+}
+
+function attachToolTelemetry<T extends object>(connector: T, type: ConnectorType): T {
+  if (!connector || typeof connector !== "object") {
+    return connector;
+  }
+
+  const wrapped = new Map<PropertyKey, (...args: unknown[]) => Promise<unknown>>();
+
+  return new Proxy(connector, {
+    get(target, prop, receiver) {
+      const value = Reflect.get(target, prop, receiver);
+      if (typeof value !== "function" || prop === "constructor") {
+        return value;
+      }
+
+      if (wrapped.has(prop)) {
+        return wrapped.get(prop);
+      }
+
+      const instrumented = async (...args: unknown[]) => {
+        const payload = args.length <= 1 ? args[0] : args;
+        return recordToolExecution(type, String(prop), payload, () =>
+          Promise.resolve(value.apply(target, args)),
+        );
+      };
+
+      wrapped.set(prop, instrumented);
+      return instrumented;
+    },
+  });
 }

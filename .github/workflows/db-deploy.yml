@@ -5,7 +5,7 @@ on:
       RUN_SEED:
         description: "Run seed after migrate"
         required: true
-        default: "true"
+        default: "false"
 
 jobs:
   db-deploy:
@@ -15,15 +15,20 @@ jobs:
     env:
       CI: "true"
       PRISMA_HIDE_UPDATE_MESSAGE: "1"
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_MIGRATE }}
+      DATABASE_URL_APP: ${{ secrets.DATABASE_URL_APP }}
+      PGSSLMODE: require
+      PRISMA_CLIENT_ENGINE_TYPE: library
+      PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK: "1"
+      PGOPTIONS: "-c lock_timeout=120000 -c statement_timeout=600000"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install pnpm FIRST before Node setup (reads version from package.json)
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -32,7 +37,7 @@ jobs:
           cache: "pnpm"
 
       - name: Enable Corepack (defense-in-depth)
-        run: corepack enable && corepack prepare pnpm@8 --activate
+        run: corepack enable && corepack prepare pnpm@9 --activate
 
       - name: Print tool versions
         run: |
@@ -43,24 +48,46 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
+        run: pnpm --filter apps/api prisma generate
 
       - name: Verify DB connectivity
-        run: pnpm --filter @neonhub/backend-v3.2 run prisma:validate
+        run: pnpm --filter apps/api prisma validate
 
-      - name: Apply migrations (deploy)
-        run: pnpm --filter @neonhub/backend-v3.2 run prisma:migrate:deploy
+      - name: Prisma Migrate Deploy (resilient)
+        run: |
+          n=0
+          until [ $n -ge 3 ]
+          do
+            pnpm --filter apps/api prisma migrate deploy && break
+            n=$((n+1))
+            echo "migrate deploy attempt $n failed - retrying in $((15*n))s"
+            sleep $((15*n))
+          done
+          if [ $n -ge 3 ]; then
+            echo "::error::Prisma migrate deploy failed after retries"
+            exit 1
+          fi
 
-      - name: Seed database (optional, staging only)
+      - name: Seed database (optional)
         if: ${{ github.event.inputs.RUN_SEED == 'true' }}
         run: |
-          # Safety: Only seed if explicitly requested
-          echo "⚠️  Seeding requested - USE CAUTION in production!"
-          pnpm --filter @neonhub/backend-v3.2 run prisma:seed
+          echo "⚠️  Seeding requested - confirm target environment before proceeding"
+          n=0
+          until [ $n -ge 3 ]
+          do
+            pnpm --filter apps/api prisma db seed && break
+            n=$((n+1))
+            echo "seed attempt $n failed - retrying in $((10*n))s"
+            sleep $((10*n))
+          done
+          if [ $n -ge 3 ]; then
+            echo "::error::Database seed failed after retries"
+            exit 1
+          fi
         continue-on-error: false
 
       - name: Status
-        run: pnpm --filter @neonhub/backend-v3.2 run prisma:status
+        run: pnpm --filter apps/api prisma migrate status
 
       - name: Log migration telemetry
         if: always()
