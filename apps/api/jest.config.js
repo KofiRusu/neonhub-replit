@@ -2,7 +2,7 @@ const config = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/../../tests'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!**/node_modules/**'],
   transform: {
@@ -10,7 +10,8 @@ const config = {
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',
-        useESM: true
+        useESM: true,
+        diagnostics: false
       }
     ]
   },

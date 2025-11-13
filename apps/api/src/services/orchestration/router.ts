@@ -153,13 +153,14 @@ export async function route(req: OrchestratorRequest): Promise<OrchestratorRespo
     const startTime = Date.now();
 
     // Execute with AgentRun persistence
-    const { runId, result: response } = await executeAgentRun(
-      dbAgent.id,
-      {
-        organizationId,
-        userId,
-        prisma,
-      },
+  const { runId, result: response } = await executeAgentRun(
+    dbAgent.id,
+    {
+      organizationId,
+      userId,
+      prisma,
+      agentName: dbAgent.name ?? req.agent,
+    },
       req.payload,
       async () => {
         const executor = withRetry(getCircuit(req.agent, registryEntry.handler), {

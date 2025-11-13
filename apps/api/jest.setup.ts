@@ -10,6 +10,7 @@ loadEnv({
 });
 
 process.env.NODE_ENV = process.env.NODE_ENV || "test";
+process.env.USE_MOCK_CONNECTORS = process.env.USE_MOCK_CONNECTORS || "true";
 
 // Mock superjson
 jest.mock("superjson", () => ({
