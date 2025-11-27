@@ -1,0 +1,21 @@
+Risk,Category,Impact,Likelihood,Severity,Mitigation,Owner,DueDate
+Test heap failures prevent coverage validation,Quality,Cannot verify code quality gates,HIGH,S1,Split unit/integration tests + mock deps + serial execution,QA Engineer,2025-11-07
+22 TypeScript errors block production build,Code Quality,Build fails on deployment,HIGH,S1,Fix CostRow + ConnectorAuth + PredictiveEngine types,Backend Engineer,2025-11-06
+AgentRun persistence missing before beta,Compliance,No audit trail + telemetry loss,MEDIUM,S1,Wire executeAgentRun + AgentRunMetric immediately,Backend Engineer,2025-11-08
+Learning loop non-functional delays AI benefits,Product,AI differentiation lost + RAG unusable,MEDIUM,S1,Instantiate PgVectorStore + expose learn/recall,AI Engineer,2025-11-12
+Stripe integration incomplete blocks billing,Revenue,Cannot process payments,MEDIUM,S1,Verify secrets + webhook + mock mode + E2E test,Backend Engineer,2025-11-10
+Prometheus metrics missing hides production issues,Operational,Blind production operations + cannot debug,MEDIUM,S1,Add prom-client + /metrics endpoint by Day 5,DevOps Engineer,2025-11-08
+Dependency vulnerabilities (ws HIGH + next-auth MODERATE) expose production,Security,DoS risk (ws) + auth security (next-auth),HIGH,S2,Upgrade next-auth + resolve snoowrap dependency,DevOps Engineer,2025-11-05
+OAuth not configured delays GA authentication,Product,SSO unavailable + limited user signup,LOW,S2,Obtain Google + GitHub credentials from Marketing Ops,DevOps Engineer,2025-11-15
+Workflow validation pending - CI/CD untested,DevOps,Deployment procedures unvalidated + unknown failure modes,MEDIUM,S2,Trigger all 29 workflows + document results,DevOps Engineer,2025-11-11
+Staging environment not tested delays deployment,Deployment,Staging → production flow untested + surprises in prod,MEDIUM,S2,Deploy API + web to staging + run smoke tests,DevOps Engineer,2025-11-14
+Stripe webhook testing incomplete before launch,Fintech,Silent payment failures possible,MEDIUM,S2,Configure Stripe dashboard + use Stripe CLI,Backend Engineer,2025-11-12
+Accessibility audit pending blocks WCAG 2.1 AA compliance,Legal,Potential ADA violations + reputational risk,MEDIUM,S2,Run axe DevTools + NVDA testing + document fixes,Frontend Engineer,2025-11-13
+Database least-privilege roles not enforced,Security,Overprivileged connections increase breach risk,MEDIUM,S2,Create neonhub_app + neonhub_migrate roles,DevOps Engineer,2025-11-10
+RAG non-functional before GA loses product differentiation,Product,Vector search unavailable + content agent context missing,MEDIUM,S2,Seed embeddings + implement recall service,AI Engineer,2025-11-15
+Security workflows (Gitleaks + CodeQL) not executed pre-launch,Security,Unknown vulnerabilities ship to production,MEDIUM,S2,Trigger workflows + fix HIGH/CRITICAL findings,DevOps Engineer,2025-11-10
+Least-privilege database roles not implemented yet,Compliance,Overprivileged database access violates security best practices,LOW,S3,Create app + migrate roles + document access,DevOps Engineer,2025-11-12
+Branch protection not enabled on main,Governance,Unreviewed code can be merged directly to main,LOW,S3,Enable branch protection + require checks + approvals,DevOps Engineer,2025-11-09
+E2E tests not running in CI yet,Quality,UI regressions undetected in automation,LOW,S3,Run Playwright suite in CI + add to pre-merge gates,QA Engineer,2025-11-14
+Legal documents incomplete (Privacy + Terms + DPA),Compliance,GDPR violations possible + reputational risk,LOW,S2,Engage legal counsel + complete docs with review,Product Manager,2025-12-05
+Load testing not performed pre-launch,Operational,Unknown performance limits + potential outages under load,LOW,S3,Run k6 tests (100 concurrent users + 1000 req/s),DevOps Engineer,2025-12-10

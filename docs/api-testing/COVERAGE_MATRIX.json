@@ -1,0 +1,1381 @@
+{
+  "POST /api/billing/checkout": {
+    "covered": true,
+    "postmanRequestName": "POST /billing/checkout (Plan upgrade)",
+    "folder": "Billing & Finance",
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  "GET /api/billing/invoices": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  "GET /api/billing/plan": {
+    "covered": true,
+    "postmanRequestName": "GET /billing/plan",
+    "folder": "Billing & Finance",
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  "POST /api/billing/portal": {
+    "covered": true,
+    "postmanRequestName": "POST /billing/portal",
+    "folder": "Billing & Finance",
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  "GET /api/billing/usage": {
+    "covered": true,
+    "postmanRequestName": "GET /billing/usage",
+    "folder": "Billing & Finance",
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  "POST /api/billing/webhook": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "billing",
+    "handlerFile": "apps/api/src/routes/stripe-webhook.ts"
+  },
+  "POST /api/brand-voice/compose": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "brand-voice",
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  "POST /api/brand-voice/guardrail": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "brand-voice",
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  "GET /api/brand-voice/prompt/:useCase": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "brand-voice",
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  "POST /api/budget/execute": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "budget",
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  "GET /api/budget/ledger": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "budget",
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  "POST /api/budget/plan": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "budget",
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  "POST /api/budget/reconcile": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "budget",
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  "GET /api/campaigns": {
+    "covered": true,
+    "postmanRequestName": "GET /campaigns (List)",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns (Create)",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "DELETE /api/campaigns/:id": {
+    "covered": true,
+    "postmanRequestName": "DELETE /campaigns/:id (Cleanup)",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "GET /api/campaigns/:id": {
+    "covered": true,
+    "postmanRequestName": "GET /campaigns/:id (Fetch)",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "PUT /api/campaigns/:id": {
+    "covered": true,
+    "postmanRequestName": "PUT /campaigns/:id (Update)",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/:id/ab-test": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/:id/ab-test",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "GET /api/campaigns/:id/analytics": {
+    "covered": true,
+    "postmanRequestName": "GET /campaigns/:id/analytics",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/:id/email/sequence": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/:id/email/sequence",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/:id/optimize": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/:id/schedule": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/:id/schedule",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/:id/social/schedule": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/:id/social/schedule",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "PATCH /api/campaigns/:id/status": {
+    "covered": true,
+    "postmanRequestName": "PATCH /campaigns/:id/status",
+    "folder": "Campaigns",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/email/optimize-subject": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/email/optimize-subject",
+    "folder": "Email Agent",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/social/generate": {
+    "covered": true,
+    "postmanRequestName": "POST /campaigns/social/generate",
+    "folder": "Social Agent",
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "POST /api/campaigns/social/optimize": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "campaigns",
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  "GET /api/connectors": {
+    "covered": true,
+    "postmanRequestName": "GET /connectors (List)",
+    "folder": "Connectors",
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/actions/:actionId": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/api-key": {
+    "covered": true,
+    "postmanRequestName": "POST /connectors/:name/api-key",
+    "folder": "Connectors",
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "DELETE /api/connectors/:name/auth/:id": {
+    "covered": true,
+    "postmanRequestName": "DELETE /connectors/:name/auth/:id",
+    "folder": "Connectors",
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/oauth/callback": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/oauth/start": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/test": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "POST /api/connectors/:name/triggers/:triggerId/run": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "GET /api/connectors/auth": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "connectors",
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  "GET /api/credentials": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "credentials",
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  "POST /api/credentials": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "credentials",
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  "DELETE /api/credentials/:provider": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "credentials",
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  "GET /api/credentials/:provider": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "credentials",
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  "POST /api/data-trust/audit/log": {
+    "covered": true,
+    "postmanRequestName": "POST /data-trust/audit/log",
+    "folder": "Governance & Data Trust",
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "GET /api/data-trust/audit/logs": {
+    "covered": true,
+    "postmanRequestName": "GET /data-trust/audit/logs",
+    "folder": "Governance & Data Trust",
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "POST /api/data-trust/hash": {
+    "covered": true,
+    "postmanRequestName": "POST /data-trust/hash",
+    "folder": "Governance & Data Trust",
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "POST /api/data-trust/merkle": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "GET /api/data-trust/provenance/:dataId": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "GET /api/data-trust/provenance/:dataId/verify": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "POST /api/data-trust/provenance/track": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "GET /api/data-trust/status": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "POST /api/data-trust/verify": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "data-trust",
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  "GET /api/documents": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "POST /api/documents": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "DELETE /api/documents/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "GET /api/documents/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "PUT /api/documents/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "POST /api/documents/:id/version": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "documents",
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  "POST /api/eco-metrics/carbon": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "GET /api/eco-metrics/efficiency": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "GET /api/eco-metrics/energy": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "POST /api/eco-metrics/green-ai": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "POST /api/eco-metrics/optimize": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "GET /api/eco-metrics/status": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "GET /api/eco-metrics/sustainability-report": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "POST /api/eco-metrics/track": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "eco-metrics",
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  "GET /api/editorial-calendar": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "editorial-calendar",
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  "POST /api/editorial-calendar": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "editorial-calendar",
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  "DELETE /api/editorial-calendar/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "editorial-calendar",
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  "GET /api/editorial-calendar/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "editorial-calendar",
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  "PUT /api/editorial-calendar/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "editorial-calendar",
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  "GET /api/feedback": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "POST /api/feedback": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "DELETE /api/feedback/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "GET /api/feedback/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "PUT /api/feedback/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "GET /api/feedback/stats": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "feedback",
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  "GET /api/governance/audit-logs": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "POST /api/governance/ethics/assess": {
+    "covered": true,
+    "postmanRequestName": "POST /governance/ethics/assess",
+    "folder": "Governance & Data Trust",
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "POST /api/governance/evaluate": {
+    "covered": true,
+    "postmanRequestName": "POST /governance/evaluate",
+    "folder": "Governance & Data Trust",
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "GET /api/governance/health": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "GET /api/governance/policies": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "POST /api/governance/policies": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "governance",
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  "GET /api/keywords": {
+    "covered": true,
+    "postmanRequestName": "GET /keywords (List)",
+    "folder": "Keywords & Personas",
+    "domain": "keywords",
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  "POST /api/keywords": {
+    "covered": true,
+    "postmanRequestName": "POST /keywords (Create)",
+    "folder": "Keywords & Personas",
+    "domain": "keywords",
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  "DELETE /api/keywords/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "keywords",
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  "GET /api/keywords/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "keywords",
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  "PUT /api/keywords/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "keywords",
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  "GET /api/marketing/campaigns": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "marketing",
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  "POST /api/marketing/campaigns": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "marketing",
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  "GET /api/marketing/overview": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "marketing",
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  "GET /api/messages": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "POST /api/messages": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "DELETE /api/messages/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "GET /api/messages/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "PUT /api/messages/:id/read": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "GET /api/messages/threads": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "PUT /api/messages/threads/:threadId/read": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "GET /api/messages/unread-count": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "messages",
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  "POST /api/orchestrate": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestrate",
+    "handlerFile": "apps/api/src/routes/orchestrate.ts"
+  },
+  "PUT /api/orchestration/config": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "POST /api/orchestration/failover/:nodeId": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "GET /api/orchestration/health": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "GET /api/orchestration/metrics": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "GET /api/orchestration/nodes": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "POST /api/orchestration/nodes/register": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "POST /api/orchestration/route": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "POST /api/orchestration/scaling/evaluate": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "orchestration",
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  "POST /api/person/:id/consent": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "person",
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  "GET /api/person/:id/memory": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "person",
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  "GET /api/person/:id/topics": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "person",
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  "POST /api/person/resolve": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "person",
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  "GET /api/personas": {
+    "covered": true,
+    "postmanRequestName": "GET /personas (List)",
+    "folder": "Keywords & Personas",
+    "domain": "personas",
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  "POST /api/personas": {
+    "covered": true,
+    "postmanRequestName": "POST /personas (Create)",
+    "folder": "Keywords & Personas",
+    "domain": "personas",
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  "DELETE /api/personas/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "personas",
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  "GET /api/personas/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "personas",
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  "PUT /api/personas/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "personas",
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  "GET /api/predictive/baseline": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "predictive",
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  "POST /api/predictive/execute": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "predictive",
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  "GET /api/predictive/health": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "predictive",
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  "POST /api/predictive/scale": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "predictive",
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  "GET /api/predictive/stats": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "predictive",
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  "GET /api/robots.txt": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "robots.txt",
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  "GET /api/seo": {
+    "covered": true,
+    "postmanRequestName": "GET /seo (Dashboard)",
+    "folder": "SEO Agent",
+    "domain": "seo",
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  "POST /api/seo/audit": {
+    "covered": true,
+    "postmanRequestName": "POST /seo/audit",
+    "folder": "SEO Agent",
+    "domain": "seo",
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  "GET /api/seo/health": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "seo",
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  "GET /api/settings": {
+    "covered": true,
+    "postmanRequestName": "GET /settings",
+    "folder": "Settings",
+    "domain": "settings",
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  "PUT /api/settings": {
+    "covered": true,
+    "postmanRequestName": "PUT /settings (Update profile)",
+    "folder": "Settings",
+    "domain": "settings",
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  "PUT /api/settings/brand-voice": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "settings",
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  "PUT /api/settings/notifications": {
+    "covered": true,
+    "postmanRequestName": "PUT /settings/notifications",
+    "folder": "Settings",
+    "domain": "settings",
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  "PUT /api/settings/privacy": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "settings",
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  "GET /api/sitemap.xml": {
+    "covered": true,
+    "postmanRequestName": "GET /sitemap.xml",
+    "folder": "Sitemaps",
+    "domain": "sitemap.xml",
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  "POST /api/sitemap/invalidate": {
+    "covered": true,
+    "postmanRequestName": "POST /sitemap/invalidate",
+    "folder": "Sitemaps",
+    "domain": "sitemap",
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  "POST /api/sms/inbound": {
+    "covered": true,
+    "postmanRequestName": "POST /sms/inbound (Webhook simulation)",
+    "folder": "SMS & Social",
+    "domain": "sms",
+    "handlerFile": "apps/api/src/routes/sms.ts"
+  },
+  "POST /api/sms/send": {
+    "covered": true,
+    "postmanRequestName": "POST /sms/send",
+    "folder": "SMS & Social",
+    "domain": "sms",
+    "handlerFile": "apps/api/src/routes/sms.ts"
+  },
+  "POST /api/social/:platform/dm": {
+    "covered": true,
+    "postmanRequestName": "POST /social/:platform/dm",
+    "folder": "SMS & Social",
+    "domain": "social",
+    "handlerFile": "apps/api/src/routes/social.ts"
+  },
+  "POST /api/social/:platform/inbound": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "social",
+    "handlerFile": "apps/api/src/routes/social.ts"
+  },
+  "GET /api/tasks": {
+    "covered": true,
+    "postmanRequestName": "GET /tasks (List)",
+    "folder": "Tasks",
+    "domain": "tasks",
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  "POST /api/tasks": {
+    "covered": true,
+    "postmanRequestName": "POST /tasks (Create)",
+    "folder": "Tasks",
+    "domain": "tasks",
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  "DELETE /api/tasks/:id": {
+    "covered": true,
+    "postmanRequestName": "DELETE /tasks/:id",
+    "folder": "Tasks",
+    "domain": "tasks",
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  "GET /api/tasks/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "tasks",
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  "PUT /api/tasks/:id": {
+    "covered": true,
+    "postmanRequestName": "PUT /tasks/:id (Update status)",
+    "folder": "Tasks",
+    "domain": "tasks",
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  "GET /api/team/team/accept": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "GET /api/team/team/invitations": {
+    "covered": true,
+    "postmanRequestName": "GET /team/invitations",
+    "folder": "Team & Access",
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "DELETE /api/team/team/invitations/:id": {
+    "covered": true,
+    "postmanRequestName": "DELETE /team/invitations/:id",
+    "folder": "Team & Access",
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "POST /api/team/team/invite": {
+    "covered": true,
+    "postmanRequestName": "POST /team/invite",
+    "folder": "Team & Access",
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "GET /api/team/team/members": {
+    "covered": true,
+    "postmanRequestName": "GET /team/members",
+    "folder": "Team & Access",
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "DELETE /api/team/team/members/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "GET /api/team/team/members/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "PUT /api/team/team/members/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "GET /api/team/team/stats": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "team",
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  "GET /api/trends/trends": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trends",
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  "POST /api/trends/trends/brief": {
+    "covered": true,
+    "postmanRequestName": "1. TrendAgent – Generate brief",
+    "folder": "E2E – Multi-Agent Flow",
+    "domain": "trends",
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  "GET /api/trends/trends/platform/:platform": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trends",
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  "GET /api/trends/trends/search": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trends",
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  "POST /auth/logout": {
+    "covered": true,
+    "postmanRequestName": "POST /auth/logout",
+    "folder": "Auth & Users",
+    "domain": "auth",
+    "handlerFile": "apps/api/src/routes/auth.ts"
+  },
+  "GET /auth/me": {
+    "covered": true,
+    "postmanRequestName": "GET /auth/me",
+    "folder": "Auth & Users",
+    "domain": "auth",
+    "handlerFile": "apps/api/src/routes/auth.ts"
+  },
+  "POST /brand-voice/compose": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "brand-voice",
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  "POST /brand-voice/guardrail": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "brand-voice",
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  "GET /content/drafts": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "content",
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  "GET /content/drafts/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "content",
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  "POST /content/generate": {
+    "covered": true,
+    "postmanRequestName": "2. ContentAgent – Generate asset",
+    "folder": "E2E – Multi-Agent Flow",
+    "domain": "content",
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  "POST /email/send": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "email",
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  "GET /events/timeline": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "events",
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  "GET /health": {
+    "covered": true,
+    "postmanRequestName": "GET /health",
+    "folder": "Health & System",
+    "domain": "health",
+    "handlerFile": "apps/api/src/routes/health.ts"
+  },
+  "GET /jobs": {
+    "covered": true,
+    "postmanRequestName": "GET /jobs (List)",
+    "folder": "Jobs & Queues",
+    "domain": "jobs",
+    "handlerFile": "apps/api/src/routes/jobs.ts"
+  },
+  "GET /jobs/:id": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "jobs",
+    "handlerFile": "apps/api/src/routes/jobs.ts"
+  },
+  "GET /metrics": {
+    "covered": true,
+    "postmanRequestName": "GET /metrics (Prometheus scrape)",
+    "folder": "Metrics & Observability",
+    "domain": "metrics",
+    "handlerFile": "apps/api/src/server.ts"
+  },
+  "POST /metrics/events": {
+    "covered": true,
+    "postmanRequestName": "POST /metrics/events",
+    "folder": "Metrics & Observability",
+    "domain": "metrics",
+    "handlerFile": "apps/api/src/routes/metrics.ts"
+  },
+  "GET /metrics/summary": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "metrics",
+    "handlerFile": "apps/api/src/routes/metrics.ts"
+  },
+  "GET /readyz": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "readyz",
+    "handlerFile": "apps/api/src/routes/health.ts"
+  },
+  "POST /sms/send": {
+    "covered": true,
+    "postmanRequestName": "POST /sms/send",
+    "folder": "SMS & Social",
+    "domain": "sms",
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  "TRPC.mutation trpc.agents.execute": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts"
+  },
+  "TRPC.query trpc.agents.getRun": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts"
+  },
+  "TRPC.query trpc.agents.listRuns": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts"
+  },
+  "TRPC.mutation trpc.brand.deleteVoiceGuide": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts"
+  },
+  "TRPC.query trpc.brand.getVoiceContext": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts"
+  },
+  "TRPC.query trpc.brand.listVoiceGuides": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts"
+  },
+  "TRPC.query trpc.brand.searchVoice": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts"
+  },
+  "TRPC.mutation trpc.brand.uploadVoiceGuide": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts"
+  },
+  "TRPC.mutation trpc.content.generateArticle": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.mutation trpc.content.meta": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.mutation trpc.content.optimize": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.mutation trpc.content.schedulePublish": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.query trpc.content.score": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.mutation trpc.content.socialSnippets": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.query trpc.content.suggestInternalLinks": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts"
+  },
+  "TRPC.query trpc.seo.analyzeIntent": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.mutation trpc.seo.discoverKeywords": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.discoverOpportunities": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.getGeoPerformance": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.getMetrics": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.getTrends": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.identifyUnderperformers": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.seo.scoreDifficulty": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.mutation trpc.seo.triggerOptimization": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts"
+  },
+  "TRPC.query trpc.trends.discover": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts"
+  },
+  "TRPC.query trpc.trends.listSubscriptions": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts"
+  },
+  "TRPC.mutation trpc.trends.subscribe": {
+    "covered": false,
+    "postmanRequestName": null,
+    "folder": null,
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts"
+  }
+}

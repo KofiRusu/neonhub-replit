@@ -1,0 +1,5 @@
+{
+  "devssd_mode": "ignore", 
+  "devssd_path": "/Volumes/devssd",
+  "note": "In this environment DevSSD is a backup and not writable; ignore its weighting."
+}

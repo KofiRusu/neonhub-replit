@@ -20,7 +20,7 @@ export default function PageLayout({ children, title, subtitle, actions }: PageL
       {/* Main Content */}
       <div className="lg:pl-64">
         {/* Top Bar */}
-        <div className="nav-glass border-b border-white/10 lg:border-l-0">
+        <div className="nav-glass border-b border-slate-700/50 lg:border-l-0">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex-1">
@@ -34,12 +34,12 @@ export default function PageLayout({ children, title, subtitle, actions }: PageL
 
               <div className="flex items-center space-x-4">
                 {actions}
-                <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
+                <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-700/50 transition-all">
                   <Search className="w-5 h-5" />
                 </button>
-                <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 relative">
+                <button className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-700/50 transition-all relative">
                   <Bell className="w-5 h-5" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-neon-pink rounded-full"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-neon-pink rounded-full shadow-lg shadow-neon-pink/50"></div>
                 </button>
               </div>
             </div>

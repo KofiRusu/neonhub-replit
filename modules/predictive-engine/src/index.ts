@@ -20,10 +20,20 @@ import {
   FederationCoordination,
   GeoDistributionConfig
 } from './types';
+import { PgVectorStore } from './memory/PgVectorStore';
+import { createEmbeddingsProvider } from './memory/EmbeddingsProvider';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
+
+export interface LearningSignal {
+  agentId: string;
+  key: string;
+  content: string;
+  reward?: number;
+  metadata?: Record<string, unknown>;
+}
 
 export class NeonHubPredictiveEngine {
   private predictiveEngine: PredictiveEngine;
@@ -36,6 +46,7 @@ export class NeonHubPredictiveEngine {
   private geoDistributionManager: GeoDistributionManager;
   private federationIntegration: FederationIntegration;
   private isInitialized = false;
+  private vectorStore: PgVectorStore;
 
   constructor() {
     const thresholds: PredictiveThresholds = {
@@ -66,6 +77,7 @@ export class NeonHubPredictiveEngine {
     this.workloadPatternAnalyzer = new WorkloadPatternAnalyzer();
     this.geoDistributionManager = new GeoDistributionManager(this.globalRegionManager);
     this.federationIntegration = new FederationIntegration(this.globalRegionManager);
+    this.vectorStore = new PgVectorStore(null, createEmbeddingsProvider());
   }
 
   async initialize(): Promise<void> {
@@ -180,6 +192,19 @@ export class NeonHubPredictiveEngine {
     return this.predictiveEngine.getBaselineMetrics();
   }
 
+  async learn(signal: LearningSignal): Promise<void> {
+    const payload = JSON.stringify({
+      content: signal.content,
+      metadata: signal.metadata ?? {},
+      reward: signal.reward ?? null,
+    });
+    await this.vectorStore.upsert(signal.agentId, signal.key, payload);
+  }
+
+  async recall(agentId: string, query: string, k = 5) {
+    return this.vectorStore.query(agentId, query, k);
+  }
+
   // Cloud integration methods
   async configureCloudProviders(awsConfig?: any, gcpConfig?: any, azureConfig?: any): Promise<void> {
     await this.globalRegionManager.initializeCloudProviders(awsConfig, gcpConfig, azureConfig);
@@ -266,7 +291,8 @@ export {
   UnifiedScalingAPI,
   WorkloadPatternAnalyzer,
   GeoDistributionManager,
-  FederationIntegration
+  FederationIntegration,
+  PgVectorStore
 };
 
 export type {
@@ -278,6 +304,8 @@ export type {
   FederationCoordination,
   GeoDistributionConfig
 };
+
+export { createEmbeddingsProvider };
 
 // Default export for easy importing
 export default NeonHubPredictiveEngine;

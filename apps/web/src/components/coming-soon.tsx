@@ -15,7 +15,7 @@ export default function ComingSoon({ feature, description }: ComingSoonProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="glassmorphism-effect p-12 text-center max-w-2xl mx-auto"
+        className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-12 text-center max-w-2xl mx-auto"
       >
         <motion.div
           animate={{

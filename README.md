@@ -44,6 +44,32 @@ chmod +x release/v3.0-hybrid-deployment.sh
 
 ---
 
+## 📚 Documentation
+
+**New to NeonHub? Start with our comprehensive documentation:**
+
+👉 **[Documentation Hub](./docs/README.md)** - Complete documentation navigation
+
+### Quick Links by Role
+
+- **📱 Product Managers:** [`docs/NEONHUB_OVERVIEW.md`](./docs/NEONHUB_OVERVIEW.md)
+- **👨‍💻 Developers:** [`docs/DEVELOPMENT_ENVIRONMENT_AND_SETUP.md`](./docs/DEVELOPMENT_ENVIRONMENT_AND_SETUP.md)
+- **🏢 Agencies:** [`docs/AGENCY_COLLABORATION_BRIEF.md`](./docs/AGENCY_COLLABORATION_BRIEF.md)
+- **🔧 DevOps:** [`docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md`](./docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md)
+
+### Core Documentation
+
+- **Architecture:** [`docs/SYSTEM_ARCHITECTURE.md`](./docs/SYSTEM_ARCHITECTURE.md)
+- **Database:** [`docs/DATABASE_AND_DATA_MODEL.md`](./docs/DATABASE_AND_DATA_MODEL.md)
+- **Backend:** [`docs/BACKEND_API_AND_SERVICES.md`](./docs/BACKEND_API_AND_SERVICES.md)
+- **AI Agents:** [`docs/AGENT_INFRASTRUCTURE_AND_AI_LOGIC.md`](./docs/AGENT_INFRASTRUCTURE_AND_AI_LOGIC.md)
+- **Frontend:** [`docs/FRONTEND_AND_UX_STRUCTURE.md`](./docs/FRONTEND_AND_UX_STRUCTURE.md)
+- **SEO:** [`docs/SEO_AND_CONTENT_SYSTEM.md`](./docs/SEO_AND_CONTENT_SYSTEM.md)
+- **Testing:** [`docs/TESTING_AND_QUALITY_STRATEGY.md`](./docs/TESTING_AND_QUALITY_STRATEGY.md)
+- **Roadmap:** [`ROADMAP_TO_100_COMPLETION.md`](./ROADMAP_TO_100_COMPLETION.md)
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -51,11 +77,19 @@ NeonHub/
 ├── apps/
 │   ├── api/              # Backend API (Express + Prisma)
 │   └── web/              # Frontend Web App (Next.js 15)
-├── docs/                 # Documentation
+├── core/                 # Shared core packages (17 packages)
+│   ├── ai-governance/    # Policy engine, ethics
+│   ├── llm-adapter/      # LLM abstraction
+│   ├── memory-rag/       # Vector memory & RAG
+│   └── ... (14 more)
+├── modules/              # Specialized modules
+│   └── predictive-engine/  # ML prediction
+├── docs/                 # 📚 Complete documentation system
 ├── scripts/              # Build and deployment scripts
-├── _archive/             # Legacy versions (v2.4.0, v2.5.0)
 └── package.json          # Workspace root
 ```
+
+**📖 See:** [`docs/SYSTEM_ARCHITECTURE.md`](./docs/SYSTEM_ARCHITECTURE.md) for detailed structure
 
 ---
 
@@ -458,6 +492,33 @@ npm install --save-dev @playwright/test
 # Run E2E tests
 npx playwright test
 ```
+
+### API Integration Testing with Newman
+
+NeonHub includes a comprehensive Postman collection for API endpoint validation:
+
+```bash
+# Run API tests via Newman
+npm run test:api:newman
+
+# Run specific API domain tests
+newman run postman/NeonHub-API.postman_collection.json \
+  -e postman/NeonHub-Local.postman_environment.json \
+  --folder "Auth & Users"
+```
+
+**Features:**
+- 68+ API requests covering all core domains
+- Automatic token management and request chaining
+- 2 E2E flows: email campaigns & SEO audit
+- GitHub Actions CI integration
+- JUnit report generation
+
+**Documentation:**
+- **Quick Start:** [`docs/POSTMAN_QUICK_REFERENCE.md`](./docs/POSTMAN_QUICK_REFERENCE.md)
+- **Testing Guide:** [`docs/api-testing.README.md`](./docs/api-testing.README.md)
+- **API Coverage:** [`docs/api-testing.postman-plan.md`](./docs/api-testing.postman-plan.md)
+- **Setup Report:** [`POSTMAN_NEWMAN_IMPLEMENTATION_REPORT.md`](./POSTMAN_NEWMAN_IMPLEMENTATION_REPORT.md)
 
 ---
 

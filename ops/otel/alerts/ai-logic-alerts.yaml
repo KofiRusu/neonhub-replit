@@ -1,0 +1,112 @@
+# Prometheus Alert Rules for AI & Logic SLO Monitoring
+# Load into Prometheus AlertManager
+
+groups:
+  - name: ai_logic_slo
+    interval: 1m
+    rules:
+      # P95 Latency SLO Breach
+      - alert: AILogicP95LatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(operation_duration_ms_bucket{service_name=~"neonhub-.*-prod"}[5m])) by (le, service_name)) > 4500
+        for: 10m
+        labels:
+          severity: warning
+          team: ai-infrastructure
+          component: orchestrator
+        annotations:
+          summary: "AI Logic P95 latency exceeds SLO threshold"
+          description: "Service {{ $labels.service_name }} P95 latency is {{ $value | humanizeDuration }} (threshold: 4500ms)"
+          runbook_url: "https://docs.neonhub.ai/runbooks/high-latency"
+          dashboard_url: "https://grafana.neonhub.ai/d/ai-logic-slo"
+
+      # Error Rate SLO Breach
+      - alert: AILogicErrorRateHigh
+        expr: (sum(rate(operation_errors_total{service_name=~"neonhub-.*-prod"}[5m])) by (service_name) / sum(rate(operation_total{service_name=~"neonhub-.*-prod"}[5m])) by (service_name)) > 0.02
+        for: 10m
+        labels:
+          severity: critical
+          team: ai-infrastructure
+          component: orchestrator
+        annotations:
+          summary: "AI Logic error rate exceeds SLO threshold"
+          description: "Service {{ $labels.service_name }} error rate is {{ $value | humanizePercentage }} (threshold: 2%)"
+          runbook_url: "https://docs.neonhub.ai/runbooks/high-error-rate"
+
+      # Median Cost SLO Breach
+      - alert: AILogicMedianCostHigh
+        expr: histogram_quantile(0.50, sum(rate(llm_cost_usd_bucket{service_name=~"neonhub-.*-prod"}[10m])) by (le, llm_model)) > 0.03
+        for: 15m
+        labels:
+          severity: warning
+          team: ai-infrastructure
+          component: llm-adapter
+        annotations:
+          summary: "AI Logic median cost exceeds budget"
+          description: "Model {{ $labels.llm_model }} median cost is ${{ $value }} (threshold: $0.03)"
+          runbook_url: "https://docs.neonhub.ai/runbooks/high-cost"
+
+      # Circuit Breaker Open
+      - alert: AILogicCircuitBreakerOpen
+        expr: circuit_breaker_state{service_name=~"neonhub-.*-prod", state="OPEN"} == 1
+        for: 5m
+        labels:
+          severity: critical
+          team: ai-infrastructure
+          component: llm-adapter
+        annotations:
+          summary: "Circuit breaker is OPEN"
+          description: "Service {{ $labels.service_name }} circuit breaker has opened due to repeated failures"
+          runbook_url: "https://docs.neonhub.ai/runbooks/circuit-breaker"
+
+      # LLM Provider Down
+      - alert: AILogicLLMProviderDown
+        expr: sum(rate(llm_errors_total{service_name=~"neonhub-.*-prod"}[5m])) by (llm_provider) / sum(rate(llm_calls_total{service_name=~"neonhub-.*-prod"}[5m])) by (llm_provider) > 0.5
+        for: 5m
+        labels:
+          severity: critical
+          team: ai-infrastructure
+          component: llm-adapter
+        annotations:
+          summary: "LLM provider experiencing high failure rate"
+          description: "Provider {{ $labels.llm_provider }} has >50% error rate"
+          runbook_url: "https://docs.neonhub.ai/runbooks/llm-provider-down"
+
+      # RAG Query Latency High
+      - alert: AILogicRAGLatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(rag_latency_ms_bucket{service_name=~"neonhub-.*-prod"}[5m])) by (le)) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          team: ai-infrastructure
+          component: memory-rag
+        annotations:
+          summary: "RAG query latency is high"
+          description: "P95 RAG latency is {{ $value }}ms (threshold: 1000ms)"
+          runbook_url: "https://docs.neonhub.ai/runbooks/rag-latency"
+
+      # Orchestrator Plan Failure Rate
+      - alert: AILogicPlanFailureRateHigh
+        expr: sum(rate(plan_failures_total{service_name=~"neonhub-.*-prod"}[5m])) / sum(rate(plan_executions_total{service_name=~"neonhub-.*-prod"}[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          team: ai-infrastructure
+          component: orchestrator
+        annotations:
+          summary: "Orchestrator plan failure rate is high"
+          description: "Plan failure rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook_url: "https://docs.neonhub.ai/runbooks/plan-failures"
+
+      # Token Budget Exhaustion
+      - alert: AILogicTokenBudgetExhausted
+        expr: sum(rate(budget_exhausted_total{service_name=~"neonhub-.*-prod", resource="tokens"}[5m])) by (service_name) > 1
+        for: 5m
+        labels:
+          severity: warning
+          team: ai-infrastructure
+          component: tools-framework
+        annotations:
+          summary: "Token budget frequently exhausted"
+          description: "Service {{ $labels.service_name }} is hitting token budget limits"
+          runbook_url: "https://docs.neonhub.ai/runbooks/budget-exhaustion"
+

@@ -236,8 +236,8 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Performance overview</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-xl font-semibold text-white">Performance overview</h2>
+          <p className="text-sm text-gray-400">
             Google Search Console insights for the last 30 days. Metrics refresh from the latest sync.
           </p>
         </div>
@@ -258,7 +258,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
       </div>
 
       {!organizationReady && (
-        <Card className="border-border/60 bg-muted/20">
+        <Card className="border-slate-700/60 bg-slate-900/60">
           <CardHeader>
             <CardTitle>Connect your organization</CardTitle>
             <CardDescription>
@@ -289,16 +289,16 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
             );
 
           return (
-            <Card key={metric.label} className="border-border/60 bg-muted/30">
+            <Card key={metric.label} className="border-slate-700/60 bg-slate-900/70">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-gray-400">
                   {metric.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-semibold text-foreground">
+                <div className="text-2xl font-semibold text-white">
                   {metricsLoading ? (
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-gray-400">—</span>
                   ) : (
                     formattedValue
                   )}
@@ -314,7 +314,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
                     {Number.isFinite(metric.delta) ? metric.delta.toFixed(1) : '0'}
                     {metric.label === 'Average position' ? '' : '%'}
                   </span>
-                  <span className="text-muted-foreground">vs previous period</span>
+                  <span className="text-gray-400">vs previous period</span>
                 </div>
               </CardContent>
             </Card>
@@ -323,14 +323,14 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/60 bg-muted/20">
+        <Card className="border-slate-700/60 bg-slate-900/60">
           <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Traffic distribution (30 days)</CardTitle>
               <CardDescription>Geographic breakdown of impressions and clicks.</CardDescription>
             </div>
             {geoSummary && (
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-gray-400">
                 {geoSummary.impressions.toLocaleString()} impressions •{' '}
                 {geoSummary.clicks.toLocaleString()} clicks
               </div>
@@ -338,7 +338,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
           </CardHeader>
           <CardContent>
             {geoLoading ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-gray-400">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Loading geo performance…
               </div>
@@ -350,14 +350,14 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
           </CardContent>
         </Card>
 
-        <Card className="border-border/60 bg-muted/20">
+        <Card className="border-slate-700/60 bg-slate-900/60">
           <CardHeader>
             <CardTitle>Top search trends</CardTitle>
             <CardDescription>Keywords with the highest visibility over the last 30 days.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {trendsLoading && (
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-gray-400">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Analysing search demand…
               </div>
@@ -366,22 +366,22 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
               <p className="text-sm text-destructive">Unable to load trends: {trendsError.message}</p>
             )}
             {!trendsLoading && !trendsError && (!trends || trends.length === 0) && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-400">
                 No trend data available yet. Connect Google Search Console to start tracking.
               </p>
             )}
             {trends?.slice(0, 5).map((trend) => (
               <div
                 key={trend.keyword}
-                className="flex flex-col gap-1 rounded border border-border/50 bg-background/60 p-3"
+                className="flex flex-col gap-1 rounded border border-slate-700/50 bg-slate-900/60 p-3"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-foreground">{trend.keyword}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="font-medium text-white">{trend.keyword}</span>
+                  <span className="text-xs text-gray-400">
                     {trend.impressions.toLocaleString()} impressions
                   </span>
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-gray-400">
                   Clicks: {trend.clicks.toLocaleString()} • CTR:{' '}
                   {(trend.ctr * 100).toFixed(1)}% • Avg position: {trend.avgPosition.toFixed(1)}
                 </div>
@@ -391,7 +391,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
         </Card>
       </div>
 
-      <Card className="border-border/60 bg-muted/20">
+      <Card className="border-slate-700/60 bg-slate-900/60">
         <CardHeader>
           <CardTitle>Underperforming content</CardTitle>
           <CardDescription>
@@ -400,7 +400,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
         </CardHeader>
         <CardContent className="space-y-3">
           {underperformersLoading && (
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-gray-400">
               <Loader2 className="h-4 w-4 animate-spin" />
               Auditing performance…
             </div>
@@ -411,25 +411,25 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
             </p>
           )}
           {!underperformersLoading && !underperformersError && (!underperformers || underperformers.length === 0) && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-400">
               No underperforming content detected in the last 30 days. Keep monitoring to maintain momentum.
             </p>
           )}
           {underperformers?.map((item) => (
             <div
               key={item.contentId ?? item.url}
-              className="rounded border border-border/50 bg-background/60 p-4"
+              className="rounded border border-slate-700/50 bg-slate-900/60 p-4"
             >
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="font-medium text-white">
                     {item.url ?? item.keyword}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {item.keyword}
                   </p>
                 </div>
-                <div className="flex gap-4 text-xs text-muted-foreground">
+                <div className="flex gap-4 text-xs text-gray-400">
                   <span>Impressions: {item.impressions.toLocaleString()}</span>
                   <span>CTR: {(item.ctr * 100).toFixed(1)}%</span>
                   <span>Avg position: {item.avgPosition.toFixed(1)}</span>
@@ -438,7 +438,7 @@ export function SEODashboard({ organizationId, siteUrl = DEFAULT_SITE_URL }: SEO
               {item.recommendation ? (
                 <>
                   <div className="my-3 border-t border-border/40" />
-                  <p className="text-xs text-muted-foreground">{item.recommendation}</p>
+                  <p className="text-xs text-gray-400">{item.recommendation}</p>
                 </>
               ) : null}
             </div>

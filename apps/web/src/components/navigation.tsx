@@ -30,7 +30,7 @@ const navigationItems = [
   { name: "AI Agents", href: "/agents", icon: Bot },
   { name: "Campaigns", href: "/campaigns", icon: Target },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "SEO", href: "/dashboard/seo", icon: Search },
+  { name: "SEO", href: "/seo", icon: Search },
   { name: "Content", href: "/content", icon: FileText },
   { name: "Email", href: "/email", icon: Mail },
   { name: "Social Media", href: "/social-media", icon: Megaphone },
@@ -48,7 +48,7 @@ export default function Navigation() {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0">
-        <div className="flex flex-col flex-grow glass-strong border-r border-white/10">
+        <div className="flex flex-col flex-grow bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-r border-white/10">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 px-6 py-4">
             <div className="w-8 h-8 bg-gradient-to-r from-neon-blue to-neon-purple rounded-lg flex items-center justify-center">
@@ -124,7 +124,7 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="glass-strong border-b border-white/10">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-b border-white/10">
             <nav className="px-4 py-2 space-y-1">
               {navigationItems.map((item) => {
                 const isActive = pathname === item.href

@@ -1,0 +1,99 @@
+Scope: all 20 workspace projects
+Progress: resolved 1, reused 0, downloaded 0, added 0
+apps/api                                 |  WARN  deprecated @types/redis@4.0.11
+apps/api                                 |  WARN  deprecated puppeteer@23.11.1
+core/compliance-consent                  |  WARN  deprecated crypto@1.0.1
+modules/predictive-engine                |  WARN  deprecated @types/winston@2.4.4
+core/eco-optimizer                       |  WARN  deprecated @azure/monitor-query@1.3.3
+modules/predictive-engine                |  WARN  deprecated json2csv@5.0.7
+Progress: resolved 198, reused 186, downloaded 4, added 0
+Progress: resolved 212, reused 186, downloaded 18, added 0
+Progress: resolved 224, reused 186, downloaded 29, added 0
+Progress: resolved 238, reused 186, downloaded 42, added 0
+Progress: resolved 255, reused 186, downloaded 58, added 0
+Progress: resolved 273, reused 186, downloaded 76, added 0
+Progress: resolved 292, reused 186, downloaded 95, added 0
+Progress: resolved 299, reused 186, downloaded 102, added 0
+Progress: resolved 303, reused 186, downloaded 106, added 0
+Progress: resolved 308, reused 186, downloaded 111, added 0
+Progress: resolved 311, reused 186, downloaded 114, added 0
+Progress: resolved 313, reused 186, downloaded 116, added 0
+Progress: resolved 314, reused 186, downloaded 117, added 0
+Progress: resolved 316, reused 186, downloaded 119, added 0
+Progress: resolved 319, reused 186, downloaded 122, added 0
+Progress: resolved 319, reused 186, downloaded 123, added 0
+Progress: resolved 324, reused 186, downloaded 127, added 0
+Progress: resolved 324, reused 186, downloaded 128, added 0
+Progress: resolved 330, reused 186, downloaded 133, added 0
+Progress: resolved 331, reused 186, downloaded 134, added 0
+Progress: resolved 337, reused 186, downloaded 140, added 0
+Progress: resolved 344, reused 186, downloaded 147, added 0
+Progress: resolved 355, reused 186, downloaded 158, added 0
+Progress: resolved 370, reused 186, downloaded 173, added 0
+Progress: resolved 381, reused 186, downloaded 184, added 0
+Progress: resolved 385, reused 186, downloaded 188, added 0
+Progress: resolved 388, reused 186, downloaded 191, added 0
+Progress: resolved 392, reused 186, downloaded 195, added 0
+Progress: resolved 395, reused 186, downloaded 198, added 0
+Progress: resolved 401, reused 186, downloaded 204, added 0
+Progress: resolved 408, reused 186, downloaded 211, added 0
+Progress: resolved 415, reused 186, downloaded 218, added 0
+Progress: resolved 420, reused 186, downloaded 223, added 0
+Progress: resolved 427, reused 186, downloaded 230, added 0
+Progress: resolved 442, reused 186, downloaded 245, added 0
+Progress: resolved 462, reused 186, downloaded 265, added 0
+Progress: resolved 474, reused 186, downloaded 277, added 0
+Progress: resolved 480, reused 186, downloaded 283, added 0
+Progress: resolved 485, reused 186, downloaded 288, added 0
+Progress: resolved 487, reused 186, downloaded 290, added 0
+Progress: resolved 494, reused 186, downloaded 297, added 0
+Progress: resolved 496, reused 186, downloaded 299, added 0
+Progress: resolved 499, reused 186, downloaded 302, added 0
+Progress: resolved 504, reused 186, downloaded 307, added 0
+Progress: resolved 506, reused 186, downloaded 309, added 0
+Progress: resolved 510, reused 186, downloaded 313, added 0
+Progress: resolved 516, reused 186, downloaded 319, added 0
+Progress: resolved 523, reused 186, downloaded 326, added 0
+Progress: resolved 526, reused 186, downloaded 329, added 0
+Progress: resolved 534, reused 186, downloaded 337, added 0
+Progress: resolved 537, reused 186, downloaded 340, added 0
+Progress: resolved 554, reused 186, downloaded 357, added 0
+Progress: resolved 571, reused 186, downloaded 374, added 0
+Progress: resolved 591, reused 186, downloaded 394, added 0
+Progress: resolved 617, reused 186, downloaded 420, added 0
+Progress: resolved 629, reused 186, downloaded 432, added 0
+Progress: resolved 642, reused 186, downloaded 445, added 0
+Progress: resolved 660, reused 186, downloaded 463, added 0
+Progress: resolved 674, reused 186, downloaded 477, added 0
+Progress: resolved 683, reused 186, downloaded 486, added 0
+Progress: resolved 689, reused 186, downloaded 493, added 0
+Progress: resolved 699, reused 186, downloaded 504, added 0
+Progress: resolved 713, reused 186, downloaded 518, added 0
+Progress: resolved 722, reused 186, downloaded 527, added 0
+Progress: resolved 735, reused 186, downloaded 540, added 0
+Progress: resolved 744, reused 186, downloaded 550, added 0
+Progress: resolved 747, reused 186, downloaded 553, added 0
+Progress: resolved 751, reused 186, downloaded 557, added 0
+Progress: resolved 758, reused 186, downloaded 564, added 0
+Progress: resolved 767, reused 186, downloaded 573, added 0
+Progress: resolved 780, reused 186, downloaded 586, added 0
+Progress: resolved 791, reused 186, downloaded 597, added 0
+Progress: resolved 807, reused 186, downloaded 613, added 0
+Progress: resolved 819, reused 186, downloaded 625, added 0
+Progress: resolved 830, reused 186, downloaded 636, added 0
+Progress: resolved 853, reused 186, downloaded 659, added 0
+Progress: resolved 879, reused 186, downloaded 685, added 0
+Progress: resolved 900, reused 186, downloaded 706, added 0
+Progress: resolved 911, reused 186, downloaded 717, added 0
+Progress: resolved 918, reused 186, downloaded 724, added 0
+Progress: resolved 923, reused 186, downloaded 729, added 0
+Progress: resolved 930, reused 186, downloaded 736, added 0
+Progress: resolved 945, reused 186, downloaded 751, added 0
+/Users/kofirusu/Desktop/NeonHub/core/cognitive-ethics:
+ ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/@neonhub%2Ffederation: Not Found - 404
+
+This error happened while installing the dependencies of @neonhub/ai-governance@4.0.0
+
+@neonhub/federation is not in the npm registry, or you have no permission to fetch it.
+
+An authorization header was used: Bearer npm_[hidden]

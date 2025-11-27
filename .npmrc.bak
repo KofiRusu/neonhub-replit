@@ -1,0 +1,14 @@
+store-dir=/Users/kofirusu/Desktop/NeonHub/.pnpm-store
+funding=false
+auto-install-peers=true
+strict-peer-dependencies=false
+offline=false
+enable-pre-post-scripts=false
+registry=https://registry.npmjs.org/
+fetch-retries=5
+fetch-retry-mintimeout=20000
+fetch-retry-maxtimeout=120000
+prefer-offline=false
+verify-store-integrity=true
+fund=false
+audit=false

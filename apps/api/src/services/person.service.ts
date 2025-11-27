@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { logger } from "../lib/logger.js";
+import { MemoryRagService } from "./rag/memory.service.js";
 import type {
   ConsentStatus,
   IdentityDescriptor,
@@ -132,6 +133,7 @@ async function persistPersonTraits(
 }
 
 export const PersonService = {
+  memory: new MemoryRagService(),
   async resolve(ident: IdentityDescriptor): Promise<string> {
     ensureIdentifier(ident);
     const { organizationId, externalId } = ident;
@@ -281,7 +283,7 @@ export const PersonService = {
     const person = await getPersonOrThrow(personId);
     const payload = typeof note === "string" ? { body: note } : note;
 
-    await prisma.note.create({
+    const created = await prisma.note.create({
       data: {
         personId,
         organizationId: person.organizationId,
@@ -291,6 +293,24 @@ export const PersonService = {
         visibility: payload.visibility ?? "internal",
       },
     });
+
+    try {
+      await this.memory.storeSnippet({
+        organizationId: person.organizationId,
+        personId,
+        label: "support_note",
+        text: payload.body,
+        category: "support",
+        metadata: {
+          tags: payload.tags ?? [],
+          visibility: payload.visibility ?? "internal",
+          authorId: authorId ?? null,
+          noteId: created.id,
+        },
+      });
+    } catch (error) {
+      logger.warn({ error, personId }, "Failed to store support note memory");
+    }
   },
 
   async getConsent(personId: string, channel: string): Promise<ConsentStatus | null> {

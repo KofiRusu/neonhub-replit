@@ -1,13 +1,12 @@
-import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
-import { openai } from "../lib/openai.js";
 import { logger } from "../lib/logger.js";
 import { normalizeChannel, DEFAULT_CHANNEL } from "../types/agentic.js";
 import type { Channel, EventClassification, NormalizedEvent, RawEvent } from "../types/agentic.js";
 import { PersonService } from "./person.service.js";
+import { MemoryRagService } from "./rag/memory.service.js";
 
-const EMBEDDING_MODEL = "text-embedding-3-small";
+const memoryService = new MemoryRagService();
 
 function normalizeTimestamp(input?: string | Date): Date {
   if (!input) return new Date();
@@ -38,12 +37,6 @@ function ensureChannel(channel: string): Channel {
 
 function ensureType(type: string): string {
   return type.replace(/\s+/g, "_").toLowerCase();
-}
-
-async function attachVector(memId: string, embedding: number[]): Promise<void> {
-  if (!embedding.length) return;
-  const vectorLiteral = Prisma.sql`ARRAY[${Prisma.join(embedding.map((value) => Prisma.sql`${value}`))}]::vector`;
-  await prisma.$executeRaw`UPDATE "mem_embeddings" SET "embedding" = ${vectorLiteral} WHERE "id" = ${memId}`;
 }
 
 export const EventIntakeService = {
@@ -150,29 +143,19 @@ export const EventIntakeService = {
   async embed(event: NormalizedEvent, eventId: string, classification: EventClassification) {
     try {
       const summary = summarizeEvent(event, classification);
-      const embeddingResponse = await openai.embeddings.create({
-        model: EMBEDDING_MODEL,
-        input: summary,
-      });
-      const vector = embeddingResponse.data?.[0]?.embedding ?? [];
-
-      const metadata: Prisma.JsonObject = {
-        classification: classification as unknown as Prisma.JsonValue,
-        summary,
-      };
-
-      const record = await prisma.memEmbedding.create({
-        data: {
-          id: randomUUID(),
-          organizationId: event.organizationId,
-          personId: event.personId,
-          sourceEventId: eventId,
-          label: `${event.channel}:${event.type}`,
-          metadata,
+      await memoryService.storeSnippet({
+        organizationId: event.organizationId,
+        personId: event.personId,
+        label: `${event.channel}:${event.type}`,
+        text: summary,
+        category: classification.intent,
+        sourceEventId: eventId,
+        metadata: {
+          classification: classification as unknown as Prisma.JsonValue,
+          summary,
+          eventId,
         },
       });
-
-      await attachVector(record.id, vector);
     } catch (error) {
       logger.error({ error }, "Failed to embed event. Memory record skipped.");
     }

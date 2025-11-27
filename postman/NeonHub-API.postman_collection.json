@@ -1,0 +1,3473 @@
+{
+  "info": {
+    "name": "NeonHub API",
+    "description": "Comprehensive API test suite for NeonHub marketing platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health & System",
+      "item": [
+        {
+          "name": "GET /health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has status field', function() {",
+                  "  pm.expect(pm.response.json()).to.have.property('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /readyz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response indicates ready', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('ready');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/health/readyz",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health",
+                "readyz"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth & Users",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 201', function() {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test('Response contains access_token', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('token').or.property('access_token');",
+                  "});",
+                  "const response = pm.response.json();",
+                  "const token = response.token || response.access_token;",
+                  "if (token) {",
+                  "  pm.environment.set('access_token', token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{auth_base_url}}/api/auth/callback/credentials",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "callback",
+                "credentials"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"{{email}}\", \"password\": \"{{password}}\"}"
+            }
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains user data', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('email');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /auth/logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 204', function() {",
+                  "  pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaigns",
+      "item": [
+        {
+          "name": "POST /campaigns (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response contains campaign id', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.environment.set('campaign_id', response.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Test Campaign\", \"description\": \"API test campaign\", \"status\": \"draft\"}"
+            }
+          }
+        },
+        {
+          "name": "GET /campaigns (List)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is array', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /campaigns/:id (Fetch)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains campaign data', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /campaigns/:id/analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains metrics', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/analytics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "analytics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "PUT /campaigns/:id (Update)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Updated API Campaign\",\"status\":\"active\",\"config\":{\"channels\":[\"email\",\"social\"],\"budget\":{\"total\":2500,\"currency\":\"USD\"}},\"schedule\":{\"startDate\":\"{{campaign_start_date}}\",\"endDate\":\"{{campaign_end_date}}\",\"timezone\":\"UTC\"}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload.result || payload;",
+                  "pm.expect(entity).to.be.an('object');",
+                  "if (payload.success !== undefined) { pm.expect(payload.success).to.be.true; }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /campaigns/:id/schedule",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/schedule",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "schedule"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"startDate\":\"{{campaign_start_date}}\",\"endDate\":\"{{campaign_end_date}}\",\"emailSequence\":[{\"day\":1,\"subject\":\"Kickoff update\",\"body\":\"Intro email generated via Postman automation.\"}],\"socialPosts\":[{\"platform\":\"linkedin\",\"content\":\"Announcing our automated growth campaign.\",\"scheduledFor\":\"{{campaign_social_date}}\"}]}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /campaigns/:id/status",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "status"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"paused\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "pm.expect(entity).to.have.property('status');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /campaigns/:id/email/sequence",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/email/sequence",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "email",
+                "sequence"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\":\"Lifecycle onboarding\",\"audience\":\"beta-users\",\"numEmails\":3,\"tone\":\"friendly\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "pm.expect(entity).to.have.property('success');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /campaigns/:id/social/schedule",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/social/schedule",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "social",
+                "schedule"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"platform\":\"twitter\",\"content\":\"Scheduling our social promotion via automation.\",\"mediaUrls\":[\"https://neonhub.ai/assets/promo.png\"],\"scheduledFor\":\"{{campaign_social_date}}\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /campaigns/:id/ab-test",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/ab-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}",
+                "ab-test"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"variants\":[{\"subject\":\"Subject A\",\"body\":\"Variant A body\"},{\"subject\":\"Subject B\",\"body\":\"Variant B body\"}]}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /campaigns/:id (Cleanup)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{campaign_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('message');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /campaigns (Negative – missing body)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function() { pm.expect([400]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('error');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Email Agent",
+      "item": [
+        {
+          "name": "POST /campaigns/email/optimize-subject",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains subject lines', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('subject').or.property('suggestions');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/email/optimize-subject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "email",
+                "optimize-subject"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"subject\": \"Test Subject\", \"context\": \"Test email campaign\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Social Agent",
+      "item": [
+        {
+          "name": "POST /campaigns/social/generate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains generated content', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('content').or.property('posts');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/social/generate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "social",
+                "generate"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\": \"Test Topic\", \"platforms\": [\"twitter\", \"linkedin\"]}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEO Agent",
+      "item": [
+        {
+          "name": "GET /seo (Dashboard)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is object', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/seo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "seo"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /seo/audit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 202', function() {",
+                  "  pm.expect([200, 202]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/seo/audit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "seo",
+                "audit"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"url\": \"https://example.com\"}"
+            }
+          }
+        },
+        {
+          "name": "POST /seo/meta/generate-title",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains title', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('title');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/seo/meta/generate-title",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "seo",
+                "meta",
+                "generate-title"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\": \"Test page content\", \"keywords\": [\"test\", \"keyword\"]}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Keywords & Personas",
+      "item": [
+        {
+          "name": "POST /keywords (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response contains keyword id', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.environment.set('keyword_id', response.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/keywords",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "keywords"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"test keyword\", \"volume\": 100, \"difficulty\": 50}"
+            }
+          }
+        },
+        {
+          "name": "GET /keywords (List)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is array', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/keywords",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "keywords"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /personas (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response contains persona id', function() {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.environment.set('persona_id', response.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/personas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "personas"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Test Persona\", \"description\": \"API test persona\", \"demographics\": {}}"
+            }
+          }
+        },
+        {
+          "name": "GET /personas (List)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is array', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/personas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "personas"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Connectors",
+      "item": [
+        {
+          "name": "GET /connectors (List)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is array', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/connectors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "connectors"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /connectors/:name/api-key",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/connectors/{{connector_slug}}/api-key",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "connectors",
+                "{{connector_slug}}",
+                "api-key"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"apiKey\":\"test-api-key\",\"apiSecret\":\"test-secret\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /connectors/:name/auth",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/connectors/{{connector_slug}}/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "connectors",
+                "{{connector_slug}}",
+                "auth"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /connectors/:name/auth/:id",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/connectors/{{connector_slug}}/auth/{{connector_auth_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "connectors",
+                "{{connector_slug}}",
+                "auth",
+                "{{connector_auth_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200/204', function() { pm.expect([200,204]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "pm.test('Connector auth cleanup acknowledged', function() { pm.expect([200,204]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jobs & Queues",
+      "item": [
+        {
+          "name": "GET /jobs (List)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is array', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/jobs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "jobs"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "GET /settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is object', function() {",
+                  "  pm.expect(pm.response.json()).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings"
+              ]
+            }
+          }
+        },
+        {
+          "name": "PUT /settings (Update profile)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brandVoice\":{\"tone\":\"trusted-advisor\"},\"timezone\":\"UTC\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('settings');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /settings/notifications",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/settings/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings",
+                "notifications"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"emailNotifications\":true,\"pushNotifications\":false,\"notificationFrequency\":\"daily\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('emailNotifications');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "E2E – Golden Flows",
+      "item": [
+        {
+          "name": "Flow 1 – Email Campaign",
+          "item": [
+            {
+              "name": "1. Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Login successful', function() {",
+                      "  pm.expect([200, 201]).to.include(pm.response.code);",
+                      "});",
+                      "const token = pm.response.json().token || pm.response.json().access_token;",
+                      "if (token) pm.environment.set('access_token', token);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{auth_base_url}}/api/auth/callback/credentials",
+                  "host": [
+                    "{{auth_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "callback",
+                    "credentials"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"username\": \"{{email}}\", \"password\": \"{{password}}\"}"
+                }
+              }
+            },
+            {
+              "name": "2. Create Campaign",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Campaign created', function() {",
+                      "  pm.response.to.have.status(201);",
+                      "});",
+                      "const campaignId = pm.response.json().id;",
+                      "pm.environment.set('campaign_id', campaignId);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"E2E Email Campaign\", \"description\": \"E2E test campaign\", \"type\": \"email\", \"status\": \"draft\"}"
+                }
+              }
+            },
+            {
+              "name": "3. Generate Email Copy",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Email copy generated', function() {",
+                      "  pm.response.to.have.status(200);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/email/optimize-subject",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "email",
+                    "optimize-subject"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"subject\": \"Special Offer Inside\", \"context\": \"E2E test email campaign for product launch\"}"
+                }
+              }
+            },
+            {
+              "name": "4. Fetch Campaign Analytics",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Analytics retrieved', function() {",
+                      "  pm.response.to.have.status(200);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/campaigns/{{campaign_id}}/analytics",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "campaigns",
+                    "{{campaign_id}}",
+                    "analytics"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flow 2 – SEO Audit",
+          "item": [
+            {
+              "name": "1. Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const token = pm.response.json().token || pm.response.json().access_token;",
+                      "if (token) pm.environment.set('access_token', token);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{auth_base_url}}/api/auth/callback/credentials",
+                  "host": [
+                    "{{auth_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "callback",
+                    "credentials"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"username\": \"{{email}}\", \"password\": \"{{password}}\"}"
+                }
+              }
+            },
+            {
+              "name": "2. Run SEO Audit",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('SEO audit initiated', function() {",
+                      "  pm.expect([200, 202]).to.include(pm.response.code);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/seo/audit",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "seo",
+                    "audit"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"url\": \"https://example.com\"}"
+                }
+              }
+            },
+            {
+              "name": "3. Generate SEO Meta Tags",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Meta tags generated', function() {",
+                      "  pm.response.to.have.status(200);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/seo/meta/generate-title",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "seo",
+                    "meta",
+                    "generate-title"
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"content\": \"E2E test page about SEO optimization\", \"keywords\": [\"seo\", \"optimization\"]}"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Billing & Finance",
+      "item": [
+        {
+          "name": "GET /billing/plan",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/billing/plan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "plan"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('plan');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /billing/usage",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/billing/usage",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "usage"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('usage').or.property('data');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /billing/checkout (Plan upgrade)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/billing/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "checkout"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"plan\":\"pro\",\"successUrl\":\"{{billing_success_url}}\",\"cancelUrl\":\"{{billing_cancel_url}}\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /billing/portal",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/billing/portal",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "portal"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"returnUrl\":\"{{billing_return_url}}\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /billing/checkout (Negative – no plan)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/billing/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "checkout"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"successUrl\":\"{{billing_success_url}}\",\"cancelUrl\":\"{{billing_cancel_url}}\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function() { pm.expect([400]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('error');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "POST /tasks (Create)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Agent coverage task\",\"description\":\"Ensure tasks API works end-to-end\",\"priority\":\"medium\",\"dueDate\":\"2025-11-25T17:27:25.978Z\",\"tags\":[\"api\",\"regression\"]}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() { pm.expect([201]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "pm.expect(entity).to.have.property('id');",
+                  "pm.environment.set('task_id', entity.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /tasks (List)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /tasks/:id (Update status)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"in_progress\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "pm.expect(entity).to.have.property('status');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /tasks/:id",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /tasks/:id (Negative – invalid status)",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tasks",
+                "{{task_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"invalid-status\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function() { pm.expect([400]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('error');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Team & Access",
+      "item": [
+        {
+          "name": "GET /team/members",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/team/team/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "team",
+                "team",
+                "members"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /team/invite",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/team/team/invite",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "team",
+                "team",
+                "invite"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"qa+1763832445981@neonhub.test\",\"role\":\"Member\",\"message\":\"API invite from automated suite\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "pm.expect(entity).to.have.property('id');",
+                  "pm.environment.set('team_invitation_id', entity.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /team/invitations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/team/team/invitations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "team",
+                "team",
+                "invitations"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /team/invitations/:id",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/team/team/invitations/{{team_invitation_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "team",
+                "team",
+                "invitations",
+                "{{team_invitation_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /team/invite (Negative – invalid email)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/team/team/invite",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "team",
+                "team",
+                "invite"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"invalid-email\",\"role\":\"Admin\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function() { pm.expect([400]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('error');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Governance & Data Trust",
+      "item": [
+        {
+          "name": "POST /governance/ethics/assess",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/governance/ethics/assess",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "governance",
+                "ethics",
+                "assess"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"scenario\":\"Automated outreach\",\"region\":\"us\",\"dataClasses\":[\"pii\",\"behavioral\"]}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /governance/evaluate",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/governance/evaluate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "governance",
+                "evaluate"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"policy\":\"marketing\",\"inputs\":{\"audience\":\"enterprise\",\"sensitivity\":\"high\"}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /data-trust/audit/log",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/data-trust/audit/log",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data-trust",
+                "audit",
+                "log"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"action\":\"api-test\",\"actor\":\"postman-suite\",\"metadata\":{\"requestId\":\"pm-1763832445981\"}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /data-trust/audit/logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/data-trust/audit/logs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data-trust",
+                "audit",
+                "logs"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /data-trust/hash",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/data-trust/hash",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "data-trust",
+                "hash"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"payload\":\"hash me\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SMS & Social",
+      "item": [
+        {
+          "name": "POST /sms/send",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/sms/send",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sms",
+                "send"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"personId\":\"{{sms_person_id}}\",\"objective\":\"Nudge opt-in\",\"brandId\":\"{{sms_brand_id}}\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 202', function() { pm.expect([202]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('body');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /sms/inbound (Webhook simulation)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/sms/inbound",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sms",
+                "inbound"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"From\":\"+15551234567\",\"Body\":\"reply STOP\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /social/:platform/dm",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/social/linkedin/dm",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "social",
+                "linkedin",
+                "dm"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"recipientHandle\":\"cmo.neonhub\",\"message\":\"Testing direct message automation.\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Metrics & Observability",
+      "item": [
+        {
+          "name": "GET /metrics (Prometheus scrape)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/metrics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "pm.test('Metrics payload present', function() { pm.expect(pm.response.text()).to.include('http_requests_total'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /metrics/events",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/metrics/events",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metrics",
+                "events"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"api.test\",\"value\":1,\"tags\":{\"suite\":\"postman\"}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sitemaps",
+      "item": [
+        {
+          "name": "GET /sitemap.xml",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/sitemap.xml",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sitemap.xml"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "pm.test('XML payload returned', function() { pm.expect(pm.response.text()).to.contain('<?xml'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /sitemap/invalidate",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/sitemap/invalidate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sitemap",
+                "invalidate"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"path\":\"/campaigns\"}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success').that.is.true;"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "E2E – Multi-Agent Flow",
+      "item": [
+        {
+          "name": "0. Login (Multi-agent flow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful', function() { pm.expect([200,201]).to.include(pm.response.code); });",
+                  "const response = pm.response.json();",
+                  "const token = response.token || response.access_token;",
+                  "pm.environment.set('access_token', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{auth_base_url}}/api/auth/callback/credentials",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "callback",
+                "credentials"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"{{email}}\", \"password\": \"{{password}}\"}"
+            }
+          }
+        },
+        {
+          "name": "1. TrendAgent – Generate brief",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "const firstTopic = (entity.topics && entity.topics[0]?.title) || entity.brief?.[0]?.title || 'retention boosters';",
+                  "pm.environment.set('latest_trend_topic', firstTopic);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/trends/trends/brief",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "trends",
+                "trends",
+                "brief"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"notes\":\"Find retention opportunities\",\"platforms\":[\"twitter\"]}"
+            }
+          }
+        },
+        {
+          "name": "2. ContentAgent – Generate asset",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const entity = payload.data || payload;",
+                  "const title = entity.title || entity.topic || pm.environment.get('latest_trend_topic');",
+                  "pm.environment.set('latest_content_title', title);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/content/generate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "content",
+                "generate"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\":\"{{latest_trend_topic}}\",\"tone\":\"authoritative\",\"audience\":\"ops leaders\",\"campaignGoal\":\"engagement\",\"callToAction\":\"Book a strategy review\"}"
+            }
+          }
+        },
+        {
+          "name": "3. CampaignAgent – Create campaign from content",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() { pm.expect([201]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "const campaign = payload.data || payload;",
+                  "pm.environment.set('e2e_campaign_id', campaign.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Multi-agent flow – {{latest_content_title}}\",\"type\":\"multi-channel\",\"config\":{\"channels\":[\"email\",\"social\"],\"targeting\":{\"audience\":\"ops leaders\"},\"budget\":{\"total\":1800,\"currency\":\"USD\"}}}"
+            }
+          }
+        },
+        {
+          "name": "4. EmailAgent – Generate sequence",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.have.property('success');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{e2e_campaign_id}}/email/sequence",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{e2e_campaign_id}}",
+                "email",
+                "sequence"
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\":\"{{latest_trend_topic}} nurture\",\"audience\":\"pilot-users\",\"numEmails\":2,\"tone\":\"friendly\"}"
+            }
+          }
+        },
+        {
+          "name": "5. Metrics – Verify campaign analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.expect([200]).to.include(pm.response.code); });",
+                  "pm.test('Response time < 1000 ms', function() { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                  "const payload = pm.response.json();",
+                  "pm.expect(payload).to.be.an('object');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{e2e_campaign_id}}/analytics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "campaigns",
+                "{{e2e_campaign_id}}",
+                "analytics"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

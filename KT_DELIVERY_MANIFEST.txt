@@ -1,0 +1,31 @@
+# KT_DELIVERY_MANIFEST
+
+| File | Lines | Purpose |
+| --- | --- | --- |
+| KT_EXECUTIVE_SUMMARY.md | 40 | Leadership snapshot, updated risks, 4-week plan, Agency ≤5 hr list |
+| KT_DB_AGENT_AUDIT.md | 64 | Deep dive on schema + agent telemetry with new tool/queue instrumentation notes |
+| KT_TASKS_BREAKDOWN.csv | 9 | Machine-readable backlog (done vs pending) with owners + acceptance |
+| KT_HANDOFF_CHECKLIST.md | 56 | ≤30 min validation script (mock Jest + /metrics curl + db workflow review) |
+| KT_SYSTEM_MAP.mmd | 37 | Mermaid architecture map (AgentRun context ↔ ToolExecution ↔ Queues ↔ Metrics) |
+| KT_SIGNALS.md | 26 | Command evidence (install failures, prisma validate, targeted Jest success) |
+| KT_DB_SUMMARY.md | 72 | Schema/enums/index summary + seed + drift guidance |
+| KT_AGENT_SUMMARY.md | 55 | Agent persistence, ToolExecution proxy, queue telemetry, Prom sample |
+| KT_CI_SUMMARY.md | 25 | Workflow review + hardened db-deploy summary |
+| KT_CONNECTOR_SUMMARY.md | 44 | Connector factory, mock providers, telemetry proxy, redaction plan |
+| ci/db-deploy.hardening.md | 54 | PGOPTIONS + retry + seed gating instructions |
+| docs/security/LEAST_PRIVILEGE_ROLES.md | 54 | SQL template + secret mapping for neonhub roles |
+| KT_PACKAGE_INDEX.md | 31 | Reading order per role + pointers to manifest |
+| KT_COMPLETION_SUMMARY.txt | 10 | Final 10-bullet readiness statement |
+| tests/orchestrate.mock.spec.ts | 135 | Jest spec proving AgentRun + ToolExecution persistence under USE_MOCK_CONNECTORS |
+| tests/queue.mock.spec.ts | 59 | BullMQ smoke test verifying queue metrics without Redis |
+| apps/api/src/services/orchestration/run-context.ts | 20 | AsyncLocalStorage helper that threads AgentRun context to connectors |
+| apps/api/src/services/tool-execution.service.ts | 116 | Helper that upserts Tool + ToolExecution rows and emits Prom metrics |
+| apps/api/src/agents/utils/agent-run.ts | 137 | Updated to seed run context + use enum statuses during persistence |
+| apps/api/src/connectors/factory.ts | 155 | ConnectorFactory instrumentation + telemetry proxy + mock fallback |
+| apps/api/src/lib/metrics.ts | 205 | Prometheus registry (agent/tool/queue metrics) |
+| apps/api/src/queues/index.ts | 84 | BullMQ queue builder with telemetry hooks |
+| apps/api/src/__mocks__/prisma.ts | 548 | Expanded Prisma mock (Tool + ToolExecution, queue helpers) |
+| .github/workflows/db-deploy.yml | 105 | Hardened workflow (new secrets, PGOPTIONS, retries, seed flag) |
+| apps/api/jest.config.js | 37 | ts-jest diagnostics disabled, adds tests/ root |
+| apps/api/jest.setup.ts | 125 | Forces `USE_MOCK_CONNECTORS=true` in Jest bootstrap |
+| apps/api/src/services/orchestration/router.ts | 210 | Passes agentName into `executeAgentRun` for telemetry context |

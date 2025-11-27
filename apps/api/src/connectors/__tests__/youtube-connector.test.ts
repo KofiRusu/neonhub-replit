@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, jest, afterAll } from "@jest/globals";
-import fs from "node:fs";
 import { PassThrough } from "node:stream";
 import { google } from "googleapis";
 import { YouTubeConnector } from "../services/YouTubeConnector.js";

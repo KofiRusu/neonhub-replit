@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
       <select
         value={timeRange}
         onChange={(e) => setTimeRange(e.target.value)}
-        className="glass border border-white/10 rounded-lg px-3 py-2 text-sm text-white bg-transparent"
+        className="bg-slate-900/50 border-2 border-slate-700/50 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white bg-transparent"
       >
         <option value="7d" className="bg-gray-800">
           Last 7 days
@@ -68,10 +68,10 @@ export default function AnalyticsPage() {
           Last year
         </option>
       </select>
-      <button className="glass p-2 rounded-lg text-gray-400 hover:text-white">
+      <button className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-gray-400 hover:text-white">
         <RefreshCw className="w-5 h-5" />
       </button>
-      <button className="glass p-2 rounded-lg text-gray-400 hover:text-white">
+      <button className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-gray-400 hover:text-white">
         <Filter className="w-5 h-5" />
       </button>
       <button className="btn-neon text-sm">
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="card-neon border-green-500/30">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 rounded-lg bg-white/5 text-neon-green">
+            <div className="p-3 rounded-lg bg-slate-800/40 text-neon-green">
               <DollarSign className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-1 text-sm text-green-400">
@@ -105,7 +105,7 @@ export default function AnalyticsPage() {
 
         <div className="card-neon border-blue-500/30">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 rounded-lg bg-white/5 text-neon-blue">
+            <div className="p-3 rounded-lg bg-slate-800/40 text-neon-blue">
               <Eye className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-1 text-sm text-green-400">
@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
 
         <div className="card-neon border-purple-500/30">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 rounded-lg bg-white/5 text-neon-purple">
+            <div className="p-3 rounded-lg bg-slate-800/40 text-neon-purple">
               <Users className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-1 text-sm text-green-400">
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
 
         <div className="card-neon border-pink-500/30">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 rounded-lg bg-white/5 text-neon-pink">
+            <div className="p-3 rounded-lg bg-slate-800/40 text-neon-pink">
               <Target className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-1 text-sm text-green-400">
@@ -161,7 +161,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Performance Chart */}
         <div className="lg:col-span-2">
-          <div className="glass-strong p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Performance Trends</h2>
               <div className="flex space-x-2">
@@ -172,7 +172,7 @@ export default function AnalyticsPage() {
                     className={`px-3 py-1 text-sm rounded-lg transition-all ${
                       selectedMetric === metric
                         ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                        : "text-gray-400 hover:text-white hover:bg-slate-800/40"
                     }`}
                   >
                     {metric.charAt(0).toUpperCase() + metric.slice(1)}
@@ -196,11 +196,11 @@ export default function AnalyticsPage() {
 
         {/* Top Performers */}
         <div className="space-y-6">
-          <div className="glass-strong p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
             <h2 className="text-xl font-bold text-white mb-4">Top Performers</h2>
             <div className="space-y-4">
               {analyticsData.topPerformers.map((performer, index) => (
-                <div key={index} className="glass p-4 rounded-lg">
+                <div key={index} className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm text-gray-400">{performer.metric}</p>
                     <span className="text-xs text-green-400">{performer.change}</span>
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Key Metrics */}
-          <div className="glass-strong p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
             <h2 className="text-xl font-bold text-white mb-4">Key Metrics</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -243,13 +243,13 @@ export default function AnalyticsPage() {
 
       {/* Campaign Performance Table */}
       <div className="mt-8">
-        <div className="glass-strong rounded-lg overflow-hidden">
-          <div className="p-6 border-b border-white/10">
+        <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl rounded-lg overflow-hidden">
+          <div className="p-6 border-b border-slate-700/50">
             <h2 className="text-xl font-bold text-white">Campaign Performance</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5">
+              <thead className="bg-slate-800/40">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Campaign</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Revenue</th>
@@ -260,7 +260,7 @@ export default function AnalyticsPage() {
               </thead>
               <tbody className="divide-y divide-white/10">
                 {analyticsData.campaigns.map((campaign, index) => (
-                  <tr key={index} className="hover:bg-white/5 transition-colors">
+                  <tr key={index} className="hover:bg-slate-800/40 transition-colors">
                     <td className="px-6 py-4">
                       <span className="font-medium text-white">{campaign.name}</span>
                     </td>

@@ -1,0 +1,8 @@
+name: Fintech Mock Tests (Air-Gap)
+on: [workflow_dispatch]
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Run fintech mocks locally once deps are available."

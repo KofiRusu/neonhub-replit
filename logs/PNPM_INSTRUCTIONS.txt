@@ -1,0 +1,6 @@
+No pnpm 9.12.0 available offline.
+Drop a compatible binary at:
+  /Users/kofirusu/Desktop/NeonHub/.pnpm-home/pnpm
+and make executable:
+  chmod +x /Users/kofirusu/Desktop/NeonHub/.pnpm-home/pnpm
+Then rerun this prompt.

@@ -48,17 +48,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter apps/api prisma generate
+        run: pnpm --filter ./apps/api prisma generate
 
       - name: Verify DB connectivity
-        run: pnpm --filter apps/api prisma validate
+        run: pnpm --filter ./apps/api prisma validate
 
       - name: Prisma Migrate Deploy (resilient)
         run: |
           n=0
           until [ $n -ge 3 ]
           do
-            pnpm --filter apps/api prisma migrate deploy && break
+            pnpm --filter ./apps/api prisma migrate deploy && break
             n=$((n+1))
             echo "migrate deploy attempt $n failed - retrying in $((15*n))s"
             sleep $((15*n))
@@ -75,7 +75,7 @@ jobs:
           n=0
           until [ $n -ge 3 ]
           do
-            pnpm --filter apps/api prisma db seed && break
+            pnpm --filter ./apps/api prisma db seed && break
             n=$((n+1))
             echo "seed attempt $n failed - retrying in $((10*n))s"
             sleep $((10*n))
@@ -87,7 +87,7 @@ jobs:
         continue-on-error: false
 
       - name: Status
-        run: pnpm --filter apps/api prisma migrate status
+        run: pnpm --filter ./apps/api prisma migrate status
 
       - name: Log migration telemetry
         if: always()

@@ -1,0 +1,62 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+  
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+  
+  # Add resource attributes
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: staging
+        action: upsert
+
+exporters:
+  # Console logging for staging validation
+  logging:
+    loglevel: info
+    sampling_initial: 10
+    sampling_thereafter: 10
+  
+  # Prometheus for metrics (if needed)
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    const_labels:
+      env: staging
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging]
+    
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging, prometheus]
+  
+  extensions: []
+  
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: 0.0.0.0:8888
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+

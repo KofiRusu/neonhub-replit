@@ -1,0 +1,3294 @@
+
+> @neonhub/backend-v3.2@3.2.0 test /Users/kofirusu/Desktop/NeonHub/apps/api
+> NODE_ENV=test NODE_OPTIONS='--max-old-space-size=6144' node ../../scripts/run-cli.mjs jest --maxWorkers=4 --no-coverage
+
+PASS src/services/budgeting/__tests__/allocation-engine.test.ts (2020.511 s)
+FAIL src/services/__tests__/keyword-research.service.test.ts
+  ● Test suite failed to run
+
+    Cannot find module '@/lib/openai' from 'src/services/__tests__/keyword-research.service.test.ts'
+
+      3 |
+      4 | // Mock OpenAI
+    > 5 | jest.mock("@/lib/openai", () => ({
+        |      ^
+      6 |   openai: {
+      7 |     chat: {
+      8 |       completions: {
+
+      at Resolver._throwModNotFoundError (../../node_modules/.pnpm/jest-resolve@30.2.0/node_modules/jest-resolve/build/index.js:863:11)
+      at Object.<anonymous> (src/services/__tests__/keyword-research.service.test.ts:5:6)
+
+PASS src/__tests__/mock-connectors.test.ts (16.636 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/connectors/mock/index.ts:7:1)
+      at Object.<anonymous> (src/__tests__/mock-connectors.test.ts:7:1)
+
+    console.info
+      [MOCK] Using mock connector for EMAIL
+
+      at getConnector (src/connectors/mock/index.ts:120:13)
+
+PASS src/__tests__/routes/feedback.test.ts (44.06 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/feedback.service.ts:2:1)
+      at Object.<anonymous> (src/__tests__/routes/feedback.test.ts:2:1)
+
+PASS src/__tests__/routes/messages.test.ts (2065.038 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/messaging.service.ts:2:1)
+      at Object.<anonymous> (src/__tests__/routes/messages.test.ts:3:1)
+
+FAIL src/services/rag/__tests__/knowledge.service.test.ts (25.962 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/rag/knowledge.service.ts:2:1)
+      at Object.<anonymous> (src/services/rag/__tests__/knowledge.service.test.ts:3:1)
+
+  ● KnowledgeBaseService › ingests snippets and retrieves similar chunks
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 2
+    Received length: 0
+    Received array:  []
+
+      203 |
+      204 |     const snippets = await service.retrieveSnippets(context.currentRetrieve);
+    > 205 |     expect(snippets).toHaveLength(2);
+          |                      ^
+      206 |     expect(snippets[0]!.similarity).toBeGreaterThanOrEqual(snippets[1]!.similarity);
+      207 |     expect(snippets.map((snippet) => snippet.text)).toEqual(
+      208 |       expect.arrayContaining([
+
+      at Object.<anonymous> (src/services/rag/__tests__/knowledge.service.test.ts:205:22)
+
+PASS src/__tests__/agentic-services.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/lib/prisma.ts:1:1)
+      at Object.<anonymous> (src/services/person.service.ts:2:1)
+      at src/__tests__/agentic-services.test.ts:115:25
+      at Object.<anonymous> (src/__tests__/agentic-services.test.ts:115:25)
+
+PASS src/services/budgeting/__tests__/simulation-engine.test.ts (5.628 s)
+PASS src/__tests__/routes/documents.test.ts (9.213 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/documents.service.ts:2:1)
+      at Object.<anonymous> (src/__tests__/routes/documents.test.ts:3:1)
+
+PASS src/connectors/__tests__/reddit-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/RedditConnector.ts:5:1)
+      at Object.<anonymous> (src/connectors/__tests__/reddit-connector.test.ts:3:1)
+
+FAIL src/__tests__/p0-minimal.test.ts
+  ● P0 Hardening - File Existence › AgentRun Persistence › should have executeAgentRun helper
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "startRun"
+    Received string:    "import type { Prisma, PrismaClient } from \"@prisma/client\";
+    import { RunStatus as RunStatusEnum } from \"@prisma/client\";
+    import type { Logger } from \"pino\";
+    import { prisma as defaultPrisma } from \"../../db/prisma.js\";
+    import { logger as defaultLogger } from \"../../lib/logger.js\";
+    import { runWithAgentContext } from \"../../services/orchestration/run-context.js\";
+    import { recordAgentRun } from \"../../lib/metrics.js\";·
+    /**
+     * Phase 3 telemetry plan:
+     *  - Emit `recordAgentRun` metrics for every agent execution (outside the orchestrator) so direct agent usage stays
+     *    observable in dev/test environments.
+     *  - Allow orchestrator to opt-out (it records at the router level) via `options.emitTelemetry`.
+     */·
+    export interface AgentExecutionContext {
+      organizationId: string;
+      prisma?: PrismaClient;
+      logger?: Logger;
+      userId?: string | null;
+      agentName?: string;
+    }·
+    export interface AgentRunOptions<T> {
+      intent?: string;
+      buildMetrics?: (result: T) => Record<string, unknown>;
+      emitTelemetry?: boolean;
+    }·
+    const JSON_SERIALIZATION_ERROR_KEY = \"__serialization_error\";·
+    const toJsonValue = (value: unknown): Prisma.JsonValue => {
+      if (value === undefined) {
+        return null;
+      }·
+      if (value === null) {
+        return null;
+      }·
+      if (typeof value === \"number\" || typeof value === \"string\" || typeof value === \"boolean\") {
+        return value as Prisma.JsonValue;
+      }·
+      try {
+        return JSON.parse(JSON.stringify(value)) as Prisma.JsonValue;
+      } catch (error) {
+        return {
+          [JSON_SERIALIZATION_ERROR_KEY]: (error as Error).message ?? \"unserializable\",
+        } as unknown as Prisma.JsonValue;
+      }
+    };·
+    export async function executeAgentRun<T>(
+      agentId: string,
+      context: AgentExecutionContext,
+      input: unknown,
+      executor: () => Promise<T>,
+      options: AgentRunOptions<T> = {},
+    ): Promise<{ runId: string; result: T }> {
+      if (!context.organizationId || typeof context.organizationId !== \"string\") {
+        throw new Error(\"organizationId is required in agent context\");
+      }·
+      const prisma = context.prisma ?? defaultPrisma;
+      const runLogger = context.logger ?? defaultLogger;
+      const startedAt = new Date();·
+      const telemetryAgent = context.agentName ?? agentId;
+      const telemetryEnabled = options.emitTelemetry !== false;·
+      const run = await prisma.agentRun.create({
+        data: {
+          agentId,
+          organizationId: context.organizationId,
+          status: RunStatusEnum.RUNNING,
+          input: toJsonValue(input),
+          startedAt,
+          metrics: toJsonValue({
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+          }),
+        },
+      });·
+      runLogger.info({ runId: run.id, agentId, intent: options.intent }, \"Agent run started\");·
+      const contextWrapper = async () => {
+        try {
+          const result = await executor();
+          const completedAt = new Date();
+          const metrics = {
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+            durationMs: completedAt.getTime() - startedAt.getTime(),
+            ...(options.buildMetrics ? options.buildMetrics(result) : {}),
+          };·
+          const updateData: Prisma.AgentRunUpdateInput = {
+            status: RunStatusEnum.SUCCESS,
+            output: toJsonValue(result),
+            completedAt,
+            metrics: toJsonValue(metrics),
+          };·
+          await prisma.agentRun.update({
+            where: { id: run.id },
+            data: updateData,
+          });·
+          const durationMs = completedAt.getTime() - startedAt.getTime();
+          runLogger.info({ runId: run.id, agentId, intent: options.intent }, \"Agent run completed\");
+          if (telemetryEnabled) {
+            recordAgentRun(telemetryAgent, RunStatusEnum.SUCCESS, durationMs / 1000, options.intent);
+          }
+          return { runId: run.id, result };
+        } catch (error) {
+          const completedAt = new Date();
+          const failureMetrics = {
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+            durationMs: completedAt.getTime() - startedAt.getTime(),
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          };·
+          const failureData: Prisma.AgentRunUpdateInput = {
+            status: RunStatusEnum.FAILED,
+            completedAt,
+            metrics: toJsonValue(failureMetrics),
+          };·
+          await prisma.agentRun.update({
+            where: { id: run.id },
+            data: failureData,
+          });·
+          const durationMs = failureMetrics.durationMs;
+          runLogger.error({ runId: run.id, agentId, intent: options.intent, error }, \"Agent run failed\");
+          if (telemetryEnabled) {
+            recordAgentRun(telemetryAgent, RunStatusEnum.FAILED, durationMs / 1000, options.intent);
+          }
+          throw error;
+        }
+      };·
+      return runWithAgentContext(
+        {
+          runId: run.id,
+          agentId,
+          agentName: context.agentName ?? agentId,
+          organizationId: context.organizationId,
+          prisma,
+        },
+        contextWrapper,
+      );
+    }
+    "
+
+      114 |       const content = readFileSync(path, 'utf-8');
+      115 |       expect(content).toContain('export async function executeAgentRun');
+    > 116 |       expect(content).toContain('startRun');
+          |                       ^
+      117 |       expect(content).toContain('finishRun');
+      118 |     });
+      119 |
+
+      at Object.<anonymous> (src/__tests__/p0-minimal.test.ts:116:23)
+
+PASS src/connectors/__tests__/whatsapp-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/WhatsAppConnector.ts:6:1)
+      at Object.<anonymous> (src/connectors/__tests__/whatsapp-connector.test.ts:2:1)
+
+PASS src/__tests__/routes/tasks.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/tasks.service.ts:2:1)
+      at Object.<anonymous> (src/__tests__/routes/tasks.test.ts:2:1)
+
+FAIL src/agents/utils/__tests__/agent-run.spec.ts (5.872 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/agents/utils/agent-run.ts:5:1)
+      at src/agents/utils/__tests__/agent-run.spec.ts:48:30
+      at Object.<anonymous> (src/agents/utils/__tests__/agent-run.spec.ts:55:33)
+
+  ● executeAgentRun utility › persists successful runs and returns result
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      70 |   const telemetryEnabled = options.emitTelemetry !== false;
+      71 |
+    > 72 |   const run = await prisma.agentRun.create({
+         |                                     ^
+      73 |     data: {
+      74 |       agentId,
+      75 |       organizationId: context.organizationId,
+
+      at executeAgentRun (src/agents/utils/agent-run.ts:72:37)
+      at Object.<anonymous> (src/agents/utils/__tests__/agent-run.spec.ts:72:26)
+
+  ● executeAgentRun utility › records failure metrics and rethrows errors
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"result": {"ok": false}, "runId": "run-123"}
+
+      131 |     agentRunService.finishRun.mockResolvedValue(undefined);
+      132 |
+    > 133 |     await expect(
+          |                 ^
+      134 |       executeAgentRun(
+      135 |         "SeoAgent",
+      136 |         { organizationId: "org-2", logger: mockLogger },
+
+      at expect (../../node_modules/.pnpm/expect@30.2.0/node_modules/expect/build/index.js:2116:15)
+      at Object.<anonymous> (src/agents/utils/__tests__/agent-run.spec.ts:133:17)
+
+PASS src/__tests__/services/internal-linking.spec.ts (8.352 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/internal-linking.ts:3:1)
+      at Object.<anonymous> (src/__tests__/services/internal-linking.spec.ts:3:1)
+
+[23:04:48 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:04:48 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "AdAgent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent orchestrator bootstrap complete[39m
+[23:04:48 UTC] [32mINFO[39m: [36mCreated new agent record[39m
+    agentId: "test-id-1002"
+    agentName: "AdAgent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent run started[39m
+    runId: "test-id-1003"
+    agentId: "test-id-1002"
+    intent: "test-intent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent run completed[39m
+    runId: "test-id-1003"
+    agentId: "test-id-1002"
+    intent: "test-intent"
+[23:04:48 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "AdAgent"
+    status: "completed"
+    durationSeconds: 0.001
+    intent: "test-intent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent run completed with persistence[39m
+    runId: "test-id-1003"
+    agent: "AdAgent"
+    intent: "test-intent"
+    durationSeconds: 0.001
+[23:04:48 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 432
+[23:04:48 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SupportAgent"
+[23:04:48 UTC] [32mINFO[39m: [36mCreated new agent record[39m
+    agentId: "test-id-1006"
+    agentName: "SupportAgent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent run started[39m
+    runId: "test-id-1007"
+    agentId: "test-id-1006"
+    intent: "test-failure"
+[23:04:48 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 1
+[23:04:48 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+[23:04:48 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 2
+[23:04:48 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 2
+    delay: 150
+[23:04:49 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 3
+[23:04:49 UTC] [31mERROR[39m: [36mAgent run failed[39m
+    runId: "test-id-1007"
+    agentId: "test-id-1006"
+    intent: "test-failure"
+    error: {}
+[23:04:49 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 826
+    error: {}
+[23:04:49 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "SupportAgent"
+    intent: "test-failure"
+    error: {}
+[23:04:49 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "SupportAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "test-failure"
+[23:04:49 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "InsightAgent"
+[23:04:49 UTC] [32mINFO[39m: [36mCreated new agent record[39m
+    agentId: "test-id-1010"
+    agentName: "InsightAgent"
+[23:04:49 UTC] [32mINFO[39m: [36mAgent run started[39m
+    runId: "test-id-1011"
+    agentId: "test-id-1010"
+    intent: "metrics-test"
+PASS src/services/orchestration/tests/persistence.test.ts (122.555 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/registry.ts:1:1)
+      at Object.<anonymous> (src/services/orchestration/tests/persistence.test.ts:3:1)
+
+[23:04:50 UTC] [32mINFO[39m: [36mAgent run completed[39m
+    runId: "test-id-1011"
+    agentId: "test-id-1010"
+    intent: "metrics-test"
+[23:04:50 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "InsightAgent"
+    status: "completed"
+    durationSeconds: 0.043
+    intent: "metrics-test"
+[23:04:50 UTC] [32mINFO[39m: [36mAgent run completed with persistence[39m
+    runId: "test-id-1011"
+    agent: "InsightAgent"
+    intent: "metrics-test"
+    durationSeconds: 0.043
+[23:04:50 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 43
+[23:04:50 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "DesignAgent"
+[23:04:50 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "DesignAgent"
+[23:04:50 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 26
+[23:04:48 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:04:48 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+[23:04:48 UTC] [32mINFO[39m: [36mAgent orchestrator bootstrap complete[39m
+[23:04:59 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:04:59 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "AdAgent"
+    version: "test"
+[23:04:59 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "AdAgent"
+[23:04:59 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:04:59 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "BrandVoiceAgent"
+    version: "test"
+[23:04:59 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "BrandVoiceAgent"
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 1
+[23:04:59 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+[23:04:59 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 76
+[23:04:59 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+    version: "test"
+[23:04:59 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "ContentAgent"
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 1
+[23:04:59 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 2
+[23:04:59 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 2
+    delay: 150
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 3
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 227
+    error: {}
+[23:04:59 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "ContentAgent"
+    intent: "test"
+    error: {}
+[23:04:59 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "ContentAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "test"
+[23:04:59 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "ContentAgent"
+[23:04:59 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+[23:04:59 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 2
+    delay: 150
+PASS src/services/orchestration/tests/router.test.ts (8.765 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/registry.ts:1:1)
+      at Object.<anonymous> (src/services/orchestration/tests/router.test.ts:3:1)
+
+[23:04:59 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 227
+    error: {
+      "name": "Circ...rror"
+    }
+[23:04:59 UTC] [31mERROR[39m: [36mCircuit breaker open for agent[39m
+    agent: "ContentAgent"
+[23:04:59 UTC] [33mWARN[39m: [36mCircuit breaker failure recorded[39m
+    agent: "ContentAgent"
+[23:04:59 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+    version: "test"
+[23:04:59 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "ContentAgent"
+[23:04:59 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:04:59 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "EmailAgent"
+    version: "test"
+PASS src/services/rag/__tests__/memory.service.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/rag/memory.service.ts:2:1)
+      at Object.<anonymous> (src/services/rag/__tests__/memory.service.test.ts:3:1)
+
+FAIL src/__tests__/orchestrator.persists.spec.ts (107.483 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/index.ts:1:1)
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:7:1)
+
+    console.log
+      prisma:error 
+      Invalid `prisma.agent.findFirst()` invocation in
+      /Users/kofirusu/Desktop/NeonHub/apps/api/src/services/orchestration/router.ts:183:38
+      
+        180 }
+        181 
+        182 // Get or create agent in database
+      → 183 let dbAgent = await prisma.agent.findFirst(
+      Can't reach database server at `localhost:5433`
+      
+      Please make sure your database server is running at `localhost:5433`.
+
+      at Object.GS (../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/binary.js:71:432)
+
+    console.log
+      prisma:error 
+      Invalid `prisma.agent.findFirst()` invocation in
+      /Users/kofirusu/Desktop/NeonHub/apps/api/src/services/orchestration/router.ts:183:38
+      
+        180 }
+        181 
+        182 // Get or create agent in database
+      → 183 let dbAgent = await prisma.agent.findFirst(
+      Can't reach database server at `localhost:5433`
+      
+      Please make sure your database server is running at `localhost:5433`.
+
+      at Object.GS (../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/binary.js:71:432)
+
+    console.log
+      prisma:error 
+      Invalid `prisma.agent.findFirst()` invocation in
+      /Users/kofirusu/Desktop/NeonHub/apps/api/src/services/orchestration/router.ts:183:38
+      
+        180 }
+        181 
+        182 // Get or create agent in database
+      → 183 let dbAgent = await prisma.agent.findFirst(
+      Can't reach database server at `localhost:5433`
+      
+      Please make sure your database server is running at `localhost:5433`.
+
+      at Object.GS (../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/binary.js:71:432)
+
+    console.log
+      prisma:error 
+      Invalid `prisma.agent.findFirst()` invocation in
+      /Users/kofirusu/Desktop/NeonHub/apps/api/src/services/orchestration/router.ts:183:38
+      
+        180 }
+        181 
+        182 // Get or create agent in database
+      → 183 let dbAgent = await prisma.agent.findFirst(
+      Can't reach database server at `localhost:5433`
+      
+      Please make sure your database server is running at `localhost:5433`.
+
+      at Object.GS (../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/binary.js:71:432)
+
+  ● Orchestrator AgentRun Persistence › should create AgentRun record when executing agent
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      50 |
+      51 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 52 |     expect(runs).toHaveLength(1);
+         |                  ^
+      53 |     const run = runs[0];
+      54 |
+      55 |     expect(run.status).toBe('SUCCESS');
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:52:18)
+
+  ● Orchestrator AgentRun Persistence › should record failure status when agent execution fails
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      85 |
+      86 |     const failedRuns = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 87 |     expect(failedRuns).toHaveLength(1);
+         |                        ^
+      88 |     expect(failedRuns[0].status).toBe('FAILED');
+      89 |   });
+      90 |
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:87:24)
+
+  ● Orchestrator AgentRun Persistence › should track duration metrics in AgentRunMetric
+
+    TypeError: Cannot read properties of undefined (reading 'metrics')
+
+      110 |
+      111 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 112 |     expect(runs[0].metrics).toMatchObject({ intent: 'generate-draft' });
+          |                    ^
+      113 |   });
+      114 |
+      115 |   it('should handle missing organizationId gracefully', async () => {
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:112:20)
+
+  ● Orchestrator AgentRun Persistence › should store intent and objective in AgentRun
+
+    expect(received).toMatchObject(expected)
+
+    Matcher error: received value must be a non-null object
+
+    Received has value: undefined
+
+      162 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+      163 |     const seoRun = runs.find((run: any) => run.objective === 'seo-audit');
+    > 164 |     expect(seoRun?.meta).toMatchObject({ intent: 'seo-audit' });
+          |                          ^
+      165 |     expect(seoRun?.objective).toBeDefined();
+      166 |   });
+      167 | });
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:164:26)
+
+[23:05:00 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 11892
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "ContentAgent"
+    intent: "generate-draft"
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "ContentAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "generate-draft"
+[23:05:00 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "EmailAgent"
+[23:05:00 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 10
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "EmailAgent"
+    intent: "invalid-intent"
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "EmailAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "invalid-intent"
+[23:05:00 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+[23:05:00 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 2
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "ContentAgent"
+    intent: "generate-draft"
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "ContentAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "generate-draft"
+[23:05:00 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+[23:05:00 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "ContentAgent"
+[23:05:00 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:00 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SEOAgent"
+[23:05:00 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 1
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "SEOAgent"
+    intent: "seo-audit"
+    error: {
+      "name": "Pris...rror",
+      "clientVersion": "5.22.0"
+    }
+[23:05:00 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "SEOAgent"
+    status: "failed"
+    durationSeconds: 0
+    intent: "seo-audit"
+[23:05:02 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+    version: "1"
+[23:05:02 UTC] [32mINFO[39m: [36mCreated new agent record[39m
+    agentId: "agent-ContentAgent"
+    agentName: "ContentAgent"
+[23:05:02 UTC] [32mINFO[39m: [36mAgent run completed with persistence[39m
+    runId: "run-1"
+    agent: "ContentAgent"
+    intent: "test"
+    durationSeconds: 0
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+    version: "1"
+[23:05:02 UTC] [32mINFO[39m: [36mCreated new agent record[39m
+    agentId: "agent-ContentAgent"
+    agentName: "ContentAgent"
+[23:05:02 UTC] [32mINFO[39m: [36mAgent run completed with persistence[39m
+    runId: "run-2"
+    agent: "ContentAgent"
+    intent: "test"
+    durationSeconds: 0
+[23:05:02 UTC] [33mWARN[39m: [36mAgent responded with error[39m
+    runId: "run-2"
+    agent: "ContentAgent"
+    intent: "test"
+    error: "boom"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SupportAgent"
+    version: "1"
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SupportAgent"
+[23:05:02 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 0
+[23:05:02 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SeoAgent"
+    version: "1"
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SeoAgent"
+[23:05:02 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 1
+[23:05:02 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+[23:05:02 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 2
+[23:05:02 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 2
+    delay: 150
+[23:05:02 UTC] [31mERROR[39m: [36mOrchestrator handler failure recorded[39m
+    failureCount: 3
+[23:05:02 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 228
+    error: {}
+[23:05:02 UTC] [31mERROR[39m: [36mAgent execution failed[39m
+    agent: "SeoAgent"
+    intent: "test"
+    error: {}
+[23:05:02 UTC] [33mWARN[39m: [36mNo organizationId in context, skipping AgentRun persistence[39m
+    agent: "SeoAgent"
+[23:05:02 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 1
+    delay: 75
+PASS src/services/orchestration/tests/router-telemetry.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/registry.ts:1:1)
+      at Object.<anonymous> (src/services/orchestration/tests/router-telemetry.test.ts:4:1)
+
+[23:05:03 UTC] [33mWARN[39m: [36mRetrying orchestrator handler after failure[39m
+    attempt: 2
+    delay: 150
+[23:05:03 UTC] [31mERROR[39m: [36mOrchestrator span completed with error[39m
+    duration: 228
+    error: {
+      "name": "Circ...rror"
+    }
+[23:05:03 UTC] [31mERROR[39m: [36mCircuit breaker open for agent[39m
+    agent: "SeoAgent"
+PASS src/ai/__tests__/orchestrator.spec.ts
+PASS src/__tests__/agents/SEOAgent.spec.ts (115.494 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/agents/SEOAgent.ts:4:1)
+      at Object.<anonymous> (src/__tests__/agents/SEOAgent.spec.ts:3:1)
+
+PASS src/__tests__/trpc/content.router.spec.ts (116.575 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/ai/openai.ts:2:1)
+      at Object.<anonymous> (src/agents/content/ContentAgent.ts:2:1)
+      at Object.<anonymous> (src/trpc/routers/content.router.ts:5:1)
+      at Object.<anonymous> (src/__tests__/trpc/content.router.spec.ts:2:1)
+
+[23:06:59 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:06:59 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/agents/__tests__/CampaignAgent.test.ts
+PASS src/connectors/__tests__/instagram-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/InstagramConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/instagram-connector.test.ts:2:1)
+
+PASS src/routes/__tests__/orchestrate.route.test.ts (130.793 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/routes/orchestrate.ts:6:1)
+      at Object.<anonymous> (src/routes/__tests__/orchestrate.route.test.ts:2:1)
+
+[23:09:10 UTC] [31mERROR[39m: [36mFailed to orchestrate agent request[39m
+    error: {
+      "issues": [
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "received": "undefined",
+          "path": [
+            "intent"
+          ],
+          "message": "Required"
+        }
+      ],
+      "name": "ZodError"
+    }
+PASS src/__tests__/p0-smoke.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/agent-run.service.ts:4:1)
+      at Object.<anonymous> (src/__tests__/p0-smoke.spec.ts:5:1)
+
+[23:09:11 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:09:11 UTC] [32mINFO[39m: [36mAgent run started[39m
+    agentId: "agent-basic"
+    agentName: "Agent Basic"
+    orgId: "org-123"
+[23:09:11 UTC] [34mDEBUG[39m: [36mAgent run step completed[39m
+    runId: "run_1"
+    step: "agent.handle"
+[23:09:11 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "Agent Basic"
+    status: "completed"
+    durationSeconds: 0.001
+    intent: "test-intent"
+[23:09:11 UTC] [32mINFO[39m: [36mAgent run finished successfully[39m
+    runId: "run_1"
+    agentId: "agent-basic"
+[23:09:11 UTC] [32mINFO[39m: [36mAgent run started[39m
+    agentId: "agent-failure"
+    agentName: "Agent Failure"
+    orgId: "org-123"
+[23:09:11 UTC] [31mERROR[39m: [36mAgent run step failed[39m
+    runId: "run_1"
+    step: "agent.handle"
+    error: {}
+[23:09:11 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "Agent Failure"
+    status: "failed"
+    durationSeconds: 0.004
+    intent: "test-intent"
+[23:09:11 UTC] [31mERROR[39m: [36mAgent run finished with failure[39m
+    runId: "run_1"
+    agentId: "agent-failure"
+    error: "step failed"
+PASS src/connectors/__tests__/youtube-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/YouTubeConnector.ts:7:1)
+      at Object.<anonymous> (src/connectors/__tests__/youtube-connector.test.ts:4:1)
+
+PASS src/connectors/__tests__/facebook-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/FacebookConnector.ts:5:1)
+      at Object.<anonymous> (src/connectors/__tests__/facebook-connector.test.ts:3:1)
+
+FAIL src/__tests__/agents/DesignAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/DesignAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/DesignAgent.test.ts:5:1)
+
+FAIL src/__tests__/agents/InsightAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/InsightAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/InsightAgent.test.ts:5:1)
+
+PASS src/connectors/__tests__/tiktok-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/TikTokConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/tiktok-connector.test.ts:2:1)
+
+PASS src/connectors/__tests__/sms-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/SMSConnector.ts:6:1)
+      at Object.<anonymous> (src/connectors/__tests__/sms-connector.test.ts:2:1)
+
+PASS src/connectors/__tests__/google-ads-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/GoogleAdsConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/google-ads-connector.test.ts:2:1)
+
+PASS src/__tests__/internal-linking.service.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/openai.ts:2:1)
+      at Object.<anonymous> (src/services/seo/internal-linking.service.ts:12:1)
+      at Object.<anonymous> (src/__tests__/internal-linking.service.test.ts:2:1)
+
+PASS src/__tests__/execute-agent-run.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/agents/utils/agent-run.ts:4:1)
+      at Object.<anonymous> (src/__tests__/execute-agent-run.test.ts:4:1)
+
+FAIL src/__tests__/agents/AdAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/AdAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/AdAgent.test.ts:5:1)
+
+PASS src/connectors/__tests__/linkedin-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/LinkedInConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/linkedin-connector.test.ts:2:1)
+
+FAIL src/__tests__/p0-validation.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/lib/metrics.ts:3:1)
+      at src/__tests__/p0-validation.test.ts:26:29
+      at Object.<anonymous> (src/__tests__/p0-validation.test.ts:26:29)
+
+  ● P0 Hardening - Core Validation › Environment Configuration › should have DATABASE_URL configured
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      17 |
+      18 |     it('should have DATABASE_URL configured', () => {
+    > 19 |       expect(process.env.DATABASE_URL).toBeDefined();
+         |                                        ^
+      20 |       expect(process.env.DATABASE_URL).toContain('postgresql://');
+      21 |     });
+      22 |   });
+
+      at Object.<anonymous> (src/__tests__/p0-validation.test.ts:19:40)
+
+[23:09:20 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS ../../tests/orchestrate.mock.spec.ts (370.84 s)
+PASS src/connectors/__tests__/factory.test.ts (2458.52 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/connectors/factory.ts:1:1)
+      at Object.<anonymous> (src/connectors/__tests__/factory.test.ts:2:1)
+
+[23:09:21 UTC] [32mINFO[39m: [36m🎭 Connector mock mode ENABLED (USE_MOCK_CONNECTORS=true or NODE_ENV=test)[39m
+[23:04:48 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "slack"
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "twilio"
+[23:09:21 UTC] [32mINFO[39m: [36m🔌 Connector real mode ENABLED (CONNECTORS_LIVE_MODE=true)[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating real connector (production mode)[39m
+    type: "gmail"
+[23:09:21 UTC] [32mINFO[39m: [36m🎭 Connector mock mode ENABLED (USE_MOCK_CONNECTORS=true or NODE_ENV=test)[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail send called[39m
+    params: {
+      "to": "test@example.com",
+      "subject": "Test Subject",
+      "body": "Test Body"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail listMessages called[39m
+    params: {
+      "maxResults": 5
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail getProfile called[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail send called[39m
+    params: {
+      "to": "telemetry@example.com",
+      "subject": "Telemetry Test",
+      "body": "Hello"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "slack"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Slack postMessage called[39m
+    params: {
+      "channel": "C123",
+      "text": "Test message"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "slack"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Slack listChannels called[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "slack"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Slack uploadFile called[39m
+    params: {
+      "channels": "C123",
+      "file": "[Buffer]",
+      "filename": "test.txt"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "twilio"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Twilio sendSms called[39m
+    params: {
+      "to": "+15555555555",
+      "from": "+15555551234",
+      "body": "Test SMS"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "twilio"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Twilio validatePhoneNumber called[39m
+    phoneNumber: "+15555555555"
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "twilio"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Twilio listMessages called[39m
+    params: {
+      "pageSize": 5
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "unknown"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Generic connector invoked[39m
+    connector: "unknown"
+    method: "noop"
+    payload: {
+      "foo": "bar"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "google-sheets"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Google Sheets listRows[39m
+    sheetId: "sheet-1"
+    range: "A1:C3"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Google Sheets appendRow[39m
+    sheetId: "sheet-1"
+    range: "Sheet1"
+    values: [
+      "A",
+      "B"
+    ]
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail getProfile called[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail getProfile called[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail send called[39m
+    params: {
+      "to": "test@example.com",
+      "subject": "Test",
+      "body": "Body"
+    }
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail send called[39m
+    params: {
+      "to": "test@example.com",
+      "subject": "Test",
+      "body": "Body"
+    }
+[23:09:21 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+[23:09:21 UTC] [32mINFO[39m: [36mAgent orchestrator bootstrap complete[39m
+[23:09:21 UTC] [32mINFO[39m: [36mAgent run started[39m
+    runId: "test-id-1000"
+    agentId: "test-agent-id"
+    intent: "kt-smoke"
+[23:09:21 UTC] [32mINFO[39m: [36m🎭 Connector mock mode ENABLED (USE_MOCK_CONNECTORS=true or NODE_ENV=test)[39m
+[23:09:21 UTC] [34mDEBUG[39m: [36mCreating mock connector[39m
+    type: "gmail"
+[23:09:21 UTC] [34mDEBUG[39m: [36m[MOCK] Gmail send called[39m
+    params: {
+      "to": "ops@example.com",
+      "subject": "Mock orchestrator run",
+      "body": "{\"subject\":\"KT bundle\",\"persona\":\"Creator Pro\"}"
+    }
+[23:09:21 UTC] [32mINFO[39m: [36mAgent run completed[39m
+    runId: "test-id-1000"
+    agentId: "test-agent-id"
+    intent: "kt-smoke"
+[23:09:21 UTC] [34mDEBUG[39m: [36mRecorded agent run metrics[39m
+    agent: "ContentAgent"
+    status: "completed"
+    durationSeconds: 0.006
+    intent: "kt-smoke"
+[23:09:21 UTC] [32mINFO[39m: [36mAgent run completed with persistence[39m
+    runId: "test-id-1000"
+    agent: "ContentAgent"
+    intent: "kt-smoke"
+    durationSeconds: 0.006
+[23:09:21 UTC] [34mDEBUG[39m: [36mOrchestrator span completed[39m
+    duration: 11
+PASS src/__tests__/metrics.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/observability/metrics.ts:3:1)
+      at Object.<anonymous> (src/__tests__/metrics.test.ts:3:1)
+
+PASS src/connectors/__tests__/shopify-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/ShopifyConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/shopify-connector.test.ts:2:1)
+
+PASS src/ai/__tests__/policies.spec.ts
+PASS src/services/__tests__/tool-exec.unit.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/tool-execution.service.ts:2:1)
+      at src/services/__tests__/tool-exec.unit.spec.ts:17:25
+      at Object.<anonymous> (src/services/__tests__/tool-exec.unit.spec.ts:17:25)
+
+[23:09:23 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/__tests__/services/sitemap-generator.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/sitemap-generator.ts:2:1)
+      at Object.<anonymous> (src/__tests__/services/sitemap-generator.spec.ts:3:1)
+
+[23:09:24 UTC] [32mINFO[39m: [36m[sitemap-generator] Building sitemap[39m
+    organizationId: "org-123"
+[23:09:24 UTC] [32mINFO[39m: [36m[sitemap-generator] Content collected[39m
+    organizationId: "org-123"
+    contentCount: 2
+[23:09:24 UTC] [32mINFO[39m: [36m[sitemap-generator] Sitemap generated[39m
+    organizationId: "org-123"
+    entryCount: 9
+PASS src/__tests__/services/seo-learning.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/services/seo-learning.ts:3:1)
+      at Object.<anonymous> (src/__tests__/services/seo-learning.spec.ts:3:1)
+
+[23:09:25 UTC] [32mINFO[39m: [36m[seo-learning] Recorded optimisation recommendation for content[39m
+    contentId: "content-2"
+    issue: "low_ctr"
+PASS src/__tests__/config/env.test.ts
+FAIL src/lib/__tests__/fsdb.spec.ts
+  ● file-system database helpers › reads JSON documents from the data directory
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      36 |     createdFiles.push(samplePath);
+      37 |
+    > 38 |     const { readJSON } = await import("../fsdb.js");
+         |                          ^
+      39 |     const payload = await readJSON<{ message: string }>("sample.json");
+      40 |
+      41 |     expect(payload).toEqual({ message: "hello" });
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:38:26
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:38:26)
+
+  ● file-system database helpers › parses knowledge articles and derives metadata
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      49 |     createdFiles.push(mdPath, txtPath);
+      50 |
+    > 51 |     const { readKnowledge } = await import("../fsdb.js");
+         |                               ^
+      52 |     const items = await readKnowledge();
+      53 |
+      54 |     const ids = items.map((item) => item.id);
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:51:31
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:51:31)
+
+  ● file-system database helpers › returns an empty array when knowledge directory is unavailable
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      66 |
+      67 |   it("returns an empty array when knowledge directory is unavailable", async () => {
+    > 68 |     const { readKnowledge } = await import("../fsdb.js");
+         |                               ^
+      69 |     const spy = jest.spyOn(fs, "readdir").mockRejectedValueOnce(new Error("missing"));
+      70 |
+      71 |     const result = await readKnowledge();
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:68:31
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:68:31)
+
+[23:09:29 UTC] [33mWARN[39m: [36m⚠️ OpenAI API key not found. Running in MOCK mode.[39m
+PASS src/lib/__tests__/rateLimiter.test.ts (12.959 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/lib/rateLimiter.ts:2:1)
+      at Object.<anonymous> (src/lib/__tests__/rateLimiter.test.ts:1:1)
+
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+[23:09:37 UTC] [32mINFO[39m: [36mRate limiter using in-memory store (env: test)[39m
+PASS src/ai/__tests__/openai.spec.ts (10.715 s)
+PASS src/__tests__/integrations/google-search-console.spec.ts (18.118 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/integrations/google-search-console.ts:2:1)
+      at Object.<anonymous> (src/__tests__/integrations/google-search-console.spec.ts:3:1)
+
+PASS src/__tests__/agents/TrendAgent.test.ts
+[23:09:39 UTC] [33mWARN[39m: [36m[gsc] Connector not registered; returning fallback data[39m
+    organizationId: "org-1"
+PASS src/lib/__tests__/audit.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at src/lib/__tests__/audit.spec.ts:10:24
+      at loadModule (src/lib/__tests__/audit.spec.ts:10:24)
+      at Object.<anonymous> (src/lib/__tests__/audit.spec.ts:27:23)
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at src/lib/__tests__/audit.spec.ts:10:24
+      at loadModule (src/lib/__tests__/audit.spec.ts:10:24)
+      at Object.<anonymous> (src/lib/__tests__/audit.spec.ts:58:23)
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at src/lib/__tests__/audit.spec.ts:10:24
+      at loadModule (src/lib/__tests__/audit.spec.ts:10:24)
+      at Object.<anonymous> (src/lib/__tests__/audit.spec.ts:68:29)
+
+[23:09:29 UTC] [32mINFO[39m: [36mGenerating text (MOCK mode)[39m
+    prompt: "Draft a welcome email"
+[23:09:32 UTC] [32mINFO[39m: [36mCalling OpenAI API[39m
+    attempt: 1
+    model: "gpt-4"
+    promptLength: 16
+[23:09:31 UTC] [32mINFO[39m: [36mCalling OpenAI API[39m
+    attempt: 1
+    model: "gpt-4"
+    promptLength: 17
+[23:09:32 UTC] [33mWARN[39m: [36mOpenAI API call failed[39m
+    attempt: 1
+    maxRetries: 3
+    error: "network flake"
+[23:09:35 UTC] [32mINFO[39m: [36mCalling OpenAI API[39m
+    attempt: 2
+    model: "gpt-4"
+    promptLength: 16
+[23:09:35 UTC] [33mWARN[39m: [36mOpenAI API call failed[39m
+    attempt: 2
+    maxRetries: 3
+    error: "network flake"
+[23:09:39 UTC] [32mINFO[39m: [36mCalling OpenAI API[39m
+    attempt: 3
+    model: "gpt-4"
+    promptLength: 16
+[23:09:39 UTC] [33mWARN[39m: [36mOpenAI API call failed[39m
+    attempt: 3
+    maxRetries: 3
+    error: "network flake"
+[23:09:39 UTC] [31mERROR[39m: [36mOpenAI API call failed after all retries[39m
+    error: {}
+[23:09:31 UTC] [32mINFO[39m: [36mOpenAI API call successful[39m
+    duration: 1
+    tokens: "[REDACTED]"
+    model: "gpt-4o-mini"
+PASS src/__tests__/services/trends.service.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/trends.service.ts:2:1)
+      at Object.<anonymous> (src/__tests__/services/trends.service.test.ts:4:1)
+
+PASS ../../tests/queue.mock.spec.ts (5.55 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/lib/metrics.ts:3:1)
+      at ../../tests/queue.mock.spec.ts:40:21
+      at Object.<anonymous> (../../tests/queue.mock.spec.ts:40:21)
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/lib/metrics.ts:3:1)
+      at ../../tests/queue.mock.spec.ts:40:21
+      at Object.<anonymous> (../../tests/queue.mock.spec.ts:40:21)
+
+[23:09:54 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:09:53 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/__tests__/agents/TrendAgent.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/openai.ts:2:1)
+      at Object.<anonymous> (src/agents/TrendAgent.ts:1:1)
+      at Object.<anonymous> (src/__tests__/agents/TrendAgent.spec.ts:2:1)
+
+[23:09:57 UTC] [32mINFO[39m: [36m[TrendAgent] Discovering trends for niche[39m
+    niche: "marketing technology"
+    region: "US"
+    limit: 10
+[23:09:57 UTC] [32mINFO[39m: [36m[TrendAgent] Creating trend subscription[39m
+    userId: "user-1"
+    keywords: [
+      "ai marketing"
+    ]
+    threshold: 50
+PASS src/connectors/__tests__/gmail-connector.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/GmailConnector.ts:5:1)
+      at Object.<anonymous> (src/connectors/__tests__/gmail-connector.test.ts:2:1)
+
+PASS src/connectors/__tests__/slack-connector.test.ts (14.742 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/connectors/execution/RetryManager.ts:2:1)
+      at Object.<anonymous> (src/connectors/services/SlackConnector.ts:4:1)
+      at Object.<anonymous> (src/connectors/__tests__/slack-connector.test.ts:2:1)
+
+PASS src/agents/__tests__/SocialAgent.test.ts (48.872 s)
+PASS src/lib/__tests__/pdfGenerator.spec.ts (24.346 s)
+FAIL src/__tests__/agent-learning.integration.spec.ts
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine/dist/index.js:1
+    import { PredictiveEngine } from './core/PredictiveEngine';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+    > 1 | import { NeonHubPredictiveEngine, PerformanceMetrics } from '@neonhub/predictive-engine';
+        | ^
+      2 |
+      3 | let predictiveEngine: NeonHubPredictiveEngine | null = null;
+      4 |
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at Object.<anonymous> (src/services/predictive-engine/index.ts:1:1)
+      at Object.<anonymous> (src/services/agent-learning.service.ts:3:1)
+      at Object.<anonymous> (src/__tests__/agent-learning.integration.spec.ts:2:1)
+
+FAIL src/services/__tests__/seed-agent-memory.spec.ts
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine/dist/index.js:1
+    import { PredictiveEngine } from './core/PredictiveEngine';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      1 | #!/usr/bin/env tsx
+      2 | import { prisma } from "../src/db/prisma.js";
+    > 3 | import { PgVectorStore, createEmbeddingsProvider } from "@neonhub/predictive-engine";
+        | ^
+      4 |
+      5 | process.env.TEST_MODE = process.env.TEST_MODE ?? "1";
+      6 |
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at Object.<anonymous> (scripts/seed-agent-memory.ts:3:1)
+      at Object.<anonymous> (src/services/__tests__/seed-agent-memory.spec.ts:3:1)
+
+PASS src/lib/__tests__/encryption.spec.ts
+FAIL src/agents/tests/agents.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/AdAgent.ts:7:16)
+      at Object.<anonymous> (src/agents/tests/agents.test.ts:2:1)
+
+PASS src/ai/__tests__/memory-docs.spec.ts
+PASS src/ai/__tests__/reward.spec.ts
+PASS src/ai/__tests__/openai-adapter.spec.ts
+PASS src/routes/__tests__/orchestrate.narrow.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/index.ts:1:1)
+      at Object.<anonymous> (src/routes/orchestrate.ts:3:1)
+      at Object.<anonymous> (src/routes/__tests__/orchestrate.narrow.test.ts:2:1)
+
+[23:11:04 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/ai/__tests__/cost.spec.ts
+PASS src/lib/__tests__/mappers.spec.ts
+PASS src/lib/__tests__/errors.spec.ts
+PASS src/lib/__tests__/hmac.spec.ts
+PASS src/events/tests/bus.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/events/bus.ts:4:1)
+      at Object.<anonymous> (src/events/tests/bus.test.ts:7:1)
+
+PASS src/ai/__tests__/memory-vector.spec.ts
+PASS src/trpc/routers/__tests__/agents.router.test.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/db/prisma.ts:2:1)
+      at Object.<anonymous> (src/integrations/google-search-console.ts:2:1)
+      at Object.<anonymous> (src/trpc/routers/seo.router.ts:4:1)
+      at Object.<anonymous> (src/trpc/router.ts:8:1)
+      at Object.<anonymous> (src/trpc/routers/__tests__/agents.router.test.ts:2:1)
+
+[23:11:09 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/ai/__tests__/reason.test.ts
+PASS src/ai/__tests__/memory-sessions.spec.ts
+PASS src/lib/__tests__/http.spec.ts
+PASS src/__tests__/health.test.ts
+PASS src/__tests__/smoke.spec.ts
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/agent-run.service.ts:4:1)
+      at Object.<anonymous> (src/__tests__/smoke.spec.ts:2:1)
+
+[23:11:13 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+PASS src/ai/__tests__/pipeline.test.ts
+PASS src/ai/__tests__/scorecard.test.ts
+PASS src/__tests__/agents/OutreachAgent.test.ts (405.572 s)
+PASS src/agents/__tests__/EmailAgent.rag.test.ts (278.955 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/ai/openai.ts:2:1)
+      at Object.<anonymous> (src/agents/EmailAgent.ts:3:1)
+      at Object.<anonymous> (src/agents/__tests__/EmailAgent.rag.test.ts:2:1)
+
+[23:14:19 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:14:19 UTC] [32mINFO[39m: [36mGenerating email sequence with AI[39m
+    jobId: "job-1"
+    topic: "Product launch"
+[23:14:19 UTC] [32mINFO[39m: [36mEmail sequence generation complete[39m
+    jobId: "job-1"
+    emailCount: 1
+    duration: 1
+    mock: false
+PASS src/services/orchestration/tests/register-agents.test.ts (335.039 s)
+  ● Console
+
+    console.warn
+      ⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.
+
+      177 |
+      178 |   if (!hasWarnedNonProd) {
+    > 179 |     console.warn(
+          |             ^
+      180 |       '⚠️  Using relaxed environment defaults. Set required variables or run `npm run verify` before production deploys.'
+      181 |     );
+      182 |     hasWarnedNonProd = true;
+
+      at src/config/env.ts:179:13
+      at Object.<anonymous> (src/config/env.ts:187:3)
+      at Object.<anonymous> (src/lib/logger.ts:2:1)
+      at Object.<anonymous> (src/services/orchestration/registry.ts:1:1)
+      at Object.<anonymous> (src/services/orchestration/tests/register-agents.test.ts:2:1)
+
+[23:11:11 UTC] [32mINFO[39m: [36mPrometheus metrics initialized[39m
+[23:16:45 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "ContentAgent"
+    version: "3.1.0"
+[23:16:45 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SEOAgent"
+    version: "2.4.0"
+[23:16:45 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "EmailAgent"
+    version: "2.2.0"
+[23:16:45 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SocialAgent"
+    version: "3.0.0"
+[23:16:45 UTC] [32mINFO[39m: [36mAgent registered with orchestrator[39m
+    agent: "SupportAgent"
+    version: "1.9.0"
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "intake.normalize"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "intake.fetch"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "intake.embed"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "email.compose"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "email.send"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "sms.compose"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "social.compose"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "sms.send"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "social.send"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "learning.tune"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "budget.execute"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+[23:16:45 UTC] [31mERROR[39m: [36mBullMQ queue error[39m
+    queue: "seo.analytics"
+    error: {
+      "code": "ECONNREFUSED"
+    }
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Summary of all failing tests
+FAIL src/services/__tests__/keyword-research.service.test.ts
+  ● Test suite failed to run
+
+    Cannot find module '@/lib/openai' from 'src/services/__tests__/keyword-research.service.test.ts'
+
+      3 |
+      4 | // Mock OpenAI
+    > 5 | jest.mock("@/lib/openai", () => ({
+        |      ^
+      6 |   openai: {
+      7 |     chat: {
+      8 |       completions: {
+
+      at Resolver._throwModNotFoundError (../../node_modules/.pnpm/jest-resolve@30.2.0/node_modules/jest-resolve/build/index.js:863:11)
+      at Object.<anonymous> (src/services/__tests__/keyword-research.service.test.ts:5:6)
+
+FAIL src/services/rag/__tests__/knowledge.service.test.ts (25.962 s)
+  ● KnowledgeBaseService › ingests snippets and retrieves similar chunks
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 2
+    Received length: 0
+    Received array:  []
+
+      203 |
+      204 |     const snippets = await service.retrieveSnippets(context.currentRetrieve);
+    > 205 |     expect(snippets).toHaveLength(2);
+          |                      ^
+      206 |     expect(snippets[0]!.similarity).toBeGreaterThanOrEqual(snippets[1]!.similarity);
+      207 |     expect(snippets.map((snippet) => snippet.text)).toEqual(
+      208 |       expect.arrayContaining([
+
+      at Object.<anonymous> (src/services/rag/__tests__/knowledge.service.test.ts:205:22)
+
+FAIL src/__tests__/p0-minimal.test.ts
+  ● P0 Hardening - File Existence › AgentRun Persistence › should have executeAgentRun helper
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "startRun"
+    Received string:    "import type { Prisma, PrismaClient } from \"@prisma/client\";
+    import { RunStatus as RunStatusEnum } from \"@prisma/client\";
+    import type { Logger } from \"pino\";
+    import { prisma as defaultPrisma } from \"../../db/prisma.js\";
+    import { logger as defaultLogger } from \"../../lib/logger.js\";
+    import { runWithAgentContext } from \"../../services/orchestration/run-context.js\";
+    import { recordAgentRun } from \"../../lib/metrics.js\";·
+    /**
+     * Phase 3 telemetry plan:
+     *  - Emit `recordAgentRun` metrics for every agent execution (outside the orchestrator) so direct agent usage stays
+     *    observable in dev/test environments.
+     *  - Allow orchestrator to opt-out (it records at the router level) via `options.emitTelemetry`.
+     */·
+    export interface AgentExecutionContext {
+      organizationId: string;
+      prisma?: PrismaClient;
+      logger?: Logger;
+      userId?: string | null;
+      agentName?: string;
+    }·
+    export interface AgentRunOptions<T> {
+      intent?: string;
+      buildMetrics?: (result: T) => Record<string, unknown>;
+      emitTelemetry?: boolean;
+    }·
+    const JSON_SERIALIZATION_ERROR_KEY = \"__serialization_error\";·
+    const toJsonValue = (value: unknown): Prisma.JsonValue => {
+      if (value === undefined) {
+        return null;
+      }·
+      if (value === null) {
+        return null;
+      }·
+      if (typeof value === \"number\" || typeof value === \"string\" || typeof value === \"boolean\") {
+        return value as Prisma.JsonValue;
+      }·
+      try {
+        return JSON.parse(JSON.stringify(value)) as Prisma.JsonValue;
+      } catch (error) {
+        return {
+          [JSON_SERIALIZATION_ERROR_KEY]: (error as Error).message ?? \"unserializable\",
+        } as unknown as Prisma.JsonValue;
+      }
+    };·
+    export async function executeAgentRun<T>(
+      agentId: string,
+      context: AgentExecutionContext,
+      input: unknown,
+      executor: () => Promise<T>,
+      options: AgentRunOptions<T> = {},
+    ): Promise<{ runId: string; result: T }> {
+      if (!context.organizationId || typeof context.organizationId !== \"string\") {
+        throw new Error(\"organizationId is required in agent context\");
+      }·
+      const prisma = context.prisma ?? defaultPrisma;
+      const runLogger = context.logger ?? defaultLogger;
+      const startedAt = new Date();·
+      const telemetryAgent = context.agentName ?? agentId;
+      const telemetryEnabled = options.emitTelemetry !== false;·
+      const run = await prisma.agentRun.create({
+        data: {
+          agentId,
+          organizationId: context.organizationId,
+          status: RunStatusEnum.RUNNING,
+          input: toJsonValue(input),
+          startedAt,
+          metrics: toJsonValue({
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+          }),
+        },
+      });·
+      runLogger.info({ runId: run.id, agentId, intent: options.intent }, \"Agent run started\");·
+      const contextWrapper = async () => {
+        try {
+          const result = await executor();
+          const completedAt = new Date();
+          const metrics = {
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+            durationMs: completedAt.getTime() - startedAt.getTime(),
+            ...(options.buildMetrics ? options.buildMetrics(result) : {}),
+          };·
+          const updateData: Prisma.AgentRunUpdateInput = {
+            status: RunStatusEnum.SUCCESS,
+            output: toJsonValue(result),
+            completedAt,
+            metrics: toJsonValue(metrics),
+          };·
+          await prisma.agentRun.update({
+            where: { id: run.id },
+            data: updateData,
+          });·
+          const durationMs = completedAt.getTime() - startedAt.getTime();
+          runLogger.info({ runId: run.id, agentId, intent: options.intent }, \"Agent run completed\");
+          if (telemetryEnabled) {
+            recordAgentRun(telemetryAgent, RunStatusEnum.SUCCESS, durationMs / 1000, options.intent);
+          }
+          return { runId: run.id, result };
+        } catch (error) {
+          const completedAt = new Date();
+          const failureMetrics = {
+            intent: options.intent ?? null,
+            userId: context.userId ?? null,
+            durationMs: completedAt.getTime() - startedAt.getTime(),
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          };·
+          const failureData: Prisma.AgentRunUpdateInput = {
+            status: RunStatusEnum.FAILED,
+            completedAt,
+            metrics: toJsonValue(failureMetrics),
+          };·
+          await prisma.agentRun.update({
+            where: { id: run.id },
+            data: failureData,
+          });·
+          const durationMs = failureMetrics.durationMs;
+          runLogger.error({ runId: run.id, agentId, intent: options.intent, error }, \"Agent run failed\");
+          if (telemetryEnabled) {
+            recordAgentRun(telemetryAgent, RunStatusEnum.FAILED, durationMs / 1000, options.intent);
+          }
+          throw error;
+        }
+      };·
+      return runWithAgentContext(
+        {
+          runId: run.id,
+          agentId,
+          agentName: context.agentName ?? agentId,
+          organizationId: context.organizationId,
+          prisma,
+        },
+        contextWrapper,
+      );
+    }
+    "
+
+      114 |       const content = readFileSync(path, 'utf-8');
+      115 |       expect(content).toContain('export async function executeAgentRun');
+    > 116 |       expect(content).toContain('startRun');
+          |                       ^
+      117 |       expect(content).toContain('finishRun');
+      118 |     });
+      119 |
+
+      at Object.<anonymous> (src/__tests__/p0-minimal.test.ts:116:23)
+
+FAIL src/agents/utils/__tests__/agent-run.spec.ts (5.872 s)
+  ● executeAgentRun utility › persists successful runs and returns result
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      70 |   const telemetryEnabled = options.emitTelemetry !== false;
+      71 |
+    > 72 |   const run = await prisma.agentRun.create({
+         |                                     ^
+      73 |     data: {
+      74 |       agentId,
+      75 |       organizationId: context.organizationId,
+
+      at executeAgentRun (src/agents/utils/agent-run.ts:72:37)
+      at Object.<anonymous> (src/agents/utils/__tests__/agent-run.spec.ts:72:26)
+
+  ● executeAgentRun utility › records failure metrics and rethrows errors
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {"result": {"ok": false}, "runId": "run-123"}
+
+      131 |     agentRunService.finishRun.mockResolvedValue(undefined);
+      132 |
+    > 133 |     await expect(
+          |                 ^
+      134 |       executeAgentRun(
+      135 |         "SeoAgent",
+      136 |         { organizationId: "org-2", logger: mockLogger },
+
+      at expect (../../node_modules/.pnpm/expect@30.2.0/node_modules/expect/build/index.js:2116:15)
+      at Object.<anonymous> (src/agents/utils/__tests__/agent-run.spec.ts:133:17)
+
+FAIL src/__tests__/orchestrator.persists.spec.ts (107.483 s)
+  ● Orchestrator AgentRun Persistence › should create AgentRun record when executing agent
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      50 |
+      51 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 52 |     expect(runs).toHaveLength(1);
+         |                  ^
+      53 |     const run = runs[0];
+      54 |
+      55 |     expect(run.status).toBe('SUCCESS');
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:52:18)
+
+  ● Orchestrator AgentRun Persistence › should record failure status when agent execution fails
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      85 |
+      86 |     const failedRuns = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 87 |     expect(failedRuns).toHaveLength(1);
+         |                        ^
+      88 |     expect(failedRuns[0].status).toBe('FAILED');
+      89 |   });
+      90 |
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:87:24)
+
+  ● Orchestrator AgentRun Persistence › should track duration metrics in AgentRunMetric
+
+    TypeError: Cannot read properties of undefined (reading 'metrics')
+
+      110 |
+      111 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+    > 112 |     expect(runs[0].metrics).toMatchObject({ intent: 'generate-draft' });
+          |                    ^
+      113 |   });
+      114 |
+      115 |   it('should handle missing organizationId gracefully', async () => {
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:112:20)
+
+  ● Orchestrator AgentRun Persistence › should store intent and objective in AgentRun
+
+    expect(received).toMatchObject(expected)
+
+    Matcher error: received value must be a non-null object
+
+    Received has value: undefined
+
+      162 |     const runs = await mockPrismaClient.agentRun.findMany({ where: { organizationId: 'test-org-id' } });
+      163 |     const seoRun = runs.find((run: any) => run.objective === 'seo-audit');
+    > 164 |     expect(seoRun?.meta).toMatchObject({ intent: 'seo-audit' });
+          |                          ^
+      165 |     expect(seoRun?.objective).toBeDefined();
+      166 |   });
+      167 | });
+
+      at Object.<anonymous> (src/__tests__/orchestrator.persists.spec.ts:164:26)
+
+FAIL src/__tests__/agents/DesignAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/DesignAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/DesignAgent.test.ts:5:1)
+
+FAIL src/__tests__/agents/InsightAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/InsightAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/InsightAgent.test.ts:5:1)
+
+FAIL src/__tests__/agents/AdAgent.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/AdAgent.ts:7:16)
+      at Object.<anonymous> (src/__tests__/agents/AdAgent.test.ts:5:1)
+
+FAIL src/__tests__/p0-validation.test.ts
+  ● P0 Hardening - Core Validation › Environment Configuration › should have DATABASE_URL configured
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+      17 |
+      18 |     it('should have DATABASE_URL configured', () => {
+    > 19 |       expect(process.env.DATABASE_URL).toBeDefined();
+         |                                        ^
+      20 |       expect(process.env.DATABASE_URL).toContain('postgresql://');
+      21 |     });
+      22 |   });
+
+      at Object.<anonymous> (src/__tests__/p0-validation.test.ts:19:40)
+
+FAIL src/lib/__tests__/fsdb.spec.ts
+  ● file-system database helpers › reads JSON documents from the data directory
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      36 |     createdFiles.push(samplePath);
+      37 |
+    > 38 |     const { readJSON } = await import("../fsdb.js");
+         |                          ^
+      39 |     const payload = await readJSON<{ message: string }>("sample.json");
+      40 |
+      41 |     expect(payload).toEqual({ message: "hello" });
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:38:26
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:38:26)
+
+  ● file-system database helpers › parses knowledge articles and derives metadata
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      49 |     createdFiles.push(mdPath, txtPath);
+      50 |
+    > 51 |     const { readKnowledge } = await import("../fsdb.js");
+         |                               ^
+      52 |     const items = await readKnowledge();
+      53 |
+      54 |     const ids = items.map((item) => item.id);
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:51:31
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:51:31)
+
+  ● file-system database helpers › returns an empty array when knowledge directory is unavailable
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/apps/api/src/lib/fsdb.ts:11
+    const ROOT = node_path_1.default.resolve(node_path_1.default.dirname((0, node_url_1.fileURLToPath)(import.meta.url)), "../../data");
+                                                                                                              ^^^^
+
+    SyntaxError: Cannot use 'import.meta' outside a module
+
+      66 |
+      67 |   it("returns an empty array when knowledge directory is unavailable", async () => {
+    > 68 |     const { readKnowledge } = await import("../fsdb.js");
+         |                               ^
+      69 |     const spy = jest.spyOn(fs, "readdir").mockRejectedValueOnce(new Error("missing"));
+      70 |
+      71 |     const result = await readKnowledge();
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at src/lib/__tests__/fsdb.spec.ts:68:31
+      at Object.<anonymous> (src/lib/__tests__/fsdb.spec.ts:68:31)
+
+FAIL src/__tests__/agent-learning.integration.spec.ts
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine/dist/index.js:1
+    import { PredictiveEngine } from './core/PredictiveEngine';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+    > 1 | import { NeonHubPredictiveEngine, PerformanceMetrics } from '@neonhub/predictive-engine';
+        | ^
+      2 |
+      3 | let predictiveEngine: NeonHubPredictiveEngine | null = null;
+      4 |
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at Object.<anonymous> (src/services/predictive-engine/index.ts:1:1)
+      at Object.<anonymous> (src/services/agent-learning.service.ts:3:1)
+      at Object.<anonymous> (src/__tests__/agent-learning.integration.spec.ts:2:1)
+
+FAIL src/services/__tests__/seed-agent-memory.spec.ts
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /Users/kofirusu/Desktop/NeonHub/modules/predictive-engine/dist/index.js:1
+    import { PredictiveEngine } from './core/PredictiveEngine';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      1 | #!/usr/bin/env tsx
+      2 | import { prisma } from "../src/db/prisma.js";
+    > 3 | import { PgVectorStore, createEmbeddingsProvider } from "@neonhub/predictive-engine";
+        | ^
+      4 |
+      5 | process.env.TEST_MODE = process.env.TEST_MODE ?? "1";
+      6 |
+
+      at Runtime.createScriptFromCode (../../node_modules/.pnpm/jest-runtime@30.2.0/node_modules/jest-runtime/build/index.js:1318:40)
+      at Object.<anonymous> (scripts/seed-agent-memory.ts:3:1)
+      at Object.<anonymous> (src/services/__tests__/seed-agent-memory.spec.ts:3:1)
+
+FAIL src/agents/tests/agents.test.ts
+  ● Test suite failed to run
+
+    TypeError: openai_1.OpenAI is not a constructor
+
+       5 | import { OpenAI } from 'openai';
+       6 |
+    >  7 | const openai = new OpenAI({
+         |                ^
+       8 |   apiKey: process.env.OPENAI_API_KEY || 'test-key-for-testing',
+       9 | });
+      10 |
+
+      at Object.<anonymous> (src/agents/AdAgent.ts:7:16)
+      at Object.<anonymous> (src/agents/tests/agents.test.ts:2:1)
+
+
+Test Suites: 13 failed, 73 passed, 86 total
+Tests:       12 failed, 347 passed, 359 total
+Snapshots:   0 total
+Time:        2936.107 s
+Ran all test suites.
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 test: `NODE_ENV=test NODE_OPTIONS='--max-old-space-size=6144' node ../../scripts/run-cli.mjs jest --maxWorkers=4 --no-coverage`
+Exit status 1

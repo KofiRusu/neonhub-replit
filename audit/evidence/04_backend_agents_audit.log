@@ -1,0 +1,123 @@
+=== Backend APIs (tRPC/REST) ===
+tRPC Routers:
+apps/api/src/trpc/routers/ai.router.ts
+apps/api/src/trpc/routers/seo.router.ts
+apps/api/src/trpc/routers/agent-runs.router.ts
+apps/api/src/trpc/routers/agents.router.ts
+apps/api/src/trpc/routers/__tests__/agents.router.test.ts
+apps/api/src/trpc/routers/trends.router.ts
+apps/api/src/trpc/routers/content.router.ts
+apps/api/src/trpc/routers/brand.router.ts
+apps/api/src/trpc/router.ts
+apps/api/src/__tests__/trpc/content.router.spec.ts
+apps/api/src/services/orchestration/router.ts
+apps/api/src/services/orchestration/tests/router.test.ts
+
+REST/API Routes:
+total 528
+drwx------  46 kofirusu  staff   1472 Nov  3 23:49 .
+drwx------  30 kofirusu  staff    960 Nov  4 22:04 ..
+drwxr-xr-x   3 kofirusu  staff     96 Nov  3 19:32 __tests__
+-rw-r--r--   1 kofirusu  staff   6150 Oct 27 20:33 agents.ts
+-rw-r--r--   1 kofirusu  staff    919 Oct 27 20:33 analytics.ts
+-rw-r--r--   1 kofirusu  staff   1199 Oct 27 20:33 auth.ts
+-rw-r--r--   1 kofirusu  staff   6141 Oct 27 20:33 billing.ts
+-rw-r--r--   1 kofirusu  staff   3043 Oct 28 18:49 brand-voice.ts
+-rw-r--r--   1 kofirusu  staff   1512 Oct 27 20:33 brandVoice.ts
+-rw-r--r--   1 kofirusu  staff   3612 Oct 28 18:49 budget.ts
+-rw-r--r--   1 kofirusu  staff   2836 Oct 29 00:20 budgets.ts
+-rw-r--r--   1 kofirusu  staff  13714 Oct 27 20:33 campaign.ts
+-rw-r--r--   1 kofirusu  staff  10721 Oct 27 20:33 connectors.ts
+-rw-r--r--   1 kofirusu  staff   3413 Nov  3 23:49 content.ts
+-rw-r--r--   1 kofirusu  staff   3424 Oct 27 20:33 credentials.ts
+-rw-r--r--   1 kofirusu  staff   6645 Oct 27 20:33 data-trust.ts
+-rw-r--r--   1 kofirusu  staff   4569 Oct 27 20:33 documents.ts
+-rw-r--r--   1 kofirusu  staff   6453 Oct 27 20:33 eco-metrics.ts
+-rw-r--r--   1 kofirusu  staff   4249 Oct 27 22:30 editorial-calendar.ts
+-rw-r--r--   1 kofirusu  staff    633 Oct 27 20:33 email.ts
+-rw-r--r--   1 kofirusu  staff   5387 Oct 27 20:33 feedback.ts
+-rw-r--r--   1 kofirusu  staff   4404 Oct 27 20:33 governance.ts
+-rw-r--r--   1 kofirusu  staff   4911 Nov  1 01:20 health.ts
+-rw-r--r--   1 kofirusu  staff   1837 Oct 27 20:33 jobs.ts
+-rw-r--r--   1 kofirusu  staff   3674 Oct 27 22:30 keywords.ts
+-rw-r--r--   1 kofirusu  staff   3701 Oct 28 01:51 marketing.ts
+-rw-r--r--   1 kofirusu  staff   4913 Oct 27 20:33 messages.ts
+-rw-r--r--   1 kofirusu  staff    534 Oct 27 20:33 metrics.schemas.ts
+-rw-r--r--   1 kofirusu  staff   5576 Oct 27 20:33 metrics.ts
+-rw-r--r--   1 kofirusu  staff  17030 Nov  3 23:03 oauth.ts
+-rw-r--r--   1 kofirusu  staff   2513 Oct 27 20:33 orchestrate.ts
+-rw-r--r--   1 kofirusu  staff   5775 Oct 27 20:33 orchestration.ts
+-rw-r--r--   1 kofirusu  staff   3938 Oct 28 18:48 person.ts
+-rw-r--r--   1 kofirusu  staff   3255 Oct 27 22:30 personas.ts
+-rw-r--r--   1 kofirusu  staff   3261 Oct 27 20:33 predictive.ts
+-rw-r--r--   1 kofirusu  staff   2140 Oct 29 00:21 sdk-handshake.ts
+drwxr-xr-x   8 kofirusu  staff    256 Oct 27 21:39 seo
+-rw-r--r--   1 kofirusu  staff   3720 Oct 27 20:33 settings.ts
+-rw-r--r--   1 kofirusu  staff   3043 Oct 28 23:58 sitemaps.ts
+-rw-r--r--   1 kofirusu  staff   1561 Oct 28 20:48 sms.ts
+-rw-r--r--   1 kofirusu  staff   3064 Oct 28 20:48 social.ts
+-rw-r--r--   1 kofirusu  staff    480 Oct 27 20:33 stripe-webhook.ts
+-rw-r--r--   1 kofirusu  staff    565 Oct 27 20:33 support.ts
+-rw-r--r--   1 kofirusu  staff   5093 Oct 27 20:33 tasks.ts
+-rw-r--r--   1 kofirusu  staff   9552 Oct 27 20:33 team.ts
+-rw-r--r--   1 kofirusu  staff   2603 Oct 27 20:33 trends.ts
+
+=== Services Layer ===
+Service Modules:
+total 528
+drwx------  50 kofirusu  staff   1600 Nov  3 23:49 .
+drwx------  30 kofirusu  staff    960 Nov  4 22:04 ..
+drwxr-xr-x   4 kofirusu  staff    128 Nov  3 23:20 __tests__
+-rw-r--r--   1 kofirusu  staff   2465 Nov  3 23:03 agent-learning.service.ts
+-rw-r--r--   1 kofirusu  staff   6921 Nov  3 23:03 agent-run.service.ts
+-rw-r--r--   1 kofirusu  staff    400 Oct 27 20:33 analytics.service.ts
+-rw-r--r--   1 kofirusu  staff    655 Nov  3 23:03 analytics.ts
+drwxr-xr-x   3 kofirusu  staff     96 Oct 27 16:29 billing
+-rw-r--r--   1 kofirusu  staff   9253 Oct 28 22:24 brand-voice-ingestion.ts
+-rw-r--r--   1 kofirusu  staff  11391 Oct 28 15:31 brand-voice.service.ts
+-rw-r--r--   1 kofirusu  staff   1034 Oct 27 20:33 brandVoice.service.ts
+-rw-r--r--   1 kofirusu  staff   4883 Oct 27 20:33 brandVoiceOptimizer.service.ts
+-rw-r--r--   1 kofirusu  staff   5528 Oct 28 18:48 budget.service.ts
+drwxr-xr-x   7 kofirusu  staff    224 Oct 28 15:56 budgeting
+-rw-r--r--   1 kofirusu  staff   3209 Oct 27 20:33 connector.service.ts
+-rw-r--r--   1 kofirusu  staff    509 Oct 27 20:33 content.service.ts
+-rw-r--r--   1 kofirusu  staff   5769 Oct 27 20:33 credentials.service.ts
+drwxr-xr-x   3 kofirusu  staff     96 Oct 27 16:29 data-trust
+-rw-r--r--   1 kofirusu  staff   7785 Oct 27 20:33 documents.service.ts
+
+=== Agents/Workers ===
+Agent Modules:
+total 320
+drwx------  21 kofirusu  staff    672 Nov  3 23:49 .
+drwx------  30 kofirusu  staff    960 Nov  4 22:04 ..
+-rw-r--r--   1 kofirusu  staff   4914 Oct 27 20:33 AdAgent.ts
+-rw-r--r--   1 kofirusu  staff   3183 Oct 27 20:33 BrandVoiceAgent.ts
+-rw-r--r--   1 kofirusu  staff  14681 Oct 27 20:33 CampaignAgent.ts
+-rw-r--r--   1 kofirusu  staff   5380 Oct 27 20:33 DesignAgent.ts
+-rw-r--r--   1 kofirusu  staff  20306 Nov  3 23:49 EmailAgent.ts
+-rw-r--r--   1 kofirusu  staff   5281 Oct 27 20:33 InsightAgent.ts
+-rw-r--r--   1 kofirusu  staff  35423 Nov  3 23:49 SEOAgent.ts
+-rw-r--r--   1 kofirusu  staff   4833 Oct 28 15:39 SMSAgent.ts
+-rw-r--r--   1 kofirusu  staff  21394 Oct 29 21:03 SocialAgent.ts
+-rw-r--r--   1 kofirusu  staff   3918 Oct 28 18:50 SocialMessagingAgent.ts
+-rw-r--r--   1 kofirusu  staff  14399 Oct 29 21:11 SupportAgent.ts
+-rw-r--r--   1 kofirusu  staff   2816 Oct 28 22:42 TrendAgent.ts
+drwxr-xr-x   5 kofirusu  staff    160 Oct 29 20:56 __tests__
+drwxr-xr-x   4 kofirusu  staff    128 Nov  3 23:03 _shared
+-rw-r--r--   1 kofirusu  staff    204 Oct 27 20:33 _types.ts
+drwxr-xr-x   3 kofirusu  staff     96 Oct 22 14:43 base
+drwxr-xr-x   3 kofirusu  staff     96 Oct 28 21:34 content
+drwxr-xr-x   3 kofirusu  staff     96 Oct 29 15:59 tests
+drwxr-xr-x   4 kofirusu  staff    128 Nov  3 23:49 utils
+
+Orchestration:
+total 56
+drwxr-xr-x   9 kofirusu  staff   288 Nov  3 23:49 .
+drwx------  50 kofirusu  staff  1600 Nov  3 23:49 ..
+-rw-r--r--   1 kofirusu  staff   650 Oct 27 20:33 bootstrap.ts
+-rw-r--r--   1 kofirusu  staff  2891 Oct 27 20:33 index.ts
+-rw-r--r--   1 kofirusu  staff  1995 Oct 27 20:33 policies.ts
+-rw-r--r--   1 kofirusu  staff  1090 Oct 27 20:33 registry.ts
+-rw-r--r--   1 kofirusu  staff  7067 Nov  3 23:49 router.ts
+drwxr-xr-x   4 kofirusu  staff   128 Nov  3 23:49 tests
+-rw-r--r--   1 kofirusu  staff  3381 Oct 27 20:33 types.ts

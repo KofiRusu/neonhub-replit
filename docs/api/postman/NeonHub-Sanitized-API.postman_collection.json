@@ -1,0 +1,1144 @@
+{
+  "info": {
+    "name": "NeonHub Sanitized API",
+    "description": "Sanitized public API surface for NeonHub platform - For external agency cost estimation",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "https://api.neonhub.example",
+      "type": "string"
+    },
+    {
+      "key": "AUTH_TOKEN",
+      "value": "{{AUTH_TOKEN}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Public",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/health",
+              "host": ["{{BASE_URL}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Metrics (Prometheus)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/metrics",
+              "host": ["{{BASE_URL}}"],
+              "path": ["metrics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/me",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/logout",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaigns",
+      "item": [
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q4 Email Campaign\",\n  \"type\": \"email\",\n  \"config\": {\n    \"objective\": \"lead_generation\",\n    \"channels\": [\"email\"],\n    \"budget\": 5000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns"]
+            }
+          }
+        },
+        {
+          "name": "List Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns?page=1&limit=10&status=draft",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "draft"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Campaign",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q4 Email Campaign - Updated\",\n  \"config\": {\n    \"budget\": 6000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Campaign Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/status",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Schedule Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-12-01T00:00:00Z\",\n  \"endDate\": \"2025-12-31T23:59:59Z\",\n  \"emailSequence\": [\n    {\n      \"day\": 1,\n      \"subject\": \"Special Offer\",\n      \"body\": \"Check out our exclusive deals\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/schedule",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "schedule"]
+            }
+          }
+        },
+        {
+          "name": "Run A/B Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variants\": [\n    { \"name\": \"Variant A\", \"config\": {} },\n    { \"name\": \"Variant B\", \"config\": {} }\n  ],\n  \"sampleSize\": 1000,\n  \"duration\": 7\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/ab-test",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "ab-test"]
+            }
+          }
+        },
+        {
+          "name": "Get Campaign Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/analytics?dateRange=7d",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "analytics"],
+              "query": [
+                {
+                  "key": "dateRange",
+                  "value": "7d"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Optimize Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optimizationGoals\": [\"ctr\", \"conversion\"],\n  \"budget\": 7000\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/optimize",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "optimize"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content Generation",
+      "item": [
+        {
+          "name": "Generate Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"How to optimize your SEO strategy\",\n  \"tone\": \"professional\",\n  \"audience\": \"Marketing professionals\",\n  \"brandVoiceId\": \"{{BRAND_VOICE_ID}}\",\n  \"callToAction\": \"Learn more about our services\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/content/generate",
+              "host": ["{{BASE_URL}}"],
+              "path": ["content", "generate"]
+            }
+          }
+        },
+        {
+          "name": "List Content Drafts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/content/drafts?page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["content", "drafts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Draft",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/content/drafts/{{DRAFT_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["content", "drafts", "{{DRAFT_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email",
+      "item": [
+        {
+          "name": "Generate Email Sequence",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"Q4 Sales Push\",\n  \"audience\": \"E-commerce customers\",\n  \"notes\": \"Focus on holiday season\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/email/sequence",
+              "host": ["{{BASE_URL}}"],
+              "path": ["email", "sequence"]
+            }
+          }
+        },
+        {
+          "name": "Optimize Subject Line",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"originalSubject\": \"Check out our new products\",\n  \"context\": \"Holiday sale\",\n  \"tone\": \"friendly\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/email/optimize-subject",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "email", "optimize-subject"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Social Media",
+      "item": [
+        {
+          "name": "Send Direct Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"personId\": \"{{PERSON_ID}}\",\n  \"objective\": \"Follow-up on inquiry\",\n  \"brandId\": \"{{BRAND_ID}}\",\n  \"platform\": \"instagram\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/social/instagram/dm",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "social", "instagram", "dm"]
+            }
+          }
+        },
+        {
+          "name": "Generate Social Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Our new product launch is happening next week!\",\n  \"platform\": \"x\",\n  \"tone\": \"excited\",\n  \"includeHashtags\": true\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/social/generate",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "social", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Optimize for Platform",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Check out our new blog post on digital marketing trends\",\n  \"platform\": \"linkedin\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/social/optimize",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "social", "optimize"]
+            }
+          }
+        },
+        {
+          "name": "Schedule Social Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"platform\": \"instagram\",\n  \"content\": \"Exciting news coming soon!\",\n  \"mediaUrls\": [\"https://cdn.example.com/image1.jpg\"],\n  \"scheduledFor\": \"2025-12-15T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/campaigns/{{CAMPAIGN_ID}}/social/schedule",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "campaigns", "{{CAMPAIGN_ID}}", "social", "schedule"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SEO",
+      "item": [
+        {
+          "name": "SEO API Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo"]
+            }
+          }
+        },
+        {
+          "name": "Classify Keyword Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"best project management software 2025\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/keywords/classify-intent",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "keywords", "classify-intent"]
+            }
+          }
+        },
+        {
+          "name": "Generate Title Tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"SEO best practices\",\n  \"topic\": \"Search engine optimization\",\n  \"brandName\": \"NeonHub\",\n  \"maxChars\": 60\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/meta/generate-title",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "meta", "generate-title"]
+            }
+          }
+        },
+        {
+          "name": "Generate Meta Descriptions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"SEO best practices\",\n  \"topic\": \"Search engine optimization\",\n  \"callToAction\": \"Learn more\",\n  \"maxChars\": 160\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/meta/generate-description",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "meta", "generate-description"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"This is a sample article about digital marketing...\",\n  \"keyword\": \"digital marketing\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/content/analyze",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "content", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Get Weekly SEO Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/recommendations/weekly?limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "recommendations", "weekly"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Analyze Competitors",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"domains\": [\"competitor1.com\", \"competitor2.com\"],\n  \"keywords\": [\"marketing\", \"seo\", \"content\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/seo/recommendations/competitors",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "seo", "recommendations", "competitors"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team Management",
+      "item": [
+        {
+          "name": "List Team Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/team/members?role=Admin",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "team", "members"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "Admin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Invite Team Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newmember@example.com\",\n  \"role\": \"Member\",\n  \"message\": \"Welcome to the team!\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/team/invite",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "team", "invite"]
+            }
+          }
+        },
+        {
+          "name": "Get Team Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/team/stats",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "team", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Billing",
+      "item": [
+        {
+          "name": "Get Current Plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/billing/plan",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "billing", "plan"]
+            }
+          }
+        },
+        {
+          "name": "Get Usage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/billing/usage",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "billing", "usage"]
+            }
+          }
+        },
+        {
+          "name": "Get Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/billing/invoices",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "billing", "invoices"]
+            }
+          }
+        },
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"pro\",\n  \"successUrl\": \"https://example.com/success\",\n  \"cancelUrl\": \"https://example.com/cancel\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/billing/checkout",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "billing", "checkout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Create Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Q4 Marketing Strategy\",\n  \"content\": \"Document content here...\",\n  \"type\": \"proposal\",\n  \"tags\": [\"marketing\", \"strategy\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/documents",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "documents"]
+            }
+          }
+        },
+        {
+          "name": "List Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/documents?status=draft",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "documents"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "draft"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/documents/{{DOCUMENT_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "documents", "{{DOCUMENT_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverId\": \"{{RECEIVER_ID}}\",\n  \"subject\": \"Campaign Update\",\n  \"body\": \"Here's the latest campaign performance...\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/messages",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "List Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/messages",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/messages/unread-count",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "messages", "unread-count"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/settings",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timezone\": \"America/New_York\",\n  \"locale\": \"en-US\",\n  \"emailNotifications\": true\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/settings",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Brand Voice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tone\": \"professional\",\n  \"vocabulary\": \"formal\",\n  \"values\": [\"trust\", \"innovation\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/settings/brand-voice",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "settings", "brand-voice"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs & Tasks",
+      "item": [
+        {
+          "name": "List Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/jobs?page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Job Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{AUTH_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/jobs/{{JOB_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "jobs", "{{JOB_ID}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

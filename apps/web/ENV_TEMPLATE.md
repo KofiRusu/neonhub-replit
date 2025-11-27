@@ -8,8 +8,8 @@ Create `.env.local` with these variables:
 # ==============================================
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXT_PUBLIC_API_URL="http://localhost:3001"
-NEXT_PUBLIC_NH_API_URL="http://localhost:4000"
-NEXT_PUBLIC_NH_USE_MOCKS=true
+NEXT_PUBLIC_NH_API_URL="http://localhost:3001"
+NEXT_PUBLIC_NH_USE_MOCKS=false
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
 NEXT_PUBLIC_STRIPE_PRICE_ID_STARTER="price_..."
 NEXT_PUBLIC_STRIPE_PRICE_ID_PRO="price_..."
@@ -45,8 +45,8 @@ NEXT_PUBLIC_ENABLE_REAL_TIME=true
 
 1. **NEXT_PUBLIC_SITE_URL** - Your production domain (e.g., `https://neonhubecosystem.com`)
 2. **NEXT_PUBLIC_API_URL** - Your backend API URL (e.g., `https://api.neonhubecosystem.com`)
-3. **NEXT_PUBLIC_NH_API_URL** - Base URL for the NeonHub SDK transport (default `http://localhost:4000`)
-4. **NEXT_PUBLIC_NH_USE_MOCKS** - Set to `false` when you want to hit the real API
+3. **NEXT_PUBLIC_NH_API_URL** - Base URL for the NeonHub SDK transport (default `http://localhost:3001`)
+4. **NEXT_PUBLIC_NH_USE_MOCKS** - Set to `true` only when you want to force mock transport responses
 5. **NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY** - Production publishable key from Stripe Dashboard
 6. **NEXT_PUBLIC_STRIPE_PRICE_ID_\*** - Price IDs for Starter/Pro/Enterprise plans
 7. **NEXT_PUBLIC_STRIPE_LIVE** - Set to `true` once live keys are configured

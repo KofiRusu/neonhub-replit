@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:0.104.0
+    container_name: neonhub-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/otel-config.yaml"]
+    volumes:
+      - ./ops/otel/otel-config.yaml:/etc/otelcol/otel-config.yaml:ro
+    ports:
+      - "4318:4318"   # OTLP/HTTP
+      - "8889:8889"   # Prometheus scrape endpoint
+      - "13133:13133" # Health check
+    networks:
+      - neonhub
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Override for API service with telemetry
+  api:
+    environment:
+      TELEMETRY_ENABLED: "true"
+      SERVICE_NAME: "neonhub-api-stg"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      LOG_LEVEL: "info"
+      NODE_ENV: "staging"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+    networks:
+      - neonhub
+
+  # Override for Web service
+  web:
+    environment:
+      TELEMETRY_ENABLED: "true"
+      SERVICE_NAME: "neonhub-web-stg"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      LOG_LEVEL: "info"
+      NODE_ENV: "staging"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+    networks:
+      - neonhub
+
+networks:
+  neonhub:
+    driver: bridge
+

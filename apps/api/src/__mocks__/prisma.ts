@@ -69,7 +69,7 @@ export const mockPrismaClient: any = {
   agent: {
     findFirst: jest.fn((args) => {
       const where = args?.where || {};
-      for (const [id, agent] of agents.entries()) {
+      for (const [, agent] of agents.entries()) {
         if (where.id && agent.id !== where.id) continue;
         if (where.organizationId && agent.organizationId !== where.organizationId) continue;
         if (where.name && agent.name !== where.name) continue;

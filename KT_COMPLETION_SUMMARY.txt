@@ -1,0 +1,11 @@
+1. Schema validated on 2025-11-10; migrations still await Agency DSN (P1001 recorded in KT_SIGNALS.md).
+2. Database + agent audit refreshed in KT_DB_AGENT_AUDIT.md, now noting ToolExecution + queue instrumentation.
+3. Smoke tests (`tests/orchestrate.mock.spec.ts`, `tests/queue.mock.spec.ts`) pass via `USE_MOCK_CONNECTORS=true pnpm --filter @neonhub/backend-v3.2 test -- … --coverage=false`; legacy suites remain skipped until fixed.
+4. Connector factory/mocks/toggle + telemetry proxy documented in KT_CONNECTOR_SUMMARY.md.
+5. Prometheus metrics (/metrics curl) and Ops checklist captured in KT_HANDOFF_CHECKLIST.md and KT_AGENT_SUMMARY.md.
+6. CI review completed; `db-deploy.yml` hardened with PGOPTIONS, retries, and seed gating per ci/db-deploy.hardening.md.
+7. Least-privilege SQL plan + secret mapping live in docs/security/LEAST_PRIVILEGE_ROLES.md.
+8. KT_TASKS_BREAKDOWN.csv highlights remaining work (lockfile, DSNs, Prom scrape, roles); Codex tasks dominate, Agency work ≤5 hrs.
+9. KT_EXECUTIVE_SUMMARY.md + KT_SIGNALS.md provide leadership snapshot, risks, and command evidence.
+10. KT_PACKAGE_INDEX.md, KT_SYSTEM_MAP.mmd, and this summary form the final KT bundle ready for Agency sign-off once secrets + scrape config land.
+✅ Codex closeout complete — lockfile attempt documented, ToolExecution verified, smokes green, workflow hardened, KT updated.

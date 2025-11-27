@@ -1,0 +1,101 @@
+ WARN  using --force I sure hope you know what you are doing
+ WARN  `node_modules` is present. Lockfile only installation will make it out-of-date
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 11, reused 0, downloaded 0, added 0
+Progress: resolved 15, reused 0, downloaded 0, added 0
+Progress: resolved 23, reused 0, downloaded 1, added 0
+apps/api                                 |  WARN  deprecated @types/redis@4.0.11
+Progress: resolved 24, reused 0, downloaded 1, added 0
+Progress: resolved 27, reused 0, downloaded 1, added 0
+Progress: resolved 31, reused 0, downloaded 1, added 0
+Progress: resolved 35, reused 0, downloaded 1, added 0
+Progress: resolved 39, reused 0, downloaded 1, added 0
+Progress: resolved 44, reused 0, downloaded 1, added 0
+Progress: resolved 48, reused 0, downloaded 1, added 0
+Progress: resolved 53, reused 0, downloaded 1, added 0
+Progress: resolved 54, reused 0, downloaded 1, added 0
+Progress: resolved 56, reused 0, downloaded 1, added 0
+Progress: resolved 57, reused 0, downloaded 1, added 0
+Progress: resolved 58, reused 0, downloaded 1, added 0
+Progress: resolved 59, reused 0, downloaded 1, added 0
+apps/api                                 |  WARN  deprecated puppeteer@23.11.1
+Progress: resolved 63, reused 0, downloaded 1, added 0
+Progress: resolved 65, reused 0, downloaded 1, added 0
+Progress: resolved 68, reused 0, downloaded 1, added 0
+Progress: resolved 69, reused 0, downloaded 1, added 0
+Progress: resolved 74, reused 0, downloaded 1, added 0
+Progress: resolved 79, reused 0, downloaded 1, added 0
+Progress: resolved 85, reused 0, downloaded 1, added 0
+Progress: resolved 91, reused 0, downloaded 1, added 0
+Progress: resolved 97, reused 0, downloaded 1, added 0
+Progress: resolved 105, reused 0, downloaded 1, added 0
+Progress: resolved 107, reused 0, downloaded 1, added 0
+Progress: resolved 109, reused 0, downloaded 1, added 0
+Progress: resolved 110, reused 0, downloaded 1, added 0
+Progress: resolved 113, reused 0, downloaded 1, added 0
+Progress: resolved 117, reused 0, downloaded 1, added 0
+Progress: resolved 126, reused 0, downloaded 1, added 0
+core/compliance-consent                  |  WARN  deprecated crypto@1.0.1
+Progress: resolved 134, reused 0, downloaded 1, added 0
+Progress: resolved 138, reused 0, downloaded 1, added 0
+Progress: resolved 140, reused 0, downloaded 1, added 0
+core/eco-optimizer                       |  WARN  deprecated @azure/monitor-query@1.3.3
+Progress: resolved 145, reused 0, downloaded 1, added 0
+Progress: resolved 150, reused 0, downloaded 1, added 0
+Progress: resolved 151, reused 0, downloaded 1, added 0
+modules/predictive-engine                |  WARN  deprecated @types/winston@2.4.4
+Progress: resolved 153, reused 0, downloaded 1, added 0
+Progress: resolved 155, reused 0, downloaded 1, added 0
+Progress: resolved 162, reused 0, downloaded 1, added 0
+modules/predictive-engine                |  WARN  deprecated json2csv@5.0.7
+Progress: resolved 174, reused 0, downloaded 1, added 0
+Progress: resolved 181, reused 0, downloaded 1, added 0
+Progress: resolved 182, reused 0, downloaded 1, added 0
+Progress: resolved 183, reused 0, downloaded 1, added 0
+Progress: resolved 196, reused 0, downloaded 1, added 0
+Progress: resolved 211, reused 0, downloaded 1, added 0
+Progress: resolved 218, reused 0, downloaded 1, added 0
+Progress: resolved 223, reused 0, downloaded 1, added 0
+Progress: resolved 225, reused 0, downloaded 1, added 0
+Progress: resolved 230, reused 0, downloaded 1, added 0
+Progress: resolved 235, reused 0, downloaded 1, added 0
+Progress: resolved 239, reused 0, downloaded 1, added 0
+Progress: resolved 243, reused 0, downloaded 1, added 0
+Progress: resolved 250, reused 0, downloaded 1, added 0
+Progress: resolved 266, reused 0, downloaded 1, added 0
+Progress: resolved 276, reused 0, downloaded 1, added 0
+Progress: resolved 287, reused 0, downloaded 1, added 0
+Progress: resolved 300, reused 0, downloaded 1, added 0
+Progress: resolved 308, reused 0, downloaded 1, added 0
+Progress: resolved 312, reused 0, downloaded 1, added 0
+Progress: resolved 315, reused 0, downloaded 1, added 0
+Progress: resolved 317, reused 0, downloaded 1, added 0
+Progress: resolved 341, reused 0, downloaded 1, added 0
+Progress: resolved 377, reused 0, downloaded 1, added 0
+Progress: resolved 405, reused 0, downloaded 1, added 0
+Progress: resolved 431, reused 0, downloaded 1, added 0
+Progress: resolved 442, reused 0, downloaded 1, added 0
+Progress: resolved 456, reused 0, downloaded 1, added 0
+Progress: resolved 466, reused 0, downloaded 1, added 0
+Progress: resolved 470, reused 0, downloaded 1, added 0
+Progress: resolved 482, reused 0, downloaded 1, added 0
+Progress: resolved 489, reused 0, downloaded 1, added 0
+Progress: resolved 496, reused 0, downloaded 1, added 0
+Progress: resolved 503, reused 0, downloaded 1, added 0
+Progress: resolved 512, reused 0, downloaded 1, added 0
+Progress: resolved 515, reused 0, downloaded 1, added 0
+Progress: resolved 518, reused 0, downloaded 1, added 0
+Progress: resolved 521, reused 0, downloaded 1, added 0
+Progress: resolved 526, reused 0, downloaded 1, added 0
+Progress: resolved 532, reused 0, downloaded 1, added 0
+Progress: resolved 543, reused 0, downloaded 1, added 0
+Progress: resolved 552, reused 0, downloaded 1, added 0
+Progress: resolved 566, reused 0, downloaded 1, added 0
+/Users/kofirusu/Desktop/NeonHub/core/cognitive-ethics:
+ ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/@neonhub%2Ffederation: Not Found - 404
+
+This error happened while installing the dependencies of @neonhub/data-trust@4.0.0
+
+@neonhub/federation is not in the npm registry, or you have no permission to fetch it.
+
+An authorization header was used: Bearer npm_[hidden]

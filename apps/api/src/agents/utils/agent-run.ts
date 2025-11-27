@@ -4,6 +4,14 @@ import type { Logger } from "pino";
 import { prisma as defaultPrisma } from "../../db/prisma.js";
 import { logger as defaultLogger } from "../../lib/logger.js";
 import { runWithAgentContext } from "../../services/orchestration/run-context.js";
+import { recordAgentRun } from "../../lib/metrics.js";
+
+/**
+ * Phase 3 telemetry plan:
+ *  - Emit `recordAgentRun` metrics for every agent execution (outside the orchestrator) so direct agent usage stays
+ *    observable in dev/test environments.
+ *  - Allow orchestrator to opt-out (it records at the router level) via `options.emitTelemetry`.
+ */
 
 export interface AgentExecutionContext {
   organizationId: string;
@@ -16,6 +24,7 @@ export interface AgentExecutionContext {
 export interface AgentRunOptions<T> {
   intent?: string;
   buildMetrics?: (result: T) => Record<string, unknown>;
+  emitTelemetry?: boolean;
 }
 
 const JSON_SERIALIZATION_ERROR_KEY = "__serialization_error";
@@ -57,6 +66,9 @@ export async function executeAgentRun<T>(
   const runLogger = context.logger ?? defaultLogger;
   const startedAt = new Date();
 
+  const telemetryAgent = context.agentName ?? agentId;
+  const telemetryEnabled = options.emitTelemetry !== false;
+
   const run = await prisma.agentRun.create({
     data: {
       agentId,
@@ -96,7 +108,11 @@ export async function executeAgentRun<T>(
         data: updateData,
       });
 
+      const durationMs = completedAt.getTime() - startedAt.getTime();
       runLogger.info({ runId: run.id, agentId, intent: options.intent }, "Agent run completed");
+      if (telemetryEnabled) {
+        recordAgentRun(telemetryAgent, RunStatusEnum.SUCCESS, durationMs / 1000, options.intent);
+      }
       return { runId: run.id, result };
     } catch (error) {
       const completedAt = new Date();
@@ -119,7 +135,11 @@ export async function executeAgentRun<T>(
         data: failureData,
       });
 
+      const durationMs = failureMetrics.durationMs;
       runLogger.error({ runId: run.id, agentId, intent: options.intent, error }, "Agent run failed");
+      if (telemetryEnabled) {
+        recordAgentRun(telemetryAgent, RunStatusEnum.FAILED, durationMs / 1000, options.intent);
+      }
       throw error;
     }
   };

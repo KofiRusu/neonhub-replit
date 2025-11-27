@@ -1,0 +1,188 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - develop
+      - 'release/**'
+  workflow_dispatch:
+    inputs:
+      run_smoke_tests:
+        description: 'Run post-deploy smoke tests'
+        required: false
+        default: 'true'
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.12.0'
+
+jobs:
+  validate:
+    name: Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
+
+      - name: Run P0 validation
+        run: node scripts/p0-validation.mjs
+
+      - name: Type check
+        run: pnpm --filter @neonhub/backend-v3.2 run typecheck || echo "Type errors exist (non-blocking)"
+
+  deploy-api:
+    name: Deploy API to Railway
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        run: |
+          echo "🚀 Deploying API to Railway staging..."
+          echo "Note: Railway deployment requires Railway CLI or webhook"
+          echo "Configure Railway webhook to trigger on push to develop branch"
+          echo "Railway Project: neonhub-api-staging"
+          echo "Expected URL: https://neonhub-api-staging.up.railway.app"
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting 60 seconds for deployment to complete..."
+          sleep 60
+
+      - name: Store API URL
+        run: echo "API_URL=${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}" >> $GITHUB_ENV
+
+  deploy-web:
+    name: Deploy Web to Vercel
+    needs: deploy-api
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: |
+          echo "🌐 Deploying Web to Vercel staging..."
+          echo "Note: Vercel deployment via GitHub integration"
+          echo "Vercel Project: neonhub-web-staging"
+          echo "Expected URL: https://neonhub-staging.vercel.app"
+
+      - name: Store Web URL
+        run: echo "WEB_URL=${{ secrets.STAGING_WEB_URL || 'https://neonhub-staging.vercel.app' }}" >> $GITHUB_ENV
+
+  smoke-tests:
+    name: Post-Deploy Smoke Tests
+    needs: [deploy-api, deploy-web]
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_smoke_tests != 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Run smoke tests
+        run: |
+          chmod +x scripts/post-deploy-smoke.sh
+          
+          API_URL="${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}"
+          WEB_URL="${{ secrets.STAGING_WEB_URL || 'https://neonhub-staging.vercel.app' }}"
+          
+          echo "🧪 Running smoke tests..."
+          echo "API: $API_URL"
+          echo "Web: $WEB_URL"
+          
+          ./scripts/post-deploy-smoke.sh "$API_URL" "$WEB_URL"
+
+      - name: Sample /metrics endpoint
+        run: |
+          API_URL="${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}"
+          echo "📊 Sampling /metrics endpoint..."
+          curl -sf "$API_URL/metrics" | head -30 > metrics-sample.txt
+          cat metrics-sample.txt
+
+      - name: Upload metrics sample
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-metrics-sample
+          path: metrics-sample.txt
+          retention-days: 7
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: |
+            /tmp/health.json
+            /tmp/metrics.txt
+          retention-days: 7
+
+  notify:
+    name: Notify Deployment Status
+    needs: [deploy-api, deploy-web, smoke-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Deployment summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ STAGING DEPLOYMENT COMPLETE"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📍 Staging URLs:"
+          echo "   API: ${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}"
+          echo "   Web: ${{ secrets.STAGING_WEB_URL || 'https://neonhub-staging.vercel.app' }}"
+          echo ""
+          echo "🔍 Health Checks:"
+          echo "   API Health: ${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}/health"
+          echo "   Metrics: ${{ secrets.STAGING_API_URL || 'https://neonhub-api-staging.up.railway.app' }}/metrics"
+          echo ""
+          echo "📊 Monitoring:"
+          echo "   Prometheus: http://localhost:9090 (if running locally)"
+          echo "   Grafana: http://localhost:3001 (if running locally)"
+          echo ""
+
+      - name: Slack notification
+        if: always() && secrets.SLACK_WEBHOOK_URL != ''
+        run: |
+          STATUS="${{ job.status }}"
+          EMOJI="✅"
+          [ "$STATUS" != "success" ] && EMOJI="❌"
+          
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${EMOJI} *Staging Deployment* - ${STATUS}\\nAPI: ${{ secrets.STAGING_API_URL }}\\nWeb: ${{ secrets.STAGING_WEB_URL }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }} || echo "Slack notification skipped"

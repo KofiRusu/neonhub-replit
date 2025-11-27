@@ -29,7 +29,7 @@ const resolveBaseURL = (provided?: string): string => {
     getEnv('NEONHUB_API_URL') ??
     getEnv('NEXT_PUBLIC_NH_API_URL') ??
     getEnv('NH_API_URL') ??
-    'http://localhost:4000';
+    'http://localhost:3001';
 
   if (!candidate) {
     throw new Error('baseURL is required');

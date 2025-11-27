@@ -1,0 +1,8 @@
+{
+  "info": { "name": "NeonHub Fintech (Mocks)", "_postman_id": "neonhub-fintech-mocks", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "item": [
+    { "name": "Metrics", "request": { "method": "GET", "url": "http://localhost:3001/api/metrics" } },
+    { "name": "Dev Trigger Run", "request": { "method": "GET", "url": "http://localhost:3001/api/dev/trigger-run?agent=ContentAgent&obj=smoke" } },
+    { "name": "Stripe Webhook (Mock)", "request": { "method": "POST", "header": [ { "key": "X-Mock-Event", "value": "payment_intent.succeeded" } ], "url": "http://localhost:3001/api/webhooks/stripe", "body": { "mode": "raw", "raw": "{\"id\":\"evt_mock_123\",\"type\":\"payment_intent.succeeded\"}" } } }
+  ]
+}

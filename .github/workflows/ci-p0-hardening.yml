@@ -1,0 +1,64 @@
+name: CI P0 Hardening
+
+on:
+  push:
+    branches:
+      - feat/p0-hardening-dual-agent
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      USE_MOCK_CONNECTORS: true
+      NODE_OPTIONS: --max-old-space-size=4096
+      CI: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @neonhub/backend-v3.2 run prisma:generate
+
+      - name: Run P0 validation script
+        run: node scripts/p0-validation.mjs
+
+      - name: Build API bundle
+        run: pnpm --filter @neonhub/backend-v3.2 run build
+
+      - name: Start API for metrics smoke test
+        run: |
+          export PORT=4100
+          export NODE_ENV=test
+          pnpm --filter @neonhub/backend-v3.2 run start &
+          echo $! > server.pid
+          sleep 6
+
+      - name: Assert /metrics endpoint exposes required series
+        run: |
+          curl -sf http://localhost:4100/metrics | tee metrics.out
+          grep -q "agent_runs_total" metrics.out
+
+      - name: Stop API server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi
+          rm -f server.pid metrics.out

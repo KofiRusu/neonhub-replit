@@ -1,0 +1,79 @@
+=== Type Check ===
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/ai/utils/cost.ts(8,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/ai/utils/cost.ts(9,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/lib/raw-body.ts(1,37): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/middleware/rbac.ts(59,34): error TS2339: Property 'toLowerCase' does not exist on type '{ name: string; description: string; id: string; createdAt: Date; updatedAt: Date; organizationId: string; slug: string; }'.
+src/pages/api/ai/preview.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/health/index.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/webhooks/stripe.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/routes/oauth.ts(32,7): error TS2353: Object literal may only specify known properties, and 'userId_connectorKind' does not exist in type 'ConnectorAuthWhereUniqueInput'.
+src/routes/oauth.ts(40,7): error TS2561: Object literal may only specify known properties, but 'connectorKind' does not exist in type '(Without<ConnectorAuthCreateInput, ConnectorAuthUncheckedCreateInput> & ConnectorAuthUncheckedCreateInput) | (Without<...> & ConnectorAuthCreateInput)'. Did you mean to write 'connectorId'?
+src/routes/oauth.ts(55,7): error TS2561: Object literal may only specify known properties, but 'scopes' does not exist in type '(Without<ConnectorAuthUpdateInput, ConnectorAuthUncheckedUpdateInput> & ConnectorAuthUncheckedUpdateInput) | (Without<...> & ConnectorAuthUpdateInput)'. Did you mean to write 'scope'?
+src/services/agent-run.service.ts(235,60): error TS2554: Expected 3 arguments, but got 4.
+src/services/learning/index.ts(26,15): error TS2352: Conversion of type 'NeonHubPredictiveEngine' to type '{ learn?: (args: { agent: string; key: string; content: string; }) => Promise<void>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'learn' are incompatible.
+    Type '(signal: LearningSignal) => Promise<void>' is not comparable to type '(args: { agent: string; key: string; content: string; }) => Promise<void>'.
+      Types of parameters 'signal' and 'args' are incompatible.
+        Property 'agentId' is missing in type '{ agent: string; key: string; content: string; }' but required in type 'LearningSignal'.
+src/services/oauth.service.ts(29,7): error TS2353: Object literal may only specify known properties, and 'userId_connectorKind' does not exist in type 'ConnectorAuthWhereUniqueInput'.
+src/services/oauth.service.ts(50,20): error TS2551: Property 'scopes' does not exist on type '{ status: string; apiKey: string; accessToken: string; refreshToken: string; id: string; userId: string; createdAt: Date; updatedAt: Date; scope: string; metadata: JsonValue; ... 8 more ...; lastError: string; }'. Did you mean 'scope'?
+src/services/oauth.service.ts(135,7): error TS2353: Object literal may only specify known properties, and 'userId_connectorKind' does not exist in type 'ConnectorAuthWhereUniqueInput'.
+src/services/predictive-engine/index.ts(28,37): error TS2345: Argument of type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>' is not assignable to parameter of type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+  Types of property '$on' are incompatible.
+    Type '<V extends "beforeExit">(eventType: V, callback: (event: V extends "query" ? QueryEvent : V extends "beforeExit" ? () => Promise<void> : LogEvent) => void) => void' is not assignable to type '<V extends LogLevel | "beforeExit">(eventType: V, callback: (event: V extends "query" ? QueryEvent : V extends "beforeExit" ? () => Promise<void> : LogEvent) => void) => PrismaClient<...>'.
+      Types of parameters 'eventType' and 'eventType' are incompatible.
+        Type 'V' is not assignable to type '"beforeExit"'.
+          Type 'LogLevel | "beforeExit"' is not assignable to type '"beforeExit"'.
+            Type '"error"' is not assignable to type '"beforeExit"'.
+src/trpc/middleware/safety.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> tsc --noEmit
+
+../api/src/ai/utils/cost.ts(8,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+../api/src/ai/utils/cost.ts(9,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+../api/src/services/agent-run.service.ts(235,60): error TS2554: Expected 3 arguments, but got 4.
+../api/src/services/predictive-engine/index.ts(28,37): error TS2345: Argument of type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>' is not assignable to parameter of type 'PrismaClient<PrismaClientOptions, LogLevel, DefaultArgs>'.
+  Types of property '$on' are incompatible.
+    Type '<V extends "beforeExit">(eventType: V, callback: (event: V extends "query" ? QueryEvent : V extends "beforeExit" ? () => Promise<void> : LogEvent) => void) => void' is not assignable to type '<V extends LogLevel | "beforeExit">(eventType: V, callback: (event: V extends "query" ? QueryEvent : V extends "beforeExit" ? () => Promise<void> : LogEvent) => void) => PrismaClient<...>'.
+      Types of parameters 'eventType' and 'eventType' are incompatible.
+        Type 'V' is not assignable to type '"beforeExit"'.
+          Type 'LogLevel | "beforeExit"' is not assignable to type '"beforeExit"'.
+            Type '"error"' is not assignable to type '"beforeExit"'.
+src/app/agents/page.tsx(87,33): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/app/content/new/page.tsx(94,9): error TS2322: Type '{ mode: "draft"; onSave: (data: any) => Promise<void>; disabled: boolean; }' is not assignable to type 'IntrinsicAttributes & PostComposerProps'.
+  Property 'disabled' does not exist on type 'IntrinsicAttributes & PostComposerProps'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error workspace @neonhub/ui-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error command failed
+npm error command sh -c tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+npm notice
+npm notice New major version of npm available! 10.8.3 -> 11.6.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.2
+npm notice To update run: npm install -g npm@11.6.2
+npm notice
+ ELIFECYCLE  Command failed with exit code 2.

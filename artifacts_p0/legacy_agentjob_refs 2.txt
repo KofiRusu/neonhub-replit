@@ -1,0 +1,91 @@
+apps/api/dist/apps/api/src/types/index.js:39:export const AgentJobSchema = z.object({
+apps/api/dist/apps/api/src/types/index.d.ts:91:export declare const AgentJobSchema: z.ZodObject<{
+apps/api/dist/apps/api/src/types/index.d.ts:122:export type AgentJob = z.infer<typeof AgentJobSchema>;
+apps/api/dist/apps/api/src/agents/EmailAgent.js:5:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/CampaignAgent.js:2:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/SocialAgent.js:4:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/SEOAgent.js:4:import { agentJobManager as defaultJobManager, } from "./base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/SEOAgent.d.ts:2:import { type AgentJobInput } from "./base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/SEOAgent.d.ts:124:interface AgentJobManagerLike {
+apps/api/dist/apps/api/src/agents/SEOAgent.d.ts:125:    createJob(input: AgentJobInput): Promise<string>;
+apps/api/dist/apps/api/src/agents/SEOAgent.d.ts:143:        jobManager?: AgentJobManagerLike;
+apps/api/dist/apps/api/src/agents/content/ContentAgent.js:4:import { agentJobManager as defaultJobManager } from "../base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/content/ContentAgent.d.ts:5:import type { AgentJobInput } from "../base/AgentJobManager.js";
+apps/api/dist/apps/api/src/agents/content/ContentAgent.d.ts:9:    createJob(input: AgentJobInput): Promise<string>;
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.js:108://# sourceMappingURL=AgentJobManager.js.map
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts.map:1:{"version":3,"file":"AgentJobManager.d.ts","sourceRoot":"","sources":["../../../../../../src/agents/base/AgentJobManager.ts"],"names":[],"mappings":"AAIA,MAAM,MAAM,SAAS,GAAG,QAAQ,GAAG,SAAS,GAAG,SAAS,GAAG,OAAO,CAAC;AAEnE,MAAM,WAAW,aAAa;IAC5B,KAAK,EAAE,MAAM,CAAC;IACd,KAAK,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAC;IAC3B,WAAW,CAAC,EAAE,MAAM,CAAC;CACtB;AAED,MAAM,WAAW,cAAc;IAC7B,MAAM,EAAE,SAAS,CAAC;IAClB,MAAM,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAC;IAC7B,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,OAAO,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAC;CAC/B;AAED;;;GAGG;AACH,cAAM,UAAU;IACd,OAAO,CAAC,WAAW,CAAmC;IAEtD;;OAEG;IACG,SAAS,CAAC,KAAK,EAAE,aAAa,GAAG,OAAO,CAAC,MAAM,CAAC;IAsBtD;;OAEG;IACG,SAAS,CAAC,KAAK,EAAE,MAAM,EAAE,MAAM,EAAE,cAAc,GAAG,OAAO,CAAC,IAAI,CAAC;IAsBrE;;OAEG;IACG,QAAQ,CAAC,KAAK,EAAE,MAAM,GAAG,OAAO,CAAC,IAAI,CAAC;IAK5C;;OAEG;IACG,WAAW,CACf,KAAK,EAAE,MAAM,EACb,MAAM,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,EAC3B,OAAO,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,GAC5B,OAAO,CAAC,IAAI,CAAC;IAShB;;OAEG;IACG,OAAO,CAAC,KAAK,EAAE,MAAM,EAAE,KAAK,EAAE,MAAM,GAAG,OAAO,CAAC,IAAI,CAAC;IAQ1D;;OAEG;IACH,YAAY,CAAC,KAAK,EAAE,MAAM,GAAG,OAAO;IAIpC;;OAEG;IACG,MAAM,CAAC,KAAK,EAAE,MAAM;;;;;;;;;;;;;;;;;;;CAc3B;AAED,eAAO,MAAM,eAAe,YAAmB,CAAC"}
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.js.map:1:{"version":3,"file":"AgentJobManager.js","sourceRoot":"","sources":["../../../../../../src/agents/base/AgentJobManager.ts"],"names":[],"mappings":"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"}
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts:2:export interface AgentJobInput {
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts:7:export interface AgentJobUpdate {
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts:22:    createJob(input: AgentJobInput): Promise<string>;
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts:26:    updateJob(jobId: string, update: AgentJobUpdate): Promise<void>;
+apps/api/dist/apps/api/src/agents/base/AgentJobManager.d.ts:68://# sourceMappingURL=AgentJobManager.d.ts.map
+apps/api/dist/apps/api/src/routes/jobs.js:2:import { agentJobManager } from "../agents/base/AgentJobManager.js";
+apps/api/prisma/schema.prisma:225:  agentJobs              AgentJob[]
+apps/api/prisma/schema.prisma:317:  AgentJob           AgentJob[]
+apps/api/prisma/schema.prisma:1421:model AgentJob {
+apps/api/coverage/coverage-summary.json:17:,"/Users/kofirusu/Desktop/NeonHub/apps/api/src/agents/base/AgentJobManager.ts": {"lines":{"total":138,"covered":0,"skipped":0,"pct":0},"functions":{"total":1,"covered":0,"skipped":0,"pct":0},"statements":{"total":138,"covered":0,"skipped":0,"pct":0},"branches":{"total":1,"covered":0,"skipped":0,"pct":0}}
+apps/api/coverage/lcov.info:5273:SF:src/agents/base/AgentJobManager.ts
+apps/api/coverage/lcov-report/src/types/index.ts.html:249:<span class="cstat-no" title="statement not covered" >export const AgentJobSchema = z.object({</span>
+apps/api/coverage/lcov-report/src/types/index.ts.html:261:<span class="cstat-no" title="statement not covered" >export type AgentJob = z.infer&lt;typeof AgentJobSchema&gt;;</span>
+apps/api/coverage/lcov-report/src/agents/CampaignAgent.ts.html:1217:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/SocialAgent.ts.html:1653:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/content/ContentAgent.ts.html:3241:<span class="cstat-no" title="statement not covered" >import { agentJobManager as defaultJobManager } from "../base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/content/ContentAgent.ts.html:3250:<span class="cstat-no" title="statement not covered" >import type { AgentJobInput } from "../base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/content/ContentAgent.ts.html:3258:<span class="cstat-no" title="statement not covered" >  createJob(input: AgentJobInput): Promise&lt;string&gt;;</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2632:<span class="cstat-no" title="statement not covered" >  type AgentJobInput,</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2633:<span class="cstat-no" title="statement not covered" >} from "./base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2806:<span class="cstat-no" title="statement not covered" >interface AgentJobManagerLike {</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2807:<span class="cstat-no" title="statement not covered" >  createJob(input: AgentJobInput): Promise&lt;string&gt;;</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2870:<span class="cstat-no" title="statement not covered" >  private readonly jobManager: AgentJobManagerLike;</span>
+apps/api/coverage/lcov-report/src/agents/SEOAgent.ts.html:2878:<span class="cstat-no" title="statement not covered" >    jobManager?: AgentJobManagerLike;</span>
+apps/api/coverage/lcov-report/src/agents/EmailAgent.ts.html:1462:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/lcov-report/src/agents/base/index.html:82:	<td class="file low" data-value="AgentJobManager.ts"><a href="AgentJobManager.ts.html">AgentJobManager.ts</a></td>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:6:    <title>Code coverage report for src/agents/base/AgentJobManager.ts</title>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:22:        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/agents/base</a> AgentJobManager.ts</h1>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:348:<span class="cstat-no" title="statement not covered" >export interface AgentJobInput {</span>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:354:<span class="cstat-no" title="statement not covered" >export interface AgentJobUpdate {</span>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:371:<span class="cstat-no" title="statement not covered" >  async createJob(input: AgentJobInput): Promise&lt;string&gt; {</span>
+apps/api/coverage/lcov-report/src/agents/base/AgentJobManager.ts.html:396:<span class="cstat-no" title="statement not covered" >  async updateJob(jobId: string, update: AgentJobUpdate): Promise&lt;void&gt; {</span>
+apps/api/coverage/lcov-report/src/routes/jobs.ts.html:223:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "../agents/base/AgentJobManager.js";</span>
+apps/api/coverage/src/types/index.ts.html:249:<span class="cstat-no" title="statement not covered" >export const AgentJobSchema = z.object({</span>
+apps/api/coverage/src/types/index.ts.html:261:<span class="cstat-no" title="statement not covered" >export type AgentJob = z.infer&lt;typeof AgentJobSchema&gt;;</span>
+apps/api/coverage/src/agents/CampaignAgent.ts.html:1217:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/SocialAgent.ts.html:1653:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/content/ContentAgent.ts.html:3241:<span class="cstat-no" title="statement not covered" >import { agentJobManager as defaultJobManager } from "../base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/content/ContentAgent.ts.html:3250:<span class="cstat-no" title="statement not covered" >import type { AgentJobInput } from "../base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/content/ContentAgent.ts.html:3258:<span class="cstat-no" title="statement not covered" >  createJob(input: AgentJobInput): Promise&lt;string&gt;;</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2632:<span class="cstat-no" title="statement not covered" >  type AgentJobInput,</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2633:<span class="cstat-no" title="statement not covered" >} from "./base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2806:<span class="cstat-no" title="statement not covered" >interface AgentJobManagerLike {</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2807:<span class="cstat-no" title="statement not covered" >  createJob(input: AgentJobInput): Promise&lt;string&gt;;</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2870:<span class="cstat-no" title="statement not covered" >  private readonly jobManager: AgentJobManagerLike;</span>
+apps/api/coverage/src/agents/SEOAgent.ts.html:2878:<span class="cstat-no" title="statement not covered" >    jobManager?: AgentJobManagerLike;</span>
+apps/api/coverage/src/agents/EmailAgent.ts.html:1462:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "./base/AgentJobManager.js";</span>
+apps/api/coverage/src/agents/base/index.html:82:	<td class="file low" data-value="AgentJobManager.ts"><a href="AgentJobManager.ts.html">AgentJobManager.ts</a></td>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:6:    <title>Code coverage report for src/agents/base/AgentJobManager.ts</title>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:22:        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/agents/base</a> AgentJobManager.ts</h1>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:348:<span class="cstat-no" title="statement not covered" >export interface AgentJobInput {</span>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:354:<span class="cstat-no" title="statement not covered" >export interface AgentJobUpdate {</span>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:371:<span class="cstat-no" title="statement not covered" >  async createJob(input: AgentJobInput): Promise&lt;string&gt; {</span>
+apps/api/coverage/src/agents/base/AgentJobManager.ts.html:396:<span class="cstat-no" title="statement not covered" >  async updateJob(jobId: string, update: AgentJobUpdate): Promise&lt;void&gt; {</span>
+apps/api/coverage/src/routes/jobs.ts.html:223:<span class="cstat-no" title="statement not covered" >import { agentJobManager } from "../agents/base/AgentJobManager.js";</span>
+apps/api/src/types/index.ts:52:export const AgentJobSchema = z.object({
+apps/api/src/types/index.ts:64:export type AgentJob = z.infer<typeof AgentJobSchema>;
+apps/api/src/agents/content/ContentAgent.ts:4:import { agentJobManager as defaultJobManager } from "../base/AgentJobManager.js";
+apps/api/src/agents/content/ContentAgent.ts:13:import type { AgentJobInput } from "../base/AgentJobManager.js";
+apps/api/src/agents/content/ContentAgent.ts:21:  createJob(input: AgentJobInput): Promise<string>;
+apps/api/src/agents/EmailAgent.ts:5:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/src/agents/base/AgentJobManager.ts:7:export interface AgentJobInput {
+apps/api/src/agents/base/AgentJobManager.ts:13:export interface AgentJobUpdate {
+apps/api/src/agents/base/AgentJobManager.ts:30:  async createJob(input: AgentJobInput): Promise<string> {
+apps/api/src/agents/base/AgentJobManager.ts:55:  async updateJob(jobId: string, update: AgentJobUpdate): Promise<void> {
+apps/api/src/agents/CampaignAgent.ts:2:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/src/agents/SocialAgent.ts:4:import { agentJobManager } from "./base/AgentJobManager.js";
+apps/api/src/agents/SEOAgent.ts:7:  type AgentJobInput,
+apps/api/src/agents/SEOAgent.ts:8:} from "./base/AgentJobManager.js";
+apps/api/src/agents/SEOAgent.ts:181:interface AgentJobManagerLike {
+apps/api/src/agents/SEOAgent.ts:182:  createJob(input: AgentJobInput): Promise<string>;
+apps/api/src/agents/SEOAgent.ts:245:  private readonly jobManager: AgentJobManagerLike;
+apps/api/src/agents/SEOAgent.ts:253:    jobManager?: AgentJobManagerLike;
+apps/api/src/routes/jobs.ts:2:import { agentJobManager } from "../agents/base/AgentJobManager.js";

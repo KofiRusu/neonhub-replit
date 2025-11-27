@@ -1,0 +1,2 @@
+apps/api/src/observability/metrics.ts:18:  name: "agent_runs_total",
+apps/api/src/__tests__/metrics.test.ts:28:    expect(snapshot).toContain('agent_runs_total{agent="content",status="success"} 1');

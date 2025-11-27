@@ -1,0 +1,7 @@
+node_modules
+dist
+.next
+*.d.ts
+src/**/__tests__/**
+src/services/orchestration/tests/**
+

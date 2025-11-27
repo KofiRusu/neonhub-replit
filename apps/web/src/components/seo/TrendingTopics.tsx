@@ -52,27 +52,27 @@ export function TrendingTopics({ niche, region = 'US', limit = 10 }: TrendingTop
   };
 
   return (
-    <Card className="border-border/60 bg-muted/20">
+    <Card className="border-slate-700/60 bg-slate-900/60">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Trending Topics</CardTitle>
           <Badge variant="outline">{region}</Badge>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-400">
           Real-time discovery powered by TrendAgent. Subscribe to alerts once you find topics worth tracking.
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
-        {isLoading && <p className="text-sm text-muted-foreground">Discovering trends…</p>}
+        {isLoading && <p className="text-sm text-gray-400">Discovering trends…</p>}
         {error && (
-          <p className="text-sm text-destructive">
+          <p className="text-sm text-red-400">
             Unable to fetch trends: {error.message}
           </p>
         )}
         {data?.map((trend, index) => (
           <div
             key={`${trend.keyword}-${index}`}
-            className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/60 p-3 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 rounded-lg border border-slate-700/50 bg-slate-900/60 p-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex-1">
               <div className="flex items-center gap-2">
@@ -84,12 +84,12 @@ export function TrendingTopics({ niche, region = 'US', limit = 10 }: TrendingTop
                   </Badge>
                 )}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-gray-400">
                 {trend.searchVolume.toLocaleString()} monthly searches •{' '}
                 {(trend.trendVelocity ?? 0).toFixed(1)}% growth
               </div>
               {trend.relatedKeywords?.length ? (
-                <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-400">
                   {trend.relatedKeywords.slice(0, 3).map((kw) => (
                     <Badge key={kw} variant="outline">
                       {kw}
@@ -117,12 +117,12 @@ export function TrendingTopics({ niche, region = 'US', limit = 10 }: TrendingTop
           </div>
         ))}
         {!isLoading && data?.length === 0 && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-400">
             Add TrendAgent subscriptions to stay ahead of emerging topics.
           </p>
         )}
         {topTrend && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-gray-400">
             Highest velocity topic: <span className="font-medium">{topTrend.keyword}</span> (
             {(topTrend.trendVelocity ?? 0).toFixed(1)}% growth).
           </p>

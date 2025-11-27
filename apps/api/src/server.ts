@@ -1,7 +1,26 @@
+/**
+ * NeonHub API Server - Entry Point
+ * Instrumented for bootstrap debugging (STEP 2)
+ */
+
+import { appendFileSync } from "fs";
+const bootLog = (msg: string) => {
+  console.log(msg);
+  try {
+    appendFileSync("/tmp/neonhub-boot.log", msg + "\n");
+  } catch (_e) {
+    // Ignore if file write fails
+  }
+};
+
+bootLog("[BOOT] 00 - Module loading starting");
+
 import express from "express";
 import type { Express } from "express";
 import { createServer } from "http";
 import { env } from "./config/env.js";
+
+bootLog("[BOOT] 01 - Env config loaded");
 import { logger } from "./lib/logger.js";
 import { initWebSocket } from "./ws/index.js";
 import { initSentry, Sentry } from "./obs/sentry.js";
@@ -38,6 +57,7 @@ import keywordsRouter from "./routes/keywords.js";
 import editorialCalendarRouter from "./routes/editorial-calendar.js";
 import seoRouter from "./routes/seo/index.js";
 import { sdkHandshakeRouter } from "./routes/sdk-handshake.js";
+import { orchestrateRouter } from "./routes/orchestrate.js";
 import { AppError } from "./lib/errors.js";
 import { registerConnectors } from "./connectors/index.js";
 import { syncRegisteredConnectors } from "./services/connector.service.js";
@@ -51,20 +71,127 @@ import socialRouter from "./routes/social.js";
 import budgetRouter from "./routes/budget.js";
 import { sitemapsRouter } from "./routes/sitemaps.js";
 import { startSeoAnalyticsJob } from "./jobs/seo-analytics.job.js";
+import { registerDefaultAgents } from "./services/orchestration/register-agents.js";
+import { startAllWorkers, stopAllWorkers } from "./queues/workers/index.js";
+
+bootLog("[BOOT] 02 - All imports complete");
 
 // Environment is validated on import
 
-// Initialize Sentry (no-op if DSN not configured)
-initSentry();
+// ════════════════════════════════════════════════════════════════════════
+// BOOTSTRAP PHASE - WITH TIMEOUT GUARDS
+// ════════════════════════════════════════════════════════════════════════
 
-// Register connectors and sync metadata in background
-registerConnectors()
-  .then(syncRegisteredConnectors)
-  .catch(error => {
-    logger.error({ error }, "Failed to register connectors");
-  });
+/**
+ * Wraps a promise with a timeout guard to detect hangs
+ * @param promise Promise to wrap
+ * @param label Debug label for timeout
+ * @param ms Timeout in milliseconds (default 30s)
+ */
+async function withBootstrapTimeout<T>(
+  promise: Promise<T>,
+  label: string,
+  ms = 30000
+): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => {
+        bootLog(`[BOOT] ⏱️  TIMEOUT: ${label} exceeded ${ms}ms - may hang indefinitely`);
+        reject(new Error(`Bootstrap timeout: ${label}`));
+      }, ms)
+    ),
+  ]);
+}
 
-startSeoAnalyticsJob();
+bootLog("[BOOT] 03 - Starting async initialization");
+
+// Run async initialization in background without blocking server startup
+(async () => {
+  try {
+    // STEP 1: Initialize Sentry (no-op if DSN not configured)
+    try {
+      bootLog("[BOOT] 04 - Sentry init starting");
+      initSentry();
+      bootLog("[BOOT] 05 - Sentry init complete");
+    } catch (err) {
+      bootLog("[BOOT] ❌ Sentry init failed: " + err);
+      // Non-blocking; continue
+    }
+
+    // STEP 2: Register connectors and sync metadata
+    // ONLY if enabled in dev mode (default: skip)
+    if (process.env.ENABLE_CONNECTORS !== "true") {
+      bootLog("[BOOT] 06 - SKIPPED registerConnectors (ENABLE_CONNECTORS=false)");
+    } else {
+      try {
+        bootLog("[BOOT] 06 - registerConnectors starting");
+        await withBootstrapTimeout(
+          (async () => {
+            await registerConnectors();
+            await syncRegisteredConnectors();
+          })(),
+          "registerConnectors + sync",
+          15000
+        );
+        bootLog("[BOOT] 07 - registerConnectors complete");
+      } catch (err) {
+        bootLog("[BOOT] ❌ Connectors failed: " + (err instanceof Error ? err.message : err));
+        if (process.env.NODE_ENV === "production") throw err;
+      }
+    }
+
+    // STEP 3: SEO Analytics Job
+    // ONLY if enabled in dev mode (default: skip)
+    if (process.env.ENABLE_SEO_ANALYTICS_JOB !== "true") {
+      bootLog("[BOOT] 08 - SKIPPED startSeoAnalyticsJob (ENABLE_SEO_ANALYTICS_JOB=false)");
+    } else {
+      try {
+        bootLog("[BOOT] 08 - SEO Analytics Job starting");
+        await withBootstrapTimeout(startSeoAnalyticsJob(), "startSeoAnalyticsJob", 10000);
+        bootLog("[BOOT] 09 - SEO Analytics Job complete");
+      } catch (err) {
+        bootLog("[BOOT] ❌ SEO Analytics Job failed: " + (err instanceof Error ? err.message : err));
+        if (process.env.NODE_ENV === "production") throw err;
+      }
+    }
+
+    // STEP 4: Queue Workers
+    // ONLY if enabled in dev mode (default: skip)
+    if (process.env.ENABLE_WORKERS !== "true") {
+      bootLog("[BOOT] 10 - SKIPPED startAllWorkers (ENABLE_WORKERS=false)");
+    } else {
+      try {
+        bootLog("[BOOT] 10 - Queue Workers starting");
+        await withBootstrapTimeout(startAllWorkers(), "startAllWorkers", 15000);
+        bootLog("[BOOT] 11 - Queue Workers complete");
+      } catch (err) {
+        bootLog("[BOOT] ❌ Queue Workers failed: " + (err instanceof Error ? err.message : err));
+        if (process.env.NODE_ENV === "production") throw err;
+      }
+    }
+
+    // STEP 5: Register Default Agents
+    // ONLY if enabled in dev mode (default: skip)
+    if (process.env.ENABLE_ORCHESTRATION_BOOTSTRAP !== "true") {
+      bootLog("[BOOT] 12 - SKIPPED registerDefaultAgents (ENABLE_ORCHESTRATION_BOOTSTRAP=false)");
+    } else {
+      try {
+        bootLog("[BOOT] 12 - Default Agents registration starting");
+        registerDefaultAgents();
+        bootLog("[BOOT] 13 - Default Agents registration complete");
+      } catch (err) {
+        bootLog("[BOOT] ❌ Default Agents failed: " + (err instanceof Error ? err.message : err));
+        if (process.env.NODE_ENV === "production") throw err;
+      }
+    }
+
+    bootLog("[BOOT] 14 - Bootstrap initialization complete");
+  } catch (err) {
+    bootLog("[BOOT] ❌ FATAL: Bootstrap failed: " + err);
+    process.exit(1);
+  }
+})();
 
 // Create Express app
 const app: Express = express();
@@ -126,7 +253,8 @@ app.get("/metrics", async (_req, res) => {
   }
 });
 
-// Protected routes (auth required + audit logging)
+// // Protected routes (auth required + audit logging)  TEMP: Skip problematic routes
+// app.use("/api", requireAuth, orchestrateRouter);
 app.use(requireAuth, contentRouter);
 app.use(requireAuth, metricsRouter);
 app.use(requireAuth, jobsRouter);
@@ -183,9 +311,29 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 });
 
 // Start server
+bootLog("[BOOT] 15 - About to call httpServer.listen() on port " + env.PORT);
 const port = env.PORT;
 httpServer.listen(port, "0.0.0.0", () => {
+  bootLog("[BOOT] ✓ 16 - SERVER LISTENING ON PORT " + port);
   logger.info({ port, env: env.NODE_ENV }, "🚀 NeonHub API server started");
 });
+
+// Graceful shutdown
+const shutdown = async (signal: string) => {
+  logger.info({ signal }, "Received shutdown signal, closing gracefully...");
+  
+  // Stop accepting new connections
+  httpServer.close(() => {
+    logger.info("HTTP server closed");
+  });
+  
+  // Stop queue workers
+  await stopAllWorkers();
+  
+  process.exit(0);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 export default app;

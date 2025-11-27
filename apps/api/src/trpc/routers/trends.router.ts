@@ -11,11 +11,14 @@ export const trendsRouter = createTRPCRouter({
         limit: z.number().int().min(1).max(20).default(10),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       return trendAgent.discoverTrends({
         niche: input.niche,
         region: input.region,
         limit: input.limit,
+      }, {
+        organizationId: ctx.user?.organizationId ?? undefined,
+        userId: ctx.user?.id,
       });
     }),
 

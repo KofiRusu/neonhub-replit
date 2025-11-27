@@ -30,7 +30,7 @@ function buildQueue(name: keyof QueueMap): Queue {
     },
   });
 
-  queue.on("error", (error) => {
+  (queue as any).on("error", (error: unknown) => {
     logger.error({ error, queue: name }, "BullMQ queue error");
   });
 
@@ -69,9 +69,9 @@ function attachQueueTelemetry(queue: Queue, name: keyof QueueMap): Queue {
     return job;
   }) as typeof queue.add;
 
-  queue.on("completed", () => recordQueueJob(name, "completed"));
-  queue.on("failed", () => recordQueueJob(name, "failed"));
-  queue.on("waiting", async () => {
+  (queue as any).on("completed", () => recordQueueJob(name, "completed"));
+  (queue as any).on("failed", () => recordQueueJob(name, "failed"));
+  (queue as any).on("waiting", async () => {
     try {
       const counts = await queue.getJobCounts("waiting");
       updateQueuePending(name, counts.waiting ?? 0);

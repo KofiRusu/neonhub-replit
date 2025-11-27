@@ -69,3 +69,7 @@ out/
 
 # Cleanup Logs
 logs/cleanup-*.log
+
+# Test Reports
+reports/
+*.xml

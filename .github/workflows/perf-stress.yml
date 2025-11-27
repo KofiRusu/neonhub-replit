@@ -1,0 +1,117 @@
+name: On-demand k6 Stress Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      vus_stage1:
+        description: "Initial VUs"
+        required: false
+        default: "5"
+      vus_stage2:
+        description: "Peak VUs"
+        required: false
+        default: "25"
+
+jobs:
+  perf-stress:
+    if: ${{ secrets.API_TEST_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      API_BEARER_TOKEN: ${{ secrets.API_TEST_TOKEN }}
+      API_EMAIL: ${{ secrets.API_TEST_EMAIL }}
+      API_PASSWORD: ${{ secrets.API_TEST_PASSWORD }}
+      K6_STAGE_VUS_STAGE1: ${{ github.event.inputs.vus_stage1 }}
+      K6_STAGE_VUS_STAGE2: ${{ github.event.inputs.vus_stage2 }}
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: neonhub_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.12.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+
+      - name: Setup database schema
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/neonhub_test"
+        run: |
+          cd apps/api
+          pnpm prisma:migrate:deploy || true
+
+      - name: Seed test data
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/neonhub_test"
+        run: pnpm db:seed:test || true
+
+      - name: Start API server
+        env:
+          NODE_ENV: test
+          DATABASE_URL: "postgresql://test:test@localhost:5432/neonhub_test"
+          PORT: 3001
+        run: |
+          cd apps/api
+          pnpm start > /tmp/api-perf.log 2>&1 &
+          echo $! > /tmp/api-perf.pid
+        timeout-minutes: 5
+
+      - name: Wait for API to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3001/api/health 2>/dev/null; then
+              echo "API is ready"
+              exit 0
+            fi
+            echo "Waiting for API... ($i/30)"
+            sleep 2
+          done
+          echo "API failed to start"
+          cat /tmp/api-perf.log || true
+          exit 1
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v0.5.0
+
+      - name: Run k6 stress suite
+        env:
+          API_BASE_URL: http://localhost:3001/api
+          AUTH_BASE_URL: http://localhost:3000
+          API_BEARER_TOKEN: ${{ secrets.API_TEST_TOKEN }}
+          API_EMAIL: ${{ secrets.API_TEST_EMAIL }}
+          API_PASSWORD: ${{ secrets.API_TEST_PASSWORD }}
+        run: k6 run tests/perf/stress-core-flows.js
+
+      - name: Cleanup API process
+        if: always()
+        run: |
+          if [ -f /tmp/api-perf.pid ]; then
+            kill $(cat /tmp/api-perf.pid) || true
+          fi

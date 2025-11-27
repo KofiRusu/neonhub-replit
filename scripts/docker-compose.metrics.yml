@@ -1,0 +1,10 @@
+# Placeholder compose (air-gap safe). Real services defined when Docker is available.
+version: "3.8"
+services:
+  prometheus:
+    image: prom/prometheus
+    ports: ["9090:9090"]
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml"]
+  grafana:
+    image: grafana/grafana
+    ports: ["3002:3000"]

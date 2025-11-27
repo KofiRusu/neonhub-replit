@@ -19,6 +19,7 @@
       "@/*": ["apps/api/src/*"],
       "@core/*": ["core/*"],
       "@modules/*": ["modules/*"],
+      "@neonhub/orchestrator-contract": ["core/orchestrator-contract/index.d.ts"],
       "@neonhub/predictive-engine": ["modules/predictive-engine/src"],
       "@neonhub/ai-governance": ["core/ai-governance/src"],
       "@neonhub/orchestrator-global": ["core/orchestrator-global/src"],

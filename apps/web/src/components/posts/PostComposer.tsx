@@ -141,7 +141,7 @@ export function PostComposer({
           <select
             {...register("kind")}
             id="kind"
-            className="w-full px-3 py-2 border rounded-md bg-background"
+            className="w-full px-3 py-2 border rounded-md bg-slate-900"
             aria-describedby="kind-description"
             disabled={mode === "published"}
           >
@@ -150,11 +150,11 @@ export function PostComposer({
             <option value="social_script">Social Media</option>
             <option value="ad_copy">Ad Copy</option>
           </select>
-          <p id="kind-description" className="text-sm text-muted-foreground">
+          <p id="kind-description" className="text-sm text-gray-400">
             {kindDescriptions[selectedKind]}
           </p>
           {errors.kind && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-sm text-red-400" role="alert">
               {errors.kind.message}
             </p>
           )}
@@ -174,7 +174,7 @@ export function PostComposer({
             autoFocus
           />
           {errors.title && (
-            <p id="title-error" className="text-sm text-destructive" role="alert">
+            <p id="title-error" className="text-sm text-red-400" role="alert">
               {errors.title.message}
             </p>
           )}
@@ -193,7 +193,7 @@ export function PostComposer({
             disabled={mode === "published"}
           />
           {errors.topic && (
-            <p id="topic-error" className="text-sm text-destructive" role="alert">
+            <p id="topic-error" className="text-sm text-red-400" role="alert">
               {errors.topic.message}
             </p>
           )}
@@ -205,7 +205,7 @@ export function PostComposer({
           <select
             {...register("tone")}
             id="tone"
-            className="w-full px-3 py-2 border rounded-md bg-background"
+            className="w-full px-3 py-2 border rounded-md bg-slate-900"
             disabled={mode === "published"}
           >
             <option value="professional">Professional</option>
@@ -215,7 +215,7 @@ export function PostComposer({
             <option value="enthusiastic">Enthusiastic</option>
           </select>
           {errors.tone && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-sm text-red-400" role="alert">
               {errors.tone.message}
             </p>
           )}
@@ -231,7 +231,7 @@ export function PostComposer({
             disabled={mode === "published"}
           />
           {errors.audience && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-sm text-red-400" role="alert">
               {errors.audience.message}
             </p>
           )}
@@ -251,7 +251,7 @@ export function PostComposer({
               disabled={mode === "published"}
             />
             {errors.body && (
-              <p id="body-error" className="text-sm text-destructive" role="alert">
+              <p id="body-error" className="text-sm text-red-400" role="alert">
                 {errors.body.message}
               </p>
             )}
@@ -260,7 +260,7 @@ export function PostComposer({
 
         {/* Action Buttons */}
         <div className="flex items-center justify-between border-t pt-4">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-gray-400">
             {isDirty && mode !== "published" && "You have unsaved changes"}
           </div>
 
@@ -313,9 +313,9 @@ export function PostComposer({
         </div>
 
         {/* Keyboard shortcuts hint */}
-        <div className="text-xs text-muted-foreground border-t pt-2">
-          <kbd className="px-1 py-0.5 rounded bg-muted">Ctrl+S</kbd> to save •{" "}
-          <kbd className="px-1 py-0.5 rounded bg-muted">Esc</kbd> to cancel
+        <div className="text-xs text-gray-400 border-t pt-2">
+          <kbd className="px-1 py-0.5 rounded bg-slate-800">Ctrl+S</kbd> to save •{" "}
+          <kbd className="px-1 py-0.5 rounded bg-slate-800">Esc</kbd> to cancel
         </div>
       </form>
     </Card>

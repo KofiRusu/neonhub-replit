@@ -125,18 +125,18 @@ export function ContentGeneratorForm({
         </div>
 
         {generateMutation.data && (
-          <div className="space-y-3 rounded-lg border border-border/60 bg-muted/20 p-4">
+          <div className="space-y-3 rounded-lg border border-slate-700/60 bg-slate-900/60 p-4">
             <div>
               <h3 className="text-lg font-semibold">{generateMutation.data.title}</h3>
-              <p className="text-sm text-muted-foreground">{generateMutation.data.summary}</p>
+              <p className="text-sm text-gray-400">{generateMutation.data.summary}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
               <Badge variant="outline">Draft ID: {generateMutation.data.draftId}</Badge>
               <Badge variant="outline">
                 Opportunity Score: {Math.round(generateMutation.data.quality.overall)}
               </Badge>
             </div>
-            <div className="rounded-md border border-border/50 bg-background/60 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border border-slate-700/50 bg-slate-900/60 p-3 text-sm text-gray-400">
               {generateMutation.data.meta.description}
             </div>
           </div>

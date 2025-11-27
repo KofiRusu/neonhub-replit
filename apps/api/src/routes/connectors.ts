@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import { ConnectorKind } from "@prisma/client";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
 import { ok, fail } from "../lib/http.js";
 import { connectorRegistry, registerConnectors } from "../connectors/index.js";
@@ -142,6 +143,7 @@ connectorsRouter.post("/:name/oauth/start", requireAuth, async (req: AuthRequest
     if (connector.metadata.authType !== "oauth2") {
       return res.status(400).json(fail("Connector does not support OAuth2").body);
     }
+    const connectorKind = connector.metadata.category as ConnectorKind;
 
     const oauthConfig = requireOAuthConfig(connector.metadata.name, connector.metadata.authConfig ?? {});
     const provider = new OAuth2Provider(oauthConfig);
@@ -162,6 +164,7 @@ connectorsRouter.post("/:name/oauth/callback", requireAuth, async (req: AuthRequ
     if (connector.metadata.authType !== "oauth2") {
       return res.status(400).json(fail("Connector does not support OAuth2").body);
     }
+    const connectorKind = connector.metadata.category as ConnectorKind;
 
     const payload = oauthCallbackSchema.parse(req.body);
     const oauthConfig = requireOAuthConfig(connector.metadata.name, connector.metadata.authConfig ?? {});
@@ -171,6 +174,7 @@ connectorsRouter.post("/:name/oauth/callback", requireAuth, async (req: AuthRequ
     await connectorCredentialManager.save({
       userId: req.user!.id,
       connectorId: connector.metadata.name,
+      connectorKind,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       scope: tokens.scope,
@@ -194,6 +198,7 @@ connectorsRouter.post("/:name/api-key", requireAuth, async (req: AuthRequest, re
     if (connector.metadata.authType === "oauth2") {
       return res.status(400).json(fail("Connector uses OAuth2").body);
     }
+    const connectorKind = connector.metadata.category as ConnectorKind;
 
     const payload = apiKeySchema.parse(req.body);
     if (!payload.apiKey && !payload.accessToken) {
@@ -203,6 +208,7 @@ connectorsRouter.post("/:name/api-key", requireAuth, async (req: AuthRequest, re
     await connectorCredentialManager.save({
       userId: req.user!.id,
       connectorId: connector.metadata.name,
+      connectorKind,
       apiKey: payload.apiKey,
       apiSecret: payload.apiSecret ?? payload.accessToken ?? null,
       accessToken: payload.accessToken ?? null,

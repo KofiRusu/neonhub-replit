@@ -1,0 +1,194 @@
+{
+  "dashboard": {
+    "title": "NeonHub AI & Logic - Production Overview",
+    "uid": "neonhub-ai-logic-overview",
+    "version": 1,
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "tags": ["ai", "logic", "production", "neonhub"],
+    "templating": {
+      "list": [
+        {
+          "name": "service",
+          "type": "query",
+          "query": "label_values(service_name)",
+          "regex": "neonhub-.*-prod",
+          "multi": true,
+          "includeAll": true
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "LLM Call Rate (calls/sec)",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(llm_calls_total{service_name=~\"$service\"}[5m])) by (llm_provider, llm_model)",
+            "legendFormat": "{{llm_provider}} - {{llm_model}}"
+          }
+        ],
+        "yaxes": [{ "format": "ops" }]
+      },
+      {
+        "id": 2,
+        "title": "LLM Cost (USD/hour)",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(llm_cost_usd_total{service_name=~\"$service\"}[1h])) by (llm_model) * 3600",
+            "legendFormat": "{{llm_model}}"
+          }
+        ],
+        "yaxes": [{ "format": "currencyUSD" }]
+      },
+      {
+        "id": 3,
+        "title": "LLM Response Time (P50, P95, P99)",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(llm_response_time_ms_bucket{service_name=~\"$service\"}[5m])) by (le))",
+            "legendFormat": "P50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(llm_response_time_ms_bucket{service_name=~\"$service\"}[5m])) by (le))",
+            "legendFormat": "P95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(llm_response_time_ms_bucket{service_name=~\"$service\"}[5m])) by (le))",
+            "legendFormat": "P99"
+          }
+        ],
+        "yaxes": [{ "format": "ms" }]
+      },
+      {
+        "id": 4,
+        "title": "Tool Execution Rate",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(tool_executions_total{service_name=~\"$service\"}[5m])) by (tool_name)",
+            "legendFormat": "{{tool_name}}"
+          }
+        ],
+        "yaxes": [{ "format": "ops" }]
+      },
+      {
+        "id": 5,
+        "title": "RAG Query Latency (P95)",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(rag_latency_ms_bucket{service_name=~\"$service\"}[5m])) by (le))",
+            "legendFormat": "P95 RAG Latency"
+          }
+        ],
+        "yaxes": [{ "format": "ms" }],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": { "params": [1000], "type": "gt" },
+              "query": { "params": ["A", "5m", "now"] }
+            }
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "title": "Orchestrator Plan Success Rate",
+        "type": "stat",
+        "gridPos": { "x": 12, "y": 16, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(plan_success_total{service_name=~\"$service\"}[5m])) / sum(rate(plan_executions_total{service_name=~\"$service\"}[5m])) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 90, "color": "yellow" },
+                { "value": 95, "color": "green" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Error Rate (%)",
+        "type": "stat",
+        "gridPos": { "x": 18, "y": 16, "w": 6, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(operation_errors_total{service_name=~\"$service\"}[5m])) / sum(rate(operation_total{service_name=~\"$service\"}[5m])) * 100",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 2, "color": "yellow" },
+                { "value": 5, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Token Usage (Input vs Output)",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(llm_tokens_prompt_total{service_name=~\"$service\"}[5m])) by (llm_model)",
+            "legendFormat": "{{llm_model}} - Input"
+          },
+          {
+            "expr": "sum(rate(llm_tokens_completion_total{service_name=~\"$service\"}[5m])) by (llm_model)",
+            "legendFormat": "{{llm_model}} - Output"
+          }
+        ],
+        "yaxes": [{ "format": "short" }]
+      },
+      {
+        "id": 9,
+        "title": "Circuit Breaker States",
+        "type": "stat",
+        "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(circuit_breaker_state{service_name=~\"$service\"}) by (state)",
+            "legendFormat": "{{state}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              { "value": "CLOSED", "color": "green" },
+              { "value": "OPEN", "color": "red" },
+              { "value": "HALF_OPEN", "color": "yellow" }
+            ]
+          }
+        }
+      }
+    ],
+    "refresh": "30s",
+    "time": { "from": "now-1h", "to": "now" }
+  }
+}
+

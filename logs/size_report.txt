@@ -1,0 +1,2 @@
+3.0G	/Users/kofirusu/Desktop/NeonHub
+5.0G	/Volumes/devssd/NeonHub

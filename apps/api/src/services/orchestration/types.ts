@@ -97,15 +97,25 @@ export const AGENT_DEFINITIONS: Record<AgentName, AgentDefinition> = {
 };
 
 export type OrchestratorRequest = {
-  agent: AgentName;
+  agent?: AgentName;
   intent: string;
   payload: unknown;
   context?: Record<string, unknown>;
 };
 
-export type OrchestratorResponse =
-  | { ok: true; data: unknown }
-  | { ok: false; error: string; code?: string };
+export type OrchestratorResponse = {
+  ok: boolean;
+  data?: unknown;
+  error?: string;
+  code?: string;
+  details?: unknown;
+  meta?: {
+    agent?: string;
+    intent?: string;
+    runId?: string;
+    metrics?: Record<string, unknown>;
+  };
+};
 
 export interface AgentHandler {
   handle(req: OrchestratorRequest): Promise<OrchestratorResponse>;

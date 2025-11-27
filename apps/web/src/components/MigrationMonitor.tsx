@@ -84,7 +84,7 @@ export function MigrationMonitor({ className, compact = false }: MigrationMonito
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Migration Progress</span>
-              <span className="text-muted-foreground">
+              <span className="text-gray-400">
                 {completedPhases} / {totalPhases} phases
               </span>
             </div>
@@ -113,8 +113,8 @@ export function MigrationMonitor({ className, compact = false }: MigrationMonito
         <div className="space-y-3">
           {migrationStatus.phases.length === 0 ? (
             <div className="text-center py-8">
-              <Circle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">
+              <Circle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-sm text-gray-400">
                 {isConnected
                   ? "Waiting for migration to start..."
                   : "Connecting to monitoring service..."}
@@ -160,19 +160,19 @@ export function MigrationMonitor({ className, compact = false }: MigrationMonito
                     <h4
                       className={cn(
                         "font-medium capitalize",
-                        phase.status === "pending" && "text-muted-foreground"
+                        phase.status === "pending" && "text-gray-400"
                       )}
                     >
                       {phase.name.replace(/_/g, " ")}
                     </h4>
                     {phase.duration > 0 && (
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      <span className="text-xs text-gray-400 whitespace-nowrap">
                         {(phase.duration / 1000).toFixed(2)}s
                       </span>
                     )}
                   </div>
                   {phase.description && !compact && (
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                    <p className="text-sm text-gray-400 mt-0.5">
                       {phase.description}
                     </p>
                   )}
@@ -206,14 +206,14 @@ export function MigrationMonitor({ className, compact = false }: MigrationMonito
         {migrationStatus.completedAt && (
           <div className="pt-4 border-t">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Completed at:</span>
+              <span className="text-gray-400">Completed at:</span>
               <span className="font-medium">
                 {migrationStatus.completedAt.toLocaleTimeString()}
               </span>
             </div>
             {migrationStatus.startedAt && (
               <div className="flex items-center justify-between text-sm mt-2">
-                <span className="text-muted-foreground">Total duration:</span>
+                <span className="text-gray-400">Total duration:</span>
                 <span className="font-medium">
                   {(
                     (migrationStatus.completedAt.getTime() -

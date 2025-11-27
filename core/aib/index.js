@@ -1,102 +1,230 @@
-import { EventEmitter } from 'events';
-// Simple logger implementation
-const logger = {
-    info: (message, meta) => console.log(`[AIB INFO] ${message}`, meta || ''),
-    debug: (message, meta) => console.debug(`[AIB DEBUG] ${message}`, meta || ''),
-    error: (message, meta) => console.error(`[AIB ERROR] ${message}`, meta || ''),
-    warn: (message, meta) => console.warn(`[AIB WARN] ${message}`, meta || '')
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
-export class AgentIntelligenceBus extends EventEmitter {
-    constructor() {
-        super();
-        this.agents = new Map();
-        this.messageQueue = [];
-        this.isProcessing = false;
-        this.setupEventHandlers();
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-    get logger() {
-        return logger;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AIB = exports.AgentIntelligenceBus = void 0;
+var events_1 = require("events");
+// Simple logger implementation
+var logger = {
+    info: function (message, meta) { return console.log("[AIB INFO] ".concat(message), meta || ''); },
+    debug: function (message, meta) { return console.debug("[AIB DEBUG] ".concat(message), meta || ''); },
+    error: function (message, meta) { return console.error("[AIB ERROR] ".concat(message), meta || ''); },
+    warn: function (message, meta) { return console.warn("[AIB WARN] ".concat(message), meta || ''); }
+};
+var AgentIntelligenceBus = /** @class */ (function (_super) {
+    __extends(AgentIntelligenceBus, _super);
+    function AgentIntelligenceBus() {
+        var _this = _super.call(this) || this;
+        _this.agents = new Map();
+        _this.messageQueue = [];
+        _this.isProcessing = false;
+        _this.setupEventHandlers();
+        return _this;
     }
-    setupEventHandlers() {
+    Object.defineProperty(AgentIntelligenceBus.prototype, "logger", {
+        get: function () {
+            return logger;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    AgentIntelligenceBus.prototype.setupEventHandlers = function () {
         this.on('agent:register', this.handleAgentRegistration.bind(this));
         this.on('agent:message', this.handleAgentMessage.bind(this));
         this.on('agent:unregister', this.handleAgentUnregistration.bind(this));
-    }
-    async registerAgent(agentId, context) {
-        this.agents.set(agentId, context);
-        this.logger.info(`Agent ${agentId} registered with AIB`, { agentId, capabilities: context.capabilities });
-        this.emit('agent:register', { agentId, context });
-    }
-    async unregisterAgent(agentId) {
-        this.agents.delete(agentId);
-        this.logger.info(`Agent ${agentId} unregistered from AIB`, { agentId });
-        this.emit('agent:unregister', { agentId });
-    }
-    async broadcastMessage(message) {
-        this.messageQueue.push(message);
-        if (!this.isProcessing) {
-            await this.processMessageQueue();
-        }
-    }
-    async sendMessage(targetAgentId, message) {
-        const targetAgent = this.agents.get(targetAgentId);
-        if (!targetAgent) {
-            throw new Error(`Agent ${targetAgentId} not found`);
-        }
-        try {
-            await targetAgent.handler(message);
-            this.logger.debug(`Message sent to agent ${targetAgentId}`, { messageId: message.id });
-        }
-        catch (error) {
-            this.logger.error(`Failed to send message to agent ${targetAgentId}`, { error, messageId: message.id });
-            throw error;
-        }
-    }
-    async processMessageQueue() {
-        if (this.isProcessing || this.messageQueue.length === 0)
-            return;
-        this.isProcessing = true;
-        while (this.messageQueue.length > 0) {
-            const message = this.messageQueue.shift();
-            await this.routeMessage(message);
-        }
-        this.isProcessing = false;
-    }
-    async routeMessage(message) {
-        const targetAgents = this.findTargetAgents(message);
-        for (const agentId of targetAgents) {
-            try {
-                await this.sendMessage(agentId, message);
-            }
-            catch (error) {
-                this.logger.error(`Failed to route message to ${agentId}`, { error, messageId: message.id });
-            }
-        }
-    }
-    findTargetAgents(message) {
-        const targetAgents = [];
-        this.agents.forEach((context, agentId) => {
+    };
+    AgentIntelligenceBus.prototype.registerAgent = function (agentId, context) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.agents.set(agentId, context);
+                this.logger.info("Agent ".concat(agentId, " registered with AIB"), { agentId: agentId, capabilities: context.capabilities });
+                this.emit('agent:register', { agentId: agentId, context: context });
+                return [2 /*return*/];
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.unregisterAgent = function (agentId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.agents.delete(agentId);
+                this.logger.info("Agent ".concat(agentId, " unregistered from AIB"), { agentId: agentId });
+                this.emit('agent:unregister', { agentId: agentId });
+                return [2 /*return*/];
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.broadcastMessage = function (message) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.messageQueue.push(message);
+                        if (!!this.isProcessing) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.processMessageQueue()];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.sendMessage = function (targetAgentId, message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var targetAgent, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        targetAgent = this.agents.get(targetAgentId);
+                        if (!targetAgent) {
+                            throw new Error("Agent ".concat(targetAgentId, " not found"));
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, targetAgent.handler(message)];
+                    case 2:
+                        _a.sent();
+                        this.logger.debug("Message sent to agent ".concat(targetAgentId), { messageId: message.id });
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        this.logger.error("Failed to send message to agent ".concat(targetAgentId), { error: error_1, messageId: message.id });
+                        throw error_1;
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.processMessageQueue = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var message;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this.isProcessing || this.messageQueue.length === 0)
+                            return [2 /*return*/];
+                        this.isProcessing = true;
+                        _a.label = 1;
+                    case 1:
+                        if (!(this.messageQueue.length > 0)) return [3 /*break*/, 3];
+                        message = this.messageQueue.shift();
+                        return [4 /*yield*/, this.routeMessage(message)];
+                    case 2:
+                        _a.sent();
+                        return [3 /*break*/, 1];
+                    case 3:
+                        this.isProcessing = false;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.routeMessage = function (message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var targetAgents, _i, targetAgents_1, agentId, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        targetAgents = this.findTargetAgents(message);
+                        _i = 0, targetAgents_1 = targetAgents;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < targetAgents_1.length)) return [3 /*break*/, 6];
+                        agentId = targetAgents_1[_i];
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, this.sendMessage(agentId, message)];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 4:
+                        error_2 = _a.sent();
+                        this.logger.error("Failed to route message to ".concat(agentId), { error: error_2, messageId: message.id });
+                        return [3 /*break*/, 5];
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AgentIntelligenceBus.prototype.findTargetAgents = function (message) {
+        var targetAgents = [];
+        this.agents.forEach(function (context, agentId) {
             if (context.capabilities.includes(message.type)) {
                 targetAgents.push(agentId);
             }
         });
         return targetAgents;
-    }
-    handleAgentRegistration(event) {
-        this.logger.info(`Agent registration event processed`, { agentId: event.agentId });
-    }
-    handleAgentMessage(event) {
-        this.logger.debug(`Agent message event processed`, { agentId: event.agentId });
-    }
-    handleAgentUnregistration(event) {
-        this.logger.info(`Agent unregistration event processed`, { agentId: event.agentId });
-    }
-    getRegisteredAgents() {
+    };
+    AgentIntelligenceBus.prototype.handleAgentRegistration = function (event) {
+        this.logger.info("Agent registration event processed", { agentId: event.agentId });
+    };
+    AgentIntelligenceBus.prototype.handleAgentMessage = function (event) {
+        this.logger.debug("Agent message event processed", { agentId: event.agentId });
+    };
+    AgentIntelligenceBus.prototype.handleAgentUnregistration = function (event) {
+        this.logger.info("Agent unregistration event processed", { agentId: event.agentId });
+    };
+    AgentIntelligenceBus.prototype.getRegisteredAgents = function () {
         return Array.from(this.agents.keys());
-    }
-    getAgentContext(agentId) {
+    };
+    AgentIntelligenceBus.prototype.getAgentContext = function (agentId) {
         return this.agents.get(agentId);
-    }
-}
-export { AgentIntelligenceBus as AIB };
-//# sourceMappingURL=index.js.map
+    };
+    return AgentIntelligenceBus;
+}(events_1.EventEmitter));
+exports.AgentIntelligenceBus = AgentIntelligenceBus;
+exports.AIB = AgentIntelligenceBus;

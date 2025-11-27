@@ -1,4 +1,5 @@
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from "prom-client";
+import type { RunStatus } from "@prisma/client";
 import { logger } from "./logger.js";
 
 // Create a Registry to hold all metrics
@@ -122,6 +123,13 @@ export const connectorRequestDuration = new Histogram({
   registers: [register],
 });
 
+export const learningRewards = new Gauge({
+  name: "neonhub_learning_reward",
+  help: "Latest reward recorded per agent",
+  labelNames: ["agent"],
+  registers: [register],
+});
+
 // Rate Limiter Metrics
 export const rateLimitHits = new Counter({
   name: "neonhub_rate_limit_hits_total",
@@ -133,13 +141,21 @@ export const rateLimitHits = new Counter({
 // Helper functions for common operations
 export function recordAgentRun(
   agent: string,
-  status: "completed" | "failed" | "cancelled",
+  status: RunStatus,
   durationSeconds: number,
-  intent?: string
+  intent?: string,
 ) {
-  agentRunsTotal.inc({ agent, status, intent: intent || "unknown" });
+  const normalized =
+    status === "SUCCESS"
+      ? "completed"
+      : status === "FAILED"
+      ? "failed"
+      : status === "CANCELLED"
+      ? "cancelled"
+      : "completed";
+  agentRunsTotal.inc({ agent, status: normalized, intent: intent || "unknown" });
   agentRunDuration.observe({ agent, intent: intent || "unknown" }, durationSeconds);
-  logger.debug({ agent, status, durationSeconds, intent }, "Recorded agent run metrics");
+  logger.debug({ agent, status: normalized, durationSeconds, intent }, "Recorded agent run metrics");
 }
 
 export function recordCircuitBreakerFailure(agent: string) {
@@ -195,6 +211,14 @@ export function recordRateLimitHit(agent: string, user: string) {
 export function recordToolExecutionMetric(tool: string, status: "completed" | "failed", durationSeconds: number) {
   toolExecutionsTotal.inc({ tool, status });
   toolExecutionDuration.observe({ tool, status }, durationSeconds);
+}
+
+export function recordLearningReward(agent: string, reward: number | null): void {
+  if (typeof reward === "number") {
+    learningRewards.set({ agent }, reward);
+  } else {
+    learningRewards.set({ agent }, 0);
+  }
 }
 
 // Get all metrics as string (for /metrics endpoint)

@@ -1,0 +1,58 @@
+Area,Task,Priority,Complexity,Owner,CanCodexDo,Artifacts,AcceptanceCriteria
+Database,Schema coverage audit & index plan,P0,Low,[Codex],Y,KT_DB_AGENT_AUDIT.md; index-plan.sql,All 75 tables accounted for; composite indexes verified
+Database,Generate & annotate drift diff,P0,Low,[Codex],Y,.tmp/db-drift.sql; drift-analysis.md,Drift report generated; schema matches target DB
+Database,Create least-privilege DB roles,P0,Medium,[Agency],N,DB_LEAST_PRIVILEGE_ROLES.md; migration.sql,neonhub_app (DML) and neonhub_migrate (DDL) roles created
+Database,Seed hardening & deterministic IDs,P0,Medium,[Codex],Y,apps/api/prisma/seed.ts; SEED_VALIDATION.md,Seed runs idempotently; 40+ baseline records created
+Database,IVFFLAT index creation (deferred),P1,Medium,[Shared],Y,migrations/add-ivfflat-indexes.sql,Indexes created after 1K+ vectors seeded; query perf validated
+Database,Query performance baseline,P1,Low,[Codex],Y,db-performance.json; query-samples.sql,Row counts and query times documented per table
+Database,Local drift check with Docker,P2,Low,[Codex],Y,docker-compose.db.yml; drift-check-local.sh,Docker Postgres starts; drift diff successful
+Orchestrator,AgentRun persistence integration test,P0,Medium,[Codex],Y,apps/api/src/services/orchestration/tests/persistence.test.ts,All AgentRun records persisted; test coverage >85%
+Orchestrator,Wire ToolExecution recording,P0,Medium,[Codex],Y,agent-handlers/**/*.ts; TOOL_EXEC_WIRING.md,Tool calls logged with input/output/duration
+Orchestrator,AgentRunMetric population,P0,Medium,[Codex],Y,agents/utils/agent-run.ts; metrics-wiring.md,Metrics populated on run completion/failure
+Orchestrator,Learning loop wiring (PgVectorStore),P0,High,[Codex],Y,modules/predictive-engine/; LEARNING_LOOP_INTEGRATION.md,learn() and recall() methods exposed; vector queries working
+Orchestrator,RAG enablement & semantic search,P0,High,[Codex],Y,services/rag/; RAG_VALIDATION.md,Embeddings seeded; similarity search returns relevant chunks
+Orchestrator,Rate limiting load test,P1,Medium,[Agency],N,load-test-report.json; rate-limit-validation.md,System handles 100+ req/min per agent
+Worker/Queues,BullMQ configuration verification,P1,Medium,[Codex],Y,apps/worker/bullmq.config.ts; QUEUE_VALIDATION.md,Queue connects to Redis; job transitions tracked
+Worker/Queues,DLQ strategy implementation,P1,Medium,[Agency],N,apps/worker/dlq.ts; DLQ_RUNBOOK.md,Dead-letter queue captures failed jobs; Slack alerts firing
+Worker/Queues,Retry & backoff policy testing,P1,Medium,[Agency],N,load-test-report.json; queue-resilience.md,Jobs retry per policy; exponential backoff verified
+Worker/Queues,Worker scale-out ops setup,P2,Medium,[Agency],N,k8s-config/worker-deployment.yaml; worker-ops.md,Workers can scale horizontally; deployment verified
+Connectors,Mock connector factory validation,P0,Low,[Codex],Y,apps/api/src/connectors/mock/index.ts; MOCK_VALIDATION.md,Deterministic responses; no network calls in test mode
+Connectors,Live connector credential provisioning,P0,High,[Agency],N,ENV_MATRIX.md; credential-setup.md,API keys/OAuth tokens in all environments
+Connectors,Connector redaction in logs,P1,Low,[Codex],Y,lib/logger.ts; REDACTION_VALIDATION.md,Credentials masked in logs; no secrets exposed
+Connectors,Connector rate-limit backoff testing,P1,Medium,[Agency],N,load-test-report.json; backoff-validation.md,Exponential backoff triggered; 429 responses handled
+Metrics,Prometheus /metrics endpoint setup,P0,Low,[Codex],Y,apps/api/src/server.ts; metrics-endpoint.ts,Endpoint returns Prometheus format; Grafana can scrape
+Metrics,Custom counter & histogram validation,P1,Low,[Codex],Y,apps/api/src/lib/metrics.ts; METRICS_INVENTORY.md,All counters/histograms recording data; test queries verify
+Metrics,Grafana dashboard deployment,P1,Medium,[Agency],N,grafana/dashboards/*.json; dashboard-setup.md,Dashboards display agent/queue/API metrics; alerts configured
+Metrics,Alerting rules & notification setup,P1,Medium,[Agency],N,grafana/rules/*.yaml; alert-config.md,Slack/email alerts fire for P0 issues; on-call rotation defined
+Tests,Fix Jest heap limit issue,P0,High,[Codex],Y,.github/workflows/ci.yml; HEAP_FIX_SUMMARY.md,Tests run with --runInBand; 95% coverage achieved
+Tests,Achieve 95% code coverage,P0,High,[Codex],Y,coverage/index.html; COVERAGE_REPORT.md,Coverage report >95% branches/functions/lines/statements
+Tests,Integration test suite (end-to-end),P0,High,[Codex],Y,apps/api/src/__tests__/integration/**; INTEGRATION_TEST_PLAN.md,E2E flows test: agent → DB → metrics
+Tests,Connector integration tests,P1,Medium,[Agency],N,apps/api/src/__tests__/connectors/**; connector-test-report.md,Live connector tests; webhook delivery validated
+Tests,E2E smoke tests post-deploy,P1,Medium,[Shared],Y,./scripts/post-deploy-smoke.sh; SMOKE_TEST_RESULTS.md,7 checks pass; health + readiness + metrics verified
+CI/CD,Security-preflight workflow execution,P0,Medium,[Codex],Y,.github/workflows/security-preflight.yml; SECURITY_RESULTS.md,Gitleaks/CodeQL/npm audit run; no high/critical vulns
+CI/CD,DB workflows validation (drift/backup/deploy),P0,Medium,[Codex],Y,.github/workflows/db-*.yml; CI_WORKFLOW_RESULTS.md,All workflows execute; approval gates function
+CI/CD,Branch protection enforcement,P1,Low,[Agency],N,github-settings.json; BRANCH_PROTECTION_SUMMARY.md,Main branch protected; security-preflight + tests required
+CI/CD,Staging deployment validation,P1,Medium,[Shared],Y,deploy-logs/staging-*.log; STAGING_DEPLOY_REPORT.md,API + web deploy; smoke tests pass; domain resolves
+CI/CD,Production deployment runbook,P1,Medium,[Codex],Y,PRODUCTION_DEPLOYMENT.md; deploy-checklist.md,Step-by-step guide; prerequisite validation
+Security,Least-privilege everything audit,P1,Medium,[Codex],Y,SECURITY_AUDIT.md; role-permissions.txt,DB roles ✅; service accounts ✅; API key scoping ✅
+Security,Secrets rotation policy,P1,Medium,[Agency],N,SECRETS_ROTATION_POLICY.md; audit.log,Manual + automated rotation; zero-downtime updates
+Security,SSL/TLS verification,P1,Low,[Codex],Y,ENCRYPTION_VALIDATION.md; ssl-check-report.txt,All connections use TLS; cert validation working
+Security,OAuth flow validation,P1,Medium,[Codex],Y,OAUTH_VALIDATION.md; oauth-test-report.md,GA4 + GSC flows tested; redirect URIs verified
+Monitoring,Database query slow-log setup,P1,Medium,[Agency],N,db-config/slowlog.conf; SLOWLOG_VALIDATION.md,Queries >100ms logged; analyzed weekly
+Monitoring,Error tracking (Sentry) deployment,P1,Medium,[Agency],N,sentry-config.yaml; ERROR_TRACKING_SETUP.md,Errors captured + grouped; alerts configured
+Monitoring,Centralized logging (Datadog/CloudWatch),P1,Medium,[Agency],N,logging-config.yaml; LOG_CENTRALIZATION.md,All logs aggregated; searchable + queryable
+Monitoring,Core Web Vitals tracking,P2,Low,[Codex],Y,Lighthouse CI config; WEB_VITALS_REPORT.md,FCP <1.8s; LCP <2.5s; CLS <0.1 tracked
+Docs,Database schema diagram (Mermaid),P2,Low,[Codex],Y,docs/DB_SCHEMA_DIAGRAM.mmd; schema-visual.png,Entity-relationship diagram generated
+Docs,Agent orchestration architecture diagram,P2,Low,[Codex],Y,docs/AGENT_ORCHESTRATION.mmd,Flow shows: Client → Orchestrator → Registry → Handler → DB
+Docs,Deployment architecture diagram,P2,Low,[Codex],Y,docs/DEPLOYMENT_ARCHITECTURE.mmd,Shows: Neon.tech ↔ Railway ↔ Vercel; Prometheus → Grafana
+Docs,API reference documentation,P2,Low,[Codex],Y,docs/API_REFERENCE.md; openapi.yaml,OpenAPI spec; tRPC routes documented
+Docs,Runbook for common operations,P2,Medium,[Codex],Y,docs/OPERATIONS_RUNBOOK.md,Scale workers; restore from backup; troubleshoot common issues
+Docs,On-call escalation guide,P2,Low,[Agency],N,docs/ONCALL_ESCALATION.md,P0/P1 procedures; contact tree; RTO/RPO targets
+Compliance,GDPR compliance checklist,P1,Medium,[Agency],N,docs/GDPR_COMPLIANCE.md; audit-log.txt,Data retention <90d; consent flows; right-to-delete
+Compliance,SOC 2 controls mapping,P1,Medium,[Agency],N,docs/SOC2_CONTROLS.md; evidence-inventory.md,CC6/CC7/CC9 mapped; controls validated
+Compliance,Data classification & handling,P1,Medium,[Agency],N,docs/DATA_CLASSIFICATION.md,PII/RESTRICTED/PUBLIC labeled; encryption per tier
+Compliance,Incident response playbook,P2,Medium,[Agency],N,docs/INCIDENT_RESPONSE.md; drill-reports.log,Detection → Containment → Recovery procedures
+Handoff,KT package complete & signed off,P0,Low,[Codex],Y,KT_DB_AGENT_AUDIT.md; KT_TASKS_BREAKDOWN.csv; KT_HANDOFF_CHECKLIST.md; KT_SYSTEM_MAP.mmd,All 4 KT docs delivered; no gaps
+Handoff,Agency onboarding & validation,P0,Medium,[Agency],N,ONBOARDING_COMPLETE.md; sign-off.pdf,Agency team trained; environment access verified; ready to operate
+
+

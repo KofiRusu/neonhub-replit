@@ -635,14 +635,14 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
       onClick={onSelect}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
-      className={`glassmorphism-effect p-6 rounded-lg cursor-pointer transition-all duration-300 relative ${
+      className={`bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg cursor-pointer transition-all duration-300 relative ${
         isSelected ? "glow-border shadow-neon-blue/20" : "hover:border-neon-blue/30"
       }`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg bg-white/5 ${typeConf.color}`}>
+          <div className={`p-2 rounded-lg bg-slate-800/40 ${typeConf.color}`}>
             <TypeIcon className="w-5 h-5" />
           </div>
           <div className="flex-1">
@@ -679,7 +679,7 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
                     e.stopPropagation()
                     onEdit()
                   }}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-neon-blue"
+                  className="p-1.5 rounded-lg hover:bg-slate-800/50 text-gray-400 hover:text-neon-blue"
                 >
                   <Edit className="w-3.5 h-3.5" />
                 </motion.button>
@@ -690,7 +690,7 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
                     e.stopPropagation()
                     onDuplicate()
                   }}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-neon-purple"
+                  className="p-1.5 rounded-lg hover:bg-slate-800/50 text-gray-400 hover:text-neon-purple"
                 >
                   <Copy className="w-3.5 h-3.5" />
                 </motion.button>
@@ -701,7 +701,7 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
                     e.stopPropagation()
                     onDelete()
                   }}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-neon-pink"
+                  className="p-1.5 rounded-lg hover:bg-slate-800/50 text-gray-400 hover:text-neon-pink"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </motion.button>
@@ -714,28 +714,28 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
       {/* Performance Metrics */}
       {campaign.status === "sent" && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          <div className="glass p-2 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1">
               <Eye className="w-3 h-3 text-neon-blue" />
               <span className="text-sm font-bold text-neon-blue">{campaign.openRate.toFixed(1)}%</span>
             </div>
             <p className="text-xs text-gray-400">Open Rate</p>
           </div>
-          <div className="glass p-2 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1">
               <MousePointer className="w-3 h-3 text-neon-purple" />
               <span className="text-sm font-bold text-neon-purple">{campaign.clickRate.toFixed(1)}%</span>
             </div>
             <p className="text-xs text-gray-400">Click Rate</p>
           </div>
-          <div className="glass p-2 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1">
               <Target className="w-3 h-3 text-neon-green" />
               <span className="text-sm font-bold text-neon-green">{campaign.conversions}</span>
             </div>
             <p className="text-xs text-gray-400">Conversions</p>
           </div>
-          <div className="glass p-2 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1">
               <TrendingUp className="w-3 h-3 text-neon-pink" />
               <span className="text-sm font-bold text-neon-pink">${campaign.revenue.toLocaleString()}</span>
@@ -747,7 +747,7 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
 
       {/* Automation Info */}
       {campaign.automation && (
-        <div className="glass p-3 rounded-lg mb-4">
+        <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-3 rounded-lg mb-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <Workflow className="w-4 h-4 text-neon-purple" />
@@ -770,7 +770,7 @@ function CampaignCard({ campaign, isSelected, onSelect, onEdit, onDuplicate, onD
 
       {/* A/B Test Info */}
       {campaign.abTest?.enabled && (
-        <div className="glass p-3 rounded-lg mb-4">
+        <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-3 rounded-lg mb-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <Split className="w-4 h-4 text-neon-blue" />
@@ -845,7 +845,7 @@ function SegmentCard({ segment, onEdit, onDelete }: SegmentCardProps) {
       whileHover={{ y: -4, scale: 1.02 }}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
-      className="glassmorphism-effect p-6 rounded-lg hover:border-neon-blue/30 transition-all duration-300 relative"
+      className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg hover:border-neon-blue/30 transition-all duration-300 relative"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -871,7 +871,7 @@ function SegmentCard({ segment, onEdit, onDelete }: SegmentCardProps) {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onEdit}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-neon-blue"
+                className="p-1.5 rounded-lg hover:bg-slate-800/50 text-gray-400 hover:text-neon-blue"
               >
                 <Edit className="w-3.5 h-3.5" />
               </motion.button>
@@ -879,7 +879,7 @@ function SegmentCard({ segment, onEdit, onDelete }: SegmentCardProps) {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onDelete}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-neon-pink"
+                className="p-1.5 rounded-lg hover:bg-slate-800/50 text-gray-400 hover:text-neon-pink"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </motion.button>
@@ -914,11 +914,11 @@ function SegmentCard({ segment, onEdit, onDelete }: SegmentCardProps) {
 
       {/* Engagement & AOV */}
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="glass p-2 rounded-lg text-center">
+        <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
           <span className="text-sm font-bold text-neon-purple">{segment.engagementRate}%</span>
           <p className="text-xs text-gray-400">Engagement</p>
         </div>
-        <div className="glass p-2 rounded-lg text-center">
+        <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-center">
           <span className="text-sm font-bold text-neon-green">${segment.avgOrderValue}</span>
           <p className="text-xs text-gray-400">Avg Order</p>
         </div>
@@ -960,7 +960,7 @@ function TemplateCard({ template, onSelect, onPreview }: TemplateCardProps) {
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
-      className="glassmorphism-effect rounded-lg overflow-hidden hover:border-neon-blue/30 transition-all duration-300"
+      className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl rounded-lg overflow-hidden hover:border-neon-blue/30 transition-all duration-300"
     >
       {/* Template Preview */}
       <div className="relative">
@@ -1025,7 +1025,7 @@ function TemplateCard({ template, onSelect, onPreview }: TemplateCardProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onPreview}
-            className="flex-1 glass border border-white/10 text-sm py-2 rounded-lg text-gray-400 hover:text-white transition-colors"
+            className="flex-1 glass border border-slate-700/50 text-sm py-2 rounded-lg text-gray-400 hover:text-white transition-colors"
           >
             <Eye className="w-4 h-4 mx-auto" />
           </motion.button>
@@ -1063,7 +1063,7 @@ function AutomationCard({ automation, onEdit, onToggle, onAnalyze }: AutomationC
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
-      className="glassmorphism-effect p-6 rounded-lg hover:border-neon-blue/30 transition-all duration-300"
+      className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg hover:border-neon-blue/30 transition-all duration-300"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -1111,7 +1111,7 @@ function AutomationCard({ automation, onEdit, onToggle, onAnalyze }: AutomationC
       </div>
 
       {/* Steps Preview */}
-      <div className="glass p-3 rounded-lg mb-4">
+      <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-3 rounded-lg mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-white">Automation Steps</span>
           <span className="text-xs text-gray-400">{automation.steps.length} steps</span>
@@ -1139,7 +1139,7 @@ function AutomationCard({ automation, onEdit, onToggle, onAnalyze }: AutomationC
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onEdit}
-          className="flex-1 glass border border-white/10 text-sm py-2 rounded-lg text-gray-400 hover:text-white transition-colors"
+          className="flex-1 glass border border-slate-700/50 text-sm py-2 rounded-lg text-gray-400 hover:text-white transition-colors"
         >
           Edit
         </motion.button>
@@ -1174,7 +1174,7 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Overall Score */}
-      <div className="glassmorphism-effect p-6 rounded-lg">
+      <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-white">Deliverability Score</h3>
           <div className="flex items-center space-x-2">
@@ -1184,21 +1184,21 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1 mb-2">
               <Globe className="w-4 h-4 text-neon-blue" />
               <span className="text-lg font-bold text-neon-blue">{data.reputation.domain}%</span>
             </div>
             <p className="text-sm text-gray-400">Domain Reputation</p>
           </div>
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1 mb-2">
               <Activity className="w-4 h-4 text-neon-purple" />
               <span className="text-lg font-bold text-neon-purple">{data.reputation.ip}%</span>
             </div>
             <p className="text-sm text-gray-400">IP Reputation</p>
           </div>
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <div className="flex items-center justify-center space-x-1 mb-2">
               <UserCheck className="w-4 h-4 text-neon-green" />
               <span className="text-lg font-bold text-neon-green">{data.reputation.sender}%</span>
@@ -1209,11 +1209,11 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
       </div>
 
       {/* Authentication Status */}
-      <div className="glassmorphism-effect p-6 rounded-lg">
+      <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
         <h3 className="text-xl font-bold text-white mb-4">Authentication Status</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(data.authentication).map(([key, value]) => (
-            <div key={key} className="glass p-4 rounded-lg">
+            <div key={key} className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white uppercase">{key}</span>
                 <div className="flex items-center space-x-1">
@@ -1227,22 +1227,22 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
       </div>
 
       {/* List Health */}
-      <div className="glassmorphism-effect p-6 rounded-lg">
+      <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
         <h3 className="text-xl font-bold text-white mb-4">List Health Metrics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <span className="text-lg font-bold text-neon-pink">{data.listHealth.bounceRate}%</span>
             <p className="text-sm text-gray-400">Bounce Rate</p>
           </div>
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <span className="text-lg font-bold text-neon-blue">{data.listHealth.complaintRate}%</span>
             <p className="text-sm text-gray-400">Complaint Rate</p>
           </div>
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <span className="text-lg font-bold text-yellow-400">{data.listHealth.unsubscribeRate}%</span>
             <p className="text-sm text-gray-400">Unsubscribe Rate</p>
           </div>
-          <div className="glass p-4 rounded-lg text-center">
+          <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg text-center">
             <span className="text-lg font-bold text-neon-green">{data.listHealth.engagementRate}%</span>
             <p className="text-sm text-gray-400">Engagement Rate</p>
           </div>
@@ -1250,7 +1250,7 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
       </div>
 
       {/* Recommendations */}
-      <div className="glassmorphism-effect p-6 rounded-lg">
+      <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
         <h3 className="text-xl font-bold text-white mb-4">Recommendations</h3>
         <div className="space-y-3">
           {data.recommendations.map((rec, index) => {
@@ -1273,7 +1273,7 @@ function DeliverabilityDashboard({ data }: DeliverabilityDashboardProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="glass p-4 rounded-lg"
+                className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg"
               >
                 <div className="flex items-start space-x-3">
                   <Icon className={`w-5 h-5 ${color} flex-shrink-0 mt-0.5`} />
@@ -1323,7 +1323,7 @@ export default function EmailPage() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="glass border border-white/10 p-2 rounded-lg text-gray-400 hover:text-white"
+        className="bg-slate-900/50 border-2 border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-gray-400 hover:text-white"
       >
         <Settings className="w-5 h-5" />
       </motion.button>
@@ -1343,7 +1343,7 @@ export default function EmailPage() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
         >
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <Mail className="w-6 h-6 text-neon-blue" />
               <span className="text-lg font-bold text-neon-blue">24</span>
@@ -1352,7 +1352,7 @@ export default function EmailPage() {
             <p className="text-xs text-gray-400">Active & completed</p>
           </div>
 
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <Users className="w-6 h-6 text-neon-purple" />
               <span className="text-lg font-bold text-neon-purple">12.4K</span>
@@ -1361,7 +1361,7 @@ export default function EmailPage() {
             <p className="text-xs text-gray-400">Total active</p>
           </div>
 
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <Eye className="w-6 h-6 text-neon-green" />
               <span className="text-lg font-bold text-neon-green">28.4%</span>
@@ -1370,7 +1370,7 @@ export default function EmailPage() {
             <p className="text-xs text-gray-400">30-day average</p>
           </div>
 
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <MousePointer className="w-6 h-6 text-neon-pink" />
               <span className="text-lg font-bold text-neon-pink">8.7%</span>
@@ -1379,7 +1379,7 @@ export default function EmailPage() {
             <p className="text-xs text-gray-400">30-day average</p>
           </div>
 
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <TrendingUp className="w-6 h-6 text-neon-blue" />
               <span className="text-lg font-bold text-neon-blue">$47K</span>
@@ -1388,7 +1388,7 @@ export default function EmailPage() {
             <p className="text-xs text-gray-400">This month</p>
           </div>
 
-          <div className="glassmorphism-effect p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <Shield className="w-6 h-6 text-neon-green" />
               <span className="text-lg font-bold text-neon-green">98.2%</span>
@@ -1423,7 +1423,7 @@ export default function EmailPage() {
                 className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   activeView === view.id
                     ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-gray-400 hover:text-white hover:bg-slate-800/40"
                 }`}
               >
                 <view.icon className="w-4 h-4" />
@@ -1442,7 +1442,7 @@ export default function EmailPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={`Search ${activeView}...`}
-                  className="w-full glass border border-white/10 rounded-lg bg-transparent py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:border-neon-blue/50 focus:outline-none"
+                  className="w-full glass border border-slate-700/50 rounded-lg bg-transparent py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:border-neon-blue/50 focus:outline-none"
                 />
               </div>
 
@@ -1451,7 +1451,7 @@ export default function EmailPage() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none"
+                    className="bg-slate-900/50 border-2 border-slate-700/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none"
                   >
                     <option value="all" className="bg-gray-800">
                       All Status
@@ -1473,7 +1473,7 @@ export default function EmailPage() {
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="glass border border-white/10 rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none"
+                    className="bg-slate-900/50 border-2 border-slate-700/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white bg-transparent focus:border-neon-blue/50 focus:outline-none"
                   >
                     <option value="all" className="bg-gray-800">
                       All Types
@@ -1623,7 +1623,7 @@ export default function EmailPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: 0.2 }}
-              className="glassmorphism-effect p-8 rounded-lg text-center"
+              className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-8 rounded-lg text-center"
             >
               <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Advanced Email Analytics</h3>

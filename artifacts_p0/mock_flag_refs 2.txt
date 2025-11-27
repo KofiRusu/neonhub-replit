@@ -1,0 +1,28 @@
+apps/api/src/connectors/mock/index.ts:3: * Routes to mock implementations when USE_MOCK_CONNECTORS=true
+apps/api/src/connectors/mock/index.ts:106:  return env.USE_MOCK_CONNECTORS === true || env.NODE_ENV === "test";
+apps/api/src/connectors/mock/index.ts:159:        `Set USE_MOCK_CONNECTORS=true to use mock connectors for testing.`
+apps/api/src/connectors/factory.ts:14:const USE_MOCK_CONNECTORS = process.env.USE_MOCK_CONNECTORS === "true" || env.NODE_ENV === "test";
+apps/api/src/connectors/factory.ts:16:if (USE_MOCK_CONNECTORS) {
+apps/api/src/connectors/factory.ts:17:  logger.info("🎭 Connector mock mode ENABLED (USE_MOCK_CONNECTORS=true or NODE_ENV=test)");
+apps/api/src/connectors/factory.ts:30:    if (USE_MOCK_CONNECTORS) {
+apps/api/src/connectors/factory.ts:72:    // TODO: Implement real connectors when USE_MOCK_CONNECTORS=false
+apps/api/src/connectors/factory.ts:105:    return USE_MOCK_CONNECTORS;
+apps/api/src/config/env.ts:51:  USE_MOCK_CONNECTORS: z.coerce.boolean().default(false),
+apps/api/src/__tests__/p0-minimal.test.ts:26:      expect(content).toContain('USE_MOCK_CONNECTORS');
+apps/api/src/__tests__/p0-minimal.test.ts:79:      expect(content).toContain('USE_MOCK_CONNECTORS');
+apps/api/src/__tests__/p0-minimal.test.ts:135:      expect(content).toContain('USE_MOCK_CONNECTORS');
+apps/api/src/__tests__/p0-minimal.test.ts:141:    it('should have USE_MOCK_CONNECTORS in env schema', () => {
+apps/api/src/__tests__/p0-minimal.test.ts:145:      expect(content).toContain('USE_MOCK_CONNECTORS');
+apps/api/src/__tests__/p0-minimal.test.ts:167:  it('should have USE_MOCK_CONNECTORS enabled', () => {
+apps/api/src/__tests__/p0-minimal.test.ts:168:    expect(process.env.USE_MOCK_CONNECTORS).toBe('true');
+apps/api/src/__tests__/setup.ts:14:process.env.USE_MOCK_CONNECTORS = 'true';
+apps/api/src/__tests__/p0-validation.test.ts:10:    it('should have USE_MOCK_CONNECTORS enabled in test mode', () => {
+apps/api/src/__tests__/p0-validation.test.ts:11:      expect(process.env.USE_MOCK_CONNECTORS).toBe('true');
+apps/api/src/__tests__/mock-connectors.test.ts:15:  // Set USE_MOCK_CONNECTORS for tests
+apps/api/src/__tests__/mock-connectors.test.ts:17:    process.env.USE_MOCK_CONNECTORS = 'true';
+apps/api/src/__tests__/mock-connectors.test.ts:21:    it('should return true when USE_MOCK_CONNECTORS is enabled', () => {
+apps/api/src/__tests__/mock-connectors.test.ts:176:    it('should return mock connector when USE_MOCK_CONNECTORS is true', () => {
+apps/api/src/routes/oauth.ts:286:    res.redirect('/oauth/skeleton?provider=instagram&message=Use+USE_MOCK_CONNECTORS=true+for+now');
+apps/api/src/routes/oauth.ts:298:    message: 'Instagram OAuth is a skeleton - use mock connector with USE_MOCK_CONNECTORS=true' 
+apps/api/src/routes/oauth.ts:385:      <p>${message || 'Use mock connectors for testing: USE_MOCK_CONNECTORS=true'}</p>
+apps/api/.env.example:26:USE_MOCK_CONNECTORS=true

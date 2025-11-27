@@ -1,0 +1,21 @@
+=== Docker Files ===
+./agent-infra/docker-compose.yml
+./docker-compose.yml
+
+=== SEO Services ===
+total 216
+drwxr-xr-x   8 kofirusu  staff    256 Oct 27 21:40 .
+drwx------  50 kofirusu  staff   1600 Nov  3 23:49 ..
+-rw-r--r--   1 kofirusu  staff  22559 Oct 27 22:31 content-optimizer.service.ts
+-rw-r--r--   1 kofirusu  staff   1314 Oct 27 22:01 index.ts
+-rw-r--r--   1 kofirusu  staff  16561 Oct 30 19:26 internal-linking.service.ts
+-rw-r--r--   1 kofirusu  staff  17757 Oct 27 22:47 keyword-research.service.ts
+-rw-r--r--   1 kofirusu  staff  19987 Oct 27 21:26 meta-generation.service.ts
+-rw-r--r--   1 kofirusu  staff  19265 Oct 27 22:47 recommendations.service.ts
+
+=== Analytics/Telemetry Refs ===
+apps/api/src/connectors/mocks/social.ts:  metrics: {
+apps/api/src/connectors/mock/MockConnector.ts:    metrics: Array<{ name: string }>;
+apps/api/src/connectors/mock/index.ts:    metrics: z.array(z.object({ name: z.string().min(1) })).optional(),
+apps/api/src/connectors/mock/index.ts:              metrics: input.metrics ?? [{ name: "activeUsers" }],
+apps/api/src/connectors/mock/index.ts:        description: "Return deterministic search console metrics.",

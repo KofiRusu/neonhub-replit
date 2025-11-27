@@ -22,7 +22,7 @@ export default function DeploymentPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Deployment Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-gray-400 mt-2">
             Monitor database migrations and system health in real-time
           </p>
         </div>
@@ -50,7 +50,7 @@ export default function DeploymentPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">{health?.status || "Unknown"}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-400">
               Version {health?.version || "N/A"}
             </p>
           </CardContent>
@@ -59,7 +59,7 @@ export default function DeploymentPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Database</CardTitle>
-            <Database className="w-4 h-4 text-muted-foreground" />
+            <Database className="w-4 h-4 text-gray-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -71,7 +71,7 @@ export default function DeploymentPage() {
                 {health?.checks?.database?.status || "unknown"}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               {health?.checks?.database?.latency
                 ? `${health.checks.database.latency}ms latency`
                 : "No latency data"}
@@ -82,7 +82,7 @@ export default function DeploymentPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">WebSocket</CardTitle>
-            <Wifi className="w-4 h-4 text-muted-foreground" />
+            <Wifi className="w-4 h-4 text-gray-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -94,7 +94,7 @@ export default function DeploymentPage() {
                 {health?.checks?.websocket?.status || "unknown"}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               {health?.checks?.websocket?.connections !== undefined
                 ? `${health.checks.websocket.connections} active connections`
                 : "No connection data"}
@@ -105,13 +105,13 @@ export default function DeploymentPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Uptime</CardTitle>
-            <RefreshCw className="w-4 h-4 text-muted-foreground" />
+            <RefreshCw className="w-4 h-4 text-gray-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {health?.uptime ? `${Math.floor(health.uptime / 60 / 60)}h` : "N/A"}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               {health?.uptime ? `${Math.floor(health.uptime)} seconds` : "Unknown"}
             </p>
           </CardContent>
@@ -172,7 +172,7 @@ export default function DeploymentPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Last Health Check</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-gray-400">
                 {health?.timestamp
                   ? new Date(health.timestamp).toLocaleTimeString()
                   : "N/A"}

@@ -17,6 +17,8 @@ module.exports = {
     }
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^@neonhub/orchestrator-contract$': '<rootDir>/../orchestrator-contract/index.cjs'
+  },
   verbose: true
 };
-

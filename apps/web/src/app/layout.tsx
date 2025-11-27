@@ -4,8 +4,6 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import Providers from "../providers/Providers"
-import Canonical from "@/components/seo/Canonical"
-import AnalyticsProvider from "@/components/analytics/AnalyticsProvider"
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -73,15 +71,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans">
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body className="font-sans bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
         <Providers>
-          <ThemeProvider defaultTheme="dark">
-            <Canonical baseUrl={siteUrl} />
-            <AnalyticsProvider />
-            {children}
-            <Toaster />
-          </ThemeProvider>
+          {children}
         </Providers>
       </body>
     </html>

@@ -6,7 +6,11 @@ import { setTransport } from "@neonhub/sdk/client";
 import { mockTransport } from "@/mocks/nhTransport";
 import { createTRPCClient, trpc } from "@/lib/trpc";
 
-if (process.env.NEXT_PUBLIC_NH_USE_MOCKS !== "false") {
+const shouldUseMockTransport =
+  (process.env.NEXT_PUBLIC_NH_USE_MOCKS ?? "false").toLowerCase() === "true";
+
+if (shouldUseMockTransport) {
+  // Phase 4 SDK alignment: default to real API, only opt into mocks explicitly.
   setTransport(mockTransport);
 }
 

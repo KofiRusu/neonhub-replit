@@ -373,22 +373,24 @@ const leads = await client.marketing.listLeads({
 
 ### 🔄 Orchestration
 
-Run multi-agent workflows:
+Route intents through the backend orchestrator:
 
 ```typescript
-// Execute orchestration
-const run = await client.orchestration.execute({
-  workflow: 'content-to-campaign',
-  params: {
-    topic: 'Product Launch',
-    channels: ['email', 'social']
-  },
-  organizationId: 'org_123'
+// Explicit request payload
+const response = await client.orchestration.execute({
+  intent: 'seo-audit',
+  payload: { keyword: 'ai automation' },
+  context: { organizationId: 'org_123' }
 });
 
-// Wait for completion
-const result = await client.orchestration.waitForCompletion(run.runId);
-console.log(result.steps);
+// Convenience helper
+const quick = await client.orchestration.executeIntent('support', {
+  notes: 'Customer is stuck on onboarding'
+}, {
+  agent: 'SupportAgent',
+});
+
+console.log(response.status, response.data);
 ```
 
 ## Error Handling
@@ -468,4 +470,3 @@ MIT
 ---
 
 Made with ❤️ by NeonHub Technologies
-

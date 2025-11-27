@@ -219,7 +219,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, scale: 1.01 }}
-      className={`glassmorphism-effect p-6 rounded-lg cursor-pointer transition-all duration-300 ${
+      className={`bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg cursor-pointer transition-all duration-300 ${
         isExpanded ? "glow-border shadow-neon-blue/20" : "hover:border-neon-blue/30"
       }`}
       onClick={onToggleExpand}
@@ -227,7 +227,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="p-3 rounded-lg bg-white/5 text-neon-blue">
+          <div className="p-3 rounded-lg bg-slate-800/40 text-neon-blue">
             <Target className="w-6 h-6" />
           </div>
           <div>
@@ -252,7 +252,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white"
+            className="p-2 rounded-lg hover:bg-slate-800/40 text-gray-400 hover:text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <MoreVertical className="w-4 h-4" />
@@ -359,7 +359,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-6 pt-6 border-t border-white/10"
+            className="mt-6 pt-6 border-t border-slate-700/50"
           >
             {/* Detailed Metrics */}
             <div className="grid grid-cols-3 gap-4 mb-6">
@@ -390,7 +390,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 glass border border-white/10 text-sm py-2 rounded-lg text-gray-400 hover:text-white"
+                className="flex-1 glass border border-slate-700/50 text-sm py-2 rounded-lg text-gray-400 hover:text-white"
                 onClick={(e) => e.stopPropagation()}
               >
                 Edit Campaign
@@ -398,7 +398,7 @@ function CampaignCard({ campaign, isExpanded, onToggleExpand }: CampaignCardProp
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 glass border border-white/10 text-sm py-2 rounded-lg text-gray-400 hover:text-white"
+                className="flex-1 glass border border-slate-700/50 text-sm py-2 rounded-lg text-gray-400 hover:text-white"
                 onClick={(e) => e.stopPropagation()}
               >
                 View Analytics
@@ -453,7 +453,7 @@ function CampaignTimeline({ campaigns }: CampaignTimelineProps) {
   }
 
   return (
-    <div className="glassmorphism-effect p-6 rounded-lg">
+    <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gradient">Campaign Timeline</h2>
         <div className="flex items-center space-x-2">
@@ -462,7 +462,7 @@ function CampaignTimeline({ campaigns }: CampaignTimelineProps) {
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
-            className="p-2 rounded-lg glass border border-white/10 text-gray-400 hover:text-white disabled:opacity-50"
+            className="p-2 rounded-lg glass border border-slate-700/50 text-gray-400 hover:text-white disabled:opacity-50"
           >
             <ChevronLeft className="w-4 h-4" />
           </motion.button>
@@ -471,7 +471,7 @@ function CampaignTimeline({ campaigns }: CampaignTimelineProps) {
             whileTap={{ scale: 0.95 }}
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
-            className="p-2 rounded-lg glass border border-white/10 text-gray-400 hover:text-white disabled:opacity-50"
+            className="p-2 rounded-lg glass border border-slate-700/50 text-gray-400 hover:text-white disabled:opacity-50"
           >
             <ChevronRight className="w-4 h-4" />
           </motion.button>
@@ -487,7 +487,7 @@ function CampaignTimeline({ campaigns }: CampaignTimelineProps) {
         <div className="flex space-x-6 pb-4" style={{ minWidth: "max-content" }}>
           {campaigns.map((campaign) => (
             <div key={campaign.id} className="flex-shrink-0 w-80">
-              <div className="glass p-4 rounded-lg">
+              <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-white">{campaign.name}</h3>
                   <span
@@ -554,7 +554,7 @@ function ABTestViewer({ campaigns }: ABTestViewerProps) {
   const selectedTestData = allTests.find((test) => test.id === selectedTest)
 
   return (
-    <div className="glassmorphism-effect p-6 rounded-lg">
+    <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gradient">A/B Test Results</h2>
         <div className="flex items-center space-x-2">
@@ -602,7 +602,7 @@ function ABTestViewer({ campaigns }: ABTestViewerProps) {
         <div className="lg:col-span-2">
           {selectedTestData ? (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <div className="glass p-4 rounded-lg">
+              <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                 <h3 className="text-lg font-bold text-white mb-2">{selectedTestData.name}</h3>
                 <p className="text-sm text-gray-400 mb-4">Campaign: {selectedTestData.campaignName}</p>
                 <div className="flex items-center space-x-4">
@@ -630,7 +630,7 @@ function ABTestViewer({ campaigns }: ABTestViewerProps) {
               {/* Comparison Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Variant A */}
-                <div className="glass p-4 rounded-lg">
+                <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                   <h4 className="font-medium text-white mb-4">{selectedTestData.variantA.name}</h4>
                   <div className="space-y-4">
                     <div>
@@ -692,7 +692,7 @@ function ABTestViewer({ campaigns }: ABTestViewerProps) {
                 </div>
 
                 {/* Variant B */}
-                <div className="glass p-4 rounded-lg">
+                <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                   <h4 className="font-medium text-white mb-4">{selectedTestData.variantB.name}</h4>
                   <div className="space-y-4">
                     <div>
@@ -755,7 +755,7 @@ function ABTestViewer({ campaigns }: ABTestViewerProps) {
               </div>
             </motion.div>
           ) : (
-            <div className="glass p-8 rounded-lg text-center">
+            <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-8 rounded-lg text-center">
               <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">Select an A/B Test</h3>
               <p className="text-gray-400">Choose a test from the list to view detailed comparison results</p>
@@ -793,7 +793,7 @@ export default function CampaignsPage() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="glass border border-white/10 p-2 rounded-lg text-gray-400 hover:text-white"
+        className="bg-slate-900/50 border-2 border-slate-700/50 backdrop-blur-sm p-2 rounded-lg text-gray-400 hover:text-white"
       >
         <Filter className="w-5 h-5" />
       </motion.button>
@@ -820,7 +820,7 @@ export default function CampaignsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search campaigns by name or description..."
-              className="w-full glass border border-white/10 rounded-lg bg-transparent py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:border-neon-blue/50 focus:outline-none"
+              className="w-full glass border border-slate-700/50 rounded-lg bg-transparent py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:border-neon-blue/50 focus:outline-none"
             />
           </div>
 
@@ -834,7 +834,7 @@ export default function CampaignsPage() {
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   statusFilter === status
                     ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-gray-400 hover:text-white hover:bg-slate-800/40"
                 }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}

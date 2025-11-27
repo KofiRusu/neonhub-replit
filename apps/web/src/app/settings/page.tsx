@@ -160,7 +160,7 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Settings Navigation */}
         <div className="lg:col-span-1">
-          <div className="glass-strong p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-4 rounded-lg">
             <nav className="space-y-2">
               {tabs.map((tab) => (
                 <button
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                   className={`w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg transition-all ${
                     activeTab === tab.id
                       ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-gray-400 hover:text-white hover:bg-slate-800/40"
                   }`}
                 >
                   <tab.icon className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default function SettingsPage() {
 
         {/* Settings Content */}
         <div className="lg:col-span-3">
-          <div className="glass-strong p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
             {activeTab === "profile" && (
               <div className="space-y-6">
                 <div>
@@ -334,7 +334,7 @@ export default function SettingsPage() {
 
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">Two-Factor Authentication</h3>
-                  <div className="glass p-4 rounded-lg">
+                  <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium text-white">2FA Status</p>
@@ -362,7 +362,7 @@ export default function SettingsPage() {
                 </div>
 
                 {connectorError && (
-                  <div className="glass p-4 rounded-lg border border-red-500/40 text-red-200 flex items-center space-x-3">
+                  <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg border border-red-500/40 text-red-200 flex items-center space-x-3">
                     <AlertTriangle className="w-5 h-5" />
                     <span>{connectorError}</span>
                   </div>
@@ -370,15 +370,15 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {loadingConnectors && connectorsWithStatus.length === 0 && (
-                    <div className="glass p-6 rounded-lg border border-white/10 animate-pulse h-40"></div>
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-6 rounded-lg border border-white/10 animate-pulse h-40"></div>
                   )}
 
                   {connectorsWithStatus.map((connector) => {
                     const isConnected = Boolean(connector.auth)
                     return (
-                      <div key={connector.id} className="glass p-6 rounded-lg border border-white/10 flex flex-col space-y-4">
+                      <div key={connector.id} className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-6 rounded-lg border border-white/10 flex flex-col space-y-4">
                         <div className="flex items-start space-x-4">
-                          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+                          <div className="w-10 h-10 rounded-lg bg-slate-800/50 border border-slate-700/30 flex items-center justify-center overflow-hidden">
                             {connector.iconUrl ? (
                               <Image
                                 src={connector.iconUrl}
@@ -423,7 +423,7 @@ export default function SettingsPage() {
                   })}
 
                   {!loadingConnectors && connectorsWithStatus.length === 0 && (
-                    <div className="glass p-6 rounded-lg border border-white/10">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-6 rounded-lg border border-white/10">
                       <p className="text-sm text-gray-400">No connectors are available yet. Refresh to sync the catalog.</p>
                     </div>
                   )}
@@ -436,7 +436,7 @@ export default function SettingsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">API Keys</h3>
                   <div className="space-y-4">
-                    <div className="glass p-4 rounded-lg">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <p className="font-medium text-white">Production API Key</p>
@@ -444,7 +444,7 @@ export default function SettingsPage() {
                         </div>
                         <button
                           onClick={() => setShowApiKey(!showApiKey)}
-                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"
+                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800/40"
                         >
                           {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -458,7 +458,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <div className="glass p-4 rounded-lg">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <p className="font-medium text-white">Development API Key</p>
@@ -479,15 +479,15 @@ export default function SettingsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">API Usage</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="glass p-4 rounded-lg">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                       <p className="text-sm text-gray-400">Requests Today</p>
                       <p className="text-2xl font-bold text-neon-blue">1,247</p>
                     </div>
-                    <div className="glass p-4 rounded-lg">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                       <p className="text-sm text-gray-400">Monthly Limit</p>
                       <p className="text-2xl font-bold text-neon-green">50,000</p>
                     </div>
-                    <div className="glass p-4 rounded-lg">
+                    <div className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg">
                       <p className="text-sm text-gray-400">Remaining</p>
                       <p className="text-2xl font-bold text-neon-purple">48,753</p>
                     </div>

@@ -1,0 +1,42 @@
+Area,Epic,Task,DefinitionOfDone,Est(hrs),Priority,Risk,Dependencies,SuggestedRole
+Backend,Code Quality,Fix 22 TypeScript Errors,All TS errors resolved + pnpm type-check passes,4,P0,HIGH,"git history, Prisma schema",Backend Engineer
+Backend,Code Quality,Fix TypeScript Error: CostRow Model,CostRow has model property + related tests pass,1,P0,MEDIUM,None,Backend Engineer
+Backend,Code Quality,Fix TypeScript Error: ConnectorAuth Schema,ConnectorAuth schema aligned + all routes pass,2,P0,MEDIUM,Database schema,Backend Engineer
+Backend,Code Quality,Fix TypeScript Error: PredictiveEngine Types,Prisma client typing resolved,1.5,P0,MEDIUM,Prisma client version,Backend Engineer
+Backend,Code Quality,Fix TypeScript Error: API Route Imports,All 4 API route imports resolved,1,P0,LOW,Next.js types,Backend Engineer
+Testing,Quality Gates,Fix Test Heap Limits,Tests run with --runInBand + coverage baseline,8,P0,CRITICAL,"NODE_OPTIONS, jest config",QA Engineer
+Testing,Quality Gates,Achieve 95% Test Coverage,Coverage report shows >=95% across metrics,8,P0,HIGH,"Mocked dependencies, critical paths",QA Engineer
+Testing,Quality Gates,Mock Heavy Dependencies,jest-mock-extended + Prisma stubs created,6,P0,HIGH,"Prisma schema, TensorFlow",QA Engineer
+Testing,Critical Paths,Add Payment Flow Tests,Checkout → payment → webhook → success,6,P0,MEDIUM,Stripe mock mode,QA Engineer
+Testing,Critical Paths,Add Agent Run Tests,Agent execution → persistence → metrics,4,P0,MEDIUM,AgentRun persistence,QA Engineer
+Backend,Persistence,Implement AgentRun Persistence,AgentRun records logged for all invocations,8,P0,HIGH,"executeAgentRun utility, Prisma models",Backend Engineer
+Backend,Persistence,Wire executeAgentRun into Orchestrator,Router uses executeAgentRun + audit trail,4,P0,HIGH,AgentRun persistence,Backend Engineer
+Backend,Persistence,Create AgentRunMetric on Completion,Metrics recorded for success/failure,2,P0,MEDIUM,"AgentRun persistence, metrics schema",Backend Engineer
+AI,Learning Loop,Wire PgVectorStore with Prisma,PgVectorStore instantiated + Prisma client injected,4,P0,HIGH,"Prisma schema, PgVectorStore",AI Engineer
+AI,Learning Loop,Expose learn() and recall() Methods,NeonHubPredictiveEngine has learn/recall implemented,6,P0,HIGH,"PgVectorStore, vector schema",AI Engineer
+AI,Learning Loop,Integration Test: Learn/Recall Flow,E2E test verifies learning loop operational,4,P0,MEDIUM,"Learning methods, test fixtures",AI Engineer
+AI,RAG,Seed Vector Embeddings,Brand voices + messages + chunks embedded,4,P0,HIGH,"OpenAI API, vector schema",AI Engineer
+AI,RAG,Implement Recall Service,pgvector similarity queries working,4,P0,HIGH,"PgVectorStore, SQL",AI Engineer
+AI,RAG,Wire RAG to ContentAgent,ContentAgent uses recall for context,2,P0,MEDIUM,"Recall service, agent",AI Engineer
+Monitoring,Observability,Add Prometheus Endpoint,/metrics endpoint exposed + prom-client integrated,3,P0,HIGH,"pnpm add prom-client",DevOps Engineer
+Monitoring,Observability,Track Key Metrics,agent_runs_total + duration + circuit_breaker,2,P0,HIGH,"Prometheus client, metrics schema",DevOps Engineer
+Monitoring,Observability,Integration Test: Metrics,curl http://localhost:4000/metrics returns valid,1,P0,LOW,Prometheus endpoint,DevOps Engineer
+Fintech,Billing,Verify Stripe Secrets,.env has STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE,0.5,P0,HIGH,"Stripe account, .env",Backend Engineer
+Fintech,Billing,Test Webhook Delivery,Stripe CLI webhook test passes,1.5,P0,HIGH,Stripe secrets,Backend Engineer
+Fintech,Billing,Create Stripe Mock Connector,USE_MOCK_CONNECTORS flag works,3,P0,HIGH,"Mock framework, Stripe SDK",Backend Engineer
+Fintech,Billing,E2E Checkout Flow,Plan selection → Stripe form → success page,4,P0,HIGH,"Stripe mock, webhook",QA Engineer
+Fintech,Billing,Smoke Test: Payment Flow,Full payment cycle tested + DB records created,2,P0,MEDIUM,"E2E checkout, Prisma",QA Engineer
+Security,Vulnerabilities,Fix ws Vulnerability,snoowrap dependency resolved or upgraded,1,P0,CRITICAL,"Dependency tree, snoowrap",DevOps Engineer
+Security,Vulnerabilities,Fix next-auth Vulnerability,next-auth@>=4.24.12 installed,0.5,P0,CRITICAL,"pnpm.lock, next-auth",DevOps Engineer
+Security,Workflows,Execute Gitleaks Workflow,gh workflow run gitleaks returns clean,1.5,P1,HIGH,GitHub CLI access,DevOps Engineer
+Security,Workflows,Execute CodeQL Workflow,CodeQL analysis completes + issues resolved,2,P1,HIGH,GitHub Actions,DevOps Engineer
+DevOps,CI/CD,Validate All 29 Workflows,Trigger each workflow + verify outputs,4,P1,MEDIUM,"GitHub Actions, secrets",DevOps Engineer
+DevOps,Deployment,Staging Deployment,API on Railway + web on Vercel + working,3,P1,HIGH,"Railway, Vercel, domains",DevOps Engineer
+DevOps,Deployment,Run Smoke Tests,./scripts/post-deploy-smoke.sh passes all 7 checks,2,P1,MEDIUM,Staging deployment,DevOps Engineer
+Frontend,Accessibility,Accessibility Audit,axe + NVDA + keyboard nav checked,3,P1,MEDIUM,Staging deployment,Frontend Engineer
+Frontend,Accessibility,Fix Accessibility Issues,WCAG 2.1 AA compliance achieved,3,P1,MEDIUM,Audit results,Frontend Engineer
+Frontend,SEO,Add Metadata Exports,21 routes have metadata exports,2,P1,LOW,"Next.js metadata API, routes",Frontend Engineer
+Database,Roles,Create Least-Privilege Roles,neonhub_app + neonhub_migrate roles created,2,P1,HIGH,Neon.tech access,DevOps Engineer
+Database,Roles,Update Connection Strings,ENV files updated per role + environment,1,P1,MEDIUM,Least-privilege roles,DevOps Engineer
+Auth,OAuth,Configure OAuth Credentials,Google + GitHub credentials in Stripe,1.5,P2,MEDIUM,"OAuth providers, .env",DevOps Engineer
+Auth,OAuth,Test OAuth Sign-In Flows,Sign-in with Google/GitHub works end-to-end,2,P2,MEDIUM,OAuth credentials,QA Engineer

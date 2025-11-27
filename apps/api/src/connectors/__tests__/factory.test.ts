@@ -1,9 +1,22 @@
-import { describe, it, expect, beforeEach } from "@jest/globals";
+import { describe, it, expect, beforeEach, afterEach, jest } from "@jest/globals";
 import { ConnectorFactory } from "../factory.js";
+import { recordToolExecution } from "../../services/tool-execution.service.js";
+
+jest.mock("../../services/tool-execution.service.js", () => ({
+  recordToolExecution: jest.fn(async (_connector, _action, _payload, executor) => executor()),
+}));
 
 describe("ConnectorFactory", () => {
   beforeEach(() => {
-    // Ensure we're in test mode (mock connectors enabled)
+    process.env.NODE_ENV = "test";
+    delete process.env.CONNECTORS_LIVE_MODE;
+    delete process.env.USE_MOCK_CONNECTORS;
+    (recordToolExecution as jest.Mock).mockClear();
+  });
+
+  afterEach(() => {
+    delete process.env.CONNECTORS_LIVE_MODE;
+    delete process.env.USE_MOCK_CONNECTORS;
     process.env.NODE_ENV = "test";
   });
 
@@ -28,6 +41,15 @@ describe("ConnectorFactory", () => {
       const connector = ConnectorFactory.create("twilio");
       expect(connector).toBeDefined();
       expect(connector.constructor.name).toContain("Mock");
+    });
+  });
+
+  describe("Real Mode", () => {
+    it("should create real connectors when CONNECTORS_LIVE_MODE is true", () => {
+      process.env.CONNECTORS_LIVE_MODE = "true";
+      const connector = ConnectorFactory.create("gmail");
+      expect(ConnectorFactory.isMockMode()).toBe(false);
+      expect(connector.constructor.name).toBe("GmailConnector");
     });
   });
 
@@ -69,6 +91,21 @@ describe("ConnectorFactory", () => {
         email: "mock-user@example.com",
         name: "Mock User",
       });
+    });
+
+    it("records telemetry for connector calls", async () => {
+      const connector = ConnectorFactory.create("gmail") as any;
+      await connector.send({
+        to: "telemetry@example.com",
+        subject: "Telemetry Test",
+        body: "Hello",
+      });
+      expect(recordToolExecution).toHaveBeenCalledWith(
+        "gmail",
+        "send",
+        expect.objectContaining({ to: "telemetry@example.com" }),
+        expect.any(Function),
+      );
     });
   });
 
@@ -161,10 +198,23 @@ describe("ConnectorFactory", () => {
   });
 
   describe("Error Handling", () => {
-    it("should throw error for unknown connector type", () => {
-      expect(() => {
-        ConnectorFactory.create("unknown" as any);
-      }).toThrow("Unknown connector type");
+    it("falls back to a generic mock connector when type is unknown", async () => {
+      const connector = ConnectorFactory.create("unknown" as any) as any;
+      const result = await connector.execute("noop", { foo: "bar" });
+      expect(result).toMatchObject({
+        success: true,
+        connector: "unknown",
+      });
+    });
+  });
+
+  describe("Workspace connectors", () => {
+    it("supports google-sheets mock operations", async () => {
+      const connector = ConnectorFactory.create("google-sheets") as any;
+      const rows = await connector.listRows("sheet-1", "A1:C3");
+      expect(rows.rows.length).toBeGreaterThan(0);
+      const append = await connector.appendRow("sheet-1", "Sheet1", ["A", "B"]);
+      expect(append.updatedRange).toContain("Sheet1");
     });
   });
 

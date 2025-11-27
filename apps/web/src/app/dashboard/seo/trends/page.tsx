@@ -6,7 +6,7 @@ export default function TrendsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Trend Intelligence</h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-400">
           Surface rising search demand, trigger alerts, and feed the content team before competitors react.
         </p>
       </div>

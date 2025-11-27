@@ -4,6 +4,8 @@ import { logger } from "../lib/logger.js";
 import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
 import { validateAgentContext } from "./_shared/normalize.js";
 import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
+import { RagContextService } from "../services/rag/context.service.js";
+import { KnowledgeBaseService } from "../services/rag/knowledge.service.js";
 
 type Sentiment = "positive" | "neutral" | "negative";
 type Priority = "low" | "medium" | "high";
@@ -92,6 +94,65 @@ const BUG_KEYWORDS = ["bug", "error", "issue", "broken", "crash", "fail", "failu
 
 export class SupportAgent {
   private readonly orchestratorAgentId = "SupportAgent";
+  private async buildSupportContext(
+    message: string,
+    context: AgentExecutionContext,
+  ): Promise<{ prompt?: string; organizationId?: string }> {
+    if (!message.trim() || !context.organizationId) {
+      return {};
+    }
+
+    const rag = await this.ragContext.build({
+      organizationId: context.organizationId,
+      query: message,
+      categories: ["support"],
+      personId: context.userId ?? undefined,
+      limit: 3,
+    });
+
+    const prompt = this.ragContext.formatForPrompt(rag);
+    return { prompt, organizationId: context.organizationId };
+  }
+
+  private async persistSupportKnowledge(args: {
+    context: AgentExecutionContext;
+    request: SupportRequest;
+    response: SupportReplyOutput;
+    intent: string;
+  }): Promise<void> {
+    const ownerId = args.context.userId ?? args.request.createdById;
+    if (!args.context.organizationId || !ownerId) {
+      return;
+    }
+
+    try {
+      await this.knowledgeBase.ingestSnippet({
+        organizationId: args.context.organizationId,
+        datasetSlug: `support-${args.context.organizationId}`,
+        datasetName: "Support Knowledge",
+        title: `Support reply ${new Date().toISOString()}`,
+        content: [
+          `Request: ${args.request.notes ?? args.request.subject ?? "n/a"}`,
+          `Reply: ${args.response.reply}`,
+        ].join("\n\n"),
+        ownerId,
+        metadata: {
+          agent: "SupportAgent",
+          intent: args.intent,
+          sentiment: args.response.sentiment,
+        },
+      });
+    } catch (error) {
+      logger.warn({ error, intent: args.intent }, "Failed to persist support knowledge");
+    }
+  }
+  private readonly ragContext: RagContextService;
+  private readonly knowledgeBase: KnowledgeBaseService;
+
+  constructor(deps: { ragContext?: RagContextService; knowledgeBase?: KnowledgeBaseService } = {}) {
+    this.ragContext = deps.ragContext ?? new RagContextService();
+    this.knowledgeBase = deps.knowledgeBase ?? new KnowledgeBaseService();
+  }
 
   private buildReplySummary(text: string): string {
     const sentences = text.match(/[^.!?]+[.!?]?/g) ?? [text];
@@ -268,10 +329,11 @@ export class SupportAgent {
     return { ok: false, error: message, code: "AGENT_EXECUTION_FAILED" };
   }
 
-  private async draftSupportReply(input: SupportRequest): Promise<SupportReplyOutput> {
+  private async draftSupportReply(input: SupportRequest, ragPrompt?: string): Promise<SupportReplyOutput> {
     const message = input.notes ?? input.subject ?? "";
     const sentiment = input.sentiment ?? this.detectSentiment(message);
-    const generated = await reply({ notes: message });
+    const notesWithContext = ragPrompt ? `${message}\n\nContext:\n${ragPrompt}` : message;
+    const generated = await reply({ notes: notesWithContext });
     const summary = this.buildReplySummary(generated.reply);
     return {
       reply: generated.reply,
@@ -326,13 +388,17 @@ export class SupportAgent {
     }
 
     const augmented = this.attachUser(parsed, context);
+    const ragContext = await this.buildSupportContext(
+      augmented.notes ?? augmented.subject ?? "",
+      context,
+    );
 
     try {
       const { result } = await executeAgentRun(
         this.orchestratorAgentId,
         context,
         augmented,
-        () => this.draftSupportReply(augmented),
+        () => this.draftSupportReply(augmented, ragContext.prompt),
         {
           intent,
           buildMetrics: (output) => ({
@@ -342,6 +408,13 @@ export class SupportAgent {
           }),
         },
       );
+
+      await this.persistSupportKnowledge({
+        context,
+        request: augmented,
+        response: result,
+        intent,
+      });
 
       return { ok: true, data: result };
     } catch (error) {
@@ -453,4 +526,3 @@ export class SupportAgent {
 }
 
 export const supportAgent = new SupportAgent();
-

@@ -188,7 +188,7 @@ export default function SocialMediaPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="glassmorphism-effect hover:shadow-neon-blue transition-all duration-300">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl hover:shadow-neon-blue transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <platform.icon className={`w-8 h-8 ${platform.color}`} />
@@ -219,7 +219,7 @@ export default function SocialMediaPage() {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 glassmorphism-effect">
+          <TabsList className="grid w-full grid-cols-5 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -230,7 +230,7 @@ export default function SocialMediaPage() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Performance Metrics */}
-              <Card className="glassmorphism-effect">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-neon-blue" />
@@ -260,7 +260,7 @@ export default function SocialMediaPage() {
               </Card>
 
               {/* Top Performing Post */}
-              <Card className="glassmorphism-effect">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-neon-green" />
@@ -302,11 +302,11 @@ export default function SocialMediaPage() {
                   placeholder="Search posts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 glassmorphism-effect border-white/20"
+                  className="pl-10 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-white/20"
                 />
               </div>
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                <SelectTrigger className="w-full sm:w-48 glassmorphism-effect border-white/20">
+                <SelectTrigger className="w-full sm:w-48 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-white/20">
                   <SelectValue placeholder="All Platforms" />
                 </SelectTrigger>
                 <SelectContent>
@@ -324,7 +324,7 @@ export default function SocialMediaPage() {
                     Create Post
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="glassmorphism-effect border-white/20">
+                <DialogContent className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-white/20">
                   <DialogHeader>
                     <DialogTitle>Create New Post</DialogTitle>
                   </DialogHeader>
@@ -342,7 +342,7 @@ export default function SocialMediaPage() {
                     </Select>
                     <Textarea
                       placeholder="What's on your mind?"
-                      className="min-h-32 glassmorphism-effect border-white/20"
+                      className="min-h-32 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl border-white/20"
                     />
                     <div className="flex justify-between">
                       <Button variant="outline">Save as Draft</Button>
@@ -365,7 +365,7 @@ export default function SocialMediaPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="glassmorphism-effect hover:shadow-neon-blue transition-all duration-300">
+                  <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl hover:shadow-neon-blue transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -418,7 +418,7 @@ export default function SocialMediaPage() {
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card className="glassmorphism-effect">
+            <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-neon-blue" />
@@ -430,7 +430,7 @@ export default function SocialMediaPage() {
                   {upcomingPosts.map((post, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
+                      className="flex items-center justify-between p-4 rounded-lg bg-slate-800/40 border border-slate-700/50"
                     >
                       <div className="flex items-center gap-3">
                         {post.platform === "Twitter" && <Twitter className="w-5 h-5 text-blue-400" />}
@@ -451,7 +451,7 @@ export default function SocialMediaPage() {
 
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="glassmorphism-effect">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Growth Rate</CardTitle>
                 </CardHeader>
@@ -461,7 +461,7 @@ export default function SocialMediaPage() {
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism-effect">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Avg. Engagement</CardTitle>
                 </CardHeader>
@@ -471,7 +471,7 @@ export default function SocialMediaPage() {
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism-effect">
+              <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Best Time to Post</CardTitle>
                 </CardHeader>
@@ -492,7 +492,7 @@ export default function SocialMediaPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="glassmorphism-effect hover:shadow-neon-purple transition-all duration-300">
+                  <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl hover:shadow-neon-purple transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <div className="p-2 rounded-lg bg-neon-blue/20">

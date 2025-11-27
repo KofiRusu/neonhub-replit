@@ -12,6 +12,24 @@ export const createMockTransport = (): Transport => {
   return async ({ url, method, body }) => {
     console.log('[Mock Transport]', method, url, body ? `(${JSON.stringify(body).substring(0, 50)}...)` : '');
 
+    // Unified orchestrator mock
+    if (url.endsWith('/orchestrate') && method === 'POST') {
+      const intent = body?.intent ?? 'mock-intent';
+      const agent = body?.agent ?? 'ContentAgent';
+      return {
+        success: true,
+        status: 'completed',
+        agent,
+        intent,
+        runId: `run_${Date.now()}`,
+        data: {
+          message: `Mock response for ${intent}`,
+          payloadEcho: body?.payload ?? null,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
+
     // Brand Voice Compose
     if (url.includes('/brand-voice/compose') && method === 'POST') {
       const { channel, objective } = body || {};

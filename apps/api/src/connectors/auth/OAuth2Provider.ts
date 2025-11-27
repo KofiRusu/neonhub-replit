@@ -112,4 +112,17 @@ export class OAuth2Provider {
 
     return (await response.json()) as TokenResponse;
   }
+
+  /**
+   * Check if an access token is expired or will expire soon (within 5 minutes)
+   */
+  isTokenExpired(expiresAt: Date | null | undefined): boolean {
+    if (!expiresAt) {
+      // No expiry data - assume valid
+      return false;
+    }
+    const now = new Date();
+    const bufferMs = 5 * 60 * 1000; // 5 minutes
+    return expiresAt.getTime() - now.getTime() < bufferMs;
+  }
 }

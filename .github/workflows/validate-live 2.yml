@@ -1,0 +1,107 @@
+name: Validate Live Endpoints
+
+on:
+  workflow_dispatch:
+    inputs:
+      STAGING_API_URL:
+        description: "Staging API URL"
+        required: false
+        default: "https://neonhub-api-staging.up.railway.app"
+      STAGING_WEB_URL:
+        description: "Staging Web URL"
+        required: false
+        default: "https://neonhub-web-staging.vercel.app"
+      PRODUCTION_API_URL:
+        description: "Production API URL"
+        required: true
+        default: "https://api.neonhubecosystem.com"
+      PRODUCTION_WEB_URL:
+        description: "Production Web URL"
+        required: true
+        default: "https://neonhubecosystem.com"
+      READINESS_TARGET:
+        description: "Target %"
+        required: false
+        default: "90"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate endpoints (strict)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts_w2 artifacts_prod_codex
+          STAGING_API_URL="${{ github.event.inputs.STAGING_API_URL }}"
+          STAGING_WEB_URL="${{ github.event.inputs.STAGING_WEB_URL }}"
+          PRODUCTION_API_URL="${{ github.event.inputs.PRODUCTION_API_URL }}"
+          PRODUCTION_WEB_URL="${{ github.event.inputs.PRODUCTION_WEB_URL }}"
+          READINESS_TARGET="${{ github.event.inputs.READINESS_TARGET }}"
+
+          echo "== DNS / reachability preflight =="
+          dns_blocked=0
+          for host in "$STAGING_API_URL" "$STAGING_WEB_URL" "$PRODUCTION_API_URL" "$PRODUCTION_WEB_URL"; do
+            h=$(echo "$host" | sed -E 's#^https?://([^/]+)/?.*$#\1#')
+            if ! (getent hosts "$h" 2>/dev/null || host "$h" 2>/dev/null || nslookup "$h" 2>/dev/null) >/dev/null; then
+              echo "DNS unresolved: $h"
+              dns_blocked=1
+            fi
+          done
+
+          PASS_HEALTH_S="⚠️"; PASS_METRICS_S="⚠️"; PASS_WEB_S="⚠️"
+          if [ $dns_blocked -eq 0 ]; then
+            curl -fsS "$STAGING_API_URL/health"  | tee artifacts_w2/health.json   >/dev/null && PASS_HEALTH_S="✅" || PASS_HEALTH_S="❌"
+            if curl -fsS "$STAGING_API_URL/metrics" | tee artifacts_w2/metrics.txt >/dev/null; then
+              grep -q 'agent_runs_total' artifacts_w2/metrics.txt && PASS_METRICS_S="✅" || PASS_METRICS_S="❌"
+            else PASS_METRICS_S="❌"; fi
+            curl -fsSI "$STAGING_WEB_URL"        | tee artifacts_w2/web_head.txt  >/dev/null && PASS_WEB_S="✅" || PASS_WEB_S="❌"
+          fi
+
+          if [ $dns_blocked -ne 0 ]; then
+            PASS_HEALTH_P="❌"; PASS_METRICS_P="❌"; PASS_WEB_P="❌"; READINESS="0"
+          else
+            curl -fsS "$PRODUCTION_API_URL/health"  | tee artifacts_prod_codex/health.json  >/dev/null && PASS_HEALTH_P="✅" || PASS_HEALTH_P="❌"
+            if curl -fsS "$PRODUCTION_API_URL/metrics" | tee artifacts_prod_codex/metrics.txt >/dev/null; then
+              grep -q 'agent_runs_total' artifacts_prod_codex/metrics.txt && PASS_METRICS_P="✅" || PASS_METRICS_P="❌"
+            else PASS_METRICS_P="❌"; fi
+            curl -fsSI "$PRODUCTION_WEB_URL"        | tee artifacts_prod_codex/web_head.txt >/dev/null && PASS_WEB_P="✅" || PASS_WEB_P="❌"
+            if [ "$PASS_HEALTH_P" = "✅" ] && [ "$PASS_METRICS_P" = "✅" ] && [ "$PASS_WEB_P" = "✅" ]; then READINESS="100"; else READINESS="0"; fi
+          fi
+
+          cat > artifacts_prod_codex/FINAL_VALIDATION_SUMMARY.md <<EOF
+          # Final Validation Summary (GitHub Actions)
+
+          ## Staging (sanity)
+          - Health:  ${PASS_HEALTH_S}
+          - Metrics: ${PASS_METRICS_S}
+          - Web:     ${PASS_WEB_S}
+
+          ## Production (required)
+          - Health:  ${PASS_HEALTH_P}
+          - Metrics: ${PASS_METRICS_P}
+          - Web:     ${PASS_WEB_P}
+
+          Readiness: ${READINESS}% (target: ${READINESS_TARGET}%)
+          EOF
+
+          cat artifacts_prod_codex/FINAL_VALIDATION_SUMMARY.md
+
+          # Fail job if below target
+          if [ "$READINESS" -lt "$READINESS_TARGET" ]; then
+            echo "❌ BLOCKED: Endpoints not reachable or metrics missing."
+            exit 1
+          fi
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-validation-artifacts
+          path: |
+            artifacts_w2/**
+            artifacts_prod_codex/**
+

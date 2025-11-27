@@ -1,0 +1,14 @@
+ M AUDIT_INDEX_OCT30.md
+ M apps/api/src/routes/health.ts
+ M apps/web/next.config.ts
+ M apps/web/src/app/dashboard/page.tsx
+ M apps/web/src/app/globals.css
+?? AUDIT_SUMMARY_OCT31.txt
+?? PROJECT_COMPLETION_AUDIT_FULL.md
+?? PROJECT_COMPLETION_TABLE.csv
+?? UI_ASSESSMENT_SUMMARY.md
+?? UI_UX_COMPLETION_ASSESSMENT.md
+?? UI_VISUAL_MAP.md
+?? docs/PROJECT_COMPLETION_AUDIT_2025-10-31.md
+?? logs/git_diff_summary.txt
+?? logs/size_report.txt

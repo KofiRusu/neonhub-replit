@@ -1,0 +1,46 @@
+=== Frontend Pages & Routes ===
+Page count:
+      53
+Total pages:       53
+
+Components:
+total 240
+drwxr-xr-x  35 kofirusu  staff  1120 Nov  3 23:49 .
+drwxr-xr-x  14 kofirusu  staff   448 Nov  4 22:04 ..
+-rw-r--r--   1 kofirusu  staff  1297 Nov  1 02:03 AppShell.tsx
+-rw-r--r--   1 kofirusu  staff  2032 Nov  1 02:03 AuthButton.tsx
+-rw-r--r--   1 kofirusu  staff   616 Nov  1 02:03 DebugStatus.tsx
+-rw-r--r--   1 kofirusu  staff  9108 Nov  1 02:03 MigrationMonitor.tsx
+-rw-r--r--   1 kofirusu  staff  7962 Nov  1 02:03 agent-card.tsx
+-rw-r--r--   1 kofirusu  staff  7289 Nov  1 02:03 agent-log.tsx
+-rw-r--r--   1 kofirusu  staff  9009 Nov  1 02:03 agent-runner.tsx
+-rw-r--r--   1 kofirusu  staff  3647 Nov  3 23:03 agent-status-card.tsx
+drwxr-xr-x   3 kofirusu  staff    96 Oct 27 21:10 analytics
+drwxr-xr-x  10 kofirusu  staff   320 Oct 24 01:26 brand-voice
+-rw-r--r--   1 kofirusu  staff  2320 Nov  1 02:03 campaign-timeline.tsx
+-rw-r--r--   1 kofirusu  staff  3488 Nov  1 02:03 chat-preview.tsx
+-rw-r--r--   1 kofirusu  staff  2659 Nov  1 02:03 coming-soon.tsx
+-rw-r--r--   1 kofirusu  staff  6405 Nov  3 23:03 content-editor.tsx
+drwxr-xr-x   3 kofirusu  staff    96 Nov  3 23:03 email
+-rw-r--r--   1 kofirusu  staff   524 Nov  1 02:03 error-boundary.tsx
+-rw-r--r--   1 kofirusu  staff   987 Nov  1 02:03 health-badge.tsx
+
+=== Auth & RBAC ===
+Auth files:
+apps/api/src/middleware/auth.ts
+apps/api/src/types/auth.ts
+apps/api/src/schemas/auth.ts
+apps/api/src/routes/oauth.ts
+apps/api/src/routes/auth.ts
+apps/api/src/services/oauth.service.ts
+
+=== Billing/Stripe ===
+total 16
+drwxr-xr-x   3 kofirusu  staff    96 Oct 27 16:29 .
+drwx------  50 kofirusu  staff  1600 Nov  3 23:49 ..
+-rw-r--r--   1 kofirusu  staff  8004 Oct 27 22:30 stripe.ts
+
+=== Testing ===
+Test files count:
+     122
+Test files:      122

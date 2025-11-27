@@ -1,0 +1,9 @@
+name: CI AI Wiring (Air-Gap)
+on: [workflow_dispatch]
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "AI wiring present: pipeline, router, preview UI. Run locally for full tests."

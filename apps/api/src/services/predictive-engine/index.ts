@@ -34,3 +34,7 @@ export async function getBaselineMetrics() {
   const engine = await getPredictiveEngine();
   return engine.getBaselineMetrics();
 }
+
+export function resetPredictiveEngine(): void {
+  predictiveEngine = null;
+}

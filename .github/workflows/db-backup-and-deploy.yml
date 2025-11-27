@@ -48,17 +48,17 @@ jobs:
           retention-days: 7
 
       - name: Generate Prisma Client
-        run: pnpm -F apps/api prisma generate
+        run: pnpm --filter ./apps/api prisma generate
 
       - name: Validate
-        run: pnpm -F apps/api prisma validate
+        run: pnpm --filter ./apps/api prisma validate
 
       - name: Migrate deploy
-        run: pnpm -F apps/api prisma migrate deploy
+        run: pnpm --filter ./apps/api prisma migrate deploy
 
       - name: Seed (optional)
         if: ${{ github.event.inputs.RUN_SEED == 'true' }}
-        run: pnpm -F apps/api prisma db seed
+        run: pnpm --filter ./apps/api prisma db seed
 
       - name: Status
-        run: pnpm -F apps/api prisma migrate status --schema apps/api/prisma/schema.prisma
+        run: pnpm --filter ./apps/api prisma migrate status --schema apps/api/prisma/schema.prisma

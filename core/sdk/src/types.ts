@@ -2,6 +2,7 @@
  * Type exports for NeonHub SDK
  * Re-exports Prisma types and defines SDK-specific types
  */
+import type { OrchestratorRequestPayload, OrchestratorUnifiedResponse } from "@neonhub/orchestrator-contract";
 
 // Re-export Prisma enums
 export {
@@ -147,41 +148,15 @@ export interface CampaignCreateInput {
 }
 
 /**
- * Orchestration workflow input
+ * Orchestration request routed through the backend orchestrator.
+ * Matches the shared orchestrator contract module.
  */
-export interface OrchestrationInput {
-  workflow: string;
-  params: Record<string, unknown>;
-  organizationId?: string;
-}
+export type OrchestrationInput = OrchestratorRequestPayload;
 
 /**
- * Orchestration result
+ * Unified orchestration result envelope.
  */
-export interface OrchestrationResult {
-  runId: string;
-  workflow: string;
-  status: 'queued' | 'running' | 'completed' | 'failed';
-  steps: OrchestrationStep[];
-  output?: unknown;
-  error?: string;
-  startedAt: Date;
-  completedAt?: Date;
-}
-
-/**
- * Orchestration step
- */
-export interface OrchestrationStep {
-  stepId: string;
-  agent: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  input?: unknown;
-  output?: unknown;
-  error?: string;
-  startedAt?: Date;
-  completedAt?: Date;
-}
+export type OrchestrationResult = OrchestratorUnifiedResponse;
 
 /**
  * Marketing metrics

@@ -1,0 +1,170 @@
+Scope: all 20 workspace projects
+Progress: resolved 0, reused 1, downloaded 0, added 0
+apps/api                                 |  WARN  deprecated @types/redis@4.0.11
+apps/api                                 |  WARN  deprecated puppeteer@23.11.1
+core/compliance-consent                  |  WARN  deprecated crypto@1.0.1
+modules/predictive-engine                |  WARN  deprecated @types/winston@2.4.4
+modules/predictive-engine                |  WARN  deprecated json2csv@5.0.7
+core/eco-optimizer                       |  WARN  deprecated @azure/monitor-query@1.3.3
+Progress: resolved 961, reused 949, downloaded 4, added 0
+Progress: resolved 972, reused 949, downloaded 15, added 0
+Progress: resolved 983, reused 949, downloaded 26, added 0
+Progress: resolved 989, reused 949, downloaded 32, added 0
+Progress: resolved 994, reused 949, downloaded 37, added 0
+Progress: resolved 997, reused 949, downloaded 40, added 0
+Progress: resolved 1002, reused 949, downloaded 45, added 0
+Progress: resolved 1005, reused 949, downloaded 48, added 0
+Progress: resolved 1007, reused 949, downloaded 50, added 0
+Progress: resolved 1011, reused 949, downloaded 54, added 0
+Progress: resolved 1017, reused 949, downloaded 60, added 0
+Progress: resolved 1024, reused 949, downloaded 67, added 0
+Progress: resolved 1031, reused 949, downloaded 74, added 0
+Progress: resolved 1039, reused 949, downloaded 82, added 0
+Progress: resolved 1039, reused 949, downloaded 83, added 0
+Progress: resolved 1048, reused 949, downloaded 91, added 0
+Progress: resolved 1061, reused 949, downloaded 104, added 0
+Progress: resolved 1070, reused 949, downloaded 113, added 0
+Progress: resolved 1079, reused 949, downloaded 122, added 0
+Progress: resolved 1083, reused 949, downloaded 126, added 0
+Progress: resolved 1091, reused 949, downloaded 134, added 0
+Progress: resolved 1098, reused 949, downloaded 141, added 0
+Progress: resolved 1106, reused 949, downloaded 149, added 0
+Progress: resolved 1118, reused 949, downloaded 161, added 0
+Progress: resolved 1137, reused 949, downloaded 180, added 0
+Progress: resolved 1167, reused 949, downloaded 210, added 0
+Progress: resolved 1187, reused 949, downloaded 230, added 0
+Progress: resolved 1208, reused 949, downloaded 251, added 0
+Progress: resolved 1231, reused 949, downloaded 274, added 0
+Progress: resolved 1255, reused 949, downloaded 298, added 0
+Progress: resolved 1272, reused 949, downloaded 315, added 0
+Progress: resolved 1292, reused 949, downloaded 335, added 0
+Progress: resolved 1308, reused 949, downloaded 351, added 0
+Progress: resolved 1329, reused 949, downloaded 372, added 0
+Progress: resolved 1385, reused 949, downloaded 428, added 0
+Progress: resolved 1392, reused 949, downloaded 435, added 0
+Progress: resolved 1392, reused 949, downloaded 436, added 0
+Progress: resolved 1393, reused 949, downloaded 436, added 0
+Progress: resolved 1396, reused 949, downloaded 439, added 0
+Progress: resolved 1408, reused 949, downloaded 450, added 0
+Progress: resolved 1433, reused 949, downloaded 475, added 0
+Progress: resolved 1468, reused 949, downloaded 496, added 0
+Progress: resolved 1481, reused 949, downloaded 498, added 0
+Progress: resolved 1486, reused 949, downloaded 498, added 0
+Progress: resolved 1489, reused 949, downloaded 500, added 0
+Progress: resolved 1493, reused 949, downloaded 500, added 0
+Progress: resolved 1500, reused 949, downloaded 500, added 0
+Progress: resolved 1509, reused 949, downloaded 500, added 0
+Progress: resolved 1518, reused 949, downloaded 501, added 0
+Progress: resolved 1532, reused 949, downloaded 501, added 0
+Progress: resolved 1540, reused 949, downloaded 502, added 0
+Progress: resolved 1546, reused 949, downloaded 502, added 0
+Progress: resolved 1549, reused 949, downloaded 507, added 0
+Progress: resolved 1556, reused 949, downloaded 513, added 0
+Progress: resolved 1568, reused 949, downloaded 514, added 0
+Progress: resolved 1580, reused 949, downloaded 523, added 0
+Progress: resolved 1591, reused 949, downloaded 526, added 0
+Progress: resolved 1601, reused 949, downloaded 528, added 0
+Progress: resolved 1612, reused 949, downloaded 528, added 0
+Progress: resolved 1613, reused 949, downloaded 529, added 0
+Progress: resolved 1616, reused 949, downloaded 535, added 0
+Progress: resolved 1627, reused 949, downloaded 547, added 0
+Progress: resolved 1639, reused 949, downloaded 559, added 0
+Progress: resolved 1652, reused 949, downloaded 572, added 0
+Progress: resolved 1669, reused 949, downloaded 589, added 0
+Progress: resolved 1685, reused 949, downloaded 605, added 0
+Progress: resolved 1694, reused 949, downloaded 614, added 0
+Progress: resolved 1700, reused 949, downloaded 619, added 0
+Progress: resolved 1706, reused 949, downloaded 626, added 0
+Progress: resolved 1708, reused 949, downloaded 630, added 0
+Progress: resolved 1714, reused 949, downloaded 636, added 0
+Progress: resolved 1727, reused 949, downloaded 648, added 0
+Progress: resolved 1749, reused 949, downloaded 667, added 0
+Progress: resolved 1788, reused 949, downloaded 710, added 0
+Progress: resolved 1828, reused 949, downloaded 749, added 0
+Progress: resolved 1856, reused 949, downloaded 778, added 0
+Progress: resolved 1887, reused 949, downloaded 809, added 0
+Progress: resolved 1912, reused 949, downloaded 832, added 0
+Progress: resolved 1927, reused 949, downloaded 848, added 0
+Progress: resolved 1958, reused 949, downloaded 879, added 0
+Progress: resolved 1967, reused 949, downloaded 890, added 0
+Progress: resolved 1967, reused 949, downloaded 891, added 0
+Progress: resolved 1971, reused 949, downloaded 895, added 0
+Progress: resolved 1971, reused 949, downloaded 896, added 0
+Progress: resolved 1972, reused 949, downloaded 896, added 0
+Progress: resolved 1973, reused 949, downloaded 896, added 0
+Progress: resolved 1975, reused 949, downloaded 896, added 0
+Progress: resolved 1985, reused 949, downloaded 901, added 0
+Progress: resolved 1993, reused 949, downloaded 910, added 0
+Progress: resolved 2004, reused 949, downloaded 920, added 0
+Progress: resolved 2014, reused 949, downloaded 934, added 0
+Progress: resolved 2016, reused 949, downloaded 938, added 0
+Progress: resolved 2016, reused 949, downloaded 939, added 0
+Progress: resolved 2018, reused 949, downloaded 939, added 0
+Progress: resolved 2025, reused 949, downloaded 942, added 0
+Progress: resolved 2025, reused 949, downloaded 943, added 0
+Progress: resolved 2027, reused 949, downloaded 946, added 0
+Progress: resolved 2028, reused 949, downloaded 946, added 0
+Progress: resolved 2030, reused 949, downloaded 949, added 0
+Progress: resolved 2030, reused 949, downloaded 950, added 0
+Progress: resolved 2032, reused 949, downloaded 952, added 0
+Progress: resolved 2033, reused 949, downloaded 952, added 0
+Progress: resolved 2034, reused 949, downloaded 952, added 0
+Progress: resolved 2034, reused 949, downloaded 953, added 0
+Progress: resolved 2034, reused 949, downloaded 956, added 0
+Progress: resolved 2035, reused 949, downloaded 956, added 0
+Progress: resolved 2036, reused 949, downloaded 956, added 0
+Progress: resolved 2036, reused 949, downloaded 957, added 0
+Progress: resolved 2036, reused 949, downloaded 958, added 0
+Progress: resolved 2037, reused 949, downloaded 958, added 0
+Progress: resolved 2037, reused 949, downloaded 959, added 0
+Progress: resolved 2037, reused 949, downloaded 960, added 0
+Progress: resolved 2037, reused 949, downloaded 961, added 0
+Progress: resolved 2037, reused 949, downloaded 962, added 0
+Progress: resolved 2038, reused 949, downloaded 962, added 0
+ WARN  11 deprecated subdependencies found: @aws-sdk/credential-provider-web-identity@3.917.0, @types/glob@9.0.0, glob@7.2.3, glob@8.1.0, google-p12-pem@4.0.1, inflight@1.0.6, lodash.get@4.4.2, node-domexception@1.0.0, querystring@0.2.0, request-promise@4.2.6, source-map@0.8.0-beta.0
+Packages: +6
+++++++
+Progress: resolved 2038, reused 949, downloaded 962, added 6, done
+apps/api prepare$ npm run prisma:generate
+. postinstall$ npm run prisma:generate
+. postinstall: > neonhub@3.2.0 prisma:generate
+. postinstall: > npm run prisma:generate --workspace=apps/api
+apps/api prepare: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+apps/api prepare: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+. postinstall: > @neonhub/backend-v3.2@3.2.0 prisma:generate
+. postinstall: > node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+. postinstall: Environment variables loaded from .env
+apps/api prepare: Environment variables loaded from .env
+. postinstall: Prisma schema loaded from prisma/schema.prisma
+apps/api prepare: Prisma schema loaded from prisma/schema.prisma
+. postinstall: ✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 1.45s
+. postinstall: Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+. postinstall: Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+apps/api prepare: ✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 1.45s
+apps/api prepare: Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+apps/api prepare: Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+apps/api prepare: Done
+. postinstall: Done
+. prepare$ husky
+. prepare: Done
+
+ WARN  Issues with peer dependencies found
+apps/api
+├─┬ @neonhub/predictive-engine 3.2.0
+│ └─┬ prometheus-api-metrics 3.2.2
+│   └── ✕ unmet peer prom-client@">=12 <15": found 15.1.3
+└─┬ snoowrap 1.23.0
+  └─┬ request-promise 4.2.6
+    ├── ✕ unmet peer request@npm:@cypress/request@^3.0.5: found 3.0.9
+    └─┬ request-promise-core 1.1.4
+      └── ✕ unmet peer request@npm:@cypress/request@^3.0.5: found 3.0.9
+
+core/ai-economy
+└─┬ @neonhub/cognitive-infra 5.0.0
+  └─┬ @tensorflow/tfjs 4.22.0
+    └─┬ @tensorflow/tfjs-data 4.22.0
+      └── ✕ missing peer seedrandom@^3.0.5
+Peer dependencies that should be installed:
+  seedrandom@^3.0.5
+
+Done in 5m 17.7s

@@ -1,0 +1,42 @@
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+src/ai/utils/cost.ts(8,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/ai/utils/cost.ts(9,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/lib/raw-body.ts(1,37): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/ai/preview.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/health/index.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/webhooks/stripe.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/trpc/middleware/safety.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error workspace @neonhub/backend-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/api
+npm error command failed
+npm error command sh -c node ../../scripts/run-cli.mjs tsc --noEmit
+
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> tsc --noEmit
+
+../api/src/ai/utils/cost.ts(8,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+../api/src/ai/utils/cost.ts(9,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+npm error Lifecycle script `typecheck` failed with error:
+npm error code 2
+npm error path /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error workspace @neonhub/ui-v3.2@3.2.0
+npm error location /Users/kofirusu/Desktop/NeonHub/apps/web
+npm error command failed
+npm error command sh -c tsc --noEmit
+
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed with exit code 2.

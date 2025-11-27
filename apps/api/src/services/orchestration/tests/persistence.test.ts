@@ -1,14 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from "@jest/globals";
+import { RunStatus } from "@prisma/client";
 import { registerAgent, clearRegistry } from "../registry.js";
 import { route } from "../router.js";
 import { prisma } from "../../../db/prisma.js";
 import type { OrchestratorRequest, AgentHandler } from "../types.js";
+import { resetMockData } from "../../../__mocks__/prisma.js";
+
+jest.mock("../../../db/prisma.js", () => {
+  const mock = require("../../../__mocks__/prisma.ts");
+  return { prisma: mock.prisma };
+});
 
 describe("Orchestrator AgentRun Persistence", () => {
   let testOrgId: string;
   let testUserId: string;
 
   beforeEach(async () => {
+    resetMockData();
     // Clear agent registry
     clearRegistry();
 
@@ -50,11 +58,11 @@ describe("Orchestrator AgentRun Persistence", () => {
       },
     };
 
-    registerAgent("test-agent", mockHandler);
+    registerAgent("AdAgent", mockHandler);
 
     // Execute orchestrator request
     const request: OrchestratorRequest = {
-      agent: "test-agent",
+      agent: "AdAgent",
       intent: "test-intent",
       payload: { foo: "bar" },
       context: {
@@ -75,21 +83,21 @@ describe("Orchestrator AgentRun Persistence", () => {
     }
 
     // Verify AgentRun was created
-    const agentRuns = await prisma.agentRun.findMany({
+    const agentRuns = (await prisma.agentRun.findMany({
       where: { organizationId: testOrgId },
       include: { agent: true },
-    });
+    })).filter((run) => run.organizationId === testOrgId);
 
     expect(agentRuns).toHaveLength(1);
     const run = agentRuns[0];
     
-    expect(run.status).toBe("completed");
+    expect(run.status).toBe(RunStatus.SUCCESS);
     expect(run.input).toMatchObject({ foo: "bar" });
     expect(run.output).toMatchObject({
       ok: true,
       data: { message: "Success", payload: { foo: "bar" } },
     });
-    expect(run.agent.name).toBe("test-agent");
+    expect(run.agent.name).toBe("AdAgent");
     expect(run.agent.organizationId).toBe(testOrgId);
     expect(run.startedAt).toBeTruthy();
     expect(run.completedAt).toBeTruthy();
@@ -103,11 +111,11 @@ describe("Orchestrator AgentRun Persistence", () => {
       },
     };
 
-    registerAgent("failing-agent", mockHandler);
+    registerAgent("SupportAgent", mockHandler);
 
     // Execute orchestrator request
     const request: OrchestratorRequest = {
-      agent: "failing-agent",
+      agent: "SupportAgent",
       intent: "test-failure",
       payload: { test: "failure" },
       context: {
@@ -122,14 +130,14 @@ describe("Orchestrator AgentRun Persistence", () => {
     expect(response.ok).toBe(false);
 
     // Verify AgentRun was created with failed status
-    const agentRuns = await prisma.agentRun.findMany({
+    const agentRuns = (await prisma.agentRun.findMany({
       where: { organizationId: testOrgId },
-    });
+    })).filter((run) => run.organizationId === testOrgId);
 
     expect(agentRuns).toHaveLength(1);
     const run = agentRuns[0];
     
-    expect(run.status).toBe("failed");
+    expect(run.status).toBe(RunStatus.FAILED);
     expect(run.input).toMatchObject({ test: "failure" });
     expect(run.metrics).toHaveProperty("error");
     expect(run.startedAt).toBeTruthy();
@@ -146,11 +154,11 @@ describe("Orchestrator AgentRun Persistence", () => {
       },
     };
 
-    registerAgent("metrics-agent", mockHandler);
+    registerAgent("InsightAgent", mockHandler);
 
     // Execute orchestrator request
     const request: OrchestratorRequest = {
-      agent: "metrics-agent",
+      agent: "InsightAgent",
       intent: "metrics-test",
       payload: { metric: "test" },
       context: {
@@ -162,15 +170,15 @@ describe("Orchestrator AgentRun Persistence", () => {
     await route(request);
 
     // Verify metrics were recorded
-    const agentRuns = await prisma.agentRun.findMany({
+    const agentRuns = (await prisma.agentRun.findMany({
       where: { organizationId: testOrgId },
-    });
+    })).filter((run) => run.organizationId === testOrgId);
 
     expect(agentRuns).toHaveLength(1);
     const run = agentRuns[0];
     
     expect(run.metrics).toHaveProperty("intent", "metrics-test");
-    expect(run.metrics).toHaveProperty("agent", "metrics-agent");
+    expect(run.metrics).toHaveProperty("agent", "InsightAgent");
     expect(run.metrics).toHaveProperty("responseOk", true);
     expect(run.metrics).toHaveProperty("durationMs");
     
@@ -185,11 +193,11 @@ describe("Orchestrator AgentRun Persistence", () => {
       handle: async () => ({ ok: true, data: { fallback: true } }),
     };
 
-    registerAgent("fallback-agent", mockHandler);
+    registerAgent("DesignAgent", mockHandler);
 
     // Execute orchestrator request WITHOUT organizationId
     const request: OrchestratorRequest = {
-      agent: "fallback-agent",
+      agent: "DesignAgent",
       intent: "no-org",
       payload: {},
       context: {

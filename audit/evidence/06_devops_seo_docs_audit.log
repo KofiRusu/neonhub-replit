@@ -1,0 +1,16 @@
+=== CI/CD Workflows ===
+      33
+Workflows: 29
+-rw-r--r--  1 kofirusu  staff   2873 Nov  3 23:03 .github/workflows/ai-logic-prod-smoke.yml
+-rw-r--r--  1 kofirusu  staff    459 Oct 30 23:00 .github/workflows/api.yml
+-rw-r--r--  1 kofirusu  staff   3993 Oct 30 23:00 .github/workflows/auto-sync-from-siblings.yml
+-rw-r--r--  1 kofirusu  staff    236 Nov  3 23:03 .github/workflows/ci-ai.yml
+-rw-r--r--  1 kofirusu  staff    490 Nov  3 23:03 .github/workflows/ci-light.yml
+-rw-r--r--  1 kofirusu  staff   1565 Nov  3 23:03 .github/workflows/ci-p0-hardening.yml
+-rw-r--r--  1 kofirusu  staff    979 Nov  3 23:03 .github/workflows/ci-p0.yml
+-rw-r--r--  1 kofirusu  staff    871 Oct 30 23:00 .github/workflows/ci.yml
+-rw-r--r--  1 kofirusu  staff   4350 Oct 30 23:00 .github/workflows/codex-autofix.yml
+-rw-r--r--  1 kofirusu  staff   1800 Oct 30 23:00 .github/workflows/db-backup-and-deploy.yml
+
+=== Docker & Infrastructure ===
+(eval):8: no matches found: Dockerfile*

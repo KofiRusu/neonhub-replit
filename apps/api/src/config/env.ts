@@ -28,6 +28,8 @@ const envSchema = z.object({
   // Environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().positive().default(3001),
+  USE_MOCK_CONNECTORS: z.coerce.boolean().default(false),
+  CONNECTORS_LIVE_MODE: z.coerce.boolean().default(false),
   
   // Beta Program
   BETA_ENABLED: z.coerce.boolean().default(false),
@@ -46,6 +48,15 @@ const envSchema = z.object({
   REDDIT_CLIENT_ID: z.string().optional(),
   REDDIT_CLIENT_SECRET: z.string().optional(),
   REDDIT_USER_AGENT: z.string().default('NeonHub/3.2'),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().optional(),
+  LINKEDIN_CLIENT_ID: z.string().optional(),
+  LINKEDIN_CLIENT_SECRET: z.string().optional(),
+  LINKEDIN_REDIRECT_URI: z.string().optional(),
+  META_APP_ID: z.string().optional(),
+  META_APP_SECRET: z.string().optional(),
+  API_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -127,6 +138,8 @@ function buildFallbackEnv(target: 'test' | 'development'): Env {
     OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4',
     NODE_ENV: target as 'test' | 'development' | 'production',
     PORT: Number(process.env.PORT ?? 3001),
+    USE_MOCK_CONNECTORS: process.env.USE_MOCK_CONNECTORS === "true" || target === 'test',
+    CONNECTORS_LIVE_MODE: process.env.CONNECTORS_LIVE_MODE === "true",
     SENTRY_DSN: process.env.SENTRY_DSN,
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_SID: process.env.TWILIO_SID || process.env.TWILIO_ACCOUNT_SID,

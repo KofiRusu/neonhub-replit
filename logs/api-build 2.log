@@ -1,0 +1,27 @@
+
+> @neonhub/backend-v3.2@3.2.0 build /Users/kofirusu/Desktop/NeonHub/apps/api
+> npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0, engine=binary) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 293ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+src/ai/utils/cost.ts(8,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/ai/utils/cost.ts(9,3): error TS2741: Property 'model' is missing in type '{ inputUsdPer1k: number; outputUsdPer1k: number; }' but required in type 'CostRow'.
+src/lib/raw-body.ts(1,37): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/ai/preview.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/health/index.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/pages/api/webhooks/stripe.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/trpc/middleware/safety.ts(1,54): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+/Users/kofirusu/Desktop/NeonHub/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @neonhub/backend-v3.2@3.2.0 build: `npm run prisma:generate && node ../../scripts/run-cli.mjs tsc -p .`
+Exit status 2

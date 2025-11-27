@@ -1,0 +1,37 @@
+flowchart LR
+  subgraph API / Agents
+    ORCH["Orchestrator Router\napps/api/src/services/orchestration/router.ts"]
+    EXEC["executeAgentRun() + RunContext\napps/api/src/agents/utils/agent-run.ts"]
+    MET["Prometheus Registry\napps/api/src/lib/metrics.ts"]
+  end
+
+  subgraph Queues
+    BULL["BullMQ Queues\n(intake.fetch, email.send, ...)"]
+    WORKER["Workers / cron jobs\n(currently seo-analytics only)"]
+  end
+
+  subgraph Connectors
+    FACTORY["ConnectorFactory\nUSE_MOCK_CONNECTORS + telemetry proxy"]
+    MOCKS["Mock Providers\n(Gmail/Slack/Twilio/etc)"]
+  end
+
+  subgraph Database (Postgres + pgvector)
+    RUNS[("AgentRun / RunStep / AgentRunMetric")]
+    TOOLS[("Tool / ToolExecution")]
+    DATA[("Datasets / Messages / MemEmbeddings\nvector(1536) + IVFFLAT")] 
+  end
+
+  subgraph Observability
+    PROM["/metrics endpoint\napp.get('/metrics')"]
+    OPS[("Prometheus / Grafana / Alerting")] 
+  end
+
+  ORCH --> EXEC
+  EXEC -->|persist| RUNS
+  EXEC -->|emit counters| MET
+  ORCH -->|enqueue| BULL --> WORKER
+  WORKER -->|call tool| FACTORY --> MOCKS
+  FACTORY -->|record ToolExecution| TOOLS
+  DATA --> ORCH
+  MET --> PROM --> OPS
+  WORKER --> DATA

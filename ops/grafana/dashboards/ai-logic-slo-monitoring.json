@@ -1,0 +1,211 @@
+{
+  "dashboard": {
+    "title": "NeonHub AI & Logic - SLO Monitoring",
+    "uid": "neonhub-ai-logic-slo",
+    "version": 1,
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "tags": ["ai", "slo", "production", "neonhub"],
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "iconColor": "blue"
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "P50 Latency (Target: ≤1.5s)",
+        "type": "timeseries",
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(operation_duration_ms_bucket{service_name=~\"neonhub-.*-prod\"}[5m])) by (le, service_name))",
+            "legendFormat": "{{service_name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "custom": {
+              "thresholdsStyle": {
+                "mode": "line"
+              }
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 1500, "color": "red" }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": { "id": "byName", "options": "Threshold" },
+              "properties": [
+                {
+                  "id": "custom.lineStyle",
+                  "value": { "fill": "dash", "dash": [10, 10] }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "title": "P95 Latency (Target: ≤4.5s)",
+        "type": "timeseries",
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(operation_duration_ms_bucket{service_name=~\"neonhub-.*-prod\"}[5m])) by (le, service_name))",
+            "legendFormat": "{{service_name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 4500, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Rate (Target: ≤2%)",
+        "type": "timeseries",
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(operation_errors_total{service_name=~\"neonhub-.*-prod\"}[5m])) by (service_name) / sum(rate(operation_total{service_name=~\"neonhub-.*-prod\"}[5m])) by (service_name) * 100",
+            "legendFormat": "{{service_name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 2, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Median Cost (Target: ≤$0.03)",
+        "type": "timeseries",
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(operation_cost_usd_bucket{service_name=~\"neonhub-.*-prod\"}[5m])) by (le, service_name))",
+            "legendFormat": "{{service_name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 0.03, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "SLO Compliance (24h Rolling)",
+        "type": "stat",
+        "gridPos": { "x": 0, "y": 16, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "(count(histogram_quantile(0.95, sum(rate(operation_duration_ms_bucket{service_name=~\"neonhub-.*-prod\"}[24h])) by (le)) <= 4500) / count(histogram_quantile(0.95, sum(rate(operation_duration_ms_bucket{service_name=~\"neonhub-.*-prod\"}[24h])) by (le)))) * 100",
+            "legendFormat": "Latency SLO"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 95, "color": "yellow" },
+                { "value": 99, "color": "green" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Active Services",
+        "type": "stat",
+        "gridPos": { "x": 6, "y": 16, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "count(count by (service_name) (up{service_name=~\"neonhub-.*-prod\"}))"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Total Operations (24h)",
+        "type": "stat",
+        "gridPos": { "x": 12, "y": 16, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "sum(increase(operation_total{service_name=~\"neonhub-.*-prod\"}[24h]))"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Total Cost (24h)",
+        "type": "stat",
+        "gridPos": { "x": 18, "y": 16, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "sum(increase(llm_cost_usd_total{service_name=~\"neonhub-.*-prod\"}[24h]))"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 4
+          }
+        }
+      }
+    ],
+    "refresh": "30s",
+    "time": { "from": "now-6h", "to": "now" }
+  }
+}
+

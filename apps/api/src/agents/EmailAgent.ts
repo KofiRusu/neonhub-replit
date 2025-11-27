@@ -15,6 +15,8 @@ import { queues } from "../queues/index.js";
 import type { ConsentStatus } from "../types/agentic.js";
 import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
 import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
+import { RagContextService } from "../services/rag/context.service.js";
+import { KnowledgeBaseService } from "../services/rag/knowledge.service.js";
 
 export type { GenerateSequenceInput } from "./_shared/normalize.js";
 
@@ -119,17 +121,91 @@ async function enqueueEmailJob(queueName: "email.compose" | "email.send", payloa
   }
 }
 
+interface EmailContextDetails {
+  prompt?: string;
+  organizationId?: string;
+  ownerId?: string;
+}
+
+async function resolveOwnerId(context?: AgentExecutionContext, fallback?: string): Promise<string | undefined> {
+  return context?.userId ?? fallback ?? undefined;
+}
+
 /**
  * EmailAgent - Generates email sequences and optimizes email content
  */
 export class EmailAgent {
   private readonly agentName = "email";
   private readonly orchestratorAgentId = "EmailAgent";
+  private readonly ragContext: RagContextService;
+  private readonly knowledgeBase: KnowledgeBaseService;
+  private readonly generateTextFn: typeof generateText;
+
+  constructor(deps: { ragContext?: RagContextService; knowledgeBase?: KnowledgeBaseService; generateText?: typeof generateText } = {}) {
+    this.ragContext = deps.ragContext ?? new RagContextService();
+    this.knowledgeBase = deps.knowledgeBase ?? new KnowledgeBaseService();
+    this.generateTextFn = deps.generateText ?? generateText;
+  }
+
+  private async buildEmailContext(
+    query: string,
+    context?: AgentExecutionContext,
+  ): Promise<EmailContextDetails> {
+    if (!context?.organizationId || !query.trim()) {
+      return { ownerId: await resolveOwnerId(context) };
+    }
+
+    const rag = await this.ragContext.build({
+      organizationId: context.organizationId,
+      query,
+      categories: ["email", "content"],
+      personId: context.userId ?? undefined,
+      limit: 3,
+    });
+
+    return {
+      prompt: this.ragContext.formatForPrompt(rag),
+      organizationId: context.organizationId,
+      ownerId: await resolveOwnerId(context),
+    };
+  }
+
+  private async persistEmailKnowledge(args: {
+    organizationId?: string;
+    ownerId?: string;
+    title: string;
+    content: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void> {
+    if (!args.organizationId || !args.ownerId) {
+      return;
+    }
+
+    try {
+      await this.knowledgeBase.ingestSnippet({
+        organizationId: args.organizationId,
+        datasetSlug: `email-${args.organizationId}`,
+        datasetName: "Email Knowledge",
+        title: args.title,
+        content: args.content,
+        ownerId: args.ownerId,
+        metadata: {
+          agent: "EmailAgent",
+          ...args.metadata,
+        },
+      });
+    } catch (error) {
+      logger.warn({ error }, "Failed to persist email knowledge");
+    }
+  }
 
   /**
    * Generate an email sequence for a campaign
    */
-  async generateSequence(input: GenerateSequenceInput): Promise<GenerateSequenceOutput> {
+  async generateSequence(
+    input: GenerateSequenceInput,
+    options: { context?: AgentExecutionContext } = {},
+  ): Promise<GenerateSequenceOutput> {
     const startTime = Date.now();
 
     const normalized = normalizeSequenceInput(input);
@@ -146,10 +222,16 @@ export class EmailAgent {
       const numEmails = normalized.numEmails;
       const tone = normalized.tone === "authoritative" ? "professional" : normalized.tone;
       
+      const contextDetails = await this.buildEmailContext(normalized.topic, options.context);
+      const contextBlock = contextDetails.prompt
+        ? `\nGrounding context:\n${contextDetails.prompt}\n`
+        : "";
+
       const prompt = `Create an email sequence for a marketing campaign about: ${normalized.topic}
 ${normalized.audience ? `Target Audience: ${normalized.audience}\n` : ""}
 Objective: ${normalized.objective}
 Tone: ${tone}
+${contextBlock}
 
 Generate ${numEmails} emails for an automated sequence. Each email should:
 - Have a compelling subject line
@@ -168,7 +250,7 @@ Return the sequence as a JSON array with format:
 
       logger.info({ jobId, topic: normalized.topic }, "Generating email sequence with AI");
 
-      const result = await generateText({
+      const result = await this.generateTextFn({
         prompt,
         temperature: 0.7,
         maxTokens: 2000,
@@ -207,6 +289,20 @@ Return the sequence as a JSON array with format:
         timestamp: new Date(),
       });
 
+      await this.persistEmailKnowledge({
+        organizationId: contextDetails.organizationId,
+        ownerId: contextDetails.ownerId ?? normalized.createdById,
+        title: `Email sequence for ${normalized.topic}`,
+        content: sequence
+          .map((item) => `Day ${item.day}: ${item.subject}\n${item.body}`)
+          .join("\n\n"),
+        metadata: {
+          objective: normalized.objective,
+          tone,
+          count: sequence.length,
+        },
+      });
+
       return {
         jobId,
         sequence,
@@ -224,7 +320,10 @@ Return the sequence as a JSON array with format:
   /**
    * Optimize a subject line with AI suggestions
    */
-  async optimizeSubjectLine(input: OptimizeSubjectLineInput): Promise<OptimizeSubjectLineOutput> {
+  async optimizeSubjectLine(
+    input: OptimizeSubjectLineInput,
+    options: { context?: AgentExecutionContext } = {},
+  ): Promise<OptimizeSubjectLineOutput> {
     const startTime = Date.now();
     
     const jobId = await agentJobManager.createJob({
@@ -236,10 +335,19 @@ Return the sequence as a JSON array with format:
     try {
       await agentJobManager.startJob(jobId);
 
+      const contextDetails = await this.buildEmailContext(
+        [input.originalSubject, input.context ?? ""].filter(Boolean).join(" "),
+        options.context,
+      );
+      const contextBlock = contextDetails.prompt
+        ? `\nUse the following context to stay on-brand:\n${contextDetails.prompt}\n`
+        : "";
+
       const prompt = `Optimize this email subject line for better open rates:
 
 Original: "${input.originalSubject}"
 ${input.context ? `Context: ${input.context}\n` : ""}
+${contextBlock}
 
 Provide 5 alternative subject lines that:
 - Are more compelling and curiosity-driving
@@ -251,7 +359,7 @@ Return as a JSON array of strings.`;
 
       logger.info({ jobId, originalSubject: input.originalSubject }, "Optimizing subject line");
 
-      const result = await generateText({
+      const result = await this.generateTextFn({
         prompt,
         temperature: 0.8,
         maxTokens: 500,
@@ -282,6 +390,17 @@ Return as a JSON array of strings.`;
         duration,
         mock: result.mock,
       }, "Subject line optimization complete");
+
+      await this.persistEmailKnowledge({
+        organizationId: contextDetails.organizationId,
+        ownerId: contextDetails.ownerId ?? input.createdById,
+        title: `Subject optimization for "${input.originalSubject}"`,
+        content: suggestions.map((suggestion, idx) => `${idx + 1}. ${suggestion}`).join("\n"),
+        metadata: {
+          type: "subject-optimization",
+          count: suggestions.length,
+        },
+      });
 
       return {
         jobId,
@@ -601,7 +720,7 @@ Return as a JSON array of strings.`;
         this.orchestratorAgentId,
         context,
         input,
-        () => this.generateSequence(input),
+        () => this.generateSequence(input, { context }),
         {
           intent,
           buildMetrics: output => ({ emailsGenerated: output.sequence.length }),
@@ -630,7 +749,7 @@ Return as a JSON array of strings.`;
         this.orchestratorAgentId,
         context,
         input,
-        () => this.optimizeSubjectLine(input),
+        () => this.optimizeSubjectLine(input, { context }),
         {
           intent,
           buildMetrics: output => ({ suggestions: output.suggestions.length }),

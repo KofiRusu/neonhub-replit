@@ -1,0 +1,23 @@
+apps/api/src/metrics/prom.ts:1:export { register as registry, agentRunsTotal as runCount, agentRunDuration as runDuration } from "../lib/metrics.js";
+apps/api/src/metrics/prom.ts:2:export { getMetrics as metricsText } from "../lib/metrics.js";
+apps/api/src/metrics/README.txt:1:Prometheus metrics live at apps/api/src/metrics/prom.ts (implemented in main branch).
+apps/api/src/__tests__/p0-minimal.test.ts:90:      const path = join(ROOT, 'src/lib/metrics.ts');
+apps/api/src/__tests__/p0-minimal.test.ts:100:    it('should have /metrics endpoint in server', () => {
+apps/api/src/__tests__/p0-minimal.test.ts:104:      expect(content).toContain('app.get("/metrics"');
+apps/api/src/__tests__/p0-minimal.test.ts:136:      expect(content).toContain('/metrics');
+apps/api/src/__tests__/metrics.test.ts:13:} from "../observability/metrics.js";
+apps/api/src/__tests__/p0-validation.test.ts:26:      const metricsModule = await import('../lib/metrics.js');
+apps/api/src/__tests__/p0-validation.test.ts:35:      const { agentRunsTotal, agentRunDuration } = await import('../lib/metrics.js');
+apps/api/src/__tests__/p0-validation.test.ts:42:      const { getMetrics } = await import('../lib/metrics.js');
+apps/api/src/ai/workflows/pipeline.ts:5:import { emitMetric, emitCostUSD } from "../utils/metrics";
+apps/api/src/lib/metrics.ts:13:} from "../observability/metrics.js";
+apps/api/src/server.ts:17:import { metricsRouter } from "./routes/metrics.js";
+apps/api/src/server.ts:46:import { getMetrics, recordHttpRequest } from "./observability/metrics.js";
+apps/api/src/server.ts:123:app.get("/metrics", async (_req, res) => {
+apps/api/src/routes/orchestration.ts:163:// GET /api/orchestration/metrics - Get orchestration metrics
+apps/api/src/routes/orchestration.ts:164:router.get('/metrics', async (req, res) => {
+apps/api/src/routes/metrics.ts:6:import { MetricEventInputSchema, MetricsSummaryQuerySchema } from "./metrics.schemas.js";
+apps/api/src/routes/metrics.ts:12:metricsRouter.post("/metrics/events", async (req, res, next) => {
+apps/api/src/routes/metrics.ts:61:metricsRouter.get("/metrics/summary", async (req, res, next) => {
+apps/api/src/services/agent-run.service.ts:5:import { recordAgentRun } from "../lib/metrics.js";
+apps/api/src/services/orchestration/router.ts:7:import { recordCircuitBreakerFailure } from "../../lib/metrics.js";

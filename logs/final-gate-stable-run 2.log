@@ -1,0 +1,24 @@
+== FINAL VERIFICATION & RELEASE GATE (Stable API Mode) ==
+== Tooling Snapshot ==
+pnpm: /opt/homebrew/bin/pnpm   version=9.12.0
+node: v20.17.0
+== Workspace Sanity ==
+All critical files present (7 checked)
+== Federation path checks ==
+✅ Federation workspace references clean
+== Start API (no-watch mode for stable testing) ==
+Starting API server directly (tsx without watch)...
+Waiting for API server to start...
+⚠️  API server not responding after 30s
+API PID: 77028
+== Smoke Tests ==
+-- /api/health --
+curl: (7) Failed to connect to localhost port 3001 after 0 ms: Couldn't connect to server
+❌ HEALTH FAIL
+-- AI REST smoke --
+./run-final-gate-stable.sh: line 110: timeout: command not found
+⚠️  AI REST FAIL (check logs/ai-rest.out)
+-- AI preview smoke --
+./run-final-gate-stable.sh: line 122: timeout: command not found
+⚠️  AI PREVIEW FAIL (check logs/ai-preview.out)
+-- Stripe webhook (mock) --

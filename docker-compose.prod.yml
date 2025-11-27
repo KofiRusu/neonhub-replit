@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector:0.104.0
+    container_name: neonhub-otel-collector-prod
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/otel-config.yaml"]
+    volumes:
+      - ./ops/otel/otel-config.prod.yaml:/etc/otelcol/otel-config.yaml:ro
+    environment:
+      # URLs read from environment or GitHub env vars at deploy time
+      TEMPO_OTLP_HTTP_URL: ${TEMPO_OTLP_HTTP_URL:-https://tempo.example.com:4318}
+      PROM_REMOTE_WRITE_URL: ${PROM_REMOTE_WRITE_URL:-https://prom.example.com/api/v1/write}
+      TEMPO_AUTH_TOKEN: ${TEMPO_AUTH_TOKEN:-}
+      PROM_AUTH_TOKEN: ${PROM_AUTH_TOKEN:-}
+    ports:
+      - "4318:4318"  # OTLP/HTTP - expose only if needed; otherwise internal network only
+      - "13133:13133" # Health check
+    networks:
+      - neonhub
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Override for API service with production telemetry
+  api:
+    environment:
+      TELEMETRY_ENABLED: "true"
+      SERVICE_NAME: "neonhub-api-prod"
+      SERVICE_VERSION: ${SERVICE_VERSION:-v3.2.0}
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      LOG_LEVEL: "info"
+      NODE_ENV: "production"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+    networks:
+      - neonhub
+
+  # Override for Web service
+  web:
+    environment:
+      TELEMETRY_ENABLED: "true"
+      SERVICE_NAME: "neonhub-web-prod"
+      SERVICE_VERSION: ${SERVICE_VERSION:-v3.2.0}
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      LOG_LEVEL: "info"
+      NODE_ENV: "production"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+    networks:
+      - neonhub
+
+networks:
+  neonhub:
+    driver: bridge
+

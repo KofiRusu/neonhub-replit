@@ -64,7 +64,7 @@ export function InternalLinkSuggestions({
             placeholder="Paste your draft content here…"
             rows={6}
           />
-          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
             <label className="flex items-center gap-2">
               Suggestions:
               <select
@@ -91,7 +91,7 @@ export function InternalLinkSuggestions({
         </div>
 
         {error && (
-          <p className="text-sm text-destructive">
+          <p className="text-sm text-red-400">
             Unable to fetch suggestions: {error.message}
           </p>
         )}
@@ -101,7 +101,7 @@ export function InternalLinkSuggestions({
             {suggestions.map((suggestion, index) => (
               <div
                 key={`${suggestion.targetContentId}-${index}`}
-                className="rounded-lg border border-border/60 bg-muted/20 p-4"
+                className="rounded-lg border border-slate-700/60 bg-slate-900/60 p-4"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-semibold text-primary">
@@ -118,7 +118,7 @@ export function InternalLinkSuggestions({
                   Suggested anchor: <span className="font-medium">{suggestion.anchorText}</span>
                 </p>
                 {suggestion.reason && (
-                  <p className="mt-2 text-xs text-muted-foreground">{suggestion.reason}</p>
+                  <p className="mt-2 text-xs text-gray-400">{suggestion.reason}</p>
                 )}
               </div>
             ))}
@@ -126,7 +126,7 @@ export function InternalLinkSuggestions({
         )}
 
         {!isLoading && suggestions.length === 0 && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-400">
             No strong internal link opportunities detected yet. Try adding more context to your draft.
           </p>
         )}

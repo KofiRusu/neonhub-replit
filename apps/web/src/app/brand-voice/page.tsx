@@ -19,7 +19,7 @@ export default function BrandVoicePage() {
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#1A1B23]/50 backdrop-blur-xl">
+      <div className="border-b border-slate-700/50 bg-slate-900/90 backdrop-blur-xl">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
@@ -41,7 +41,7 @@ export default function BrandVoicePage() {
                   placeholder="Search knowledge..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-64 bg-[#2A2B35]/50 border-white/10 text-white placeholder-gray-400"
+                  className="pl-10 w-64 bg-slate-900/70 border-slate-700/50 text-white placeholder-gray-400"
                 />
               </div>
               <Button
@@ -78,7 +78,7 @@ export default function BrandVoicePage() {
       {/* Main Content */}
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-[#2A2B35]/30 border border-white/10">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 border border-slate-700/50">
             <TabsTrigger
               value="copilot"
               className="data-[state=active]:bg-[#00D4FF]/20 data-[state=active]:text-[#00D4FF] data-[state=active]:border-[#00D4FF]/30"

@@ -29,19 +29,19 @@ export function GeoPerformanceMap({ organizationId }: GeoPerformanceMapProps) {
 
   if (!enabled) {
     return (
-      <div className="rounded border border-border/50 bg-background/60 p-4 text-sm text-muted-foreground">
+      <div className="rounded border border-slate-700/50 bg-slate-900/60 p-4 text-sm text-gray-400">
         Connect an organization to view geographic performance insights.
       </div>
     );
   }
 
   if (isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading geographic performance…</div>;
+    return <div className="text-sm text-gray-400">Loading geographic performance…</div>;
   }
 
   if (error) {
     return (
-      <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+      <div className="rounded border border-destructive/40 bg-destructive/10 p-4 text-sm text-red-400">
         Unable to load geographic performance: {error.message}
       </div>
     );
@@ -49,7 +49,7 @@ export function GeoPerformanceMap({ organizationId }: GeoPerformanceMapProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="rounded border border-border/50 bg-background/60 p-4 text-sm text-muted-foreground">
+      <div className="rounded border border-slate-700/50 bg-slate-900/60 p-4 text-sm text-gray-400">
         No geographic performance data available yet.
       </div>
     );
@@ -60,10 +60,10 @@ export function GeoPerformanceMap({ organizationId }: GeoPerformanceMapProps) {
       {data.map((geo) => (
         <div
           key={geo.countryCode}
-          className="flex items-center justify-between rounded border border-border/50 bg-background/60 p-3 text-sm text-muted-foreground"
+          className="flex items-center justify-between rounded border border-slate-700/50 bg-slate-900/60 p-3 text-sm text-gray-400"
         >
           <div>
-            <div className="font-medium text-foreground">{geo.country}</div>
+            <div className="font-medium text-white">{geo.country}</div>
             <div>{geo.countryCode}</div>
           </div>
           <div className="text-right">

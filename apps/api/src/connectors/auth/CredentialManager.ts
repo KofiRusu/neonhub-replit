@@ -1,11 +1,12 @@
 import { prisma } from "../../db/prisma.js";
 import { encrypt, decrypt, maskToken } from "../../lib/encryption.js";
-import { Prisma, type ConnectorAuth } from "@prisma/client";
+import { Prisma, type ConnectorAuth, ConnectorKind } from "@prisma/client";
 import type { ConnectorAuthContext } from "../base/types.js";
 
 export interface SaveConnectorAuthParams {
   userId: string;
   connectorId: string;
+  connectorKind: ConnectorKind;
   accountId?: string | null;
   accountName?: string | null;
   accessToken?: string | null;
@@ -86,10 +87,12 @@ export class ConnectorCredentialManager {
         status: "active",
         lastUsedAt: timestamp,
         updatedAt: timestamp,
+        connectorKind: params.connectorKind,
       } satisfies Prisma.ConnectorAuthUncheckedUpdateInput,
       create: {
         userId: params.userId,
         connectorId: params.connectorId,
+        connectorKind: params.connectorKind,
         accountId: params.accountId ?? null,
         accountName: params.accountName ?? null,
         accessToken: encryptedAccessToken,

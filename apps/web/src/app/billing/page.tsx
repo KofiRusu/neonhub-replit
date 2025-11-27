@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Skeleton } from "@/src/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Dialog,
   DialogContent,
@@ -409,13 +409,13 @@ export default function BillingPage() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-400">Total Calls</span>
                       <span className="font-semibold">
-                        {usageData.apiCalls.used.toLocaleString()} / {usageData.apiCalls.total.toLocaleString()}
+                        {usageData?.apiCalls?.used?.toLocaleString() || "0"} / {usageData?.apiCalls?.total?.toLocaleString() || "0"}
                       </span>
                     </div>
                     <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-[#00D9FF] to-[#B14BFF]"
-                        style={{ width: `${(usageData.apiCalls.used / usageData.apiCalls.total) * 100}%` }}
+                        style={{ width: `${usageData?.apiCalls ? (usageData.apiCalls.used / usageData.apiCalls.total) * 100 : 0}%` }}
                       />
                     </div>
                   </div>

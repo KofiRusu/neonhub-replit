@@ -2,6 +2,56 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { ContentAgent } from "../../agents/content/ContentAgent.js";
 import type { QualityScore } from "../../agents/content/ContentAgent.js";
 
+const mockRagBuild = jest.fn().mockResolvedValue({
+  brandVoice: [],
+  knowledge: [],
+  memories: [],
+});
+const mockRagFormat = jest.fn().mockReturnValue("");
+const mockKnowledgeIngest = jest.fn().mockResolvedValue(undefined);
+const mockInternalLinkSuggestions = [
+  {
+    targetUrl: "/content/example",
+    targetTitle: "Example Content",
+    anchorText: "Automation",
+    priority: "high",
+    position: { paragraph: 0 },
+  },
+];
+
+jest.mock("../../services/rag/context.service.js", () => ({
+  RagContextService: jest.fn().mockImplementation(() => ({
+    build: mockRagBuild,
+    formatForPrompt: mockRagFormat,
+  })),
+}));
+
+jest.mock("../../services/rag/knowledge.service.js", () => ({
+  KnowledgeBaseService: jest.fn().mockImplementation(() => ({
+    ingestSnippet: mockKnowledgeIngest,
+    retrieveSnippets: jest.fn().mockResolvedValue([]),
+  })),
+}));
+
+jest.mock("../../services/seo/internal-linking.service.js", () => ({
+  InternalLinkingService: jest.fn().mockImplementation(() => ({
+    suggestLinks: jest.fn(async () => mockInternalLinkSuggestions),
+  })),
+}));
+
+jest.mock("../../agents/base/AgentJobManager.js", () => ({
+  agentJobManager: {
+    createJob: jest.fn(),
+    startJob: jest.fn(),
+    completeJob: jest.fn(),
+    failJob: jest.fn(),
+  },
+}));
+
+jest.mock("../../ws/index.js", () => ({
+  broadcast: jest.fn(),
+}));
+
 const FIXED_DATE = new Date("2025-02-01T12:00:00.000Z");
 
 describe("ContentAgent", () => {
@@ -13,6 +63,14 @@ describe("ContentAgent", () => {
   let agent: ContentAgent;
 
   beforeEach(() => {
+    mockRagBuild.mockClear().mockResolvedValue({
+      brandVoice: [],
+      knowledge: [],
+      memories: [],
+    });
+    mockRagFormat.mockClear().mockReturnValue("");
+    mockKnowledgeIngest.mockClear();
+
     const createDraft = jest.fn(async () => ({
       id: "draft-1",
       title: "Marketing Automation Blueprint",

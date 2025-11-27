@@ -1,0 +1,109 @@
+
+> @neonhub/ui-v3.2@3.2.0 build /Users/kofirusu/Desktop/NeonHub/apps/web
+> next build
+
+   ▲ Next.js 15.5.6
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 23.1min
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/17) ...
+   Generating static pages (4/17) 
+   Generating static pages (8/17) 
+   Generating static pages (12/17) 
+ ✓ Generating static pages (17/17)
+   Finalizing page optimization ...
+   Collecting build traces ...
+ ⚠ Failed to copy traced files for /Users/kofirusu/Desktop/NeonHub/apps/web/.next/server/app/(seo)/page.js [Error: ENOENT: no such file or directory, copyfile '/Users/kofirusu/Desktop/NeonHub/apps/web/.next/server/app/(seo)/page_client-reference-manifest.js' -> '/Users/kofirusu/Desktop/NeonHub/apps/web/.next/standalone/apps/web/.next/server/app/(seo)/page_client-reference-manifest.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'copyfile',
+  path: '/Users/kofirusu/Desktop/NeonHub/apps/web/.next/server/app/(seo)/page_client-reference-manifest.js',
+  dest: '/Users/kofirusu/Desktop/NeonHub/apps/web/.next/standalone/apps/web/.next/server/app/(seo)/page_client-reference-manifest.js'
+}
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                      379 B         102 kB
+├ ƒ /_not-found                            215 B         102 kB
+├ ƒ /admin                                 215 B         102 kB
+├ ƒ /agents                                215 B         102 kB
+├ ƒ /agents/[id]                         2.35 kB         111 kB
+├ ƒ /ai/preview                          1.04 kB         103 kB
+├ ƒ /analytics                             215 B         102 kB
+├ ƒ /api/analytics/brand-voice-kpis        215 B         102 kB
+├ ƒ /api/analytics/executive-summary       215 B         102 kB
+├ ƒ /api/auth/[...nextauth]                215 B         102 kB
+├ ƒ /api/brand-voice/profile               215 B         102 kB
+├ ƒ /api/brand-voice/search                215 B         102 kB
+├ ƒ /api/content/generate-post             215 B         102 kB
+├ ƒ /api/email/sequence                    215 B         102 kB
+├ ƒ /api/seo/audit                         215 B         102 kB
+├ ƒ /api/seo/content/optimize              215 B         102 kB
+├ ƒ /api/seo/keywords/analyze              215 B         102 kB
+├ ƒ /api/sms/send                          215 B         102 kB
+├ ƒ /api/support/reply                     215 B         102 kB
+├ ƒ /api/trends/brief                      215 B         102 kB
+├ ƒ /auth/signin                         1.36 kB         149 kB
+├ ƒ /billing                             12.9 kB         175 kB
+├ ƒ /brand-voice                         10.7 kB         170 kB
+├ ƒ /campaigns                             215 B         102 kB
+├ ƒ /campaigns/[id]                      2.32 kB         111 kB
+├ ƒ /content                               215 B         102 kB
+├ ƒ /content/[id]/review                 1.04 kB         136 kB
+├ ƒ /content/blog                        2.12 kB         111 kB
+├ ƒ /content/case-studies                 2.1 kB         111 kB
+├ ƒ /content/email                       2.09 kB         111 kB
+├ ƒ /content/new                           587 B         135 kB
+├ ƒ /content/product                     2.13 kB         111 kB
+├ ƒ /content/social                       2.1 kB         111 kB
+├ ƒ /content/video                        2.1 kB         111 kB
+├ ƒ /dashboard                             215 B         102 kB
+├ ƒ /dashboard/seo                       4.32 kB         139 kB
+├ ƒ /dashboard/seo/analytics               215 B         102 kB
+├ ƒ /dashboard/seo/content               3.22 kB         138 kB
+├ ƒ /dashboard/seo/keywords              4.79 kB         135 kB
+├ ƒ /dashboard/seo/links                 4.38 kB         135 kB
+├ ƒ /dashboard/seo/trends                2.36 kB         137 kB
+├ ƒ /deployment                            21 kB         137 kB
+├ ƒ /documents                           6.26 kB         198 kB
+├ ƒ /email                               6.32 kB         145 kB
+├ ƒ /email/automations                   2.09 kB         111 kB
+├ ƒ /email/deliverability                2.03 kB         110 kB
+├ ƒ /email/segments                       2.1 kB         111 kB
+├ ƒ /email/templates                     2.11 kB         111 kB
+├ ƒ /feedback                              215 B         102 kB
+├ ƒ /legal/privacy                         215 B         102 kB
+├ ƒ /legal/terms                           215 B         102 kB
+├ ƒ /marketing                           5.06 kB         144 kB
+├ ƒ /marketing/attribution                 338 B         102 kB
+├ ƒ /marketing/campaigns                   340 B         102 kB
+├ ƒ /marketing/funnel                      352 B         102 kB
+├ ƒ /marketing/insights                    354 B         102 kB
+├ ƒ /marketing/leads                       343 B         102 kB
+├ ƒ /marketing/roi                         340 B         102 kB
+├ ƒ /messaging                             215 B         102 kB
+├ ƒ /metrics                               215 B         102 kB
+├ ○ /robots.txt                            215 B         102 kB
+├ ƒ /settings                              215 B         102 kB
+├ ○ /sitemap.xml                           215 B         102 kB
+├ ƒ /social-media                        6.99 kB         146 kB
+├ ƒ /support                               215 B         102 kB
+├ ƒ /tasks                                 215 B         102 kB
+├ ƒ /team                                9.98 kB         202 kB
+└ ƒ /trends                                215 B         102 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/7610-67bfc49cd3331fe4.js      45.6 kB
+  ├ chunks/ea88c1da-8a86e8fb9e4a5c7f.js  54.2 kB
+  └ other shared chunks (total)          1.88 kB
+
+
+ƒ Middleware                             61.4 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

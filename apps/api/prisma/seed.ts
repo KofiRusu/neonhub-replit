@@ -698,45 +698,10 @@ async function main() {
     },
   ];
 
-  for (const authSeed of connectorAuthSeeds) {
-    const connector = connectorMap[authSeed.connectorName];
-    if (!connector) continue;
-
-    const existingAuth = await prisma.connectorAuth.findFirst({
-      where: {
-        connectorId: connector.id,
-        userId: adminUser.id,
-        organizationId: organization.id,
-      },
-    });
-
-    if (existingAuth) {
-      await prisma.connectorAuth.update({
-        where: { id: existingAuth.id },
-        data: {
-          accountId: authSeed.accountId,
-          accountName: authSeed.accountName,
-          scope: authSeed.scope,
-          status: authSeed.status ?? existingAuth.status,
-          metadata: authSeed.metadata,
-          organizationId: organization.id,
-        },
-      });
-    } else {
-      await prisma.connectorAuth.create({
-        data: {
-          connectorId: connector.id,
-          userId: adminUser.id,
-          organizationId: organization.id,
-          accountId: authSeed.accountId,
-          accountName: authSeed.accountName,
-          scope: authSeed.scope,
-          status: authSeed.status ?? "active",
-          metadata: authSeed.metadata,
-        },
-      });
-    }
-  }
+  // Skip connector auth seeding - can be done via API later
+  // for (const authSeed of connectorAuthSeeds) {
+  //   ...seed logic...
+  // }
 
   console.log(`Connector catalog seeded with ${connectorRecords.length} entries.`);
 

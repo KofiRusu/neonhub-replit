@@ -1,0 +1,40 @@
+=== Database Layer Audit ===
+Prisma Schema Files:
+./agent-infra/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/schema.prisma
+./agent-infra/apps/api/prisma/migrations/20251027233223_init_neonhub_db/migration.sql
+./agent-infra/apps/api/prisma/schema.prisma
+./preservation/v3.0/apps/web/prisma/schema.prisma
+./preservation/v3.0/apps/api/prisma/migrations/20251012154609_initial/migration.sql
+./preservation/v3.0/apps/api/prisma/schema.prisma
+./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/schema.prisma
+./node_modules/.pnpm/@prisma+client@5.22.0_prisma@6.18.0_typescript@5.9.3_/node_modules/.prisma/client/schema.prisma
+./prisma/schema.prisma
+./apps/web/prisma/schema.prisma
+./apps/api/prisma/migrations/20240105000000_add_connector_kind_enum/migration.sql
+./apps/api/prisma/migrations/20240104000000_add_agent_memory/migration.sql
+./apps/api/prisma/migrations/20250129_add_marketing_tables/migration.sql
+./apps/api/prisma/migrations/20251028100000_add_link_graph/migration.sql
+./apps/api/prisma/migrations/20240107000000_gpt5_merge_vector/migration.sql
+./apps/api/prisma/migrations/20251028110000_add_seo_metrics/migration.sql
+./apps/api/prisma/migrations/20240106000000_full_org_ai_vector_bootstrap/migration.sql
+./apps/api/prisma/migrations/20251027000000_add_citext_keyword_unique/migration.sql
+./apps/api/prisma/migrations/20240102000000_phase4_beta/migration.sql
+./apps/api/prisma/migrations/20240101000000_initial/migration.sql
+
+Prisma Models (from schema):
+      76
+Total models:       76
+
+Migration Files:
+drwxr-xr-x   3 kofirusu  staff   96 Oct 28 22:45 20251028100000_add_link_graph
+drwxr-xr-x   3 kofirusu  staff   96 Oct 28 23:40 20251028110000_add_seo_metrics
+drwxr-xr-x   3 kofirusu  staff   96 Oct 28 16:00 20251028_budget_transactions
+drwxr-xr-x   3 kofirusu  staff   96 Oct 28 15:23 20251101093000_add_agentic_models
+-rw-r--r--   1 kofirusu  staff  126 Oct 27 20:33 migration_lock.toml
+
+Vector Extensions:
+// NeonHub Prisma schema aligned with Postgres + pgvector
+  extensions = [vector(schema: "public"), citext(schema: "public")]
+  embedding        Unsupported("vector")?
+  embedding      Unsupported("vector")?
+  embedding        Unsupported("vector")?

@@ -1,0 +1,1916 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/billing/checkout",
+    "domain": "billing",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/billing/invoices",
+    "domain": "billing",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/billing/plan",
+    "domain": "billing",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/billing/portal",
+    "domain": "billing",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/billing/usage",
+    "domain": "billing",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/billing.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/billing/webhook",
+    "domain": "billing",
+    "notes": [
+      "raw body parser"
+    ],
+    "handlerFile": "apps/api/src/routes/stripe-webhook.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/brand-voice/compose",
+    "domain": "brand-voice",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/brand-voice/guardrail",
+    "domain": "brand-voice",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/brand-voice/prompt/:useCase",
+    "domain": "brand-voice",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/brand-voice.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/budget/execute",
+    "domain": "budget",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/budget/ledger",
+    "domain": "budget",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/budget/plan",
+    "domain": "budget",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/budget/reconcile",
+    "domain": "budget",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/budget.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/campaigns",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/campaigns/:id",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/campaigns/:id",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/campaigns/:id",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/:id/ab-test",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/campaigns/:id/analytics",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/:id/email/sequence",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/:id/optimize",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/:id/schedule",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/:id/social/schedule",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/campaigns/:id/status",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/email/optimize-subject",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/social/generate",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/campaigns/social/optimize",
+    "domain": "campaigns",
+    "notes": [
+      "requires auth",
+      "audited (campaign)"
+    ],
+    "handlerFile": "apps/api/src/routes/campaign.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/connectors",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/actions/:actionId",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/api-key",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/connectors/:name/auth/:id",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/oauth/callback",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/oauth/start",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/test",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/connectors/:name/triggers/:triggerId/run",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/connectors/auth",
+    "domain": "connectors",
+    "notes": [
+      "requires auth",
+      "audited (connector)"
+    ],
+    "handlerFile": "apps/api/src/routes/connectors.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/credentials",
+    "domain": "credentials",
+    "notes": [
+      "requires auth",
+      "audited (credential)"
+    ],
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/credentials",
+    "domain": "credentials",
+    "notes": [
+      "requires auth",
+      "audited (credential)"
+    ],
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/credentials/:provider",
+    "domain": "credentials",
+    "notes": [
+      "requires auth",
+      "audited (credential)"
+    ],
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/credentials/:provider",
+    "domain": "credentials",
+    "notes": [
+      "requires auth",
+      "audited (credential)"
+    ],
+    "handlerFile": "apps/api/src/routes/credentials.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/data-trust/audit/log",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data-trust/audit/logs",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/data-trust/hash",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/data-trust/merkle",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data-trust/provenance/:dataId",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data-trust/provenance/:dataId/verify",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/data-trust/provenance/track",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data-trust/status",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/data-trust/verify",
+    "domain": "data-trust",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (data-trust)"
+    ],
+    "handlerFile": "apps/api/src/routes/data-trust.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/documents",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/documents",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/documents/:id",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/documents/:id",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/documents/:id",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/documents/:id/version",
+    "domain": "documents",
+    "notes": [
+      "requires auth",
+      "audited (document)"
+    ],
+    "handlerFile": "apps/api/src/routes/documents.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/eco-metrics/carbon",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/eco-metrics/efficiency",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/eco-metrics/energy",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/eco-metrics/green-ai",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/eco-metrics/optimize",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/eco-metrics/status",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/eco-metrics/sustainability-report",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/eco-metrics/track",
+    "domain": "eco-metrics",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (eco-metrics)"
+    ],
+    "handlerFile": "apps/api/src/routes/eco-metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/editorial-calendar",
+    "domain": "editorial-calendar",
+    "notes": [
+      "requires auth",
+      "audited (editorial-calendar)"
+    ],
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/editorial-calendar",
+    "domain": "editorial-calendar",
+    "notes": [
+      "requires auth",
+      "audited (editorial-calendar)"
+    ],
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/editorial-calendar/:id",
+    "domain": "editorial-calendar",
+    "notes": [
+      "requires auth",
+      "audited (editorial-calendar)"
+    ],
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/editorial-calendar/:id",
+    "domain": "editorial-calendar",
+    "notes": [
+      "requires auth",
+      "audited (editorial-calendar)"
+    ],
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/editorial-calendar/:id",
+    "domain": "editorial-calendar",
+    "notes": [
+      "requires auth",
+      "audited (editorial-calendar)"
+    ],
+    "handlerFile": "apps/api/src/routes/editorial-calendar.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/feedback",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/feedback",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/feedback/:id",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/feedback/:id",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/feedback/:id",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/feedback/stats",
+    "domain": "feedback",
+    "notes": [
+      "requires auth",
+      "audited (feedback)"
+    ],
+    "handlerFile": "apps/api/src/routes/feedback.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/governance/audit-logs",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/governance/ethics/assess",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/governance/evaluate",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/governance/health",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/governance/policies",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/governance/policies",
+    "domain": "governance",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (governance)"
+    ],
+    "handlerFile": "apps/api/src/routes/governance.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/keywords",
+    "domain": "keywords",
+    "notes": [
+      "requires auth",
+      "audited (keyword)"
+    ],
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/keywords",
+    "domain": "keywords",
+    "notes": [
+      "requires auth",
+      "audited (keyword)"
+    ],
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/keywords/:id",
+    "domain": "keywords",
+    "notes": [
+      "requires auth",
+      "audited (keyword)"
+    ],
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/keywords/:id",
+    "domain": "keywords",
+    "notes": [
+      "requires auth",
+      "audited (keyword)"
+    ],
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/keywords/:id",
+    "domain": "keywords",
+    "notes": [
+      "requires auth",
+      "audited (keyword)"
+    ],
+    "handlerFile": "apps/api/src/routes/keywords.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/marketing/campaigns",
+    "domain": "marketing",
+    "notes": [
+      "requires auth",
+      "audited (marketing)"
+    ],
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/marketing/campaigns",
+    "domain": "marketing",
+    "notes": [
+      "requires auth",
+      "audited (marketing)"
+    ],
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/marketing/overview",
+    "domain": "marketing",
+    "notes": [
+      "requires auth",
+      "audited (marketing)"
+    ],
+    "handlerFile": "apps/api/src/routes/marketing.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/messages",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/messages",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/messages/:id",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/messages/:id",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/messages/:id/read",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/messages/threads",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/messages/threads/:threadId/read",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/messages/unread-count",
+    "domain": "messages",
+    "notes": [
+      "requires auth",
+      "audited (message)"
+    ],
+    "handlerFile": "apps/api/src/routes/messages.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/orchestrate",
+    "domain": "orchestrate",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestrate.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/orchestration/config",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/orchestration/failover/:nodeId",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/orchestration/health",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/orchestration/metrics",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/orchestration/nodes",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/orchestration/nodes/register",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/orchestration/route",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/orchestration/scaling/evaluate",
+    "domain": "orchestration",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (orchestration)"
+    ],
+    "handlerFile": "apps/api/src/routes/orchestration.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/person/:id/consent",
+    "domain": "person",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/person/:id/memory",
+    "domain": "person",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/person/:id/topics",
+    "domain": "person",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/person/resolve",
+    "domain": "person",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/person.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/personas",
+    "domain": "personas",
+    "notes": [
+      "requires auth",
+      "audited (persona)"
+    ],
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/personas",
+    "domain": "personas",
+    "notes": [
+      "requires auth",
+      "audited (persona)"
+    ],
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/personas/:id",
+    "domain": "personas",
+    "notes": [
+      "requires auth",
+      "audited (persona)"
+    ],
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/personas/:id",
+    "domain": "personas",
+    "notes": [
+      "requires auth",
+      "audited (persona)"
+    ],
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/personas/:id",
+    "domain": "personas",
+    "notes": [
+      "requires auth",
+      "audited (persona)"
+    ],
+    "handlerFile": "apps/api/src/routes/personas.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/predictive/baseline",
+    "domain": "predictive",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/predictive/execute",
+    "domain": "predictive",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/predictive/health",
+    "domain": "predictive",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/predictive/scale",
+    "domain": "predictive",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/predictive/stats",
+    "domain": "predictive",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/predictive.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/robots.txt",
+    "domain": "robots.txt",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/seo",
+    "domain": "seo",
+    "notes": [
+      "requires auth",
+      "audited (seo)"
+    ],
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/seo/audit",
+    "domain": "seo",
+    "notes": [
+      "requires auth",
+      "audited (seo)"
+    ],
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/seo/health",
+    "domain": "seo",
+    "notes": [
+      "requires auth",
+      "audited (seo)"
+    ],
+    "handlerFile": "apps/api/src/routes/seo/index.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/settings",
+    "domain": "settings",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (settings)"
+    ],
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/settings",
+    "domain": "settings",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (settings)"
+    ],
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/settings/brand-voice",
+    "domain": "settings",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (settings)"
+    ],
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/settings/notifications",
+    "domain": "settings",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (settings)"
+    ],
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/settings/privacy",
+    "domain": "settings",
+    "notes": [
+      "requires auth",
+      "admin IP guard",
+      "audited (settings)"
+    ],
+    "handlerFile": "apps/api/src/routes/settings.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sitemap.xml",
+    "domain": "sitemap.xml",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sitemap/invalidate",
+    "domain": "sitemap",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sitemaps.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sms/inbound",
+    "domain": "sms",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sms.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sms/send",
+    "domain": "sms",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/sms.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/social/:platform/dm",
+    "domain": "social",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/social.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/social/:platform/inbound",
+    "domain": "social",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/social.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/tasks",
+    "domain": "tasks",
+    "notes": [
+      "requires auth",
+      "audited (task)"
+    ],
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks",
+    "domain": "tasks",
+    "notes": [
+      "requires auth",
+      "audited (task)"
+    ],
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/tasks/:id",
+    "domain": "tasks",
+    "notes": [
+      "requires auth",
+      "audited (task)"
+    ],
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/tasks/:id",
+    "domain": "tasks",
+    "notes": [
+      "requires auth",
+      "audited (task)"
+    ],
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/tasks/:id",
+    "domain": "tasks",
+    "notes": [
+      "requires auth",
+      "audited (task)"
+    ],
+    "handlerFile": "apps/api/src/routes/tasks.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/team/team/accept",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/team/team/invitations",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/team/team/invitations/:id",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/team/team/invite",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/team/team/members",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/team/team/members/:id",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/team/team/members/:id",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/team/team/members/:id",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/team/team/members/:id",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/team/team/stats",
+    "domain": "team",
+    "notes": [
+      "requires auth",
+      "audited (team)"
+    ],
+    "handlerFile": "apps/api/src/routes/team.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/trends/trends",
+    "domain": "trends",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/api/trends/trends/brief",
+    "domain": "trends",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/trends/trends/platform/:platform",
+    "domain": "trends",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/api/trends/trends/search",
+    "domain": "trends",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/trends.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/auth/logout",
+    "domain": "auth",
+    "notes": [
+      "auth rate limited",
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/auth.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/auth/me",
+    "domain": "auth",
+    "notes": [
+      "auth rate limited",
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/auth.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/brand-voice/compose",
+    "domain": "brand-voice",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/brand-voice/guardrail",
+    "domain": "brand-voice",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/content/drafts",
+    "domain": "content",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/content/drafts/:id",
+    "domain": "content",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/content/generate",
+    "domain": "content",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/content.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/email/send",
+    "domain": "email",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/events/timeline",
+    "domain": "events",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/health",
+    "domain": "health",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/health.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/jobs",
+    "domain": "jobs",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/jobs.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/jobs/:id",
+    "domain": "jobs",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/jobs.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/metrics",
+    "notes": [],
+    "handlerFile": "apps/api/src/server.ts",
+    "domain": "metrics"
+  },
+  {
+    "method": "POST",
+    "path": "/metrics/events",
+    "domain": "metrics",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/metrics/summary",
+    "domain": "metrics",
+    "notes": [
+      "requires auth"
+    ],
+    "handlerFile": "apps/api/src/routes/metrics.ts"
+  },
+  {
+    "method": "GET",
+    "path": "/readyz",
+    "domain": "readyz",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/health.ts"
+  },
+  {
+    "method": "POST",
+    "path": "/sms/send",
+    "domain": "sms",
+    "notes": [],
+    "handlerFile": "apps/api/src/routes/sdk-handshake.ts"
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.agents.execute",
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.agents.getRun",
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.agents.listRuns",
+    "domain": "trpc.agents",
+    "handlerFile": "apps/api/src/trpc/routers/agents.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.brand.deleteVoiceGuide",
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.brand.getVoiceContext",
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.brand.listVoiceGuides",
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.brand.searchVoice",
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.brand.uploadVoiceGuide",
+    "domain": "trpc.brand",
+    "handlerFile": "apps/api/src/trpc/routers/brand.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.content.generateArticle",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.content.meta",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.content.optimize",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.content.schedulePublish",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.content.score",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.content.socialSnippets",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.content.suggestInternalLinks",
+    "domain": "trpc.content",
+    "handlerFile": "apps/api/src/trpc/routers/content.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.analyzeIntent",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.seo.discoverKeywords",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.discoverOpportunities",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.getGeoPerformance",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.getMetrics",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.getTrends",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.identifyUnderperformers",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.seo.scoreDifficulty",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.seo.triggerOptimization",
+    "domain": "trpc.seo",
+    "handlerFile": "apps/api/src/trpc/routers/seo.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.trends.discover",
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.query",
+    "path": "trpc.trends.listSubscriptions",
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  },
+  {
+    "method": "TRPC.mutation",
+    "path": "trpc.trends.subscribe",
+    "domain": "trpc.trends",
+    "handlerFile": "apps/api/src/trpc/routers/trends.router.ts",
+    "notes": [
+      "requires auth"
+    ]
+  }
+]

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonHub - UI Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0F1120 0%, #13152A 50%, #0F1120 100%);
+            color: #E6E8FF;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #2B26FE 0%, #7A78FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #8A8FB2;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2B26FE 0%, #7A78FF 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .refresh-btn:hover {
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(43, 38, 254, 0.3), rgba(122, 120, 255, 0.3));
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .icon.blue { color: #2B26FE; }
+        .icon.green { color: #10B981; }
+        .icon.purple { color: #7A78FF; }
+        .icon.pink { color: #EC4899; }
+
+        .change {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .change.positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+
+        .change.negative {
+            background: rgba(236, 72, 153, 0.2);
+            color: #EC4899;
+        }
+
+        .card-title {
+            color: #8A8FB2;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .card-value.blue { color: #2B26FE; }
+        .card-value.green { color: #10B981; }
+        .card-value.purple { color: #7A78FF; }
+        .card-value.pink { color: #EC4899; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .agent-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(43, 38, 254, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .status-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10B981;
+            border: 2px solid #0F1120;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-dot.idle {
+            background: #8A8FB2;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .agent-desc {
+            font-size: 12px;
+            color: #8A8FB2;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.idle {
+            background: rgba(138, 143, 178, 0.2);
+            color: #8A8FB2;
+            border: 1px solid rgba(138, 143, 178, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2B26FE 0%, #10B981 100%);
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+
+        .agent-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+        }
+
+        .stat-label {
+            color: #8A8FB2;
+        }
+
+        .stat-value {
+            color: #E6E8FF;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #E6E8FF;
+        }
+
+        .large-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+            animation: pulse 2s infinite;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .health-item {
+            margin-bottom: 20px;
+        }
+
+        .health-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .health-label {
+            color: #8A8FB2;
+        }
+
+        .health-value {
+            font-weight: 600;
+        }
+
+        .health-value.blue { color: #2B26FE; }
+        .health-value.green { color: #10B981; }
+        .health-value.purple { color: #7A78FF; }
+
+        .notice {
+            background: rgba(43, 38, 254, 0.1);
+            border: 1px solid rgba(43, 38, 254, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .notice h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #7A78FF;
+        }
+
+        .notice p {
+            color: #8A8FB2;
+            margin-bottom: 8px;
+        }
+
+        .notice code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #2B26FE;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Notice Banner -->
+        <div class="notice">
+            <h2>🎨 NeonHub UI Preview</h2>
+            <p>This is a static HTML preview showing what the UI looks like.</p>
+            <p>To run the actual app with live data and interactions:</p>
+            <p><code>cd /Users/kofirusu/Desktop/NeonHub && ./FIX_DEPENDENCIES.sh</code></p>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>AI Command Center</h1>
+                <p>Real-time agent orchestration and performance analytics</p>
+            </div>
+            <button class="refresh-btn">⟳ Refresh</button>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon green">📊</div>
+                    <span class="change positive">+251%</span>
+                </div>
+                <div class="card-title">Total Events</div>
+                <div class="card-value green">12,450</div>
+                <span class="badge">Top Performer</span>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon blue">🤖</div>
+                    <span class="change positive">+15%</span>
+                </div>
+                <div class="card-title">Job Success Rate</div>
+                <div class="card-value blue">94%</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon purple">📝</div>
+                    <span class="change positive">+8%</span>
+                </div>
+                <div class="card-title">Drafts Created</div>
+                <div class="card-value purple">245</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon pink">⚡</div>
+                    <span class="change negative">-5%</span>
+                </div>
+                <div class="card-title">Avg Latency</div>
+                <div class="card-value pink">234ms</div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-col">
+            <!-- Live Agent Fleet -->
+            <div>
+                <div class="large-card">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Live Agent Fleet</h2>
+                            <p style="color: #8A8FB2; font-size: 14px;">Real-time agent monitoring and control</p>
+                        </div>
+                        <div class="status-indicator">
+                            All Systems Online
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Content Agent -->
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-info">
+                                    <div class="agent-icon">
+                                        <div class="status-dot"></div>
+                                        🤖
+                                    </div>
+                                    <div>
+                                        <div class="agent-name">Content Agent</div>
+                                        <div class="agent-desc">AI content generation</div>
+                                    </div>
+                                </div>
+                                <span class="status-badge active">Active</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94%"></div>
+                            </div>
+                            <div class="agent-stats">
+                                <div>
+                                    <div class="stat-label">Tasks</div>
+                                    <div class="stat-value">1,247</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Last Active</div>
+                                    <div class="stat-value" style="color: #2B26FE;">2 min ago</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEO Agent -->
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-info">
+                                    <div class="agent-icon">
+                                        <div class="status-dot"></div>
+                                        🔍
+                                    </div>
+                                    <div>
+                                        <div class="agent-name">SEO Agent</div>
+                                        <div class="agent-desc">SEO optimization</div>
+                                    </div>
+                                </div>
+                                <span class="status-badge active">Active</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 89%"></div>
+                            </div>
+                            <div class="agent-stats">
+                                <div>
+                                    <div class="stat-label">Tasks</div>
+                                    <div class="stat-value">892</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Last Active</div>
+                                    <div class="stat-value" style="color: #2B26FE;">5 min ago</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Agent -->
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-info">
+                                    <div class="agent-icon">
+                                        <div class="status-dot idle"></div>
+                                        📱
+                                    </div>
+                                    <div>
+                                        <div class="agent-name">Social Agent</div>
+                                        <div class="agent-desc">Social media automation</div>
+                                    </div>
+                                </div>
+                                <span class="status-badge idle">Idle</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 87%"></div>
+                            </div>
+                            <div class="agent-stats">
+                                <div>
+                                    <div class="stat-label">Tasks</div>
+                                    <div class="stat-value">634</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Last Active</div>
+                                    <div class="stat-value" style="color: #8A8FB2;">1 hour ago</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Agent -->
+                        <div class="agent-card">
+                            <div class="agent-header">
+                                <div class="agent-info">
+                                    <div class="agent-icon">
+                                        <div class="status-dot"></div>
+                                        ✉️
+                                    </div>
+                                    <div>
+                                        <div class="agent-name">Email Agent</div>
+                                        <div class="agent-desc">Email campaigns</div>
+                                    </div>
+                                </div>
+                                <span class="status-badge active">Active</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 91%"></div>
+                            </div>
+                            <div class="agent-stats">
+                                <div>
+                                    <div class="stat-label">Tasks</div>
+                                    <div class="stat-value">456</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Last Active</div>
+                                    <div class="stat-value" style="color: #2B26FE;">30 sec ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health & Stats -->
+            <div>
+                <!-- System Health -->
+                <div class="large-card" style="margin-bottom: 24px;">
+                    <h3 class="section-title" style="font-size: 20px;">System Health</h3>
+                    
+                    <div class="health-item">
+                        <div class="health-header">
+                            <span class="health-label">💻 CPU Usage</span>
+                            <span class="health-value blue">45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%; background: linear-gradient(90deg, #2B26FE 0%, #7A78FF 100%);"></div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="health-header">
+                            <span class="health-label">💾 Memory</span>
+                            <span class="health-value green">32%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 32%; background: linear-gradient(90deg, #10B981 0%, #2B26FE 100%);"></div>
+                        </div>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="health-header">
+                            <span class="health-label">🌐 Network</span>
+                            <span class="health-value purple">56%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 56%; background: linear-gradient(90deg, #7A78FF 0%, #EC4899 100%);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="large-card">
+                    <h3 class="section-title" style="font-size: 20px; margin-bottom: 20px;">Quick Stats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: center;">
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: #2B26FE;">12,450</div>
+                            <div style="font-size: 11px; color: #8A8FB2;">Events Tracked</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: #7A78FF;">1,890</div>
+                            <div style="font-size: 11px; color: #8A8FB2;">Jobs Processed</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: #10B981;">567</div>
+                            <div style="font-size: 11px; color: #8A8FB2;">Conversions</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: #EC4899;">94%</div>
+                            <div style="font-size: 11px; color: #8A8FB2;">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate progress bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+
+            // Animate counter
+            document.querySelectorAll('.card-value').forEach(counter => {
+                const text = counter.textContent;
+                if (text.match(/^\d+,?\d*$/)) {
+                    const target = parseInt(text.replace(/,/g, ''));
+                    let current = 0;
+                    const increment = target / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = target.toLocaleString();
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(current).toLocaleString();
+                        }
+                    }, 20);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

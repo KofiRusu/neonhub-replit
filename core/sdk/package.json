@@ -65,6 +65,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@neonhub/orchestrator-contract": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

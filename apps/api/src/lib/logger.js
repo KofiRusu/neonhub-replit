@@ -1,6 +1,9 @@
-import pino from "pino";
-import { getEnv } from "../config/env.js";
-const env = getEnv();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.logger = void 0;
+var pino_1 = require("pino");
+var env_js_1 = require("../config/env.js");
+var env = (0, env_js_1.getEnv)();
 /**
  * Sanitize sensitive data from logs
  * Redacts tokens, passwords, secrets, and masks long alphanumeric strings
@@ -11,7 +14,7 @@ function sanitize(data) {
     if (typeof data === 'string') {
         // Mask potential tokens (long alphanumeric strings)
         if (data.length > 20 && /^[A-Za-z0-9_-]+$/.test(data)) {
-            return `${data.substring(0, 4)}...${data.substring(data.length - 4)}`;
+            return "".concat(data.substring(0, 4), "...").concat(data.substring(data.length - 4));
         }
         return data;
     }
@@ -19,23 +22,27 @@ function sanitize(data) {
         return data.map(sanitize);
     }
     if (typeof data === 'object') {
-        const sanitized = {};
-        for (const [key, value] of Object.entries(data)) {
+        var sanitized = {};
+        var _loop_1 = function (key, value) {
             // Never log these fields
-            const sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'accessToken',
+            var sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'accessToken',
                 'refreshToken', 'authorization', 'cookie', 'sessionToken'];
-            if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk.toLowerCase()))) {
+            if (sensitiveKeys.some(function (sk) { return key.toLowerCase().includes(sk.toLowerCase()); })) {
                 sanitized[key] = '[REDACTED]';
             }
             else {
                 sanitized[key] = sanitize(value);
             }
+        };
+        for (var _i = 0, _a = Object.entries(data); _i < _a.length; _i++) {
+            var _b = _a[_i], key = _b[0], value = _b[1];
+            _loop_1(key, value);
         }
         return sanitized;
     }
     return data;
 }
-const baseLogger = pino({
+var baseLogger = (0, pino_1.default)({
     level: env.NODE_ENV === "production" ? "info" : "debug",
     transport: env.NODE_ENV !== "production"
         ? {
@@ -51,8 +58,8 @@ const baseLogger = pino({
 /**
  * Wrapped logger that automatically sanitizes sensitive data
  */
-export const logger = {
-    info: (obj, msg) => {
+exports.logger = {
+    info: function (obj, msg) {
         if (typeof obj === 'string') {
             baseLogger.info(obj);
         }
@@ -60,7 +67,7 @@ export const logger = {
             baseLogger.info(sanitize(obj), msg);
         }
     },
-    error: (obj, msg) => {
+    error: function (obj, msg) {
         if (typeof obj === 'string') {
             baseLogger.error(obj);
         }
@@ -68,7 +75,7 @@ export const logger = {
             baseLogger.error(sanitize(obj), msg);
         }
     },
-    warn: (obj, msg) => {
+    warn: function (obj, msg) {
         if (typeof obj === 'string') {
             baseLogger.warn(obj);
         }
@@ -76,7 +83,7 @@ export const logger = {
             baseLogger.warn(sanitize(obj), msg);
         }
     },
-    debug: (obj, msg) => {
+    debug: function (obj, msg) {
         if (typeof obj === 'string') {
             baseLogger.debug(obj);
         }
@@ -85,4 +92,3 @@ export const logger = {
         }
     },
 };
-//# sourceMappingURL=logger.js.map

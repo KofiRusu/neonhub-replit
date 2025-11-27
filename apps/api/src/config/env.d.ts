@@ -1,5 +1,5 @@
 import { z } from 'zod';
-declare const envSchema: z.ZodObject<{
+type EnvSchema = z.ZodObject<{
     DATABASE_URL: z.ZodString;
     NEXTAUTH_SECRET: z.ZodString;
     NEXTAUTH_URL: z.ZodString;
@@ -69,7 +69,7 @@ declare const envSchema: z.ZodObject<{
     REDDIT_CLIENT_SECRET?: string | undefined;
     REDDIT_USER_AGENT?: string | undefined;
 }>;
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<EnvSchema>;
 export declare function validateEnv(): Env;
 export declare const env: {
     DATABASE_URL: string;

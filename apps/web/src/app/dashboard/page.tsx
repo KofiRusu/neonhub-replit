@@ -74,12 +74,12 @@ function KPIMetricCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, scale: 1.02 }}
-      className={`glass-strong p-6 rounded-lg border transition-all duration-300 ${
+      className={`bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg border transition-all duration-300 ${
         colorClasses[color]
       } ${glowClasses[color]} ${isTopPerformer ? "glow-border animate-pulse" : ""} hover:border-opacity-50`}
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg bg-white/5 ${colorClasses[color].split(" ")[0]}`}>
+        <div className={`p-3 rounded-lg bg-slate-800/40 ${colorClasses[color].split(" ")[0]}`}>
           {isLoading ? (
             <motion.div
               animate={{ rotate: 360 }}
@@ -167,12 +167,12 @@ function AgentStatusCard({ agent, index }: AgentStatusCardProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
       whileHover={{ scale: 1.02 }}
-      className="glass p-4 rounded-lg border border-white/10 hover:border-neon-blue/30 transition-all duration-300"
+      className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700/50 hover:border-neon-blue/30 transition-all duration-300"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <div className="p-2 rounded-lg bg-white/5 text-neon-blue">
+            <div className="p-2 rounded-lg bg-slate-800/40 text-neon-blue">
               <Bot className="w-5 h-5" />
             </div>
             <div
@@ -362,10 +362,10 @@ export default function DashboardPage() {
         >
           {summaryLoading && kpiData.length === 0 ? (
             Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="glass-strong p-6 rounded-lg border border-white/10 animate-pulse">
-                <div className="h-4 w-24 bg-white/10 rounded mb-4" />
-                <div className="h-8 w-32 bg-white/10 rounded mb-3" />
-                <div className="h-3 w-16 bg-white/10 rounded" />
+              <div key={index} className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg border border-slate-700/50 animate-pulse">
+                <div className="h-4 w-24 bg-slate-800/50 rounded mb-4" />
+                <div className="h-8 w-32 bg-slate-800/50 rounded mb-3" />
+                <div className="h-3 w-16 bg-slate-800/50 rounded" />
               </div>
             ))
           ) : (
@@ -392,7 +392,7 @@ export default function DashboardPage() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="glass-strong p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gradient">Live Agent Fleet</h2>
@@ -407,7 +407,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {agentsLoading && agentStatuses.length === 0 ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="glass p-4 rounded-lg border border-white/10 animate-pulse h-36" />
+                    <div key={index} className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700/50 animate-pulse h-36" />
                   ))
                 ) : agentStatuses.length > 0 ? (
                   agentStatuses.slice(0, 4).map((agent, index) => (
@@ -428,7 +428,7 @@ export default function DashboardPage() {
             className="space-y-6"
           >
             {/* System Health */}
-            <div className="glass-strong p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
               <h3 className="text-xl font-bold text-white mb-4">System Health</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -482,12 +482,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Trend Analyzer */}
-            <div className="glass-strong p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
               <h3 className="text-xl font-bold text-white mb-4">Performance Trends</h3>
               <div className="space-y-3">
                 {trendsLoading && trendMetrics.length === 0 ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="glass p-3 rounded-lg border border-white/10 animate-pulse h-16" />
+                    <div key={index} className="bg-slate-900/50 border border-slate-700/50 backdrop-blur-sm p-3 rounded-lg border border-slate-700/50 animate-pulse h-16" />
                   ))
                 ) : trendMetrics.map((trend, index) => {
                   const tone = trend.trend === "up" ? "text-neon-green" : trend.trend === "down" ? "text-neon-pink" : "text-gray-300";
@@ -513,14 +513,14 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="glass-strong p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 border-2 border-slate-700/50 backdrop-blur-sm shadow-xl p-6 rounded-lg">
               <h3 className="text-xl font-bold text-white mb-4">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-4 text-center">
                 {quickStats.length === 0 ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <div key={index} className="space-y-2 animate-pulse">
-                      <div className="h-6 w-20 mx-auto bg-white/10 rounded" />
-                      <div className="h-3 w-24 mx-auto bg-white/10 rounded" />
+                      <div className="h-6 w-20 mx-auto bg-slate-800/50 rounded" />
+                      <div className="h-3 w-24 mx-auto bg-slate-800/50 rounded" />
                     </div>
                   ))
                 ) : (

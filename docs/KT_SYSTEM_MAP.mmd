@@ -1,0 +1,145 @@
+graph TB
+    subgraph Client["🖥️ Client Layer"]
+        WEB["Next.js Web<br/>apps/web"]
+        CLI["CLI / SDK<br/>TypeScript"]
+    end
+
+    subgraph API["🌐 API Layer"]
+        EXPRESS["Express Server<br/>localhost:4000"]
+        TRPC["tRPC Router<br/>Type-safe RPC"]
+        ORCHESTRATOR["Orchestrator<br/>Agent Registry +<br/>Circuit Breaker"]
+    end
+
+    subgraph AgentLayer["🤖 Agent Execution Layer"]
+        REGISTRY["Agent Registry<br/>ContentAgent<br/>SEOAgent<br/>EmailAgent<br/>+18 more"]
+        HANDLER["Agent Handlers<br/>execute()"]
+        TOOLS["Tool Executor<br/>ToolExecution"]
+        LEARNING["Learning Loop<br/>PgVectorStore<br/>learn() / recall()"]
+    end
+
+    subgraph Persistence["💾 Persistence Layer"]
+        DB["PostgreSQL 16<br/>Neon.tech<br/>AWS US East 2"]
+        AGENTRUN["AgentRun Table<br/>status, input, output<br/>startedAt, completedAt"]
+        TOOLEXEC["ToolExecution Table<br/>toolName, input, output<br/>duration, status"]
+        AGENTMEM["AgentMemory<br/>embedding<br/>context, reward"]
+        SCHEMA["75 Tables<br/>Identity, Agents<br/>RAG, Marketing<br/>Billing, Compliance"]
+    end
+
+    subgraph RAG["🔍 RAG & Vector Store"]
+        PGVECTOR["pgvector Extension<br/>1536 dimensions<br/>IVFFLAT index"]
+        EMBEDDING["Embedding Columns<br/>Message.embedding<br/>Chunk.embedding<br/>BrandVoice.embedding"]
+        RECALL["Vector Search<br/>ORDER BY embedding<br/>&lt;=&gt; similarity"]
+    end
+
+    subgraph Connectors["🔌 Connector SDK"]
+        FACTORY["Connector Factory<br/>USE_MOCK_CONNECTORS"]
+        MOCK["Mock Mode<br/>Deterministic responses<br/>No network calls"]
+        LIVE["Live Providers<br/>Gmail, Slack, Twitter<br/>Stripe, HubSpot<br/>+16 more"]
+        AUTH["OAuth / API Keys<br/>Credential mgmt<br/>Rate-limit backoff"]
+    end
+
+    subgraph Queue["📨 Worker & Queue Layer"]
+        REDIS["Redis Cluster<br/>Cache + Pub/Sub"]
+        BULLMQ["BullMQ Jobs<br/>orchestration<br/>marketing<br/>notifications"]
+        WORKER["Worker Pool<br/>Process jobs<br/>Update DB<br/>Record metrics"]
+        DLQ["Dead Letter Queue<br/>Failed jobs<br/>Slack alerts"]
+    end
+
+    subgraph Monitoring["📊 Observability"]
+        PROMETHEUS["Prometheus<br/>/api/metrics<br/>prom-client"]
+        METRICS["Custom Metrics<br/>neonhub_agent_runs_total<br/>neonhub_agent_run_duration_seconds<br/>neonhub_circuit_breaker_failures<br/>neonhub_queue_jobs_pending"]
+        HEALTH["Health Endpoints<br/>/api/health<br/>/api/readyz"]
+        GRAFANA["Grafana Dashboards<br/>Agent performance<br/>API latency<br/>Queue depth"]
+        LOGS["Centralized Logs<br/>Datadog / CloudWatch<br/>Structured JSON<br/>Secret redaction"]
+    end
+
+    subgraph CI["🔧 CI/CD & DevOps"]
+        WORKFLOWS["GitHub Actions<br/>30+ workflows"]
+        SECURITY["Security Preflight<br/>Gitleaks<br/>CodeQL<br/>npm audit"]
+        DB_DEPLOY["DB Workflows<br/>drift-check<br/>backup<br/>restore<br/>migrate"]
+        BRANCH["Branch Protection<br/>Require security-preflight<br/>+ tests before merge"]
+    end
+
+    subgraph Infrastructure["🏗️ Deployment Infrastructure"]
+        NEON["Neon.tech<br/>PostgreSQL 16<br/>Pgvector enabled<br/>Daily backup"]
+        RAILWAY["Railway.app<br/>API deployment<br/>Auto-scaling<br/>Preview deploys"]
+        VERCEL["Vercel<br/>Web deployment<br/>neonhubecosystem.com<br/>Edge functions"]
+        BACKUP["Backup & Restore<br/>Automated daily<br/>2-person approval<br/>RTO < 1 hour"]
+    end
+
+    %% Data Flow
+    WEB -->|tRPC calls| TRPC
+    CLI -->|HTTP POST| EXPRESS
+    TRPC -->|routes to| ORCHESTRATOR
+    EXPRESS -->|exposes| HEALTH
+    EXPRESS -->|Prometheus format| PROMETHEUS
+    
+    ORCHESTRATOR -->|getAgent| REGISTRY
+    REGISTRY -->|invokes| HANDLER
+    HANDLER -->|execute| TOOLS
+    TOOLS -->|recordToolExecution| TOOLEXEC
+    
+    ORCHESTRATOR -->|executeAgentRun| AGENTRUN
+    AGENTRUN -->|stores persistence| DB
+    AGENTRUN -->|queries state| SCHEMA
+    
+    HANDLER -->|uses| LEARNING
+    LEARNING -->|store/recall| PGVECTOR
+    PGVECTOR -->|query| EMBEDDING
+    EMBEDDING -->|similarity <=>| RECALL
+    
+    HANDLER -->|creates connector| FACTORY
+    FACTORY -->|selects mode| MOCK
+    FACTORY -->|selects mode| LIVE
+    LIVE -->|uses| AUTH
+    
+    TOOLS -->|emit completion| BULLMQ
+    BULLMQ -->|Redis job queue| REDIS
+    REDIS -->|workers consume| WORKER
+    WORKER -->|failed jobs| DLQ
+    DLQ -->|alert| LOGS
+    
+    AGENTRUN -->|emits metric| PROMETHEUS
+    TOOLEXEC -->|emits metric| PROMETHEUS
+    BULLMQ -->|job depth| PROMETHEUS
+    
+    PROMETHEUS -->|scrape| METRICS
+    HEALTH -->|status| GRAFANA
+    METRICS -->|visualize| GRAFANA
+    LOGS -->|aggregate| LOGS
+    
+    WORKFLOWS -->|trigger| DB_DEPLOY
+    WORKFLOWS -->|trigger| SECURITY
+    BRANCH -->|enforce| WORKFLOWS
+    
+    DB_DEPLOY -->|apply migration| NEON
+    SECURITY -->|validate| NEON
+    BACKUP -->|automated| NEON
+    
+    RAILWAY -->|runs| EXPRESS
+    VERCEL -->|serves| WEB
+    NEON -->|provides| DB
+    
+    %% Styling
+    classDef client fill:#3b82f6,stroke:#1e40af,color:#fff
+    classDef api fill:#8b5cf6,stroke:#6d28d9,color:#fff
+    classDef agent fill:#ec4899,stroke:#be185d,color:#fff
+    classDef data fill:#10b981,stroke:#059669,color:#fff
+    classDef rag fill:#f59e0b,stroke:#d97706,color:#fff
+    classDef connector fill:#14b8a6,stroke:#0d9488,color:#fff
+    classDef queue fill:#6366f1,stroke:#4f46e5,color:#fff
+    classDef monitor fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef ci fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef infra fill:#f97316,stroke:#ea580c,color:#fff
+    
+    class WEB,CLI client
+    class EXPRESS,TRPC,ORCHESTRATOR api
+    class REGISTRY,HANDLER,TOOLS,LEARNING agent
+    class DB,AGENTRUN,TOOLEXEC,AGENTMEM,SCHEMA data
+    class PGVECTOR,EMBEDDING,RECALL rag
+    class FACTORY,MOCK,LIVE,AUTH connector
+    class REDIS,BULLMQ,WORKER,DLQ queue
+    class PROMETHEUS,METRICS,HEALTH,GRAFANA,LOGS monitor
+    class WORKFLOWS,SECURITY,DB_DEPLOY,BRANCH ci
+    class NEON,RAILWAY,VERCEL,BACKUP infra
+

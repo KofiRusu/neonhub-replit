@@ -14,6 +14,8 @@ import type { AgentJobInput } from "../base/AgentJobManager.js";
 import { validateAgentContext } from "../_shared/normalize.js";
 import type { OrchestratorRequest, OrchestratorResponse } from "../../services/orchestration/types.js";
 import { executeAgentRun, type AgentExecutionContext } from "../utils/agent-run.js";
+import { RagContextService } from "../../services/rag/context.service.js";
+import { KnowledgeBaseService } from "../../services/rag/knowledge.service.js";
 
 type PrismaLike = typeof defaultPrisma;
 
@@ -387,6 +389,8 @@ export class ContentAgent {
   private readonly seoAgent: SEOAgent;
   private readonly brandVoiceSearch: BrandVoiceSearch;
   private readonly generateText: GenerateTextFn;
+  private readonly ragContextService: RagContextService;
+  private readonly knowledgeBase: KnowledgeBaseService;
   private readonly now: () => Date;
   private readonly orchestratorAgentId = "ContentAgent";
   private readonly contentStopWords = new Set<string>([
@@ -442,6 +446,8 @@ export class ContentAgent {
     this.seoAgent = deps.seoAgent ?? defaultSeoAgent;
     this.brandVoiceSearch = deps.brandVoiceSearch ?? defaultBrandVoiceSearch;
     this.generateText = deps.generateText ?? defaultGenerateText;
+    this.ragContextService = new RagContextService();
+    this.knowledgeBase = new KnowledgeBaseService();
     this.now = deps.now ?? (() => new Date());
   }
 
@@ -474,7 +480,24 @@ export class ContentAgent {
         }),
       ]);
 
-      const structuredArticle = await this.requestArticleFromModel(input, brandVoice, keywordContext);
+      const ragContext =
+        organizationId &&
+        (await this.ragContextService.build({
+          organizationId,
+          brandId: input.brandId,
+          query: input.topic,
+          categories: ["content", "seo"],
+          personId: input.createdById,
+        }));
+
+      const ragPrompt = ragContext ? this.ragContextService.formatForPrompt(ragContext) : "";
+
+      const structuredArticle = await this.requestArticleFromModel(
+        input,
+        brandVoice,
+        keywordContext,
+        ragPrompt,
+      );
       let body = this.composeMarkdownBody(structuredArticle);
 
       // Internal linking integration
@@ -571,6 +594,22 @@ export class ContentAgent {
         timestamp: this.now(),
       });
 
+      if (organizationId) {
+        await this.knowledgeBase.ingestSnippet({
+          organizationId,
+          datasetSlug: `content-${organizationId}`,
+          datasetName: "Content Knowledge",
+          title: structuredArticle.title,
+          content: body,
+          ownerId: input.createdById,
+          metadata: {
+            agent: "ContentAgent",
+            primaryKeyword: input.primaryKeyword,
+            topic: input.topic,
+          },
+        });
+      }
+
       return {
         jobId,
         draftId: draft.id,
@@ -610,6 +649,8 @@ export class ContentAgent {
     await this.jobManager.startJob(jobId);
 
     try {
+      const organizationId = await this.resolveOrganizationId(input.createdById);
+
       const [brandVoice, keywordContext] = await Promise.all([
         this.buildBrandVoiceSnippet({
           topic: input.primaryKeyword,
@@ -624,7 +665,19 @@ export class ContentAgent {
         }),
       ]);
 
-      const prompt = this.buildOptimizationPrompt(input, brandVoice, keywordContext);
+      const ragContext =
+        organizationId &&
+        (await this.ragContextService.build({
+          organizationId,
+          brandId: input.brandId,
+          query: input.primaryKeyword,
+          categories: ["content", "seo"],
+          personId: input.createdById,
+        }));
+
+      const ragPrompt = ragContext ? this.ragContextService.formatForPrompt(ragContext) : "";
+
+      const prompt = this.buildOptimizationPrompt(input, brandVoice, keywordContext, ragPrompt);
 
       const response = await this.generateText({
         prompt,
@@ -646,6 +699,22 @@ export class ContentAgent {
         await this.prisma.contentDraft.update({
           where: { id: input.draftId },
           data: { body: parsed.revision },
+        });
+      }
+
+      if (organizationId) {
+        await this.knowledgeBase.ingestSnippet({
+          organizationId,
+          datasetSlug: `content-${organizationId}`,
+          datasetName: "Content Knowledge",
+          title: `Optimization: ${input.primaryKeyword}`,
+          content: parsed.revision,
+          ownerId: input.createdById,
+          metadata: {
+            agent: "ContentAgent",
+            operation: "optimize",
+            primaryKeyword: input.primaryKeyword,
+          },
         });
       }
 
@@ -900,9 +969,10 @@ Constraints:
   private async requestArticleFromModel(
     input: GenerateArticleInput,
     brand: BrandVoiceSnippet,
-    keywordInsights: KeywordInsight[]
+    keywordInsights: KeywordInsight[],
+    ragSection?: string,
   ): Promise<StructuredArticle> {
-    const prompt = this.buildArticlePrompt(input, brand, keywordInsights);
+    const prompt = this.buildArticlePrompt(input, brand, keywordInsights, ragSection);
 
     const response = await this.generateText({
       prompt,
@@ -958,7 +1028,8 @@ Constraints:
   private buildArticlePrompt(
     input: GenerateArticleInput,
     brand: BrandVoiceSnippet,
-    keywordInsights: KeywordInsight[]
+    keywordInsights: KeywordInsight[],
+    ragSection?: string,
   ): string {
     const outline = input.outline?.length
       ? input.outline.map((item, index) => `${index + 1}. ${item}`).join("\n")
@@ -986,6 +1057,8 @@ Constraints:
       ? `Brand Voice Excerpts:\n${brand.knowledgeBase.map((item) => `- ${item}`).join("\n")}`
       : "";
 
+    const ragContextBlock = ragSection ? `\nAdditional context:\n${ragSection}\n` : "";
+
     return `Create an SEO-optimized article as JSON for the topic "${input.topic}" targeting "${input.primaryKeyword}".
 
 Tone: ${tone}
@@ -995,6 +1068,8 @@ Desired Word Count: ${input.wordCount ?? 900}
 ${brandDirectives}
 
 ${knowledgeBase}
+
+${ragContextBlock}
 
 SEO Keywords:
 ${keywordBlock}
@@ -1015,11 +1090,14 @@ Include:
   private buildOptimizationPrompt(
     input: OptimizeArticleInput,
     brand: BrandVoiceSnippet,
-    keywordContext: KeywordInsight[]
+    keywordContext: KeywordInsight[],
+    ragSection?: string,
   ): string {
     const keywordBlock = keywordContext
       .map((item) => `- ${item.keyword} (${item.intent}, opportunity ${item.opportunity})`)
       .join("\n");
+
+    const ragContextBlock = ragSection ? `\nContextual insights:\n${ragSection}\n` : "";
 
     return `Revise the following Markdown content to improve SEO performance for the keyword "${input.primaryKeyword}".
 
@@ -1030,6 +1108,8 @@ Brand Voice:
 
 SEO Keywords:
 ${keywordBlock}
+
+${ragContextBlock}
 
 Call To Action: ${input.callToAction ?? "Encourage readers to engage with NeonHub."}
 

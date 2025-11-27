@@ -1,0 +1,91 @@
+=== Git Status ===
+/Users/kofirusu/Desktop/NeonHub
+commit 2906b2f83c10aaf3557f82110d2549411b1b9223
+Author:     KofiRusu <kofi.rusu@ofauto.co>
+AuthorDate: Mon Nov 3 23:34:21 2025 +0100
+Commit:     KofiRusu <kofi.rusu@ofauto.co>
+CommitDate: Mon Nov 3 23:34:21 2025 +0100
+
+    test: add router validation tests & complete week 1 test infrastructure
+    
+    Content Router Tests:
+    ✅ Input validation (Zod schemas)
+    ✅ Required field checks
+    ✅ Format/tone enums
+    ✅ Batch operations
+    ✅ HTTP status codes (400, 401, 404)
+    ✅ UUID validation
+    ✅ Error messages
+    
+    Test Infrastructure Complete:
+    ✅ Factories: keyword (150 lines)
+    ✅ MSW Handlers: keyword APIs (200 lines)
+    ✅ Service Tests: keyword-research (30+ cases)
+    ✅ Router Tests: content validation (15+ cases)
+    
+    Coverage Status:
+    • Baseline: 26% (181/181 tests passing)
+    • Projection after tests: ~32-35%
+    • Target end of week: 60%+
+    • Test cases: 45+ created, 250+ total planned
+    
+    All deterministic, network-mocked, production patterns.
+    Ready for Phase 3 expansion (meta-gen, analytics, e2e).
+    
+    Reports: /reports/TEST_SUMMARY.md generated
+?? audit/
+?? docs/COMPLETION_STATUS_EXECUTIVE_BRIEF.md
+
+=== Environment ===
+ WARN  The "workspaces" field in package.json is not supported by pnpm. Create a "pnpm-workspace.yaml" file instead.
+9.12.0
+v20.17.0
+PWD: /Users/kofirusu/Desktop/NeonHub
+
+=== Workspace Structure ===
+packages:
+  - apps/*
+  - core/*
+  - modules/*
+
+=== Root package.json ===
+{
+  "name": "neonhub",
+  "version": "3.2.0",
+  "private": true,
+  "description": "NeonHub v3.2 - AI-Powered Marketing Automation Platform with Campaign Orchestration",
+  "prisma": {
+    "schema": "apps/api/prisma/schema.prisma"
+  },
+  "workspaces": [
+    "apps/api",
+    "apps/web",
+    "core/*",
+    "modules/*"
+  ],
+  "pnpm": {
+    "overrides": {
+      "eslint": "^9.15.0",
+      "@typescript-eslint/eslint-plugin": "^8.46.0",
+      "@typescript-eslint/parser": "^8.46.0",
+      "protobufjs": "^7.4.0",
+      "jsonpath-plus": "^10.3.0",
+      "form-data": "^4.0.1",
+      "got": "^11.8.6",
+      "jose": "^5.9.6",
+      "tough-cookie": "^5.0.0",
+      "request": "npm:@cypress/request@^3.0.5"
+    }
+  },
+  "scripts": {
+    "type-check": "npm run typecheck --workspaces --if-present",
+    "build": "npm run prisma:generate && npm run build:api && npm run build:web && npm run build:engine",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:engine": "npm run build --workspace=@neonhub/predictive-engine",
+    "test:ci": "CI_LIGHT_TESTS=true pnpm --filter @neonhub/backend-v3.2 run test:ci:light",
+    "test:all": "npm run test --workspaces",
+    "postinstall": "npm run prisma:generate",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/api",
+    "db:migrate": "pnpm --filter apps/api run prisma:migrate:deploy",
+    "db:seed:test": "pnpm --filter apps/api run seed",

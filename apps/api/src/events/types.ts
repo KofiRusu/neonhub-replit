@@ -20,6 +20,7 @@ export interface FeedbackEvent {
   sourceAgent: AgentName;
   channel: FeedbackChannel;
   kind: FeedbackKind;
+  intent?: string;
   text?: string;
   meta?: Record<string, unknown>;
 }

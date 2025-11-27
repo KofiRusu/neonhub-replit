@@ -1,0 +1,78 @@
+groups:
+  - name: neonhub_agents_prod
+    interval: 30s
+    rules:
+      - alert: HighAgentFailureRate
+        expr: |
+          (sum(rate(agent_runs_total{status="failed"}[5m])) by (agent)
+            / sum(rate(agent_runs_total[5m])) by (agent)) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "High agent failure rate: {{ $labels.agent }}"
+          description: "Agent {{ $labels.agent }} failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: SlowAgentExecution
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(agent_run_duration_seconds_bucket[5m])) by (le, agent)) > 10
+        for: 10m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "Slow agent execution: {{ $labels.agent }}"
+          description: "P99 latency is {{ $value }}s (threshold: 10s)"
+
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state > 0
+        for: 2m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "Circuit breaker open: {{ $labels.agent }}"
+          description: "Agent {{ $labels.agent }} circuit breaker has tripped"
+
+  - name: neonhub_api_prod
+    interval: 30s
+    rules:
+      - alert: HighHTTPErrorRate
+        expr: |
+          sum(rate(neonhub_http_requests_total{status=~"5.."}[5m]))
+            / sum(rate(neonhub_http_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          environment: production
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "Error rate: {{ $value | humanizePercentage }}"
+
+      - alert: SlowAPIResponses
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(api_request_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 10m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "Slow API responses"
+          description: "P95 response time: {{ $value }}s"
+
+  - name: neonhub_oauth_prod
+    interval: 60s
+    rules:
+      - alert: OAuthRefreshFailures
+        expr: increase(oauth_refresh_failures_total[15m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          environment: production
+        annotations:
+          summary: "OAuth refresh failures: {{ $labels.provider }}"
+          description: "{{ $value }} refresh failures in 15 minutes"
+

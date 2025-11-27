@@ -66,7 +66,7 @@ export default function ReviewPostPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Review Content</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-gray-400 mt-2">
               Review your AI-generated content before publishing
             </p>
           </div>
@@ -75,11 +75,11 @@ export default function ReviewPostPage() {
       </div>
 
       {/* Preview Card */}
-      <Card className="p-6 mb-6 bg-muted/20">
+      <Card className="p-6 mb-6 bg-slate-900/60">
         <h3 className="font-semibold mb-2">Preview</h3>
         <div className="prose dark:prose-invert max-w-none">
           <h2>{draft.title}</h2>
-          <div className="text-sm text-muted-foreground mb-4">
+          <div className="text-sm text-gray-400 mb-4">
             {draft.kind} • {draft.tone} tone • Target: {draft.audience || "General"}
           </div>
           <p className="whitespace-pre-wrap">{draft.body}</p>

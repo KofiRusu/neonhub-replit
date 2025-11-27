@@ -1,0 +1,9 @@
+✅ docs/P0_HARDENING_SUMMARY.md
+✅ docs/OBSERVABILITY_GUIDE.md
+✅ reports/WEEK1_COMPLETION_AUDIT.md
+✅ reports/P0_COMPLETION_EVIDENCE.md
+✅ P0_INDEX.md
+✅ P0_SPRINT_SUCCESS.md
+✅ P0_QUICK_REFERENCE.md
+✅ scripts/p0-validation.mjs
+✅ .github/workflows/ci-p0-hardening.yml

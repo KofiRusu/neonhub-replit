@@ -1,0 +1,8 @@
+🧪 NeonHub Post-Deployment Smoke Tests
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+API URL: http://localhost:4100
+Web URL: http://localhost:3000
+
+Test 1: API Health Check
+[0;31m❌ FAIL[0m: Health endpoint returned HTTP 000000 (expected 200)

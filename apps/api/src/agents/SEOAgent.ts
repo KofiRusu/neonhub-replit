@@ -10,6 +10,8 @@ import { logger } from "../lib/logger.js";
 import { validateAgentContext } from "./_shared/normalize.js";
 import type { OrchestratorRequest, OrchestratorResponse } from "../services/orchestration/types.js";
 import { executeAgentRun, type AgentExecutionContext } from "./utils/agent-run.js";
+import { RagContextService } from "../services/rag/context.service.js";
+import { KnowledgeBaseService } from "../services/rag/knowledge.service.js";
 
 export type SearchIntent =
   | "informational"
@@ -85,6 +87,7 @@ export interface DiscoverKeywordsInput {
   limit?: number;
   competitorDomains?: string[];
   createdById?: string;
+  organizationId?: string;
 }
 
 export interface DiscoverKeywordsOutput {
@@ -97,6 +100,7 @@ export interface DiscoverKeywordsOutput {
     personaId?: number;
     computedAt: string;
     seedsAnalyzed: number;
+    contextSnippets?: string[];
   };
 }
 
@@ -128,6 +132,8 @@ export interface ScoreDifficultyInput {
   competitorDomains?: string[];
   backlinkCount?: number;
   domainAuthority?: number;
+  ragPrompt?: string;
+  knowledgeSnippets?: string[];
 }
 
 export interface ScoreDifficultyOutput {
@@ -147,6 +153,8 @@ export interface ScoreDifficultyOutput {
     referencedBacklinks: number;
     domainAuthority: number;
     calculatedAt: string;
+    ragPrompt?: string;
+    knowledgeSnippets?: string[];
   };
 }
 
@@ -247,6 +255,8 @@ export class SEOAgent {
   private readonly agentName = "seo";
   private readonly orchestratorAgentId = "SEOAgent";
   private readonly descriptor = DEFAULT_DESCRIPTOR;
+  private readonly ragContext: RagContextService;
+  private readonly knowledgeBase: KnowledgeBaseService;
 
   constructor(deps: {
     prisma?: PrismaClient;
@@ -256,6 +266,8 @@ export class SEOAgent {
     this.prisma = deps.prisma ?? defaultPrisma;
     this.jobManager = deps.jobManager ?? defaultJobManager;
     this.now = deps.now ?? (() => new Date());
+    this.ragContext = new RagContextService();
+    this.knowledgeBase = new KnowledgeBaseService();
   }
 
   /**
@@ -293,6 +305,21 @@ export class SEOAgent {
         this.enrichKeyword(candidate, personaId),
       );
 
+      const ragContext =
+        input.organizationId &&
+        (await this.ragContext.build({
+          organizationId: input.organizationId,
+          query: seeds.join(" "),
+          categories: ["seo"],
+          personId: input.createdById,
+        }));
+      const contextSnippets = ragContext
+        ? [
+            ...ragContext.knowledge.slice(0, 3).map((entry) => entry.text),
+            ...ragContext.memories.slice(0, 2).map((entry) => entry.label ?? ""),
+          ].filter(Boolean)
+        : [];
+
       const ranked = enriched
         .sort((a, b) => b.opportunityScore - a.opportunityScore)
         .slice(0, limit);
@@ -303,6 +330,7 @@ export class SEOAgent {
         personaId,
         seeds.length,
       );
+      summary.contextSnippets = contextSnippets;
 
       await this.jobManager.completeJob(
         jobId,
@@ -315,6 +343,29 @@ export class SEOAgent {
           totalClusters: clusters.length,
         },
       );
+
+      if (input.organizationId && input.createdById) {
+        const highlightLines = clusters.slice(0, 3).map(
+          (cluster, index) =>
+            `${index + 1}. ${cluster.label} → ${cluster.keywords
+              .slice(0, 3)
+              .map((kw) => kw.keyword)
+              .join(", ")}`,
+        );
+
+        await this.knowledgeBase.ingestSnippet({
+          organizationId: input.organizationId,
+          datasetSlug: `seo-${input.organizationId}`,
+          datasetName: "SEO Knowledge",
+          title: `Keyword research ${this.now().toISOString()}`,
+          content: `Seeds: ${seeds.join(", ")}\n${highlightLines.join("\n")}`,
+          ownerId: input.createdById,
+          metadata: {
+            agent: "SEOAgent",
+            personaId,
+          },
+        });
+      }
 
       return {
         jobId,
@@ -444,8 +495,25 @@ export class SEOAgent {
           input.backlinkCount ?? Math.max(20, (baseHash >> 5) % 400),
         domainAuthority: input.domainAuthority ?? 45 + (baseHash % 30),
         calculatedAt: this.now().toISOString(),
+        ragPrompt: input.ragPrompt,
+        knowledgeSnippets: input.knowledgeSnippets,
       },
     };
+  }
+
+  private formatAuditSnippet(result: ScoreDifficultyOutput): string {
+    const recommendations = result.recommendations.slice(0, 3).join("\n- ");
+    const contextLines = result.context.knowledgeSnippets?.length
+      ? `Context:\n- ${result.context.knowledgeSnippets.join("\n- ")}\n`
+      : "";
+    return [
+      `Keyword: ${result.keyword}`,
+      `Difficulty: ${result.difficulty} (${result.tier})`,
+      contextLines ? contextLines.trimEnd() : "",
+      `Recommendations:\n- ${recommendations}`,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
   }
 
   /**
@@ -614,7 +682,7 @@ export class SEOAgent {
 
   private enrichKeyword(
     candidate: CandidateKeyword,
-    personaId?: number,
+    _personaId?: number,
   ): KeywordOpportunity {
     const normalized = this.normalizeKeyword(candidate.term);
     const hash = this.hash(normalized);
@@ -1161,6 +1229,7 @@ export class SEOAgent {
       limit: parsed.limit,
       competitorDomains: parsed.competitorDomains,
       createdById: parsed.createdById,
+      organizationId: context.organizationId,
     };
 
     const resolvedInput = this.withUserFallback(input, context);
@@ -1221,11 +1290,25 @@ export class SEOAgent {
       context,
     );
 
+    const ragDetails =
+      context.organizationId &&
+      (await this.ragContext.build({
+        organizationId: context.organizationId,
+        query: keyword,
+        categories: ["seo"],
+        personId: context.userId ?? undefined,
+      }));
+
+    const ragPrompt = ragDetails ? this.ragContext.formatForPrompt(ragDetails) : "";
+    const knowledgeSnippets = ragDetails?.knowledge.slice(0, 3).map((entry) => entry.text) ?? [];
+
     const scoreInput: ScoreDifficultyInput = {
       keyword: payloadWithUser.keyword,
       competitorDomains: payloadWithUser.competitorDomains,
       backlinkCount: payloadWithUser.backlinkCount,
       domainAuthority: payloadWithUser.domainAuthority,
+      ragPrompt: ragPrompt || undefined,
+      knowledgeSnippets: knowledgeSnippets.length ? knowledgeSnippets : undefined,
     };
 
     try {
@@ -1242,6 +1325,24 @@ export class SEOAgent {
           }),
         },
       );
+
+      if (context.organizationId) {
+        const ownerId = context.userId ?? payloadWithUser.createdById;
+        if (ownerId) {
+          await this.knowledgeBase.ingestSnippet({
+            organizationId: context.organizationId,
+            datasetSlug: `seo-${context.organizationId}`,
+            datasetName: "SEO Knowledge",
+            title: `SEO audit for ${keyword}`,
+            content: this.formatAuditSnippet(result),
+            ownerId,
+            metadata: {
+              agent: "SEOAgent",
+              intent,
+            },
+          });
+        }
+      }
 
       return { ok: true, data: result };
     } catch (error) {

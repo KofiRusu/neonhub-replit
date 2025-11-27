@@ -8,7 +8,7 @@ export default function InternalLinksPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Internal Linking</h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-400">
           Ensure every strategic asset is linked into your topic cluster. Paste a draft or recent article to receive recommendations.
         </p>
       </div>

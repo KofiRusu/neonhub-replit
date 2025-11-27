@@ -1,0 +1,783 @@
+== Fix EPERM by forcing project-local pnpm config & retry install ==
+== Ensure workspace file (silences pnpm workspaces warning) ==
+pnpm-workspace.yaml exists
+== Write project-local .npmrc (no global writes) ==
+Wrote .npmrc with project-local store-dir -> /Volumes/devssd/NeonHub/node_modules/.pnpm
+== Try strict offline install first ==
+ EPERM  EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+
+pnpm: EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+    at async Object.mkdir (node:internal/fs/promises:858:10)
+    at async createNewStoreController (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:135560:7)
+    at async recursive (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:198024:21)
+    at async installDeps (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:198461:11)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234540:21
+    at async main (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234499:34)
+    at async runPnpm (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234770:5)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234762:7
+Offline install FAILED — attempting one-time fetch
+ EPERM  EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+
+pnpm: EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+    at async Object.mkdir (node:internal/fs/promises:858:10)
+    at async createNewStoreController (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:135560:7)
+    at async Object.handler [as fetch] (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:199336:21)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234540:21
+    at async main (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234499:34)
+    at async runPnpm (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234770:5)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234762:7
+WARN: fetch failed (still offline?)
+ EPERM  EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+
+pnpm: EPERM: operation not permitted, mkdir '/Volumes/devssd/NeonHub/node_modules/.pnpm/v3'
+    at async Object.mkdir (node:internal/fs/promises:858:10)
+    at async createNewStoreController (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:135560:7)
+    at async recursive (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:198024:21)
+    at async installDeps (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:198461:11)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234540:21
+    at async main (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234499:34)
+    at async runPnpm (/Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234770:5)
+    at async /Users/kofirusu/Library/pnpm/.tools/pnpm/9.12.2/node_modules/pnpm/dist/pnpm.cjs:234762:7
+WARN: install still incomplete
+== Toolchain check (may still warn until install fully succeeds) ==
+v20.17.0
+9.12.2
+== Baseline scripts (best-effort) ==
+
+> neonhub@3.2.0 type-check /Users/kofirusu/Desktop/NeonHub
+> npm run typecheck --workspaces --if-present
+
+
+> @neonhub/backend-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+error TS2688: Cannot find type definition file for 'jest'.
+  The file is in the program because:
+    Entry point of type library 'jest' specified in compilerOptions
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point of type library 'node' specified in compilerOptions
+
+> @neonhub/ui-v3.2@3.2.0 typecheck
+> node ../../scripts/run-cli.mjs tsc --noEmit
+
+../api/src/agents/_shared/normalize.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/_shared/normalize.ts(2,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/agents/_shared/normalize.ts(3,29): error TS2307: Cannot find module 'pino' or its corresponding type declarations.
+../api/src/agents/content/ContentAgent.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/EmailAgent.ts(1,24): error TS2307: Cannot find module 'resend' or its corresponding type declarations.
+../api/src/agents/EmailAgent.ts(2,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/SEOAgent.ts(1,28): error TS2307: Cannot find module 'crypto' or its corresponding type declarations.
+../api/src/agents/SEOAgent.ts(2,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/SEOAgent.ts(3,44): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/agents/SocialAgent.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/SupportAgent.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/agents/utils/agent-run.ts(1,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/agents/utils/agent-run.ts(2,44): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/agents/utils/agent-run.ts(3,29): error TS2307: Cannot find module 'pino' or its corresponding type declarations.
+../api/src/ai/openai.ts(1,20): error TS2307: Cannot find module 'openai' or its corresponding type declarations.
+../api/src/config/env.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/config/env.ts(57,28): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(63,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(65,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(66,9): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(103,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(108,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(112,19): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(113,32): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(114,16): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(116,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(119,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(121,21): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(123,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(127,19): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(129,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(130,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(131,25): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(132,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(132,43): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(133,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(134,26): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(143,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(145,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(146,5): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(154,38): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(159,34): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/config/env.ts(160,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/connectors/base/types.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/db/prisma.ts(1,30): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/db/prisma.ts(12,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/db/prisma.ts(17,5): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+../api/src/integrations/google-search-console.ts(1,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/lib/logger.ts(1,18): error TS2307: Cannot find module 'pino' or its corresponding type declarations.
+../api/src/lib/metrics.ts(1,76): error TS2307: Cannot find module 'prom-client' or its corresponding type declarations.
+../api/src/lib/metrics.ts(2,27): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/lib/openai.ts(1,20): error TS2307: Cannot find module 'openai' or its corresponding type declarations.
+../api/src/lib/prisma.ts(2,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/queues/index.ts(1,23): error TS2307: Cannot find module 'bullmq' or its corresponding type declarations.
+../api/src/services/agent-run.service.ts(1,28): error TS2307: Cannot find module 'crypto' or its corresponding type declarations.
+../api/src/services/agent-run.service.ts(2,54): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/agent-run.service.ts(3,44): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/brand-voice-ingestion.ts(1,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/brand-voice.service.ts(1,29): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/connector.service.ts(1,59): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/event-intake.service.ts(1,28): error TS2307: Cannot find module 'node:crypto' or its corresponding type declarations.
+../api/src/services/event-intake.service.ts(2,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/internal-linking.ts(1,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/internal-linking.ts(2,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/orchestration/types.ts(1,27): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/person.service.ts(1,29): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/seo-learning.ts(1,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/seo-learning.ts(2,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/seo-metrics.ts(1,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/services/seo/internal-linking.service.ts(13,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/context.ts(6,40): error TS2307: Cannot find module 'express' or its corresponding type declarations.
+../api/src/trpc/context.ts(7,30): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/routers/agent-runs.router.ts(1,27): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/routers/agent-runs.router.ts(2,27): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/routers/agent-runs.router.ts(3,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/routers/agents.router.ts(1,27): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/routers/agents.router.ts(2,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/routers/agents.router.ts(4,27): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/routers/brand.router.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/routers/brand.router.ts(10,27): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/routers/content.router.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/routers/content.router.ts(2,27): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/routers/content.router.ts(3,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/routers/seo.router.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/routers/seo.router.ts(2,27): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/routers/seo.router.ts(3,35): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../api/src/trpc/routers/trends.router.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/trpc/trpc.ts(6,37): error TS2307: Cannot find module '@trpc/server' or its corresponding type declarations.
+../api/src/trpc/trpc.ts(7,23): error TS2307: Cannot find module 'superjson' or its corresponding type declarations.
+../api/src/types/agentic.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../api/src/ws/index.ts(1,42): error TS2307: Cannot find module 'socket.io' or its corresponding type declarations.
+../api/src/ws/index.ts(2,43): error TS2307: Cannot find module 'http' or its corresponding type declarations.
+../api/src/ws/index.ts(10,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+.next/types/app/agents/page.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/agents/page.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/api/auth/[...nextauth]/route.ts(3,34): error TS2307: Cannot find module 'next/server.js' or its corresponding type declarations.
+.next/types/app/api/auth/[...nextauth]/route.ts(318,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/dashboard/page.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/dashboard/page.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/layout.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/layout.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/marketing/layout.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/marketing/layout.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/marketing/page.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/marketing/page.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/app/page.ts(3,59): error TS2307: Cannot find module 'next/dist/lib/metadata/types/metadata-interface.js' or its corresponding type declarations.
+.next/types/app/page.ts(59,14): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(6,59): error TS2307: Cannot find module 'next/types.js' or its corresponding type declarations.
+.next/types/validator.ts(7,34): error TS2307: Cannot find module 'next/server.js' or its corresponding type declarations.
+.next/types/validator.ts(10,12): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(10,134): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(10,160): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(25,12): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(25,86): error TS2503: Cannot find namespace 'React'.
+.next/types/validator.ts(25,112): error TS2503: Cannot find namespace 'React'.
+next.config.ts(1,18): error TS2307: Cannot find module 'path' or its corresponding type declarations.
+next.config.ts(2,33): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+next.config.ts(26,9): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+next.config.ts(38,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+next.config.ts(83,25): error TS2304: Cannot find name '__dirname'.
+next.config.ts(84,36): error TS2304: Cannot find name '__dirname'.
+next.config.ts(85,43): error TS2304: Cannot find name '__dirname'.
+playwright.config.ts(1,39): error TS2307: Cannot find module '@playwright/test' or its corresponding type declarations.
+playwright.config.ts(17,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+playwright.config.ts(19,12): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+playwright.config.ts(21,12): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+playwright.config.ts(31,14): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+playwright.config.ts(75,27): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.client.config.ts(1,25): error TS2307: Cannot find module '@sentry/nextjs' or its corresponding type declarations.
+sentry.client.config.ts(3,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.client.config.ts(8,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.edge.config.ts(1,25): error TS2307: Cannot find module '@sentry/nextjs' or its corresponding type declarations.
+sentry.edge.config.ts(3,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.edge.config.ts(8,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.server.config.ts(1,25): error TS2307: Cannot find module '@sentry/nextjs' or its corresponding type declarations.
+sentry.server.config.ts(3,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+sentry.server.config.ts(8,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/(dashboard)/contacts/[id]/timeline.tsx(3,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/app/agents/[id]/page.tsx(3,27): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/agents/[id]/page.tsx(6,42): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/agents/[id]/page.tsx(35,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/agents/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/agents/page.tsx(4,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/agents/page.tsx(22,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/agents/page.tsx(246,22): error TS2741: Property 'children' is missing in type '{ className: string; onClick: () => any; }' but required in type 'NeonCardProps'.
+src/app/agents/page.tsx(358,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/analytics/page-old.tsx(4,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/analytics/page-old.tsx(16,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/analytics/page-old.tsx(85,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/analytics/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/analytics/page.tsx(4,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/analytics/page.tsx(5,89): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/api/analytics/brand-voice-kpis/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/analytics/brand-voice-kpis/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/analytics/executive-summary/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/analytics/executive-summary/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/auth/[...nextauth]/route.ts(1,22): error TS2307: Cannot find module 'next-auth' or its corresponding type declarations.
+src/app/api/brand-voice/profile/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/brand-voice/profile/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/brand-voice/search/route.ts(1,43): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/brand-voice/search/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/content/generate-post/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/content/generate-post/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/email/sequence/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/email/sequence/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/seo/audit/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/seo/audit/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/seo/content/optimize/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/seo/content/optimize/route.ts(4,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/seo/keywords/analyze/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/seo/keywords/analyze/route.ts(4,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/sms/send/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/support/reply/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/support/reply/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/api/trends/brief/route.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/app/api/trends/brief/route.ts(5,13): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/auth/signin/page.tsx(3,24): error TS2307: Cannot find module 'next-auth/react' or its corresponding type declarations.
+src/app/auth/signin/page.tsx(4,24): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/auth/signin/page.tsx(5,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/auth/signin/page.tsx(6,33): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/auth/signin/page.tsx(7,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/billing/page.tsx(5,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/billing/page.tsx(22,118): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/billing/page.tsx(23,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/billing/page.tsx(120,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(121,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(124,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(125,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(128,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(129,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/billing/page.tsx(165,6): error TS2741: Property 'children' is missing in type '{ title: any; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/billing/page.tsx(170,20): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(174,20): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(318,26): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(343,32): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(348,32): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(570,34): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/billing/page.tsx(667,28): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/app/brand-voice/layout.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/brand-voice/layout.tsx(2,31): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/app/brand-voice/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/brand-voice/page.tsx(4,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/brand-voice/page.tsx(13,72): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/campaigns/[id]/page.tsx(3,27): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/campaigns/[id]/page.tsx(6,36): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/campaigns/[id]/page.tsx(31,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/campaigns/page-old.tsx(3,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/campaigns/page-old.tsx(4,45): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/campaigns/page-old.tsx(26,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/campaigns/page-old.tsx(804,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/campaigns/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/campaigns/page.tsx(4,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/app/campaigns/page.tsx(5,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/campaigns/page.tsx(6,66): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/campaigns/page.tsx(130,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/campaigns/page.tsx(215,18): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/campaigns/page.tsx(269,16): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/[id]/review/page.tsx(3,38): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/content/[id]/review/page.tsx(73,18): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/content/blog/page.tsx(5,32): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/blog/page.tsx(23,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/case-studies/page.tsx(5,33): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/case-studies/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/ContentStudioClient.tsx(3,18): error TS2307: Cannot find module 'next/head' or its corresponding type declarations.
+src/app/content/ContentStudioClient.tsx(4,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/content/ContentStudioClient.tsx(5,46): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/content/ContentStudioClient.tsx(31,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/ContentStudioClient.tsx(793,8): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/content/email/page.tsx(5,28): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/email/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/new/page.tsx(3,27): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/content/page.tsx(1,31): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/app/content/page.tsx(4,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/content/product/page.tsx(5,27): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/product/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/social/page.tsx(5,28): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/social/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/content/video/page.tsx(5,29): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/content/video/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/dashboard/page-old.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/dashboard/page-old.tsx(5,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/dashboard/page-old.tsx(6,59): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/dashboard/page-old.tsx(7,74): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/dashboard/page-old.tsx(9,32): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/app/dashboard/page-old.tsx(380,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/dashboard/page-old.tsx(403,17): error TS2322: Type '{ key: string; title: any; value: any; change: any; format: any; icon: any; color: any; isTopPerformer: any; }' is not assignable to type 'KPIMetricCardProps'.
+  Property 'key' does not exist on type 'KPIMetricCardProps'.
+src/app/dashboard/page-old.tsx(443,38): error TS2322: Type '{ key: string; agent: AgentStatusSummary; index: number; }' is not assignable to type 'AgentStatusCardProps'.
+  Property 'key' does not exist on type 'AgentStatusCardProps'.
+src/app/dashboard/page.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/dashboard/page.tsx(5,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/dashboard/page.tsx(6,59): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/dashboard/page.tsx(7,92): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/dashboard/page.tsx(9,32): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/app/dashboard/page.tsx(499,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/dashboard/page.tsx(522,17): error TS2322: Type '{ key: string; title: any; value: any; change: any; format: any; icon: any; color: any; isTopPerformer: any; }' is not assignable to type 'KPIMetricCardProps'.
+  Property 'key' does not exist on type 'KPIMetricCardProps'.
+src/app/dashboard/page.tsx(562,38): error TS2322: Type '{ key: string; agent: AgentStatusSummary; index: number; }' is not assignable to type 'AgentStatusCardProps'.
+  Property 'key' does not exist on type 'AgentStatusCardProps'.
+src/app/dashboard/seo/page.tsx(1,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/dashboard/seo/page.tsx(6,24): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/dashboard/seo/page.tsx(7,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/deployment/page.tsx(3,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/deployment/page.tsx(9,65): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/deployment/page.tsx(67,17): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/deployment/page.tsx(90,17): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/deployment/page.tsx(135,17): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/deployment/page.tsx(149,17): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/deployment/page.tsx(171,22): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/deployment/page.tsx(171,43): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/documents/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/documents/page.tsx(44,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/documents/page.tsx(45,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/documents/page.tsx(168,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/documents/page.tsx(531,31): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/email/automations/page.tsx(5,32): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/automations/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/deliverability/page.tsx(5,24): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/deliverability/page.tsx(13,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/page-old.tsx(3,19): error TS2307: Cannot find module 'next/image' or its corresponding type declarations.
+src/app/email/page-old.tsx(4,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/email/page-old.tsx(5,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/email/page-old.tsx(36,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/page-old.tsx(1334,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/email/page.tsx(3,34): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/email/page.tsx(4,101): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/page.tsx(85,12): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/page.tsx(107,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/page.tsx(113,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/page.tsx(119,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/page.tsx(125,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/segments/page.tsx(5,29): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/segments/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/email/templates/page.tsx(5,32): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/email/templates/page.tsx(22,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/error.tsx(2,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/error.tsx(3,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/app/error.tsx(11,10): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/layout.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/layout.tsx(2,31): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/app/layout.tsx(15,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/layout.tsx(16,28): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/layout.tsx(79,10): error TS2741: Property 'children' is missing in type '{}' but required in type '{ children: React.ReactNode; }'.
+src/app/layout.tsx(80,12): error TS2741: Property 'children' is missing in type '{ defaultTheme: "dark"; }' but required in type 'ThemeProviderProps'.
+src/app/marketing/layout.tsx(3,32): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/marketing/layout.tsx(12,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; }' but required in type 'PageLayoutProps'.
+src/app/marketing/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/marketing/page.tsx(4,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/marketing/page.tsx(15,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/marketing/page.tsx(246,12): error TS2741: Property 'children' is missing in type '{ title: string; actions: any; }' but required in type 'ChartContainerProps'.
+src/app/not-found.tsx(1,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/app/not-found.tsx(7,8): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/page.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/page.tsx(4,27): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/app/page.tsx(5,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/robots.ts(1,36): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/app/robots.ts(3,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/settings/page.tsx(4,19): error TS2307: Cannot find module 'next/image' or its corresponding type declarations.
+src/app/settings/page.tsx(5,59): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/settings/page.tsx(6,143): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/settings/page.tsx(159,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/sitemap.ts(1,36): error TS2307: Cannot find module 'next' or its corresponding type declarations.
+src/app/sitemap.ts(3,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/social-media/page-old.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/social-media/page-old.tsx(4,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/social-media/page-old.tsx(22,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/social-media/page-old.tsx(180,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; }' but required in type 'PageLayoutProps'.
+src/app/social-media/page-old.tsx(195,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/social-media/page-old.tsx(289,28): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/app/social-media/page-old.tsx(377,34): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/social-media/page-old.tsx(400,27): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/app/social-media/page-old.tsx(444,30): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/social-media/page-old.tsx(505,31): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/app/social-media/page.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/social-media/page.tsx(4,108): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/social-media/page.tsx(73,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/social-media/page.tsx(86,33): error TS2322: Type '{ key: string; className: string; }' is not assignable to type 'NeonCardProps'.
+  Property 'key' does not exist on type 'NeonCardProps'.
+src/app/social-media/page.tsx(120,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/social-media/page.tsx(164,14): error TS2741: Property 'children' is missing in type '{ className: string; }' but required in type 'NeonCardProps'.
+src/app/social-media/page.tsx(177,31): error TS2322: Type '{ key: string; className: string; }' is not assignable to type 'NeonCardProps'.
+  Property 'key' does not exist on type 'NeonCardProps'.
+src/app/support/page.tsx(3,53): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/support/page.tsx(16,21): error TS2322: Type '{ key: "Status" | "Docs" | "Contact"; className: string; }' is not assignable to type 'NeonCardProps'.
+  Property 'key' does not exist on type 'NeonCardProps'.
+src/app/team/page.tsx(3,19): error TS2307: Cannot find module 'next/image' or its corresponding type declarations.
+src/app/team/page.tsx(4,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/team/page.tsx(44,106): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/team/page.tsx(45,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/team/page.tsx(152,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; actions: any; }' but required in type 'PageLayoutProps'.
+src/app/team/page.tsx(367,36): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/team/page.tsx(429,34): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/team/page.tsx(475,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/trends/page.tsx(5,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/app/trends/page.tsx(12,88): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/app/trends/page.tsx(13,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/app/trends/page.tsx(15,32): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/app/trends/page.tsx(27,19): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/app/trends/page.tsx(81,6): error TS2741: Property 'children' is missing in type '{ title: string; subtitle: string; }' but required in type 'PageLayoutProps'.
+src/app/trends/page.tsx(191,22): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/trends/page.tsx(239,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/trends/page.tsx(281,30): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/app/trends/page.tsx(369,30): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/agent-card.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/agent-card.tsx(4,74): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/agent-card.tsx(5,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/agent-card.tsx(6,33): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/agent-log.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/agent-log.tsx(4,45): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/agent-log.tsx(5,65): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/agent-log.tsx(166,18): error TS2580: Cannot find name 'require'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/agent-log.tsx(188,44): error TS2580: Cannot find name 'require'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/agent-runner.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/agent-runner.tsx(5,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/agent-runner.tsx(6,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/agent-runner.tsx(7,53): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/agent-status-card.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/agent-status-card.tsx(4,43): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/agent-status-card.tsx(54,6): error TS2741: Property 'children' is missing in type '{ glow: "blue"; className: string; }' but required in type 'NeonCardProps'.
+src/components/analytics/AnalyticsProvider.tsx(3,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/analytics/AnalyticsProvider.tsx(4,20): error TS2307: Cannot find module 'next/script' or its corresponding type declarations.
+src/components/analytics/AnalyticsProvider.tsx(5,46): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/components/analytics/AnalyticsProvider.tsx(8,27): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/AppShell.tsx(2,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/components/AppShell.tsx(3,29): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/components/AppShell.tsx(20,60): error TS2503: Cannot find namespace 'React'.
+src/components/AuthButton.tsx(3,19): error TS2307: Cannot find module 'next/image' or its corresponding type declarations.
+src/components/AuthButton.tsx(4,45): error TS2307: Cannot find module 'next-auth/react' or its corresponding type declarations.
+src/components/AuthButton.tsx(5,37): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/AuthButton.tsx(6,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/brand-voice/AgentActionPicker.tsx(3,35): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/BrandMemoryPanel.tsx(3,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/BrandVoiceCopilot.tsx(3,43): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/BrandVoiceCopilot.tsx(10,39): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/brand-voice/BrandVoiceCopilot.tsx(60,24): error TS2503: Cannot find namespace 'React'.
+src/components/brand-voice/HealthProbe.tsx(3,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/InsightsStrip.tsx(3,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/InsightsStrip.tsx(54,18): error TS2322: Type '{ key: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'key' does not exist on type 'BadgeProps'.
+src/components/brand-voice/InsightsStrip.tsx(64,14): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/brand-voice/InsightsStrip.tsx(65,14): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/brand-voice/InsightsStrip.tsx(66,14): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/brand-voice/InsightsStrip.tsx(67,14): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/brand-voice/KnowledgeIndex.tsx(3,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/brand-voice/PromptPresets.tsx(4,23): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/campaign-timeline.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/campaign-timeline.tsx(4,55): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/chat-preview.tsx(2,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/coming-soon.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/coming-soon.tsx(4,38): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/content-editor.tsx(3,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/content-editor.tsx(4,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/content-editor.tsx(5,56): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/content-editor.tsx(49,8): error TS2741: Property 'children' is missing in type '{ glow: "blue"; className: string; }' but required in type 'NeonCardProps'.
+src/components/content-editor.tsx(86,8): error TS2741: Property 'children' is missing in type '{ glow: "purple"; className: string; }' but required in type 'NeonCardProps'.
+src/components/DebugStatus.tsx(2,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/DebugStatus.tsx(7,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/email/CampaignWizard.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/email/CampaignWizard.tsx(8,45): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/error-boundary.tsx(2,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/error-boundary.tsx(10,42): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.
+src/components/error-boundary.tsx(11,17): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.
+src/components/health-badge.tsx(2,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/health-badge.tsx(3,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/components/health-badge.tsx(12,15): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/kpi-count.tsx(2,45): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/kpi-count.tsx(3,34): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/kpi-widget.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/kpi-widget.tsx(5,42): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/kpi-widget.tsx(6,42): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/kpi-widget.tsx(7,37): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/kpi-widget.tsx(53,6): error TS2741: Property 'children' is missing in type '{ glow: "blue" | "purple" | "pink" | "green"; }' but required in type 'NeonCardProps'.
+src/components/marketing/ChartContainer.tsx(3,32): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/marketing/DataTable.tsx(3,35): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/marketing/DataTable.tsx(4,32): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/marketing/MetricCard.tsx(3,32): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/marketing/MetricCard.tsx(4,24): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/marketing/MetricCard.tsx(5,28): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/MigrationMonitor.tsx(3,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/MigrationMonitor.tsx(8,71): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/MigrationMonitor.tsx(53,15): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/MigrationMonitor.tsx(66,17): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/MigrationMonitor.tsx(187,19): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/navigation.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/navigation.tsx(4,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/components/navigation.tsx(5,29): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/components/navigation.tsx(6,41): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/navigation.tsx(24,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon-card.tsx(3,42): error TS2307: Cannot find module 'framer-motion' or its corresponding type declarations.
+src/components/neon-card.tsx(4,32): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/ConfirmDialog.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/ConfirmDialog.tsx(7,29): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon/DeployAgentDialog.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/DeployAgentDialog.tsx(7,21): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon/KeyMetricTile.tsx(3,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/KeyMetricTile.tsx(4,42): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon/MultiSeriesChart.tsx(3,27): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon/neon-card.tsx(3,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/neon-stats.tsx(3,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/neon-toolbar.tsx(3,30): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/neon/neon-toolbar.tsx(4,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/SocialComposer.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/neon/SocialComposer.tsx(8,76): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/page-layout.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/page-layout.tsx(6,30): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/personalization/RealTimeRecommendations.tsx(3,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/personalization/RealTimeRecommendations.tsx(8,66): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/personalization/RealTimeRecommendations.tsx(164,34): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/personalization/RealTimeRecommendations.tsx(168,29): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/personalization/UserBehaviorAnalytics.tsx(3,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/personalization/UserBehaviorAnalytics.tsx(8,61): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/personalization/UserBehaviorAnalytics.tsx(176,30): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/personalization/UserBehaviorAnalytics.tsx(202,34): error TS2322: Type '{ key: any; variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'key' does not exist on type 'BadgeProps'.
+src/components/personalization/UserBehaviorAnalytics.tsx(222,34): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/personalization/UserBehaviorAnalytics.tsx(225,34): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/policy-console/AuditLogViewer.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/AuditLogViewer.tsx(111,22): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/policy-console/DataTrustViewer.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/EthicalMonitor.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/EthicalMonitor.tsx(51,16): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/policy-console/OrchestrationControl.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/OrchestrationControl.tsx(45,16): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/policy-console/OrchestrationControl.tsx(78,22): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/policy-console/PolicyDashboard.tsx(8,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/PolicyDashboard.tsx(146,18): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/policy-console/PolicyEditor.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/SustainabilityMetrics.tsx(7,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/policy-console/utils.ts(11,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/policy-console/utils.ts(194,16): error TS2503: Cannot find namespace 'NodeJS'.
+src/components/posts/PostComposer.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/posts/PostComposer.tsx(4,25): error TS2307: Cannot find module 'react-hook-form' or its corresponding type declarations.
+src/components/posts/PostComposer.tsx(5,29): error TS2307: Cannot find module '@hookform/resolvers/zod' or its corresponding type declarations.
+src/components/posts/PostComposer.tsx(6,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+src/components/posts/PostComposer.tsx(126,22): error TS2322: Type '{ variant: string; "aria-live": string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/posts/PostComposer.tsx(129,22): error TS2322: Type '{ className: string; "aria-live": string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/posts/PostComposer.tsx(132,22): error TS2322: Type '{ variant: string; "aria-live": string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/posts/PostComposer.tsx(309,22): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/posts/PostList.tsx(3,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.
+src/components/posts/PostList.tsx(8,41): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/posts/PostList.tsx(110,24): error TS2322: Type '{ className: string; variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/posts/PostList.tsx(120,24): error TS2322: Type '{ className: string; variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(3,44): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/qa-monitor/QAMonitorDashboard.tsx(24,8): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/qa-monitor/QAMonitorDashboard.tsx(202,18): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(293,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(299,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(305,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(311,28): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(372,38): error TS2322: Type '{ className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'className' does not exist on type 'BadgeProps'.
+src/components/qa-monitor/QAMonitorDashboard.tsx(375,38): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/Canonical.tsx(3,18): error TS2307: Cannot find module 'next/head' or its corresponding type declarations.
+src/components/seo/Canonical.tsx(4,29): error TS2307: Cannot find module 'next/navigation' or its corresponding type declarations.
+src/components/seo/ContentGeneratorForm.tsx(3,26): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/seo/ContentGeneratorForm.tsx(4,35): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/ContentGeneratorForm.tsx(134,22): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/ContentGeneratorForm.tsx(135,22): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/InternalLinkSuggestions.tsx(3,35): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/seo/InternalLinkSuggestions.tsx(4,32): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/InternalLinkSuggestions.tsx(110,26): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/InternalLinkSuggestions.tsx(113,26): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/KeywordDiscoveryPanel.tsx(3,35): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/seo/KeywordDiscoveryPanel.tsx(4,36): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/KeywordDiscoveryPanel.tsx(87,22): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/KeywordDiscoveryPanel.tsx(88,22): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/KeywordDiscoveryPanel.tsx(90,24): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/KeywordDiscoveryPanel.tsx(114,26): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/SEODashboard.tsx(3,35): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/seo/SEODashboard.tsx(4,66): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/SEODashboard.tsx(23,26): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/components/seo/TrendingTopics.tsx(3,25): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/seo/TrendingTopics.tsx(4,39): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/TrendingTopics.tsx(59,18): error TS2322: Type '{ variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/TrendingTopics.tsx(81,26): error TS2322: Type '{ variant: string; className: string; }' is not assignable to type 'BadgeProps'.
+  Property 'variant' does not exist on type 'BadgeProps'.
+src/components/seo/TrendingTopics.tsx(94,28): error TS2322: Type '{ key: any; variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'key' does not exist on type 'BadgeProps'.
+src/components/seo/TrendSubscriptionsCard.tsx(3,35): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/seo/TrendSubscriptionsCard.tsx(97,34): error TS2322: Type '{ key: string; variant: string; }' is not assignable to type 'BadgeProps'.
+  Property 'key' does not exist on type 'BadgeProps'.
+src/components/skeleton.tsx(2,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/theme-provider.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/theme-provider.tsx(5,64): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/alert.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/badge.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/badge.tsx(2,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+src/components/ui/badge.tsx(30,18): error TS2339: Property 'className' does not exist on type 'BadgeProps'.
+src/components/ui/badge.tsx(30,29): error TS2339: Property 'variant' does not exist on type 'BadgeProps'.
+src/components/ui/button.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/button.tsx(2,22): error TS2307: Cannot find module '@radix-ui/react-slot' or its corresponding type declarations.
+src/components/ui/button.tsx(3,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+src/components/ui/card.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/dialog.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/dialog.tsx(4,34): error TS2307: Cannot find module '@radix-ui/react-dialog' or its corresponding type declarations.
+src/components/ui/dialog.tsx(5,19): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/ui/dropdown-menu.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/dropdown-menu.tsx(4,40): error TS2307: Cannot find module '@radix-ui/react-dropdown-menu' or its corresponding type declarations.
+src/components/ui/dropdown-menu.tsx(5,45): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/ui/input.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/label.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/label.tsx(4,33): error TS2307: Cannot find module '@radix-ui/react-label' or its corresponding type declarations.
+src/components/ui/label.tsx(5,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+src/components/ui/progress.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/progress.tsx(4,36): error TS2307: Cannot find module '@radix-ui/react-progress' or its corresponding type declarations.
+src/components/ui/select.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/select.tsx(4,34): error TS2307: Cannot find module '@radix-ui/react-select' or its corresponding type declarations.
+src/components/ui/select.tsx(5,47): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/components/ui/skeleton.tsx(6,4): error TS2503: Cannot find namespace 'React'.
+src/components/ui/tabs.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/tabs.tsx(4,32): error TS2307: Cannot find module '@radix-ui/react-tabs' or its corresponding type declarations.
+src/components/ui/textarea.tsx(1,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/toast.tsx(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/components/ui/toast.tsx(4,34): error TS2307: Cannot find module '@radix-ui/react-toast' or its corresponding type declarations.
+src/components/ui/toast.tsx(5,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+src/components/ui/toast.tsx(6,19): error TS2307: Cannot find module 'lucide-react' or its corresponding type declarations.
+src/config/env.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+src/config/env.ts(27,28): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/config/env.ts(32,7): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/hooks/marketing/useCampaigns.ts(1,55): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/marketing/useMarketingMetrics.ts(1,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/use-toast.ts(3,24): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/hooks/useAgents.ts(3,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useBilling.ts(5,74): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useCopilotRouter.ts(3,29): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/hooks/useEditorial.ts(1,25): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/hooks/useEditorial.ts(2,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useHealth.ts(2,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useMetrics.ts(2,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useMetricsLive.ts(3,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/hooks/useMetricsLive.ts(4,32): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useMigrationStatus.ts(3,58): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/hooks/useMigrationStatus.ts(4,28): error TS2307: Cannot find module 'socket.io-client' or its corresponding type declarations.
+src/hooks/useMigrationStatus.ts(70,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/hooks/useSummary.ts(3,26): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useSummary.ts(30,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/hooks/useTeam.ts(5,90): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/hooks/useTrends.ts(5,42): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/lib/adapters/billing.ts(6,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/billing.ts(7,21): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/billing.ts(148,10): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/editorial.ts(1,19): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/team.ts(6,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/team.ts(7,22): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/adapters/trends.ts(6,17): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/analytics.ts(1,19): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/analytics.ts(22,9): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/api.ts(1,25): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/auth.ts(1,38): error TS2307: Cannot find module 'next-auth' or its corresponding type declarations.
+src/lib/auth.ts(2,33): error TS2307: Cannot find module 'next-auth/providers/credentials' or its corresponding type declarations.
+src/lib/auth.ts(5,3): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/auth.ts(6,22): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/auth.ts(7,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/auth.ts(8,20): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/realtime.ts(3,28): error TS2307: Cannot find module 'socket.io-client' or its corresponding type declarations.
+src/lib/realtime.ts(23,18): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/lib/trpc.ts(3,33): error TS2307: Cannot find module '@trpc/react-query' or its corresponding type declarations.
+src/lib/trpc.ts(4,31): error TS2307: Cannot find module '@trpc/client' or its corresponding type declarations.
+src/lib/utils.ts(1,39): error TS2307: Cannot find module 'clsx' or its corresponding type declarations.
+src/lib/utils.ts(2,25): error TS2307: Cannot find module 'tailwind-merge' or its corresponding type declarations.
+src/middleware.ts(1,30): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/middleware.ts(2,34): error TS2307: Cannot find module 'next/server' or its corresponding type declarations.
+src/middleware.ts(3,26): error TS2307: Cannot find module 'next-auth/middleware' or its corresponding type declarations.
+src/providers/Providers.tsx(2,50): error TS2307: Cannot find module '@tanstack/react-query' or its corresponding type declarations.
+src/providers/Providers.tsx(3,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/providers/Providers.tsx(9,5): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/providers/Providers.tsx(17,6): error TS2741: Property 'children' is missing in type '{}' but required in type '{ children: ReactNode; }'.
+src/providers/SessionProvider.tsx(3,60): error TS2307: Cannot find module 'next-auth/react' or its corresponding type declarations.
+src/providers/SessionProvider.tsx(4,27): error TS2307: Cannot find module 'react' or its corresponding type declarations.
+src/server/brand-voice-data.ts(1,32): error TS2307: Cannot find module 'node:fs' or its corresponding type declarations.
+src/server/brand-voice-data.ts(2,18): error TS2307: Cannot find module 'node:path' or its corresponding type declarations.
+src/server/brand-voice-data.ts(7,3): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+src/server/brand-voice-data.ts(8,16): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+tailwind.config.ts(1,29): error TS2307: Cannot find module 'tailwindcss' or its corresponding type declarations.
+tailwind.config.ts(2,32): error TS2307: Cannot find module 'tailwindcss-animate' or its corresponding type declarations.
+
+> @neonhub/sdk@1.0.0 typecheck
+> tsc --noEmit
+
+ ELIFECYCLE  Command failed.
+
+> neonhub@3.2.0 build /Users/kofirusu/Desktop/NeonHub
+> npm run prisma:generate && npm run build:api && npm run build:web && npm run build:engine
+
+
+> neonhub@3.2.0 prisma:generate
+> npm run prisma:generate --workspace=apps/api
+
+
+> @neonhub/backend-v3.2@3.2.0 prisma:generate
+> node ../../scripts/run-cli.mjs prisma generate || node ../../scripts/offline-prisma-generate.mjs
+
+ ELIFECYCLE  Command failed with exit code 1.
+== Mark phase done (even if partial) ==
+== Prompt 1R complete — paste this output back here. Next: Prompt 2 (Prisma generate + smoke tests) ==

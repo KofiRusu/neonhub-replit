@@ -211,18 +211,20 @@ function AgentCard({ agent, isSelected, onClick }: AgentCardProps) {
       whileHover={{ y: -4, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`glassmorphism-effect p-6 rounded-lg cursor-pointer transition-all duration-300 ${
-        isSelected ? "border-neon-blue/50 glow-border shadow-neon-blue/20" : "border-white/10 hover:border-neon-blue/30"
-      }`}
+      className={`relative p-6 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
+        isSelected 
+          ? "bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-neon-blue/70 shadow-2xl shadow-neon-blue/30" 
+          : "bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-slate-700/50 hover:border-neon-blue/50 hover:shadow-xl hover:shadow-neon-blue/20"
+      } backdrop-blur-sm`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center text-2xl">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-slate-800 to-slate-700 border border-slate-600/50 flex items-center justify-center text-2xl shadow-inner">
               {agent.icon}
             </div>
             <div
-              className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${config.bg} ${config.border} border ${config.pulse}`}
+              className={`absolute -top-1 -right-1 w-4 h-4 rounded-full ${config.bg} ${config.border} border-2 ${config.pulse} shadow-lg`}
             >
               <StatusIcon className="w-2.5 h-2.5 m-0.5" />
             </div>
@@ -288,12 +290,12 @@ function AgentCard({ agent, isSelected, onClick }: AgentCardProps) {
           <span className="text-gray-400">CPU</span>
           <span className="text-neon-blue">{agent.cpuUsage}%</span>
         </div>
-        <div className="neon-progress h-1">
+        <div className="h-1.5 bg-slate-800/50 rounded-full overflow-hidden border border-slate-700/30">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${agent.cpuUsage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="bg-gradient-to-r from-neon-blue to-neon-purple h-1 rounded-full"
+            className="bg-gradient-to-r from-neon-blue to-neon-purple h-full rounded-full shadow-[0_0_10px_rgba(0,255,255,0.5)]"
           />
         </div>
 
@@ -301,12 +303,12 @@ function AgentCard({ agent, isSelected, onClick }: AgentCardProps) {
           <span className="text-gray-400">Memory</span>
           <span className="text-neon-purple">{agent.memoryUsage}%</span>
         </div>
-        <div className="neon-progress h-1">
+        <div className="h-1.5 bg-slate-800/50 rounded-full overflow-hidden border border-slate-700/30">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${agent.memoryUsage}%` }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="bg-gradient-to-r from-neon-purple to-neon-pink h-1 rounded-full"
+            className="bg-gradient-to-r from-neon-purple to-neon-pink h-full rounded-full shadow-[0_0_10px_rgba(255,0,255,0.5)]"
           />
         </div>
       </div>
@@ -374,10 +376,10 @@ function AgentTerminal({ agent, logs, isExpanded, onToggleExpand, onClose }: Age
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className={`glassmorphism-effect rounded-lg overflow-hidden ${isExpanded ? "fixed inset-4 z-50" : "h-[600px]"}`}
+      className={`bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-2 border-slate-700/50 rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm ${isExpanded ? "fixed inset-4 z-50" : "h-[600px]"}`}
     >
       {/* Terminal Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
+      <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-slate-900/50">
         <div className="flex items-center space-x-3">
           <Terminal className="w-5 h-5 text-neon-green" />
           <div>
@@ -526,23 +528,23 @@ function AgentTerminal({ agent, logs, isExpanded, onToggleExpand, onClose }: Age
         </div>
 
         {/* Command Input */}
-        <div className="p-4 border-t border-white/10 bg-black/20">
-          <div className="flex items-center space-x-2">
-            <span className="text-neon-green font-mono">$</span>
+        <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
+          <div className="flex items-center space-x-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2">
+            <span className="text-neon-green font-mono font-bold">$</span>
             <input
               type="text"
               value={command}
               onChange={(e) => setCommand(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleExecute()}
               placeholder="Enter command..."
-              className="flex-1 bg-transparent text-white font-mono focus:outline-none"
+              className="flex-1 bg-transparent text-white font-mono focus:outline-none placeholder-gray-500"
             />
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleExecute}
               disabled={!command.trim() || isExecuting}
-              className="p-2 rounded-lg bg-neon-blue/20 text-neon-blue hover:bg-neon-blue/30 disabled:opacity-50"
+              className="p-2 rounded-lg bg-neon-blue/30 text-neon-blue hover:bg-neon-blue/40 disabled:opacity-50 border border-neon-blue/30 transition-all"
             >
               <Send className="w-4 h-4" />
             </motion.button>
@@ -582,7 +584,7 @@ export default function AgentsPage() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="glass border border-white/10 p-2 rounded-lg text-gray-400 hover:text-white"
+        className="bg-slate-900/50 border-2 border-slate-700/50 p-2 rounded-lg text-gray-400 hover:text-white hover:border-neon-blue/50 transition-all backdrop-blur-sm"
       >
         <Download className="w-5 h-5" />
       </motion.button>
@@ -608,21 +610,21 @@ export default function AgentsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search agents by name or type..."
-              className="w-full glass border border-white/10 rounded-lg bg-transparent py-3 px-4 text-white placeholder-gray-400 focus:border-neon-blue/50 focus:outline-none"
+              className="w-full bg-slate-900/50 border-2 border-slate-700/50 rounded-lg backdrop-blur-sm py-3 px-4 text-white placeholder-gray-400 focus:border-neon-blue/70 focus:outline-none focus:shadow-lg focus:shadow-neon-blue/20 transition-all"
             />
           </div>
 
-          <div className="flex space-x-1 glass p-1 rounded-lg">
+          <div className="flex space-x-2 bg-slate-900/50 border border-slate-700/50 p-1.5 rounded-lg backdrop-blur-sm">
             {["all", "active", "idle", "error"].map((status) => (
               <motion.button
                 key={status}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setStatusFilter(status)}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   statusFilter === status
-                    ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "bg-neon-blue/30 text-neon-blue border-2 border-neon-blue/50 shadow-lg shadow-neon-blue/20"
+                    : "text-gray-400 hover:text-white hover:bg-slate-800/50 border-2 border-transparent"
                 }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -676,7 +678,7 @@ export default function AgentsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="glassmorphism-effect p-8 rounded-lg text-center"
+              className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-2 border-slate-700/50 p-8 rounded-xl text-center shadow-xl backdrop-blur-sm"
             >
               <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Select an Agent</h3>

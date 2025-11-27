@@ -1,0 +1,93 @@
+name: AI & Logic Prod Smoke Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+
+permissions:
+  contents: read
+
+jobs:
+  prod-smoke:
+    name: Production Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+      
+      - name: Enable corepack
+        run: corepack enable && corepack prepare pnpm@latest-9 --activate || true
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build packages
+        run: pnpm prod:build
+      
+      - name: Production smoke test
+        env:
+          TEMPO_OTLP_HTTP_URL: ${{ secrets.TEMPO_OTLP_HTTP_URL }}
+          PROM_REMOTE_WRITE_URL: ${{ secrets.PROM_REMOTE_WRITE_URL }}
+          TEMPO_AUTH_TOKEN: ${{ secrets.TEMPO_AUTH_TOKEN }}
+          PROM_AUTH_TOKEN: ${{ secrets.PROM_AUTH_TOKEN }}
+          TELEMETRY_ENABLED: "true"
+          SERVICE_NAME: "neonhub-orchestrator-prod"
+          SERVICE_VERSION: "v3.2.0"
+          NODE_ENV: "production"
+          LOG_LEVEL: "info"
+        run: pnpm prod:smoke
+      
+      - name: SLO validation
+        env:
+          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
+          SLO_P50_MS: 1500
+          SLO_P95_MS: 4500
+          SLO_ERR_RATE_MAX: 0.02
+          SLO_COST_USD_P50: 0.03
+        run: pnpm prod:slo
+      
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_TELEMETRY }}
+          payload: |
+            {
+              "text": "⚠️ Production AI & Logic Smoke Test Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Production Smoke Test Failed*\n\n❌ AI & Logic telemetry health check failed.\n\n*Workflow*: ${{ github.workflow }}\n*Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Action Required*:\n• Check OTel Collector health\n• Review service logs\n• Verify exporter connectivity\n• See runbook: docs/AI_LOGIC_RUNBOOK.md"
+                  }
+                }
+              ]
+            }
+      
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-logs
+          path: |
+            *.log
+            scripts/production/*.log
+          retention-days: 7
+

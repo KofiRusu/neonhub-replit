@@ -17,10 +17,10 @@
 }
 
 .neon-surface {
-  background: rgba(19, 20, 36, 0.78);
-  border: 1px solid var(--border-glow);
+  background: linear-gradient(to bottom right, rgba(15, 23, 42, 0.90), rgba(30, 41, 59, 0.90));
+  border: 2px solid rgba(51, 65, 85, 0.50);
   backdrop-filter: var(--surface-blur);
-  box-shadow: 0 16px 42px rgba(2, 6, 23, 0.45);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 150, 255, 0.1);
 }
 
 .neon-ring {
